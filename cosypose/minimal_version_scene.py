@@ -4,6 +4,7 @@ import cv2
 import pickle
 import numpy as np
 from matplotlib import pyplot as plt
+from cosypose.config import LOCAL_DATA_DIR
 
 # Standard Library
 import argparse
@@ -21,7 +22,6 @@ from PIL import Image
 ########################
 # Add cosypose to my path -> dirty
 import sys
-sys.path.insert(0, '/home/emaitre/cosypose')
 ########################
 
 import cosypose
@@ -79,7 +79,8 @@ brg = cv2.imread(img_dir + '/' + image_name)
 rgb = cv2.cvtColor(brg, cv2.COLOR_BGR2RGB)
 """
 
-path_data = Path("/home/emaitre/cosypose/local_data/bop_datasets/ycbv/test")
+sub_dir = "/bop_datasets/ycbv/test"
+path_data = Path(str(LOCAL_DATA_DIR) + sub_dir)
 
 scene_number = Path("000057")
 
@@ -110,19 +111,11 @@ for index, pic in enumerate(pictures):
 
     labels = preds.infos.label.to_list()
 
-    print(type)
-    print("preds = ", preds)
-    print("poses =", preds.poses)
-    print("poses_input =", preds.poses_input)
-    print("k_crop =", preds.K_crop )
-    print("boxes_rend =", preds.boxes_rend)
-    print("boxes_crop =", preds.boxes_crop)
-
 
     ### Object dataset is necessary for panda3d renderer
 
 
-    example_dir = Path("/home/emaitre/cosypose/local_data/bop_datasets/ycbv/examples/")
+    example_dir = Path(str(LOCAL_DATA_DIR) + "/bop_datasets/ycbv/examples/")
 
     object_dataset = make_object_dataset('ycbv')
 

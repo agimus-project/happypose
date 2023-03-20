@@ -185,12 +185,6 @@ class CosyPoseWrapper:
         box_detections = self.detector.get_detections(images=images, one_instance_per_class=False,
                                                       # detection_th=0.8, output_masks=False, mask_th=0.9)
                                                       detection_th=0.7, output_masks=False, mask_th=0.8)
-        print("box detections =", box_detections)
-        print("bboxes =", box_detections.bboxes)
-        print("type bboxes=", type(box_detections.bboxes))
-        print("infos box_detection=", box_detections.infos['score'][0])
-        print("type infos=", type(box_detections.infos))
-        print("types box detections=", type(box_detections))
         # exit(10)
         # pose esitimition
         if len(box_detections) == 0:
@@ -225,12 +219,6 @@ class CosyPoseWrapper:
         temp_box_detections = self.detector.get_detections(images=images, one_instance_per_class=False,
                                                       # detection_th=0.8, output_masks=False, mask_th=0.9)
                                                       detection_th=0.7, output_masks=False, mask_th=0.8)
-        print("box detections =", temp_box_detections)
-        print("bboxes =", temp_box_detections.bboxes)
-        print("type bboxes=", type(temp_box_detections.bboxes))
-        print("infos box_detection=", temp_box_detections.infos['score'][0])
-        print("type infos=", type(temp_box_detections.infos))
-        print("types box detections=", type(temp_box_detections))
         # exit(10)
         # pose esitimition
         
@@ -244,13 +232,6 @@ class CosyPoseWrapper:
             infos=pd.DataFrame(infos),
             bboxes=temp_box_detections.bboxes
         )
-        
-        print("modified box detections =", box_detections)
-        print("modified bboxes =", box_detections.bboxes)
-        print("modified type bboxes=", type(box_detections.bboxes))
-        print("modified infos box_detection=", box_detections.infos['score'][0])
-        print("modified type infos=", type(box_detections.infos))
-        print("modified types box detections=", type(box_detections))
         
         if len(box_detections) == 0:
             return None

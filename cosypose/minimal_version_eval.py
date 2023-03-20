@@ -30,6 +30,7 @@ from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
 from cosypose.visualization.singleview import render_prediction_wrt_camera
 import cosypose.utils.tensor_collection as tc
 from cosypose_wrapper import CosyPoseWrapper
+from cosypose.config import LOCAL_DATA_DIR
 
 # MegaPose
 from megapose.datasets.object_dataset import RigidObject, RigidObjectDataset
@@ -81,7 +82,9 @@ brg = cv2.imread(img_dir + '/' + image_name)
 rgb = cv2.cvtColor(brg, cv2.COLOR_BGR2RGB)
 """
 
-path_data = Path("/home/emaitre/cosypose/local_data/bop_datasets/ycbv/test")
+
+sub_dir = "/bop_datasets/ycbv/test"
+path_data = Path(str(LOCAL_DATA_DIR) + sub_dir)
 
 scene_number = Path("000052")
 pred_prefix = '000052'

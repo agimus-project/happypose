@@ -21,13 +21,13 @@ from PIL import Image
 ########################
 # Add cosypose to my path -> dirty
 import sys
-sys.path.insert(0, '/home/emaitre/cosypose')
 ########################
 
 import cosypose
 
 from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
 from cosypose.visualization.singleview import render_prediction_wrt_camera
+from cosypose.config import LOCAL_DATA_DIR
 
 from cosypose_wrapper import CosyPoseWrapper
 
@@ -115,7 +115,7 @@ def make_object_dataset(example_dir: Path) -> RigidObjectDataset:
     rigid_object_dataset = RigidObjectDataset(rigid_objects)
     return rigid_object_dataset
 
-example_dir = Path("/home/emaitre/cosypose/local_data/bop_datasets/ycbv/examples/")
+example_dir = Path(str(LOCAL_DATA_DIR) + "/bop_datasets/ycbv/examples/")
 
 object_dataset = make_object_dataset(Path(example_dir / "cheetos" ))
 

@@ -11,12 +11,10 @@ class Detector:
         self.model = model
         self.config = model.config
         self.category_id_to_label = {v: k for k, v in self.config.label_to_category_id.items()}
-        print("avant", self.category_id_to_label)
         for k, v in self.category_id_to_label.items():
             if k ==0:
                 continue
             self.category_id_to_label[k] = '{}-'.format(ds_name) + v 
-        print("après", self.category_id_to_label)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     @torch.no_grad()

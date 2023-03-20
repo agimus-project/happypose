@@ -14,11 +14,11 @@ from bokeh.plotting import gridplot
 ########################
 # Add cosypose to my path -> dirty
 import sys
-sys.path.insert(0, '/home/emaitre/cosypose')
 ########################
 
 from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
 from cosypose.visualization.singleview import render_prediction_wrt_camera
+from cosypose.config import LOCAL_DATA_DIR
 
 from cosypose_wrapper import CosyPoseWrapper
 
@@ -71,7 +71,8 @@ rgb = cv2.cvtColor(brg, cv2.COLOR_BGR2RGB)
 """
 
 
-path_data = Path("/home/emaitre/cosypose/local_data/bop_datasets/ycbv/test/")
+sub_dir = "/bop_datasets/ycbv/test"
+path_data = Path(str(LOCAL_DATA_DIR) + sub_dir)
 
 scenes = glob.glob(str(path_data) + "/*")
 
@@ -109,7 +110,7 @@ for path_scene in scenes:
         ### Object dataset is necessary for panda3d renderer
 
 
-        output_dir = Path("/home/emaitre/cosypose/local_data/bop_datasets/ycbv/results/")
+        output_dir = Path(str(LOCAL_DATA_DIR) + "/bop_datasets/ycbv/results/")
 
         object_dataset = make_object_dataset('ycbv')
 
