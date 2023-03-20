@@ -4,6 +4,7 @@ Toolbox and trackers for object pose-estimation. Based on the work CosyPose and 
 
 # Installation
 
+`git clone --recurse-submodules git@github.com:agimus-project/happypose.git`
 Please install both  `cosypose` and `megapose`. To do so, refer to each individual `readme`.
 
 # Usage
