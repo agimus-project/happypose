@@ -1,5 +1,5 @@
 # HappyPose
-Toolbox and trackers for object pose-estimation. Based on the work CosyPose and MegaPose. This directory is currently under development.
+Toolbox and trackers for object pose-estimation. Based on the work [CosyPose](https://github.com/Simple-Robotics/cosypose) and [MegaPose](https://github.com/megapose6d/megapose6d). This directory is currently under development.
 
 
 # Installation
