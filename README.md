@@ -1,5 +1,5 @@
 # HappyPose
-Toolbox and trackers for object pose-estimation. Based on the work CosyPose and MegaPose. This directory is currently under development.
+Toolbox and trackers for object pose-estimation. Based on the work [CosyPose](https://github.com/Simple-Robotics/cosypose) and [MegaPose](https://github.com/megapose6d/megapose6d). This directory is currently under development.
 
 
 # Installation
@@ -7,7 +7,7 @@ Toolbox and trackers for object pose-estimation. Based on the work CosyPose and 
 This installation procedure will be curated. 
 
 ```
-git clone --recurse-submodules git@github.com:agimus-project/happypose.git
+git clone --recurse-submodules https://github.com/agimus-project/happypose.git
 conda create env -n happypose
 cd happypose/cosypose
 conda env update --name happypose --file environment_noversion.yml
