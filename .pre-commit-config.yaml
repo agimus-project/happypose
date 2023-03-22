@@ -31,8 +31,8 @@ repos:
     hooks:
     - id: toml-sort-fix
       exclude: 'poetry.lock'
-- repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.0.257
-  hooks:
-    - id: ruff
-      args: [--fix, --exit-non-zero-on-fix]
+-   repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.257
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
