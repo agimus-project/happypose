@@ -15,6 +15,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: poetry
-      - run: poetry install --with dev
+      - run: poetry install --with dev -E render
       - run: poetry run coverage run -m unittest
       - uses: codecov/codecov-action@v3
