@@ -1768,18 +1768,88 @@ files = [
 
 [[package]]
 name = "panda3d"
-version = "1.10.13.post1"
+version = "1.10.13"
 description = "Panda3D is a framework for 3D rendering and game development for Python and C++ programs."
 category = "main"
 optional = true
 python-versions = "*"
 files = [
-    {file = "panda3d-1.10.13.post1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:447ae57766a44d43cd95edebf5ac54a84ae6f17bec6793346113ecdc5801f292"},
-    {file = "panda3d-1.10.13.post1-cp311-cp311-macosx_11_0_universal2.whl", hash = "sha256:cb1417a6604eda53bd3b22ea56e11ae83737522b12c56faa83542d593d1e4513"},
-    {file = "panda3d-1.10.13.post1-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:d049fd28bd858c9bd146e1ee91ba3d9cb61341577d4bf73f79ea46b18fa2236c"},
-    {file = "panda3d-1.10.13.post1-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:0564592ffe62a37e953b9e07c35ab8b3724dfaa340d0ed2a06c64a7324d854bb"},
-    {file = "panda3d-1.10.13.post1-cp311-cp311-win32.whl", hash = "sha256:e9d335c53241d65c6ab7af11520dca337e809d743f05b9325186b6677cffa507"},
-    {file = "panda3d-1.10.13.post1-cp311-cp311-win_amd64.whl", hash = "sha256:4ffb25f61e76046f1c0029bc8b74f7a41a0cba01f5be8672c8ba4371294936f1"},
+    {file = "panda3d-1.10.13-cp27-cp27m-macosx_10_6_i386.whl", hash = "sha256:697555595a01c3f5468d49a1ee1f05f57df31e63a251a9ba47a8f534faf0ba15"},
+    {file = "panda3d-1.10.13-cp27-cp27m-macosx_10_6_x86_64.whl", hash = "sha256:ccfa288a3575c2996ad7f409f14e8ceb8541a9b1b39bb0162e30f73b1fa0884b"},
+    {file = "panda3d-1.10.13-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:b2d9870c044e8ac0f6a65e96b6814d122a560adfe045b6ad500bc107aa361726"},
+    {file = "panda3d-1.10.13-cp27-cp27m-win32.whl", hash = "sha256:1c35d8676caa1a2c11f91592a6abd8cf18c3ac9496437082e79b4b0671603857"},
+    {file = "panda3d-1.10.13-cp27-cp27m-win_amd64.whl", hash = "sha256:f7423bf86d3369f5f7578ec70199f6674ba9f81f80f3eea83d0b27ec7d2522fc"},
+    {file = "panda3d-1.10.13-cp27-cp27mu-manylinux1_i686.whl", hash = "sha256:017c2a9d40c024de3d68359926dfbb0fef51e219bd2bc6d021464051bba9c80e"},
+    {file = "panda3d-1.10.13-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:8028fd67c0fc524eae3b7dbfba0b433e3d811e386ba51adbccf1f95a79ef32cb"},
+    {file = "panda3d-1.10.13-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:50427b08d6dcbe91e95c719b3eb32abe5e806fe265a2cfa66f5b704d22776409"},
+    {file = "panda3d-1.10.13-cp310-cp310-macosx_11_0_universal2.whl", hash = "sha256:597332377b09cb97a1699fed2514c99bcc4241924ce7c21e7577685164576afc"},
+    {file = "panda3d-1.10.13-cp310-cp310-manylinux2010_i686.whl", hash = "sha256:fd64c7995fc9d3f07100d4fe225498106cf3851f77bd54be3131193965768041"},
+    {file = "panda3d-1.10.13-cp310-cp310-manylinux2010_x86_64.whl", hash = "sha256:acbcdf204ff75abe75b66af5c025b2f42e7777c2acb6cb17375cf7c66751a062"},
+    {file = "panda3d-1.10.13-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:73905d348b486675706ac53e454b34138a3ab12faa1058720b6bf40110973be1"},
+    {file = "panda3d-1.10.13-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:870da8fb7654f60d04ff5a85c75e80f89f14406c7f8812f4916f5781d1caeb25"},
+    {file = "panda3d-1.10.13-cp310-cp310-win32.whl", hash = "sha256:5f75c18323ba3d36236e4756a98cba68268b0dd4ac6e4b889d87904a65b4fbbc"},
+    {file = "panda3d-1.10.13-cp310-cp310-win_amd64.whl", hash = "sha256:7d8a28b10167990d55ac696275b08b21b06fb35e7f5f64d482c9b76410373e96"},
+    {file = "panda3d-1.10.13-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:52f4b9014235ef5abbd6b5714389dc887ad45828316c42c83af53937179360d8"},
+    {file = "panda3d-1.10.13-cp311-cp311-macosx_11_0_universal2.whl", hash = "sha256:d4cbd179bf442fab572bd9a486f866147ce38579e78dd5c01e1f59887bea64b8"},
+    {file = "panda3d-1.10.13-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:b4419faa2ca1747fccca8e76ca37700c1e011a38a8bad5be104fc703d1216bc3"},
+    {file = "panda3d-1.10.13-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:68e9e215c4192ca14ab1304be79f86657f43d6d663b3dbe3af209caf8eb9793c"},
+    {file = "panda3d-1.10.13-cp311-cp311-win32.whl", hash = "sha256:3a4df33d18fad4bfbc70907e6f7d6ef27f20ef4d0f3dfb3c17d7e4d46abd78f5"},
+    {file = "panda3d-1.10.13-cp311-cp311-win_amd64.whl", hash = "sha256:55efa8ae9a04260358257e94f29c506e338af0197c5b75dae29b0112dfdd67ac"},
+    {file = "panda3d-1.10.13-cp34-cp34m-macosx_10_6_i386.whl", hash = "sha256:f6f016870c22ba0a250958fb09c49843eb17d5620dd1bfa86f38dfd200af9401"},
+    {file = "panda3d-1.10.13-cp34-cp34m-macosx_10_6_x86_64.whl", hash = "sha256:fd901d3a822824a9b288392ba6ade77143c8024e208d3ce73a554e364f03cadb"},
+    {file = "panda3d-1.10.13-cp34-cp34m-manylinux1_i686.whl", hash = "sha256:4e46ad41febad38f57e4948912f9642838f5bff196c7c336194904e13165172d"},
+    {file = "panda3d-1.10.13-cp34-cp34m-manylinux1_x86_64.whl", hash = "sha256:dc7cd2ee0bd8ca9f7e957b2672f2d8ee1132cd6ddc2f8287d9579efa682b8b01"},
+    {file = "panda3d-1.10.13-cp34-cp34m-win32.whl", hash = "sha256:190bd5c58184cae94cf158900106215f20d579f84a1b7ce1474bfbcb797b4a0b"},
+    {file = "panda3d-1.10.13-cp34-cp34m-win_amd64.whl", hash = "sha256:372ac3770ada07f1c92848f36f13359c2c00f3eefa525b0b3cad4804ec64c6ca"},
+    {file = "panda3d-1.10.13-cp35-cp35m-macosx_10_6_i386.whl", hash = "sha256:496147561f15a738a9a212a69ce3dda340ff1d8ae8bfd0501507945a94153bd8"},
+    {file = "panda3d-1.10.13-cp35-cp35m-macosx_10_6_x86_64.whl", hash = "sha256:b78acc42a2ee7006dd9618d52ea2657e03d6e39fe4d8c9b4c48342a1d866bbfd"},
+    {file = "panda3d-1.10.13-cp35-cp35m-macosx_10_9_x86_64.whl", hash = "sha256:35bb1a847a9012e218b1fa768632e4e52644e87ac8daf08fbd4c49feff0672b4"},
+    {file = "panda3d-1.10.13-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:fdd564b7f154a78310d6d08920a9a6f405d9e7e9f74fd4b53c9eb73a007d2dea"},
+    {file = "panda3d-1.10.13-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:730e5c6b8fb20448478ac1af117cc4aadd8e9dfa2558b5f9e89a69f83ce5f284"},
+    {file = "panda3d-1.10.13-cp35-cp35m-win32.whl", hash = "sha256:4da16ba0a2c9615c9d68afdee47681454ece21bf252039078b4662dca856b8f0"},
+    {file = "panda3d-1.10.13-cp35-cp35m-win_amd64.whl", hash = "sha256:526a1db71fcf1a2b4eaafb36642c710eb5d2425c9ec96d1afb7fadde4b1af619"},
+    {file = "panda3d-1.10.13-cp36-cp36m-macosx_10_6_i386.whl", hash = "sha256:3298dcbfc8a9e87565d35129e3942ba0d076c6c7a504b32f656ccea39b876eb4"},
+    {file = "panda3d-1.10.13-cp36-cp36m-macosx_10_6_x86_64.whl", hash = "sha256:36c55f8aeb1b4eb305c3f76e0704678bdad80e37d46db71d3f723cbe4aa1eecf"},
+    {file = "panda3d-1.10.13-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:e4a7549e3583cd009a1a3ce33f84ed68f9ffd5b3f34f67606af6e8d6dafa32d5"},
+    {file = "panda3d-1.10.13-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:1711c7edc7620a8ca2f4fee2e6e448522726678cc5318d59de00d0d1e3f35ea6"},
+    {file = "panda3d-1.10.13-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:4c9da46324813e23b1108c0c3906460aa73a052c2934643a0e4a406a1a93dc03"},
+    {file = "panda3d-1.10.13-cp36-cp36m-manylinux2010_i686.whl", hash = "sha256:c1c77315e2a998f9173fe86d3af63b0affc1e7399a03226881d39ff758cc6b2d"},
+    {file = "panda3d-1.10.13-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:017fdcb16c1a786f12b45a39bd33666423689a94060d1fc6135539d826146eb3"},
+    {file = "panda3d-1.10.13-cp36-cp36m-manylinux2014_aarch64.whl", hash = "sha256:b112c8d0ecdc85b14a93f6bae57dbb31043a3bbf1cd3ce3905b143e76ffbfc84"},
+    {file = "panda3d-1.10.13-cp36-cp36m-manylinux2014_x86_64.whl", hash = "sha256:1e18194c78b9b519da885620ddcc7f6709e139645f665f08309b7eff58a5a0ee"},
+    {file = "panda3d-1.10.13-cp36-cp36m-win32.whl", hash = "sha256:8eda3bd2402d75fb52962051c157f9495742f1f85c49c38b9bc47091fc0639b0"},
+    {file = "panda3d-1.10.13-cp36-cp36m-win_amd64.whl", hash = "sha256:39652709ae0b8167aaf253edacc78898109cce96e872d9e7be33257dd5f98485"},
+    {file = "panda3d-1.10.13-cp37-cp37m-macosx_10_6_i386.whl", hash = "sha256:d8c9668f257da744f301bf83ff44b2cdc8bd635e732fadf2f9b09200655cd3e4"},
+    {file = "panda3d-1.10.13-cp37-cp37m-macosx_10_6_x86_64.whl", hash = "sha256:ece8eb268a0be1fa45b6ef1e6cfa1ae89f25ee926e866893baf8bf391708c02d"},
+    {file = "panda3d-1.10.13-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:508df5128cb63163eeee8f3cb6cb2984aefe473ee7e8e328f25a8bf205d54de2"},
+    {file = "panda3d-1.10.13-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:d8a7beb7b88f1fc4ec0061be28018f6da1511783eb6a9911442d2a3435e50f7d"},
+    {file = "panda3d-1.10.13-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:a1cae74294394aa4afe93414c799798be77777e5bba77a45368bb1973ca65d2e"},
+    {file = "panda3d-1.10.13-cp37-cp37m-manylinux2010_i686.whl", hash = "sha256:94d59874924de7b6765d427ea833ffea38fbb1b72a35679f81ef76c34ddf584d"},
+    {file = "panda3d-1.10.13-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:23806bb1b289ad31f1ec1c206ddbdddd484ecdf8fdb09a4f89bc1c61af6b19ba"},
+    {file = "panda3d-1.10.13-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:6013bf0049bb6b30b0ff17ca5dc6bde621b553f0d1815481ced186ba710aa3b6"},
+    {file = "panda3d-1.10.13-cp37-cp37m-manylinux2014_x86_64.whl", hash = "sha256:e208d1ac385acb48e24f557badfdb6244b0122bc25511c512b893c55ccb1bed3"},
+    {file = "panda3d-1.10.13-cp37-cp37m-win32.whl", hash = "sha256:1dea56806643077e863abd8735e7056019ffd2b935990670607b44f996ef8456"},
+    {file = "panda3d-1.10.13-cp37-cp37m-win_amd64.whl", hash = "sha256:08f7729e3b13d7417a07b14a3532ee93e4c50293de45392d9783038dcc24cfd4"},
+    {file = "panda3d-1.10.13-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:8099b2bc211a98ff1d26a91c26d126d538896a59ad29d4de50dea19ccaf31b1b"},
+    {file = "panda3d-1.10.13-cp38-cp38-macosx_11_0_universal2.whl", hash = "sha256:bc41bd97e3a2dd04d0f664ae0ea1a7677ce7c6a718ab4d3b3ff79ef06f0a22c9"},
+    {file = "panda3d-1.10.13-cp38-cp38-manylinux1_i686.whl", hash = "sha256:2027d6d8ac86db0989fbcbafa9f4f1e1a4de79a94f087325e43ccf9e65da12a9"},
+    {file = "panda3d-1.10.13-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:dbfccaf3ff52b4e5de66d33bf06aa489af43cb139367b77fa6bc79ac774d23dc"},
+    {file = "panda3d-1.10.13-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:c0785bfa3ad3e87f837433737679dce5e0d1a33accbfcb0dcb0393ce3a7a68f2"},
+    {file = "panda3d-1.10.13-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:e384ed11490d479095cbad2f27ad61f536ca75aeb702557ce83b67381d4448bd"},
+    {file = "panda3d-1.10.13-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:8cd5e47e18f56dd6dab7ed1acb21c07f356b7220db72b820f02363050ee3bdfd"},
+    {file = "panda3d-1.10.13-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:094ccf20cdfb2a2f44cde56a1ab9a1287a09cfd33dd4fe094cb255aaacfb678f"},
+    {file = "panda3d-1.10.13-cp38-cp38-win32.whl", hash = "sha256:83c39308ee95951616dd5ab1e2ee730853fca9b4331a7c9ea9d92c9af3321aa9"},
+    {file = "panda3d-1.10.13-cp38-cp38-win_amd64.whl", hash = "sha256:2ae1bd477a8882c80bdb6d63d6738ae2c4c335f0d88af592a051a9705434c75d"},
+    {file = "panda3d-1.10.13-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:df904a0ca374fd7667727a3d3743c386e913e6e80b8efe67fe0fcd01f904e4c3"},
+    {file = "panda3d-1.10.13-cp39-cp39-macosx_11_0_universal2.whl", hash = "sha256:db8cc33163112722cdf313d06939ff30b260c7a5e2a404b38bddc7558e6e8a26"},
+    {file = "panda3d-1.10.13-cp39-cp39-manylinux1_i686.whl", hash = "sha256:029d7c698114da30d0d5ecd57e0c92423d319848e4197e6a86ac54b9ae43c424"},
+    {file = "panda3d-1.10.13-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:4927f23e8c1469e6a17c3f05a81ac0c6fa7c23b2d39bffee5277ecabfb2da10f"},
+    {file = "panda3d-1.10.13-cp39-cp39-manylinux2010_i686.whl", hash = "sha256:2683fc8ad1e98a98ae692dbd82896c3f055743351e7a61a8ecd22557ddef643e"},
+    {file = "panda3d-1.10.13-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:809881853087d36211f380245499778a4838f2f1748a4f8d90546debed294f8b"},
+    {file = "panda3d-1.10.13-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:05be45eeddc81fb4879b0e6b206422b810e2de0f6639ab04522f660270eb202a"},
+    {file = "panda3d-1.10.13-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:a00823d1ae2490dba0643109f10e7347b15e6c2554de0b1bed0a085950fa6ed0"},
+    {file = "panda3d-1.10.13-cp39-cp39-win32.whl", hash = "sha256:2d5d3e2160d8fa667ef548171695be84e7de25f51817ae31c61cf2e869a2f6c6"},
+    {file = "panda3d-1.10.13-cp39-cp39-win_amd64.whl", hash = "sha256:839d8b2724a149d56a31f621c6397a1fed597a7dacee478922c711426160990e"},
 ]
 
 [[package]]
@@ -2529,4 +2599,4 @@ render = ["panda3d", "pybullet"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "123a5d269f327acfda2ff5165d2905c68e4f674ccce05a957ada858409ae7806"
+content-hash = "21b6a0e1d16b00f8d55e6b89ea85d5889562b95c8d834e5aa2d0681f9b62c594"
