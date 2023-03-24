@@ -1,0 +1,63 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.coverage.run]
+omit = ["cosypose", "megapose6d"]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+exclude = ["cosypose", "megapose6d"]
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "pybullet"
+
+[tool.poetry]
+authors = ["Elliot Maître", "Yann Labbé"]
+description = "Toolbox and trackers for object pose-estimation"
+license = "BSD-2-Clause"
+name = "happypose"
+readme = "README.md"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+panda3d = {optional = true, version = "=1.10.13"}
+pin = "^2.6.17"
+pybullet = {optional = true, version = "^3.2.5"}
+python = "^3.8"
+torch = "^2.0.0"
+
+[tool.poetry.extras]
+render = ["panda3d", "pybullet"]
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+coverage = {extras = ["toml"], version = "^7.2.2"}
+ipython = "^8.11.0"
+pre-commit = "^3.2.0"
+ruff = "^0.0.257"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+myst-parser = "^1.0.0"
+sphinx = "^6.1.3"
+
+[tool.poetry.urls]
+changelog = "https://github.com/agimus-project/happypose/blob/main/CHANGELOG.md"
+
+[tool.ruff]
+extend-exclude = ["cosypose", "megapose6d"]
+extend-ignore = ["D203", "D213"]
+extend-select = ["A", "B", "C", "COM", "D", "EM", "EXE", "G", "N", "PTH", "RET", "RUF", "UP", "W", "YTT"]
+target-version = "py38"
+
+[tool.tomlsort]
+all = true

@@ -1,0 +1,70 @@
+cff-version: 1.2.0
+title: happypose
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Yann
+    family-names: Labbé
+    orcid: 'https://orcid.org/0000-0002-2757-5723'
+repository-code: 'https://github.com/agimus-project/happypose'
+abstract: >-
+  Toolbox and trackers for object pose-estimation. Based on
+  the work CosyPose and MegaPose
+license: BSD-2-Clause
+references:
+  - authors:
+      - given-names: Yann
+        family-names: Labbé
+        orcid: 'https://orcid.org/0000-0002-2757-5723'
+      - given-names: Justin
+        family-names: Carpentier
+        orcid: 'https://orcid.org/0000-0001-6585-2894'
+      - given-names: Mathieu
+        family-names: Aubry
+        orcid: 'https://orcid.org/0000-0002-3804-0193'
+      - given-names: Josef
+        family-names: Sivic
+        orcid: 'https://orcid.org/0000-0002-2554-5301'
+    title: "CosyPose: Consistent multi-view multi-object 6D pose estimation"
+    collection-title: "Proceedings of the European Conference on Computer Vision (ECCV)"
+    collection-type: proceedings
+    type: article
+    year: 2020
+  - authors:
+      - given-names: Yann
+        family-names: Labbé
+        orcid: 'https://orcid.org/0000-0002-2757-5723'
+      - given-names: Lucas
+        family-names: Manuelli
+        affiliation: NVidia
+      - given-names: Arsalan
+        family-names: Mousavian
+        affiliation: NVidia
+      - given-names: Stephen
+        family-names: Tyree
+        affiliation: NVidia
+      - given-names: Stan
+        family-names: Birchfield
+        affiliation: NVidia
+      - given-names: Jonathan
+        family-names: Tremblay
+        affiliation: NVidia
+      - given-names: Justin
+        family-names: Carpentier
+        orcid: 'https://orcid.org/0000-0001-6585-2894'
+      - given-names: Mathieu
+        family-names: Aubry
+        orcid: 'https://orcid.org/0000-0002-3804-0193'
+      - given-names: Dieiter
+        family-names: Fox
+        affiliation: NVidia
+      - given-names: Josef
+        family-names: Sivic
+        orcid: 'https://orcid.org/0000-0002-2554-5301'
+    title: "MegaPose: 6D Pose Estimation of Novel Objects via Render & Compare"
+    collection-title: "CoRL"
+    collection-type: proceedings
+    type: article
+    year: 2022
