@@ -13,7 +13,7 @@ from PIL import Image
 import torch
 
 # MegaPose
-from megapose.dataset.object_dataset import RigidObject, RigidObjectDataset
+from megapose.datasets.object_dataset import RigidObject, RigidObjectDataset
 from megapose.datasets.scene_dataset import CameraData, ObjectData
 from megapose.inference.types import (
     DetectionsType,
