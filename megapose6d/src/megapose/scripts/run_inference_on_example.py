@@ -10,9 +10,10 @@ import numpy as np
 from bokeh.io import export_png
 from bokeh.plotting import gridplot
 from PIL import Image
+import torch
 
 # MegaPose
-from megapose.datasets.object_dataset import RigidObject, RigidObjectDataset
+from megapose.dataset.object_dataset import RigidObject, RigidObjectDataset
 from megapose.datasets.scene_dataset import CameraData, ObjectData
 from megapose.inference.types import (
     DetectionsType,
@@ -31,6 +32,7 @@ from megapose.visualization.utils import make_contour_overlay
 
 logger = get_logger(__name__)
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def load_observation(
     example_dir: Path,
@@ -68,7 +70,7 @@ def load_detections(
     example_dir: Path,
 ) -> DetectionsType:
     input_object_data = load_object_data(example_dir / "inputs/object_data.json")
-    detections = make_detections_from_object_data(input_object_data).cuda()
+    detections = make_detections_from_object_data(input_object_data).to(device)
     return detections
 
 
@@ -131,18 +133,17 @@ def run_inference(
 
     observation = load_observation_tensor(
         example_dir, load_depth=model_info["requires_depth"]
-    ).cuda()
-    detections = load_detections(example_dir).cuda()
+    )
+    detections = load_detections(example_dir).to(device)
     object_dataset = make_object_dataset(example_dir)
 
     logger.info(f"Loading model {model_name}.")
-    pose_estimator = load_named_model(model_name, object_dataset).cuda()
-
+    pose_estimator = load_named_model(model_name, object_dataset).to(device)
     logger.info(f"Running inference.")
     output, _ = pose_estimator.run_inference_pipeline(
         observation, detections=detections, **model_info["inference_parameters"]
     )
-
+    
     save_predictions(example_dir, output)
     return
 

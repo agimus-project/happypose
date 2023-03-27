@@ -31,8 +31,11 @@ def one_to_one_matching(
     pred_infos["pred_id"] = np.arange(len(pred_infos))
     gt_infos["gt_id"] = np.arange(len(gt_infos))
     matches = pred_infos.merge(gt_infos, on=keys)
-
+    print("matches =", matches)
     matches_gb = matches.groupby(keys).groups
+    print("matches_gb =", matches_gb)
+    for v in matches_gb.values():
+        print("v matched = ", v)
     assert all([len(v) == 1 for v in matches_gb.values()])
     if not allow_pred_missing:
         assert len(matches) == len(gt_infos)

@@ -32,7 +32,6 @@ from megapose.datasets.scene_dataset import SceneDataset, SceneObservation
 from megapose.evaluation.data_utils import parse_obs_data
 from megapose.utils.distributed import get_rank, get_tmp_dir, get_world_size
 
-
 class EvaluationRunner:
     def __init__(self, scene_ds, meters, batch_size=64, cache_data=True, n_workers=4, sampler=None):
 
@@ -75,6 +74,8 @@ class EvaluationRunner:
         return tc.PandasTensorCollection(infos=pd.DataFrame(infos), poses=poses)
 
     def evaluate(self, obj_predictions, device="cuda"):
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
         for meter in self.meters.values():
             meter.reset()
         obj_predictions = obj_predictions.to(device)

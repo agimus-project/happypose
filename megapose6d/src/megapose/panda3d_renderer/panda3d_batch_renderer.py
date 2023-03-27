@@ -43,6 +43,7 @@ from .types import (
 
 logger = get_logger(__name__)
 
+
 @dataclass
 class RenderOutput:
     """
@@ -257,29 +258,19 @@ class Panda3dBatchRenderer:
             del renders
 
         assert list_rgbs[0] is not None
-        if torch.cuda.is_available():
-            rgbs = torch.stack(list_rgbs).pin_memory().cuda(non_blocking=True)
-        else:
-            rgbs = torch.stack(list_rgbs)
-
+        rgbs = torch.stack(list_rgbs)
         rgbs = rgbs.float().permute(0, 3, 1, 2) / 255
 
         if render_depth:
             assert list_depths[0] is not None
-            if torch.cuda.is_available():
-                depths = torch.stack(list_depths).pin_memory().cuda(non_blocking=True)
-            else:
-                depths = torch.stack(list_depths)
+            depths = torch.stack(list_depths)
             depths = depths.float().permute(0, 3, 1, 2)
         else:
             depths = None
 
         if render_normals:
             assert list_normals[0] is not None
-            if torch.cuda.is_available():
-                normals = torch.stack(list_normals).pin_memory().cuda(non_blocking=True)
-            else:
-                normals = torch.stack(list_normals)
+            normals = torch.stack(list_normals)
             normals = normals.float().permute(0, 3, 1, 2) / 255
         else:
             normals = None

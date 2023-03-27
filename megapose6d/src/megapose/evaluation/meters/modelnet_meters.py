@@ -32,10 +32,13 @@ from .lf_utils import angular_distance
 from .utils import one_to_one_matching
 
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
 class ModelNetErrorMeter(Meter):
     def __init__(self, mesh_db, sample_n_points=None):
         self.reset()
-        self.mesh_db = mesh_db.batched(resample_n_points=sample_n_points).cuda().float()
+        self.mesh_db = mesh_db.batched(resample_n_points=sample_n_points).to(device).float()
 
     def is_data_valid(self, data):
         valid = False
@@ -46,7 +49,7 @@ class ModelNetErrorMeter(Meter):
     def add(self, pred_data, gt_data):
         pred_data = pred_data.float()
         gt_data = gt_data.float()
-
+        
         matches = one_to_one_matching(
             pred_data.infos, gt_data.infos, keys=("scene_id", "view_id"), allow_pred_missing=False
         )

@@ -55,6 +55,7 @@ class BOPObjectDataset(RigidObjectDataset):
                 symmetries_continuous=symmetries_continuous,
                 mesh_diameter=bop_info["diameter"],
             )
+            print("obj_label =", obj.label)
             objects.append(obj)
 
         self.ds_dir = ds_dir

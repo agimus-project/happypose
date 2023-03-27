@@ -48,6 +48,7 @@ from megapose.utils.timer import Timer
 
 logger = get_logger(__name__)
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class PoseEstimator(torch.nn.Module):
     """Performs inference for pose estimation."""
@@ -96,7 +97,7 @@ class PoseEstimator(torch.nn.Module):
     def load_SO3_grid(self, grid_size: int) -> None:
         """Loads the SO(3) grid."""
         self._SO3_grid = transform_utils.load_SO3_grid(grid_size)
-        self._SO3_grid = self._SO3_grid.cuda()
+        self._SO3_grid = self._SO3_grid.to(device)
 
     @torch.no_grad()
     def forward_refiner(

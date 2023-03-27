@@ -53,6 +53,7 @@ from megapose.utils.tensor_collection import PandasTensorCollection
 
 logger = get_logger(__name__)
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def load_detector(run_id: str) -> torch.nn.Module:
     run_dir = EXP_DIR / run_id
@@ -60,10 +61,10 @@ def load_detector(run_id: str) -> torch.nn.Module:
     cfg = check_update_config_detector(cfg)
     label_to_category_id = cfg.label_to_category_id
     model = create_model_detector(cfg, len(label_to_category_id))
-    ckpt = torch.load(run_dir / "checkpoint.pth.tar")
+    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=torch.device('cpu'))
     ckpt = ckpt["state_dict"]
     model.load_state_dict(ckpt)
-    model = model.cuda().eval()
+    model = model.to(device).eval()
     model.cfg = cfg
     model.config = cfg
     model = Detector(model)
@@ -124,7 +125,7 @@ def load_pose_models(
     else:
         refiner_renderer = make_renderer(refiner_cfg.renderer)
 
-    mesh_db_batched = mesh_db.batched().cuda()
+    mesh_db_batched = mesh_db.batched().to(device)
 
     def load_model(run_id: str, renderer: Panda3dBatchRenderer) -> PosePredictor:
         if run_id is None:
@@ -133,11 +134,11 @@ def load_pose_models(
         cfg: TrainingConfig = load_cfg(run_dir / "config.yaml")
         cfg = check_update_config_pose(cfg)
         model = create_model_pose(cfg, renderer=renderer, mesh_db=mesh_db_batched)
-        ckpt = torch.load(run_dir / "checkpoint.pth.tar")
+        ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=torch.device('cpu'))
         ckpt = ckpt["state_dict"]
         ckpt = change_keys_of_older_models(ckpt)
         model.load_state_dict(ckpt)
-        model = model.cuda().eval()
+        model = model.to(device).eval()
         model.cfg = cfg
         model.config = cfg
         return model

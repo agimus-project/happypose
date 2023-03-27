@@ -1,4 +1,4 @@
-name: megapose
+name: happypose
 channels:
    - conda-forge
    - pytorch
