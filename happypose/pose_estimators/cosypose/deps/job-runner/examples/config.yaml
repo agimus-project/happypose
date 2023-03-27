@@ -1,0 +1,27 @@
+default_project: 'job-runner'
+default_queue: 'gpu_p1'
+
+projects:
+  job-runner:
+    dir: '$WORK/projects/job-runner'
+    preamble: 'preamble.sh'
+    conda_env: 'test'
+    default_queue: 'gpu_p1'
+
+conda:
+  root: '$WORK/anaconda'
+
+storage:
+  root: '$SCRATCH/jobs'
+
+gpu_queues:
+  gpu_p1:
+    n_cpus_per_node: 80
+    n_gpus_per_node: 4
+    flags:
+      partition: 'gpu_p1'
+      time: '20:00:00'
+
+  local:
+    n_cpus_per_node: 'auto'
+    n_gpus_per_node: 'auto'
