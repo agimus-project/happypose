@@ -1,9 +1,9 @@
 # MegaPose
-from megapose.config import LOCAL_DATA_DIR
-from megapose.datasets.object_dataset import RigidObjectDataset
-from megapose.inference.icp_refiner import ICPRefiner
-from megapose.inference.pose_estimator import PoseEstimator
-from megapose.inference.utils import load_pose_models
+from happypose.pose_estimators.megapose.src.megapose.config import LOCAL_DATA_DIR
+from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
+from happypose.pose_estimators.megapose.src.megapose.inference.icp_refiner import ICPRefiner
+from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import PoseEstimator
+from happypose.pose_estimators.megapose.src.megapose.inference.utils import load_pose_models
 
 NAMED_MODELS = {
     "megapose-1.0-RGB": {

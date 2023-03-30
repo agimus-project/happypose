@@ -30,21 +30,21 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 
 # MegaPose
-import megapose
-import megapose.inference.utils
-import megapose.utils.tensor_collection as tc
-from megapose.inference.depth_refiner import DepthRefiner
-from megapose.inference.types import (
+import happypose.pose_estimators.megapose.src.megapose as megapose
+import happypose.pose_estimators.megapose.src.megapose.inference.utils
+import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
+from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import DepthRefiner
+from happypose.pose_estimators.megapose.src.megapose.inference.types import (
     DetectionsType,
     ObservationTensor,
     PoseEstimatesType,
 )
-from megapose.lib3d.cosypose_ops import TCO_init_from_boxes_autodepth_with_R
-from megapose.training.utils import CudaTimer, SimpleTimer
-from megapose.utils import transform_utils
-from megapose.utils.logging import get_logger
-from megapose.utils.tensor_collection import PandasTensorCollection
-from megapose.utils.timer import Timer
+from happypose.pose_estimators.megapose.src.megapose.lib3d.cosypose_ops import TCO_init_from_boxes_autodepth_with_R
+from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer, SimpleTimer
+from happypose.pose_estimators.megapose.src.megapose.utils import transform_utils
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection import PandasTensorCollection
+from happypose.pose_estimators.megapose.src.megapose.utils.timer import Timer
 
 logger = get_logger(__name__)
 

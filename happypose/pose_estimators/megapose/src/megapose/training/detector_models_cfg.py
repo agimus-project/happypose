@@ -16,8 +16,8 @@ limitations under the License.
 
 
 # MegaPose
-from megapose.models.mask_rcnn import DetectorMaskRCNN
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.models.mask_rcnn import DetectorMaskRCNN
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

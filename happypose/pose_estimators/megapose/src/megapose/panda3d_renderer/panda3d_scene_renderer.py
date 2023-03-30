@@ -35,7 +35,7 @@ from direct.showbase.ShowBase import ShowBase
 from tqdm import tqdm
 
 # MegaPose
-from megapose.datasets.object_dataset import RigidObjectDataset
+from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 
 # Local Folder
 from .types import (

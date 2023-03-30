@@ -24,10 +24,10 @@ from pathlib import Path
 import numpy as np
 
 # MegaPose
-from megapose.lib3d.symmetries import ContinuousSymmetry, DiscreteSymmetry
+from happypose.pose_estimators.megapose.src.megapose.lib3d.symmetries import ContinuousSymmetry, DiscreteSymmetry
 
 # Local Folder
-from .object_dataset import RigidObject, RigidObjectDataset
+from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 
 
 class BOPObjectDataset(RigidObjectDataset):

@@ -25,8 +25,8 @@ import numpy.typing as npt
 import panda3d as p3d
 
 # MegaPose
-from megapose.lib3d.transform import Transform
-from megapose.panda3d_renderer.geometry import make_axes, make_box, make_sphere
+from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.geometry import make_axes, make_box, make_sphere
 
 def compute_view_mat(TWC):
     TCCGL = np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float)

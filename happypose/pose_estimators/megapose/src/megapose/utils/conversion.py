@@ -19,8 +19,8 @@ limitations under the License.
 from typing import List, Tuple
 
 # MegaPose
-from megapose.datasets.scene_dataset import CameraData, ObjectData
-from megapose.panda3d_renderer.types import Panda3dCameraData, Panda3dObjectData
+from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.types import Panda3dCameraData, Panda3dObjectData
 
 
 def convert_scene_observation_to_panda3d(

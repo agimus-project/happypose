@@ -20,15 +20,15 @@ from typing import Union
 
 # MegaPose
 # Backbones
-import megapose.models.torchvision_resnet as models
-from megapose.lib3d.rigid_mesh_database import BatchedMeshes
+import happypose.pose_estimators.megapose.src.megapose.models.torchvision_resnet as models
+from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import BatchedMeshes
 
 # Pose models
-from megapose.models.pose_rigid import PosePredictor
-from megapose.models.wide_resnet import WideResNet18, WideResNet34
-from megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from megapose.training.training_config import TrainingConfig
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.models.pose_rigid import PosePredictor
+from happypose.pose_estimators.megapose.src.megapose.models.wide_resnet import WideResNet18, WideResNet34
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.pose_estimators.megapose.src.megapose.training.training_config import TrainingConfig
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

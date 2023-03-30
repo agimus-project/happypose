@@ -24,7 +24,7 @@ import pandas as pd
 from joblib import Memory
 
 # MegaPose
-import megapose
+import happypose.pose_estimators.megapose.src.megapose as megapose
 
 PROJECT_ROOT = Path(megapose.__file__).parent.parent.parent
 PROJECT_DIR = PROJECT_ROOT

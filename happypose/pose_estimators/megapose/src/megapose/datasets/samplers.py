@@ -22,7 +22,7 @@ import torch
 from torch.utils.data import Sampler
 
 # MegaPose
-from megapose.utils.random import temp_numpy_seed
+from happypose.pose_estimators.megapose.src.megapose.utils.random import temp_numpy_seed
 
 
 class PartialSampler(Sampler):

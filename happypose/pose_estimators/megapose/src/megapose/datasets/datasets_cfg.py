@@ -24,8 +24,12 @@ from typing import List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
+# HappyPose
+from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
+from happypose.toolbox.datasets.scene_dataset import SceneDataset
+
 # MegaPose
-from megapose.config import (
+from happypose.pose_estimators.megapose.src.megapose.config import (
     BOP_DS_DIR,
     BOP_PANDA3D_DS_DIR,
     GSO_DIR,
@@ -35,17 +39,15 @@ from megapose.config import (
     WDS_DS_DIR,
     YCBV_OBJECT_NAMES,
 )
-from megapose.datasets.bop_object_datasets import BOPObjectDataset
-from megapose.datasets.bop_scene_dataset import BOPDataset, remap_bop_targets
-from megapose.datasets.deepim_modelnet import DeepImModelNetDataset
-from megapose.datasets.gso_dataset import GoogleScannedObjectDataset
-from megapose.datasets.modelnet_object_dataset import ModelNetObjectDataset
-from megapose.datasets.object_dataset import RigidObjectDataset
-from megapose.datasets.scene_dataset import SceneDataset
-from megapose.datasets.shapenet_object_dataset import ShapeNetObjectDataset
-from megapose.datasets.urdf_dataset import UrdfDataset
-from megapose.datasets.web_scene_dataset import WebSceneDataset
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.datasets.bop_object_datasets import BOPObjectDataset
+from happypose.pose_estimators.megapose.src.megapose.datasets.bop_scene_dataset import BOPDataset, remap_bop_targets
+from happypose.pose_estimators.megapose.src.megapose.datasets.deepim_modelnet import DeepImModelNetDataset
+from happypose.pose_estimators.megapose.src.megapose.datasets.gso_dataset import GoogleScannedObjectDataset
+from happypose.pose_estimators.megapose.src.megapose.datasets.modelnet_object_dataset import ModelNetObjectDataset
+from happypose.pose_estimators.megapose.src.megapose.datasets.shapenet_object_dataset import ShapeNetObjectDataset
+from happypose.pose_estimators.megapose.src.megapose.datasets.urdf_dataset import UrdfDataset
+from happypose.pose_estimators.megapose.src.megapose.datasets.web_scene_dataset import WebSceneDataset
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

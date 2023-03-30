@@ -22,10 +22,10 @@ from pathlib import Path
 from typing import List
 
 # MegaPose
-from megapose.config import MEMORY
+from happypose.pose_estimators.megapose.src.megapose.config import MEMORY
 
 # Local Folder
-from .object_dataset import RigidObject, RigidObjectDataset
+from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 
 
 @MEMORY.cache

@@ -25,13 +25,13 @@ import torch
 from scipy import ndimage
 
 # MegaPose
-from megapose.config import DEBUG_DATA_DIR
-from megapose.inference.depth_refiner import DepthRefiner
-from megapose.inference.refiner_utils import compute_masks
-from megapose.inference.types import PoseEstimatesType
-from megapose.lib3d.rigid_mesh_database import BatchedMeshes
-from megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from megapose.panda3d_renderer.types import Panda3dLightData
+from happypose.pose_estimators.megapose.src.megapose.config import DEBUG_DATA_DIR
+from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import DepthRefiner
+from happypose.pose_estimators.megapose.src.megapose.inference.refiner_utils import compute_masks
+from happypose.pose_estimators.megapose.src.megapose.inference.types import PoseEstimatesType
+from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import BatchedMeshes
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.types import Panda3dLightData
 
 
 def get_normal(depth_refine, fx=-1, fy=-1, cx=-1, cy=-1, bbox=np.array([0]), refine=True):

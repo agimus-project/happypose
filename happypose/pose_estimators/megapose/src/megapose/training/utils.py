@@ -29,9 +29,9 @@ from bokeh.io.export import get_screenshot_as_png
 from omegaconf import OmegaConf
 
 # MegaPose
-from megapose.training.training_config import TrainingConfig
-from megapose.utils.distributed import get_rank, get_world_size
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.training.training_config import TrainingConfig
+from happypose.pose_estimators.megapose.src.megapose.utils.distributed import get_rank, get_world_size
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

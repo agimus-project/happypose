@@ -26,23 +26,25 @@ import numpy as np
 import torch
 from torch import nn
 
+# HappyPose
+from happypose.toolbox.datasets.scene_dataset import Resolution
+
 # MegaPose
-from megapose.datasets.scene_dataset import Resolution
-from megapose.lib3d.camera_geometry import boxes_from_uv, get_K_crop_resize
-from megapose.lib3d.camera_geometry import (
+from happypose.pose_estimators.megapose.src.megapose.lib3d.camera_geometry import boxes_from_uv, get_K_crop_resize
+from happypose.pose_estimators.megapose.src.megapose.lib3d.camera_geometry import (
     project_points_robust as project_points_robust,
 )
-from megapose.lib3d.cosypose_ops import pose_update_with_reference_point
-from megapose.lib3d.cropping import deepim_crops_robust as deepim_crops_robust
-from megapose.lib3d.multiview import make_TCO_multiview
-from megapose.lib3d.rigid_mesh_database import MeshDataBase
-from megapose.lib3d.rotations import compute_rotation_matrix_from_ortho6d
-from megapose.lib3d.transform_ops import normalize_T
-from megapose.panda3d_renderer import Panda3dLightData
-from megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from megapose.panda3d_renderer.panda3d_scene_renderer import make_scene_lights
-from megapose.training.utils import CudaTimer
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.lib3d.cosypose_ops import pose_update_with_reference_point
+from happypose.pose_estimators.megapose.src.megapose.lib3d.cropping import deepim_crops_robust as deepim_crops_robust
+from happypose.pose_estimators.megapose.src.megapose.lib3d.multiview import make_TCO_multiview
+from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.pose_estimators.megapose.src.megapose.lib3d.rotations import compute_rotation_matrix_from_ortho6d
+from happypose.pose_estimators.megapose.src.megapose.lib3d.transform_ops import normalize_T
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer import Panda3dLightData
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import make_scene_lights
+from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

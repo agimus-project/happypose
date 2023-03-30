@@ -31,10 +31,12 @@ import torch
 from PIL import ImageEnhance, ImageFilter
 from torchvision.datasets import ImageFolder
 
+# HappyPose
+from happypose.toolbox.datasets.scene_dataset import Resolution, SceneObservation
+
 # MegaPose
-from megapose.datasets.scene_dataset import Resolution, SceneObservation
-from megapose.datasets.utils import make_detections_from_segmentation
-from megapose.lib3d.camera_geometry import get_K_crop_resize
+from happypose.pose_estimators.megapose.src.megapose.datasets.utils import make_detections_from_segmentation
+from happypose.pose_estimators.megapose.src.megapose.lib3d.camera_geometry import get_K_crop_resize
 
 
 class SceneObservationTransform:

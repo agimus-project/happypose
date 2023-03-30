@@ -24,7 +24,7 @@ import omegaconf
 import torch
 
 # MegaPose
-from megapose.utils.types import Resolution
+from happypose.pose_estimators.megapose.src.megapose.utils.types import Resolution
 
 
 @dataclass

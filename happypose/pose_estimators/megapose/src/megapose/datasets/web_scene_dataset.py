@@ -33,8 +33,8 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 # MegaPose
-from megapose.datasets.samplers import ListSampler
-from megapose.datasets.scene_dataset import (
+from happypose.pose_estimators.megapose.src.megapose.datasets.samplers import ListSampler
+from happypose.toolbox.datasets.scene_dataset import (
     CameraData,
     DataJsonType,
     IterableSceneDataset,
@@ -43,7 +43,7 @@ from megapose.datasets.scene_dataset import (
     SceneDataset,
     SceneObservation,
 )
-from megapose.utils.webdataset import tarfile_to_samples
+from happypose.pose_estimators.megapose.src.megapose.utils.webdataset import tarfile_to_samples
 
 
 def simple_collate_fn(batch: Any) -> Any:

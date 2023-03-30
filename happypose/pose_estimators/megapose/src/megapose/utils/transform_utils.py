@@ -20,8 +20,8 @@ import roma
 import torch
 
 # MegaPose
-import megapose
-from megapose.config import PROJECT_DIR
+import happypose.pose_estimators.megapose.src.megapose as megapose
+from happypose.pose_estimators.megapose.src.megapose.config import PROJECT_DIR
 
 
 def load_SO3_grid(resolution):

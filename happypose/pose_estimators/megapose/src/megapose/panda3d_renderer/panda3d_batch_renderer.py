@@ -25,11 +25,14 @@ import numpy as np
 import torch
 import torch.multiprocessing
 
+# HappyPose
+from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
+
+
 # MegaPose
-from megapose.datasets.object_dataset import RigidObjectDataset
-from megapose.lib3d.transform import Transform
-from megapose.lib3d.transform_ops import invert_transform_matrices
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
+from happypose.pose_estimators.megapose.src.megapose.lib3d.transform_ops import invert_transform_matrices
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
 
 # Local Folder
 from .panda3d_scene_renderer import Panda3dSceneRenderer

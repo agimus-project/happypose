@@ -26,11 +26,11 @@ import torch
 from PIL import Image
 
 # MegaPose
-from megapose.datasets.utils import make_detections_from_segmentation
-from megapose.lib3d.transform import Transform
+from happypose.pose_estimators.megapose.src.megapose.datasets.utils import make_detections_from_segmentation
+from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
 
 # Local Folder
-from .scene_dataset import (
+from happypose.toolbox.datasets.scene_dataset import (
     CameraData,
     ObjectData,
     ObservationInfos,

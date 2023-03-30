@@ -26,9 +26,9 @@ import pandas as pd
 import torch
 
 # MegaPose
-import megapose
-import megapose.utils.tensor_collection as tc
-from megapose.inference.types import DetectionsType, ObservationTensor
+import happypose.pose_estimators.megapose.src.megapose
+import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
+from happypose.pose_estimators.megapose.src.megapose.inference.types import DetectionsType, ObservationTensor
 
 
 class Detector(torch.nn.Module):

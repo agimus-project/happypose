@@ -29,12 +29,12 @@ from PIL import Image
 from tqdm import tqdm
 
 # MegaPose
-from megapose.config import BOP_TOOLKIT_DIR, MEMORY
-from megapose.lib3d.transform import Transform
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.config import BOP_TOOLKIT_DIR, MEMORY
+from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
 
 # Local Folder
-from .scene_dataset import (
+from happypose.toolbox.datasets.scene_dataset import (
     CameraData,
     ObjectData,
     ObservationInfos,

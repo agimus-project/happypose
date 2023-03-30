@@ -26,7 +26,7 @@ import numpy as np
 import torch
 
 # MegaPose
-from megapose.utils.tensor_collection import PandasTensorCollection
+from happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection import PandasTensorCollection
 
 # Type Aliases
 

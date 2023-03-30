@@ -31,7 +31,7 @@ import PIL
 from PIL import Image
 
 # MegaPose
-from megapose.utils.types import Resolution
+from happypose.pose_estimators.megapose.src.megapose.utils.types import Resolution
 
 
 def save_image_figure(f: bokeh.plotting.figure, im_path: Path) -> PIL.Image:

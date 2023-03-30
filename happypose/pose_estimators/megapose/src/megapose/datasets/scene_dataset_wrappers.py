@@ -23,7 +23,7 @@ import dataclasses
 import numpy as np
 
 # Local Folder
-from .scene_dataset import SceneDataset, SceneObservation
+from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation
 
 
 class SceneDatasetWrapper(SceneDataset):

@@ -20,10 +20,10 @@ import json
 from pathlib import Path
 
 # MegaPose
-from megapose.config import MEMORY
+from happypose.pose_estimators.megapose.src.megapose.config import MEMORY
 
 # Local Folder
-from .object_dataset import RigidObject, RigidObjectDataset
+from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 
 
 class ShapeNetSynset:

@@ -20,7 +20,7 @@ limitations under the License.
 from pathlib import Path
 
 # MegaPose
-from megapose.datasets.object_dataset import RigidObject, RigidObjectDataset
+from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 
 
 class UrdfDataset(RigidObjectDataset):

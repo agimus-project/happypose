@@ -23,7 +23,7 @@ from typing import Optional, Tuple
 import torch
 
 # MegaPose
-from megapose.inference.types import PoseEstimatesType
+from happypose.pose_estimators.megapose.src.megapose.inference.types import PoseEstimatesType
 
 
 class DepthRefiner(ABC):

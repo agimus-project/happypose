@@ -26,10 +26,12 @@ import torch
 import trimesh
 
 # MegaPose
-from megapose.datasets.object_dataset import RigidObject
-from megapose.lib3d.mesh_ops import get_meshes_bounding_boxes, sample_points
-from megapose.lib3d.symmetries import make_symmetries_poses
-from megapose.utils.tensor_collection import TensorCollection
+from happypose.toolbox.datasets.object_dataset import RigidObject
+
+
+from happypose.pose_estimators.megapose.src.megapose.lib3d.mesh_ops import get_meshes_bounding_boxes, sample_points
+from happypose.pose_estimators.megapose.src.megapose.lib3d.symmetries import make_symmetries_poses
+from happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection import TensorCollection
 
 
 def as_mesh(scene_or_mesh):

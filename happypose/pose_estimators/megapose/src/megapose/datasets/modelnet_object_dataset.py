@@ -19,7 +19,7 @@ limitations under the License.
 from pathlib import Path
 
 # Local Folder
-from .object_dataset import RigidObject, RigidObjectDataset
+from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 
 
 class ModelNetObjectDataset(RigidObjectDataset):

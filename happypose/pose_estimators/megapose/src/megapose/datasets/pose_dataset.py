@@ -26,9 +26,17 @@ from typing import Iterator, List, Optional, Set, Union
 import numpy as np
 import torch
 
+# HappyPose
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableSceneDataset,
+    ObjectData,
+    SceneDataset,
+    SceneObservation,
+)
+
 # MegaPose
-from megapose.config import LOCAL_DATA_DIR
-from megapose.datasets.augmentations import (
+from happypose.pose_estimators.megapose.src.megapose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.megapose.src.megapose.datasets.augmentations import (
     CropResizeToAspectTransform,
     DepthBackgroundDropoutTransform,
     DepthBlurTransform,
@@ -44,16 +52,10 @@ from megapose.datasets.augmentations import (
     PillowContrast,
     PillowSharpness,
 )
-from megapose.datasets.augmentations import SceneObservationAugmentation as SceneObsAug
-from megapose.datasets.augmentations import VOCBackgroundAugmentation
-from megapose.datasets.scene_dataset import (
-    IterableSceneDataset,
-    ObjectData,
-    SceneDataset,
-    SceneObservation,
-)
-from megapose.datasets.scene_dataset_wrappers import remove_invisible_objects
-from megapose.utils.types import Resolution
+from happypose.pose_estimators.megapose.src.megapose.datasets.augmentations import SceneObservationAugmentation as SceneObsAug
+from happypose.pose_estimators.megapose.src.megapose.datasets.augmentations import VOCBackgroundAugmentation
+from happypose.pose_estimators.megapose.src.megapose.datasets.scene_dataset_wrappers import remove_invisible_objects
+from happypose.pose_estimators.megapose.src.megapose.utils.types import Resolution
 
 
 @dataclass
