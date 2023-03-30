@@ -31,8 +31,8 @@ import torch
 from tqdm import tqdm
 
 # MegaPose
-from megapose.config import BOP_TOOLKIT_DIR, LOCAL_DATA_DIR, PROJECT_DIR
-from megapose.evaluation.eval_config import BOPEvalConfig
+from happypose.pose_estimators.megapose.src.config import BOP_TOOLKIT_DIR, LOCAL_DATA_DIR, PROJECT_DIR
+from happypose.pose_estimators.megapose.src.evaluation.eval_config import BOPEvalConfig
 
 # Note we are actually using the bop_toolkit_lib that is directly conda installed
 # inside the docker image. This is just to access the scripts.

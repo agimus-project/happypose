@@ -28,7 +28,7 @@ from omegaconf import OmegaConf
 # MegaPose
 import megapose.evaluation.bop
 import megapose.evaluation.evaluation
-from megapose.bop_config import (
+from happypose.pose_estimators.megapose.src.bop_config import (
     PBR_COARSE,
     PBR_DETECTORS,
     PBR_REFINER,
@@ -36,21 +36,21 @@ from megapose.bop_config import (
     SYNT_REAL_DETECTORS,
     SYNT_REAL_REFINER,
 )
-from megapose.config import (
+from happypose.pose_estimators.megapose.src.config import (
     DEBUG_RESULTS_DIR,
     EXP_DIR,
     MODELNET_TEST_CATEGORIES,
     RESULTS_DIR,
 )
-from megapose.evaluation.eval_config import (
+from happypose.pose_estimators.megapose.src.evaluation.eval_config import (
     BOPEvalConfig,
     EvalConfig,
     FullEvalConfig,
     HardwareConfig,
 )
-from megapose.evaluation.evaluation import generate_save_key, run_eval
-from megapose.utils.distributed import get_rank, get_world_size, init_distributed_mode
-from megapose.utils.logging import get_logger, set_logging_level
+from happypose.pose_estimators.megapose.src.evaluation.evaluation import generate_save_key, run_eval
+from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_world_size, init_distributed_mode
+from happypose.pose_estimators.megapose.src.utils.logging import get_logger, set_logging_level
 
 logger = get_logger(__name__)
 

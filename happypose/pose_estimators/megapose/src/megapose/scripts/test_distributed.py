@@ -24,13 +24,13 @@ import torch
 from torch.distributed.elastic.multiprocessing.errors import record
 
 # MegaPose
-from megapose.utils.distributed import (
+from happypose.pose_estimators.megapose.src.utils.distributed import (
     get_rank,
     get_tmp_dir,
     get_world_size,
     init_distributed_mode,
 )
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

@@ -49,7 +49,7 @@ from happypose.pose_estimators.megapose.src.megapose.utils.load_model import NAM
 from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger, set_logging_level
 from happypose.pose_estimators.megapose.src.megapose.visualization.bokeh_plotter import BokehPlotter
 from happypose.pose_estimators.megapose.src.megapose.visualization.utils import make_contour_overlay
-from happypose.pose_estimators.megapose.src.megapose.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
+from happypose.toolbox.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
 from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import MeshDataBase
 
 

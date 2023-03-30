@@ -31,6 +31,10 @@ from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 from cosypose_wrapper import CosyPoseWrapper
 
+# HappyPose
+from happypose.toolbox.renderer import Panda3dLightData
+from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
+
 # MegaPose
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
@@ -41,8 +45,6 @@ from happypose.pose_estimators.megapose.src.megapose.inference.types import (
 )
 from happypose.pose_estimators.megapose.src.megapose.inference.utils import make_detections_from_object_data
 from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
-from happypose.toolbox.renderer import Panda3dLightData
-from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
 from happypose.pose_estimators.megapose.src.megapose.utils.conversion import convert_scene_observation_to_panda3d
 from happypose.pose_estimators.megapose.src.megapose.utils.load_model import NAMED_MODELS, load_named_model
 from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger, set_logging_level

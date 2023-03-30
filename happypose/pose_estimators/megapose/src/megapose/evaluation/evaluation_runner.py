@@ -27,10 +27,10 @@ from tqdm import tqdm
 
 # MegaPose
 import megapose.utils.tensor_collection as tc
-from megapose.datasets.samplers import DistributedSceneSampler
-from megapose.datasets.scene_dataset import SceneDataset, SceneObservation
-from megapose.evaluation.data_utils import parse_obs_data
-from megapose.utils.distributed import get_rank, get_tmp_dir, get_world_size
+from happypose.pose_estimators.megapose.src.datasets.samplers import DistributedSceneSampler
+from happypose.pose_estimators.megapose.src.datasets.scene_dataset import SceneDataset, SceneObservation
+from happypose.pose_estimators.megapose.src.evaluation.data_utils import parse_obs_data
+from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_tmp_dir, get_world_size
 
 class EvaluationRunner:
     def __init__(self, scene_ds, meters, batch_size=64, cache_data=True, n_workers=4, sampler=None):

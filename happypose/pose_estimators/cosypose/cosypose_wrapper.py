@@ -22,7 +22,7 @@ import argparse
 import pandas as pd
 
 # from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
-from happypose.pose_estimators.megapose.src.megapose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
+from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
 
 # Pose estimator
 from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import MeshDataBase

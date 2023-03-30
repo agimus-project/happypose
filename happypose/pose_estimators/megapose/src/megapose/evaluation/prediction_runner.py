@@ -30,18 +30,18 @@ from tqdm import tqdm
 # MegaPose
 import megapose
 import megapose.utils.tensor_collection as tc
-from megapose.datasets.samplers import DistributedSceneSampler
-from megapose.datasets.scene_dataset import SceneDataset, SceneObservation
-from megapose.inference.pose_estimator import PoseEstimator
-from megapose.inference.types import (
+from happypose.pose_estimators.megapose.src.datasets.samplers import DistributedSceneSampler
+from happypose.pose_estimators.megapose.src.datasets.scene_dataset import SceneDataset, SceneObservation
+from happypose.pose_estimators.megapose.src.inference.pose_estimator import PoseEstimator
+from happypose.pose_estimators.megapose.src.inference.types import (
     DetectionsType,
     InferenceConfig,
     ObservationTensor,
     PoseEstimatesType,
 )
-from megapose.training.utils import CudaTimer
-from megapose.utils.distributed import get_rank, get_tmp_dir, get_world_size
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.training.utils import CudaTimer
+from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_tmp_dir, get_world_size
+from happypose.pose_estimators.megapose.src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

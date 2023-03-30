@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 # MegaPose
-from megapose.inference.types import InferenceConfig
+from happypose.pose_estimators.megapose.src.inference.types import InferenceConfig
 
 BOP_TEST_DATASETS = [
     "lmo.bop19",

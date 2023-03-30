@@ -34,7 +34,7 @@ from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
 import happypose.pose_estimators.megapose.src.megapose
 import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
 from happypose.pose_estimators.megapose.src.megapose.config import EXP_DIR
-from happypose.pose_estimators.megapose.src.megapose.datasets.datasets_cfg import make_object_dataset
+from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 from happypose.pose_estimators.megapose.src.megapose.inference.detector import Detector
 from happypose.pose_estimators.megapose.src.megapose.inference.types import DetectionsType, PoseEstimatesType
 from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import MeshDataBase

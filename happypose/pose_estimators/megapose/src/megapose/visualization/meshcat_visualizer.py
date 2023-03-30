@@ -32,7 +32,7 @@ from meshcat.geometry import (
 )
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.datasets.datasets_cfg import make_object_dataset
+from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
 # Local Folder
 from .meshcat_utils import create_visualizer, trimesh_to_meshcat_geometry

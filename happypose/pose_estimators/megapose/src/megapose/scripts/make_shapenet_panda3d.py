@@ -28,8 +28,8 @@ from pathlib import Path
 from tqdm import tqdm
 
 # MegaPose
-from megapose.config import SHAPENET_DIR
-from megapose.datasets.datasets_cfg import make_object_dataset
+from happypose.pose_estimators.megapose.src.config import SHAPENET_DIR
+from happypose.pose_estimators.megapose.src.datasets.datasets_cfg import make_object_dataset
 
 
 def fix_normals(obj_path):

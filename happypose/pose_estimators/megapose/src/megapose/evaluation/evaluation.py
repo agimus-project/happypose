@@ -28,19 +28,19 @@ import megapose
 import megapose.datasets.datasets_cfg
 import megapose.evaluation.eval_runner
 import megapose.inference.utils
-from megapose.datasets.datasets_cfg import make_object_dataset
-from megapose.evaluation.eval_config import EvalConfig
-from megapose.evaluation.evaluation_runner import EvaluationRunner
-from megapose.evaluation.meters.modelnet_meters import ModelNetErrorMeter
-from megapose.evaluation.prediction_runner import PredictionRunner
-from megapose.evaluation.runner_utils import format_results
-from megapose.inference.depth_refiner import DepthRefiner
-from megapose.inference.icp_refiner import ICPRefiner
-from megapose.inference.pose_estimator import PoseEstimator
-from megapose.inference.teaserpp_refiner import TeaserppRefiner
-from megapose.lib3d.rigid_mesh_database import MeshDataBase
-from megapose.utils.distributed import get_rank, get_tmp_dir
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.datasets.datasets_cfg import make_object_dataset
+from happypose.pose_estimators.megapose.src.evaluation.eval_config import EvalConfig
+from happypose.pose_estimators.megapose.src.evaluation.evaluation_runner import EvaluationRunner
+from happypose.pose_estimators.megapose.src.evaluation.meters.modelnet_meters import ModelNetErrorMeter
+from happypose.pose_estimators.megapose.src.evaluation.prediction_runner import PredictionRunner
+from happypose.pose_estimators.megapose.src.evaluation.runner_utils import format_results
+from happypose.pose_estimators.megapose.src.inference.depth_refiner import DepthRefiner
+from happypose.pose_estimators.megapose.src.inference.icp_refiner import ICPRefiner
+from happypose.pose_estimators.megapose.src.inference.pose_estimator import PoseEstimator
+from happypose.pose_estimators.megapose.src.inference.teaserpp_refiner import TeaserppRefiner
+from happypose.pose_estimators.megapose.src.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_tmp_dir
+from happypose.pose_estimators.megapose.src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

@@ -26,13 +26,13 @@ import teaserpp_python
 import torch
 
 # MegaPose
-from megapose.inference.depth_refiner import DepthRefiner
-from megapose.inference.refiner_utils import compute_masks, numpy_to_open3d
-from megapose.inference.types import PoseEstimatesType
-from megapose.lib3d.rigid_mesh_database import BatchedMeshes
-from megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from megapose.panda3d_renderer.types import Panda3dLightData
-from megapose.visualization.meshcat_utils import get_pointcloud
+from happypose.pose_estimators.megapose.src.inference.depth_refiner import DepthRefiner
+from happypose.pose_estimators.megapose.src.inference.refiner_utils import compute_masks, numpy_to_open3d
+from happypose.pose_estimators.megapose.src.inference.types import PoseEstimatesType
+from happypose.pose_estimators.megapose.src.lib3d.rigid_mesh_database import BatchedMeshes
+from happypose.pose_estimators.megapose.src.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.pose_estimators.megapose.src.panda3d_renderer.types import Panda3dLightData
+from happypose.pose_estimators.megapose.src.visualization.meshcat_utils import get_pointcloud
 
 
 def get_solver_params(noise_bound: float = 0.01):

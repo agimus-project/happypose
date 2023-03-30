@@ -28,9 +28,9 @@ import trimesh
 from tqdm import tqdm
 
 # MegaPose
-from megapose.config import SHAPENET_DIR
-from megapose.datasets.datasets_cfg import make_object_dataset
-from megapose.lib3d.rigid_mesh_database import as_mesh
+from happypose.pose_estimators.megapose.src.config import SHAPENET_DIR
+from happypose.pose_estimators.megapose.src.datasets.datasets_cfg import make_object_dataset
+from happypose.pose_estimators.megapose.src.lib3d.rigid_mesh_database import as_mesh
 
 SPLIT_NAME = "models_pointcloud"
 TARGETS_MODEL_DIR = Path(str(SHAPENET_DIR)) / SPLIT_NAME

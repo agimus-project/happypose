@@ -26,8 +26,8 @@ import pandas as pd
 from tqdm import tqdm
 
 # MegaPose
-from megapose.config import SHAPENET_DIR
-from megapose.datasets.datasets_cfg import make_object_dataset
+from happypose.pose_estimators.megapose.src.config import SHAPENET_DIR
+from happypose.pose_estimators.megapose.src.datasets.datasets_cfg import make_object_dataset
 
 
 def read_all_stats(obj_dataset):

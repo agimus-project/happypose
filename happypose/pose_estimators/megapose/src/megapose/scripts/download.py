@@ -27,7 +27,7 @@ from pathlib import Path
 import wget
 
 # MegaPose
-from megapose.bop_config import (
+from happypose.pose_estimators.megapose.src.bop_config import (
     PBR_COARSE,
     PBR_DETECTORS,
     PBR_REFINER,
@@ -35,8 +35,8 @@ from megapose.bop_config import (
     SYNT_REAL_DETECTORS,
     SYNT_REAL_REFINER,
 )
-from megapose.config import BOP_DS_DIR, LOCAL_DATA_DIR, PROJECT_DIR
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.config import BOP_DS_DIR, LOCAL_DATA_DIR, PROJECT_DIR
+from happypose.pose_estimators.megapose.src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

@@ -29,7 +29,7 @@ from omegaconf import OmegaConf
 
 # MegaPose
 import megapose.utils.hostlist as hostlist
-from megapose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

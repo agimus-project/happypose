@@ -33,29 +33,29 @@ from torchnet.meter import AverageValueMeter
 from tqdm import tqdm
 
 # MegaPose
-from megapose.config import EXP_DIR
-from megapose.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
-from megapose.datasets.object_dataset import RigidObjectDataset, concat_object_datasets
-from megapose.datasets.pose_dataset import PoseDataset
-from megapose.datasets.scene_dataset import (
+from happypose.pose_estimators.megapose.src.config import EXP_DIR
+from happypose.pose_estimators.megapose.src.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
+from happypose.pose_estimators.megapose.src.datasets.object_dataset import RigidObjectDataset, concat_object_datasets
+from happypose.pose_estimators.megapose.src.datasets.pose_dataset import PoseDataset
+from happypose.pose_estimators.megapose.src.datasets.scene_dataset import (
     IterableMultiSceneDataset,
     IterableSceneDataset,
     RandomIterableSceneDataset,
     SceneDataset,
 )
-from megapose.datasets.web_scene_dataset import IterableWebSceneDataset, WebSceneDataset
-from megapose.lib3d.rigid_mesh_database import MeshDataBase
-from megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from megapose.training.megapose_forward_loss import megapose_forward_loss
-from megapose.training.pose_models_cfg import check_update_config, create_model_pose
-from megapose.training.training_config import DatasetConfig, TrainingConfig
-from megapose.training.utils import (
+from happypose.pose_estimators.megapose.src.datasets.web_scene_dataset import IterableWebSceneDataset, WebSceneDataset
+from happypose.pose_estimators.megapose.src.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.pose_estimators.megapose.src.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.pose_estimators.megapose.src.training.megapose_forward_loss import megapose_forward_loss
+from happypose.pose_estimators.megapose.src.training.pose_models_cfg import check_update_config, create_model_pose
+from happypose.pose_estimators.megapose.src.training.training_config import DatasetConfig, TrainingConfig
+from happypose.pose_estimators.megapose.src.training.utils import (
     CudaTimer,
     make_lr_ratio_function,
     make_optimizer,
     write_logs,
 )
-from megapose.utils.distributed import (
+from happypose.pose_estimators.megapose.src.utils.distributed import (
     get_rank,
     get_world_size,
     init_distributed_mode,
@@ -63,9 +63,9 @@ from megapose.utils.distributed import (
     sync_config,
     sync_model,
 )
-from megapose.utils.logging import get_logger
-from megapose.utils.random import get_unique_seed, set_seed, temp_numpy_seed
-from megapose.utils.resources import get_cuda_memory, get_gpu_memory, get_total_memory
+from happypose.pose_estimators.megapose.src.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.utils.random import get_unique_seed, set_seed, temp_numpy_seed
+from happypose.pose_estimators.megapose.src.utils.resources import get_cuda_memory, get_gpu_memory, get_total_memory
 
 
 def worker_init_fn(worker_id: int) -> None:

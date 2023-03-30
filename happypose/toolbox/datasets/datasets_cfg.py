@@ -39,8 +39,8 @@ from happypose.pose_estimators.megapose.src.megapose.config import (
     WDS_DS_DIR,
     YCBV_OBJECT_NAMES,
 )
-from happypose.pose_estimators.megapose.src.megapose.datasets.bop_object_datasets import BOPObjectDataset
-from happypose.pose_estimators.megapose.src.megapose.datasets.bop_scene_dataset import BOPDataset, remap_bop_targets
+from happypose.toolbox.datasets.bop_object_datasets import BOPObjectDataset
+from happypose.toolbox.datasets.bop_scene_dataset import BOPDataset, remap_bop_targets
 from happypose.pose_estimators.megapose.src.megapose.datasets.deepim_modelnet import DeepImModelNetDataset
 from happypose.pose_estimators.megapose.src.megapose.datasets.gso_dataset import GoogleScannedObjectDataset
 from happypose.pose_estimators.megapose.src.megapose.datasets.modelnet_object_dataset import ModelNetObjectDataset
