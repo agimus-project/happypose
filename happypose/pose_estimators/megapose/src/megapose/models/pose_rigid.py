@@ -40,9 +40,9 @@ from happypose.pose_estimators.megapose.src.megapose.lib3d.multiview import make
 from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.pose_estimators.megapose.src.megapose.lib3d.rotations import compute_rotation_matrix_from_ortho6d
 from happypose.pose_estimators.megapose.src.megapose.lib3d.transform_ops import normalize_T
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer import Panda3dLightData
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import make_scene_lights
+from happypose.toolbox.renderer import Panda3dLightData
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.toolbox.renderer.panda3d_scene_renderer import make_scene_lights
 from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer
 from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
 

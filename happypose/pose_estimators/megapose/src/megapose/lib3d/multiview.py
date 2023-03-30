@@ -25,7 +25,7 @@ from panda3d.core import NodePath, RenderState, TransformState
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
 from happypose.pose_estimators.megapose.src.megapose.lib3d.transform_ops import invert_transform_matrices
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.utils import compute_view_mat
+from happypose.toolbox.renderer.utils import compute_view_mat
 
 
 def _get_views_TCO_pos_sphere(TCO, tCR, cam_positions_wrt_cam0):

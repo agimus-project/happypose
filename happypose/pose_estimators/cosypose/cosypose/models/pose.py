@@ -12,7 +12,7 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import (
 from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import apply_imagespace_predictions
 
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer import Panda3dLightData
+from happypose.toolbox.renderer import Panda3dLightData
 logger = get_logger(__name__)
 
 

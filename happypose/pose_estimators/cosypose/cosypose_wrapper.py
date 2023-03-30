@@ -46,8 +46,8 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import init_d
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, RESULTS_DIR
 
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import Panda3dSceneRenderer
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
 
 """

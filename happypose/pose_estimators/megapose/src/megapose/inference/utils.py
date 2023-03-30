@@ -39,7 +39,7 @@ from happypose.pose_estimators.megapose.src.megapose.inference.detector import D
 from happypose.pose_estimators.megapose.src.megapose.inference.types import DetectionsType, PoseEstimatesType
 from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.pose_estimators.megapose.src.megapose.models.pose_rigid import PosePredictor
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.pose_estimators.megapose.src.megapose.training.detector_models_cfg import (
     check_update_config as check_update_config_detector,
 )

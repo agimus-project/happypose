@@ -42,8 +42,8 @@ from happypose.pose_estimators.megapose.src.megapose.inference.types import (
 )
 from happypose.pose_estimators.megapose.src.megapose.inference.utils import make_detections_from_object_data
 from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer import Panda3dLightData
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import Panda3dSceneRenderer
+from happypose.toolbox.renderer import Panda3dLightData
+from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
 from happypose.pose_estimators.megapose.src.megapose.utils.conversion import convert_scene_observation_to_panda3d
 from happypose.pose_estimators.megapose.src.megapose.utils.load_model import NAMED_MODELS, load_named_model
 from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger, set_logging_level
