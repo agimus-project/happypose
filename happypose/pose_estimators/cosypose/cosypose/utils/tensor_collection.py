@@ -1,7 +1,7 @@
 import torch
 from pathlib import Path
 import pandas as pd
-from cosypose.utils.distributed import get_rank, get_world_size
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_rank, get_world_size
 
 
 def concatenate(datas):

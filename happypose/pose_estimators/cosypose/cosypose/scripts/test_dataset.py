@@ -1,10 +1,10 @@
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from cosypose.datasets.pose_dataset import PoseDataset
-from cosypose.datasets.datasets_cfg import make_scene_dataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.pose_dataset import PoseDataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset
 
 if __name__ == '__main__':
-    from cosypose.bop_config import BOP_CONFIG
+    from happypose.pose_estimators.cosypose.cosypose.bop_config import BOP_CONFIG
     for ds_name, bop_config in BOP_CONFIG.items():
         train_synt_real_ds_names = bop_config.get('train_synt_real_ds_names', [])
         for (ds_name_, _) in train_synt_real_ds_names:

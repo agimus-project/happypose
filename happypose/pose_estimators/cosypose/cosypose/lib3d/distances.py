@@ -1,5 +1,5 @@
 import torch
-from cosypose.lib3d.transform_ops import transform_pts
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import transform_pts
 
 
 def dists_add(TXO_pred, TXO_gt, points):

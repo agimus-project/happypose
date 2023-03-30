@@ -6,7 +6,7 @@ import os
 import argparse
 import sys
 from pathlib import Path
-from cosypose.config import PROJECT_DIR, RESULTS_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import PROJECT_DIR, RESULTS_DIR
 
 
 TOOLKIT_DIR = Path(PROJECT_DIR / 'deps' / 'bop_toolkit_challenge')

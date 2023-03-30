@@ -3,8 +3,8 @@ import numpy as np
 import os
 from colorama import Fore, Style
 
-from cosypose.training.train_pose import train_pose
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.training.train_pose import train_pose
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 
@@ -71,8 +71,8 @@ def make_cfg(args):
     cfg.min_area = None
 
     if 'bop-' in args.config:
-        from cosypose.bop_config import BOP_CONFIG
-        from cosypose.bop_config import PBR_COARSE, PBR_REFINER
+        from happypose.pose_estimators.cosypose.cosypose.bop_config import BOP_CONFIG
+        from happypose.pose_estimators.cosypose.cosypose.bop_config import PBR_COARSE, PBR_REFINER
 
         bop_name, train_type, model_type = args.config.split('-')[1:]
         bop_cfg = BOP_CONFIG[bop_name]

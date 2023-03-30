@@ -9,7 +9,7 @@ from bokeh.io import output_notebook, show
 import numpy as np
 from bokeh.plotting import figure
 from bokeh.models import HoverTool
-from cosypose.training.pose_models_cfg import check_update_config
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import check_update_config
 from bokeh.layouts import gridplot
 import seaborn as sns
 

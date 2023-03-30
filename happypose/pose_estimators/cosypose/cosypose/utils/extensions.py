@@ -1,4 +1,4 @@
-from cosypose.config import PROJECT_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import PROJECT_DIR
 from torch.utils.cpp_extension import load
 
 

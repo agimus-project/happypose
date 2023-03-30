@@ -1,6 +1,6 @@
 from tqdm import tqdm
 from PIL import Image
-from cosypose.datasets.datasets_cfg import make_scene_dataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset
 
 if __name__ == '__main__':
     ds_name = 'itodd.pbr'

@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from cosypose.config import LOCAL_DATA_DIR, ASSET_DIR, BOP_DS_DIR
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR, ASSET_DIR, BOP_DS_DIR
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 
 from .bop_object_datasets import BOPObjectDataset
 from .bop import BOPDataset, remap_bop_targets

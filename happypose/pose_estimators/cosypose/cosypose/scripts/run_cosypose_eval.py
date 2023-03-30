@@ -1,4 +1,4 @@
-from cosypose.utils.tqdm import patch_tqdm; patch_tqdm()  # noqa
+from happypose.pose_estimators.cosypose.cosypose.utils.tqdm import patch_tqdm; patch_tqdm()  # noqa
 import torch.multiprocessing
 import time
 import json
@@ -13,33 +13,33 @@ import pandas as pd
 import pickle as pkl
 import logging
 
-from cosypose.config import EXP_DIR, MEMORY, RESULTS_DIR, LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, MEMORY, RESULTS_DIR, LOCAL_DATA_DIR
 
-from cosypose.utils.distributed import init_distributed_mode, get_world_size
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import init_distributed_mode, get_world_size
 
-from cosypose.lib3d import Transform
+from happypose.pose_estimators.cosypose.cosypose.lib3d import Transform
 
-from cosypose.lib3d.rigid_mesh_database import MeshDataBase
-from cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse, check_update_config
-from cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
-from cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
-from cosypose.integrated.multiview_predictor import MultiviewScenePredictor
+from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse, check_update_config
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
+from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
+from happypose.pose_estimators.cosypose.cosypose.integrated.multiview_predictor import MultiviewScenePredictor
 
-from cosypose.evaluation.meters.pose_meters import PoseErrorMeter
-from cosypose.evaluation.pred_runner.multiview_predictions import MultiviewPredictionRunner
-from cosypose.evaluation.eval_runner.pose_eval import PoseEvaluation
+from happypose.pose_estimators.cosypose.cosypose.evaluation.meters.pose_meters import PoseErrorMeter
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.multiview_predictions import MultiviewPredictionRunner
+from happypose.pose_estimators.cosypose.cosypose.evaluation.eval_runner.pose_eval import PoseEvaluation
 
 import cosypose.utils.tensor_collection as tc
-from cosypose.evaluation.runner_utils import format_results, gather_predictions
-from cosypose.utils.distributed import get_rank
+from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import format_results, gather_predictions
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_rank
 
 
-from cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
-from cosypose.datasets.bop import remap_bop_targets
-from cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.bop import remap_bop_targets
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
 
-from cosypose.datasets.samplers import ListSampler
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import ListSampler
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 torch.multiprocessing.set_sharing_strategy('file_system')

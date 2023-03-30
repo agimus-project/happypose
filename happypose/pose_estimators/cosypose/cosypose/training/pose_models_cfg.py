@@ -1,12 +1,12 @@
 # Backbones
-from cosypose.models.efficientnet import EfficientNet
-from cosypose.models.wide_resnet import WideResNet18, WideResNet34
-from cosypose.models.flownet import flownet_pretrained
+from happypose.pose_estimators.cosypose.cosypose.models.efficientnet import EfficientNet
+from happypose.pose_estimators.cosypose.cosypose.models.wide_resnet import WideResNet18, WideResNet34
+from happypose.pose_estimators.cosypose.cosypose.models.flownet import flownet_pretrained
 
 # Pose models
-from cosypose.models.pose import PosePredictor
+from happypose.pose_estimators.cosypose.cosypose.models.pose import PosePredictor
 
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 

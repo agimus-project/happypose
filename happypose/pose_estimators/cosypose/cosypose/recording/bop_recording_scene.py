@@ -2,12 +2,12 @@ from pathlib import Path
 import pinocchio as pin
 import numpy as np
 
-from cosypose.config import ASSET_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import ASSET_DIR
 
-from cosypose.datasets.datasets_cfg import make_urdf_dataset, make_texture_dataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_urdf_dataset, make_texture_dataset
 
-from cosypose.simulator import BaseScene, Body, Camera
-from cosypose.simulator import BodyCache, TextureCache, apply_random_textures
+from happypose.pose_estimators.cosypose.cosypose.simulator import BaseScene, Body, Camera
+from happypose.pose_estimators.cosypose.cosypose.simulator import BodyCache, TextureCache, apply_random_textures
 
 
 class SamplerError(Exception):

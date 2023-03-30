@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from torch.utils.data import Sampler
-from cosypose.utils.random import temp_numpy_seed
+from happypose.pose_estimators.cosypose.cosypose.utils.random import temp_numpy_seed
 
 
 class PartialSampler(Sampler):

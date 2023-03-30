@@ -8,8 +8,8 @@ from dask_jobqueue import SLURMCluster
 from distributed import Client, LocalCluster, as_completed
 from .record_chunk import record_chunk
 
-from cosypose.config import CONDA_BASE_DIR, CONDA_ENV, PROJECT_DIR, DASK_LOGS_DIR
-from cosypose.config import SLURM_GPU_QUEUE, SLURM_QOS, DASK_NETWORK_INTERFACE
+from happypose.pose_estimators.cosypose.cosypose.config import CONDA_BASE_DIR, CONDA_ENV, PROJECT_DIR, DASK_LOGS_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import SLURM_GPU_QUEUE, SLURM_QOS, DASK_NETWORK_INTERFACE
 
 import dask
 dask.config.set({'distributed.scheduler.allowed-failures': 1000})

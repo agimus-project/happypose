@@ -1,5 +1,5 @@
-from cosypose.models.mask_rcnn import DetectorMaskRCNN
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.models.mask_rcnn import DetectorMaskRCNN
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

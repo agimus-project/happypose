@@ -1,8 +1,8 @@
 import argparse
 from colorama import Fore, Style
 
-from cosypose.config import LOCAL_DATA_DIR
-from cosypose.recording.record_dataset import record_dataset
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.recording.record_dataset import record_dataset
 
 
 def make_cfg(cfg_name,

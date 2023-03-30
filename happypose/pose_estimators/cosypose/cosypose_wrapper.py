@@ -21,33 +21,33 @@ import torch
 import argparse
 import pandas as pd
 
-# from cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
-from megapose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
+# from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
+from happypose.pose_estimators.megapose.src.megapose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
 
 # Pose estimator
-from megapose.lib3d.rigid_mesh_database import MeshDataBase
-from cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse
-from cosypose.training.pose_models_cfg import check_update_config as check_update_config_pose
-from cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
-from cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
-from cosypose.integrated.multiview_predictor import MultiviewScenePredictor
-from cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
+from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import check_update_config as check_update_config_pose
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
+from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
+from happypose.pose_estimators.cosypose.cosypose.integrated.multiview_predictor import MultiviewScenePredictor
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
 import cosypose.utils.tensor_collection as tc
 # Detection
-from cosypose.training.detector_models_cfg import create_model_detector
-from cosypose.training.detector_models_cfg import check_update_config as check_update_config_detector
-from cosypose.integrated.detector import Detector
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import create_model_detector
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import check_update_config as check_update_config_detector
+from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 
-from cosypose.evaluation.pred_runner.bop_predictions import BopPredictionRunner
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.bop_predictions import BopPredictionRunner
 
-from cosypose.utils.distributed import get_tmp_dir, get_rank
-from cosypose.utils.distributed import init_distributed_mode
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_tmp_dir, get_rank
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import init_distributed_mode
 
-from cosypose.config import EXP_DIR, RESULTS_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, RESULTS_DIR
 
-from megapose.datasets.object_dataset import RigidObject, RigidObjectDataset
-from megapose.panda3d_renderer.panda3d_scene_renderer import Panda3dSceneRenderer
-from megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import Panda3dSceneRenderer
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
 
 """

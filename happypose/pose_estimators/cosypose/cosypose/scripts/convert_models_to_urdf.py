@@ -1,12 +1,12 @@
 from pathlib import Path
 import argparse
 import shutil
-from cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 from tqdm import tqdm
 
-from cosypose.datasets.datasets_cfg import make_object_dataset
-from cosypose.libmesh import ply_to_obj, obj_to_urdf
-from cosypose.libmesh import downsample_obj
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_object_dataset
+from happypose.pose_estimators.cosypose.cosypose.libmesh import ply_to_obj, obj_to_urdf
+from happypose.pose_estimators.cosypose.cosypose.libmesh import downsample_obj
 
 
 def convert_obj_dataset_to_urdfs(obj_ds_name, texture_size=(1024, 1024), n_faces=None):

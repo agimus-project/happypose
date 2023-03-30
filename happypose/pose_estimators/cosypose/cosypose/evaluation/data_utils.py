@@ -2,7 +2,7 @@ import pandas as pd
 import torch
 from collections import defaultdict
 import cosypose.utils.tensor_collection as tc
-from cosypose.lib3d.transform_ops import invert_T
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 
 
 def parse_obs_data(obs):

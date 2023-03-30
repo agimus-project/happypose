@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import multiprocessing
 
-from cosypose.lib3d.transform_ops import invert_T
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 from .bullet_scene_renderer import BulletSceneRenderer
 
 

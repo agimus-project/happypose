@@ -7,11 +7,11 @@ from collections import OrderedDict
 
 from torch.utils.data import DataLoader
 
-from cosypose.utils.distributed import get_world_size, get_rank, get_tmp_dir
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_world_size, get_rank, get_tmp_dir
 
 import cosypose.utils.tensor_collection as tc
-from cosypose.evaluation.data_utils import parse_obs_data
-from cosypose.datasets.samplers import DistributedSceneSampler
+from happypose.pose_estimators.cosypose.cosypose.evaluation.data_utils import parse_obs_data
+from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import DistributedSceneSampler
 
 
 class PoseEvaluation:

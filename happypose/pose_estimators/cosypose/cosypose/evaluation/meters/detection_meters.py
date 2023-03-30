@@ -8,7 +8,7 @@ from .base import Meter
 
 from .utils import (match_poses, get_top_n_ids,
                     add_valid_gt, get_candidate_matches, add_inst_num)
-from cosypose.utils.xarray import xr_merge
+from happypose.pose_estimators.cosypose.cosypose.utils.xarray import xr_merge
 
 
 class DetectionMeter(Meter):

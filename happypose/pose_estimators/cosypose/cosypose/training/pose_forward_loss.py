@@ -1,13 +1,13 @@
 import torch
 import numpy as np
 
-from cosypose.lib3d.cosypose_ops import TCO_init_from_boxes, TCO_init_from_boxes_zup_autodepth
-from cosypose.lib3d.transform_ops import add_noise
-from cosypose.lib3d.cosypose_ops import (
+from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import TCO_init_from_boxes, TCO_init_from_boxes_zup_autodepth
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import add_noise
+from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import (
     loss_refiner_CO_disentangled,
     loss_refiner_CO_disentangled_quaternions,
 )
-from cosypose.lib3d.mesh_losses import compute_ADD_L1_loss
+from happypose.pose_estimators.cosypose.cosypose.lib3d.mesh_losses import compute_ADD_L1_loss
 
 
 def cast(obj):

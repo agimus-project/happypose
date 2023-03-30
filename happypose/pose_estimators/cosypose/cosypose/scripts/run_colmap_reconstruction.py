@@ -3,9 +3,9 @@ import subprocess
 from tqdm import tqdm
 import os
 import numpy as np
-from cosypose.datasets.datasets_cfg import make_scene_dataset
-from cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
-from cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 
 if __name__ == '__main__':

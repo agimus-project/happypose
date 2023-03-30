@@ -5,8 +5,8 @@ from collections import OrderedDict
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 
-from cosypose.lib3d.distances import dists_add, dists_add_symmetric
-from cosypose.utils.xarray import xr_merge
+from happypose.pose_estimators.cosypose.cosypose.lib3d.distances import dists_add, dists_add_symmetric
+from happypose.pose_estimators.cosypose.cosypose.utils.xarray import xr_merge
 
 from .utils import (match_poses, get_top_n_ids,
                     add_valid_gt, get_candidate_matches, add_inst_num,

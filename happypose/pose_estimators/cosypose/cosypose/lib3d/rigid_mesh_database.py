@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from .mesh_ops import get_meshes_bounding_boxes, sample_points
 from .symmetries import make_bop_symmetries
-from cosypose.utils.tensor_collection import TensorCollection
+from happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection import TensorCollection
 
 
 class MeshDataBase:

@@ -13,8 +13,8 @@ sys.path.insert(0, '/home/emaitre/cosypose')
 
 import cosypose
 
-from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
-from cosypose.visualization.singleview import render_prediction_wrt_camera
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
+from happypose.pose_estimators.cosypose.cosypose.visualization.singleview import render_prediction_wrt_camera
 
 from cosypose_wrapper import CosyPoseWrapper
 

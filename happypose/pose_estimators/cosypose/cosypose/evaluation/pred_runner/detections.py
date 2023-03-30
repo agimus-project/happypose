@@ -4,9 +4,9 @@ from tqdm import tqdm
 import torch
 from collections import defaultdict
 
-from cosypose.datasets.samplers import DistributedSceneSampler
+from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import DistributedSceneSampler
 import cosypose.utils.tensor_collection as tc
-from cosypose.utils.distributed import get_world_size, get_rank, get_tmp_dir
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_world_size, get_rank, get_tmp_dir
 
 from torch.utils.data import DataLoader
 

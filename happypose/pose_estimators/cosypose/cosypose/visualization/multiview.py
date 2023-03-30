@@ -6,10 +6,10 @@ from copy import deepcopy
 from collections import defaultdict
 import seaborn as sns
 
-from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
-from cosypose.lib3d.transform import Transform
-from cosypose.lib3d.transform_ops import invert_T
-from cosypose.lib3d.rotations import euler2quat
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform import Transform
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
+from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import euler2quat
 from .plotter import Plotter
 
 

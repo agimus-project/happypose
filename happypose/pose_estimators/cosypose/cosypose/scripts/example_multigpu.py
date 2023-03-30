@@ -1,7 +1,7 @@
 import os
 import torch
-from cosypose.utils.distributed import init_distributed_mode, get_world_size, get_tmp_dir, get_rank
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import init_distributed_mode, get_world_size, get_tmp_dir, get_rank
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 

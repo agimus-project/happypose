@@ -1,18 +1,18 @@
 import torch
 from torch import nn
 
-from cosypose.config import DEBUG_DATA_DIR
-from cosypose.lib3d.camera_geometry import get_K_crop_resize, boxes_from_uv
+from happypose.pose_estimators.cosypose.cosypose.config import DEBUG_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.lib3d.camera_geometry import get_K_crop_resize, boxes_from_uv
 
-from cosypose.lib3d.cropping import deepim_crops_robust as deepim_crops
-from cosypose.lib3d.camera_geometry import project_points_robust as project_points
+from happypose.pose_estimators.cosypose.cosypose.lib3d.cropping import deepim_crops_robust as deepim_crops
+from happypose.pose_estimators.cosypose.cosypose.lib3d.camera_geometry import project_points_robust as project_points
 
-from cosypose.lib3d.rotations import (
+from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import (
     compute_rotation_matrix_from_ortho6d, compute_rotation_matrix_from_quaternions)
-from cosypose.lib3d.cosypose_ops import apply_imagespace_predictions
+from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import apply_imagespace_predictions
 
-from cosypose.utils.logging import get_logger
-from megapose.panda3d_renderer import Panda3dLightData
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer import Panda3dLightData
 logger = get_logger(__name__)
 
 

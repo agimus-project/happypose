@@ -7,7 +7,7 @@ from torchvision.datasets import ImageFolder
 import torch.nn.functional as F
 from copy import deepcopy
 
-from cosypose.lib3d.camera_geometry import get_K_crop_resize
+from happypose.pose_estimators.cosypose.cosypose.lib3d.camera_geometry import get_K_crop_resize
 from .utils import make_detections_from_segmentation, crop_to_aspect_ratio
 
 

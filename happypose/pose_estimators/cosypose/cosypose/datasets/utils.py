@@ -1,7 +1,7 @@
 import torch
 import torchvision
 import numpy as np
-from cosypose.lib3d.camera_geometry import get_K_crop_resize
+from happypose.pose_estimators.cosypose.cosypose.lib3d.camera_geometry import get_K_crop_resize
 
 
 def crop_to_aspect_ratio(images, box, masks=None, K=None):

@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import random
-from cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 from .wrappers.visibility_wrapper import VisibilityWrapper
 from .augmentations import (

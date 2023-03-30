@@ -5,7 +5,7 @@ import numpy as np
 import os
 import argparse
 import sys
-from cosypose.config import PROJECT_DIR, LOCAL_DATA_DIR, RESULTS_DIR, MEMORY, BOP_TOOLKIT_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import PROJECT_DIR, LOCAL_DATA_DIR, RESULTS_DIR, MEMORY, BOP_TOOLKIT_DIR
 
 SISO_SCRIPT_PATH = BOP_TOOLKIT_DIR / 'scripts/eval_siso.py'
 VIVO_SCRIPT_PATH = BOP_TOOLKIT_DIR / 'scripts/eval_vivo.py'

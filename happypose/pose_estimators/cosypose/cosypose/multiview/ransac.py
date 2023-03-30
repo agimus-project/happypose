@@ -7,12 +7,12 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 import cosypose.utils.tensor_collection as tc
 
-from cosypose.lib3d.transform_ops import invert_T
-from cosypose.lib3d.symmetric_distances import (
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
+from happypose.pose_estimators.cosypose.cosypose.lib3d.symmetric_distances import (
     symmetric_distance_batched_fast, expand_ids_for_symmetry, scatter_argmin)
 
-from cosypose.utils.logging import get_logger
-from cosypose.utils.timer import Timer
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.utils.timer import Timer
 logger = get_logger(__name__)
 
 

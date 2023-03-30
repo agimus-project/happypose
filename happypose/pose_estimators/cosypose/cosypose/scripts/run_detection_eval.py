@@ -7,24 +7,24 @@ import yaml
 import torch
 import argparse
 
-from cosypose.datasets.datasets_cfg import make_scene_dataset
-from cosypose.datasets.bop import remap_bop_targets
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.bop import remap_bop_targets
 
-from cosypose.evaluation.runner_utils import format_results
+from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import format_results
 
-from cosypose.training.detector_models_cfg import create_model_detector, check_update_config
-from cosypose.integrated.detector import Detector
-from cosypose.evaluation.pred_runner.detections import DetectionRunner
-from cosypose.scripts.run_cosypose_eval import load_pix2pose_results, load_posecnn_results
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import create_model_detector, check_update_config
+from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.detections import DetectionRunner
+from happypose.pose_estimators.cosypose.cosypose.scripts.run_cosypose_eval import load_pix2pose_results, load_posecnn_results
 
-from cosypose.evaluation.meters.detection_meters import DetectionMeter
-from cosypose.evaluation.eval_runner.detection_eval import DetectionEvaluation
+from happypose.pose_estimators.cosypose.cosypose.evaluation.meters.detection_meters import DetectionMeter
+from happypose.pose_estimators.cosypose.cosypose.evaluation.eval_runner.detection_eval import DetectionEvaluation
 
-from cosypose.utils.distributed import get_tmp_dir, get_rank
-from cosypose.utils.distributed import init_distributed_mode
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_tmp_dir, get_rank
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import init_distributed_mode
 
-from cosypose.config import EXP_DIR
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')

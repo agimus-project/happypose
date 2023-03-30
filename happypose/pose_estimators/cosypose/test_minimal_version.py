@@ -10,27 +10,30 @@ import torch
 from cosypose_wrapper import CosyPoseWrapper
 import cosypose
 from torch.testing import assert_close
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 # Functions to test
 
-#from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
-#from cosypose.visualization.singleview import render_prediction_wrt_camera
+#from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
+#from happypose.pose_estimators.cosypose.cosypose.visualization.singleview import render_prediction_wrt_camera
+
+# HappyPose
+from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
+from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
 
 # MegaPose
-from megapose.datasets.object_dataset import RigidObject, RigidObjectDataset
-from megapose.datasets.scene_dataset import CameraData, ObjectData
-from megapose.inference.types import (
+from happypose.pose_estimators.megapose.src.megapose.inference.types import (
     ObservationTensor
 )
-from megapose.inference.utils import make_detections_from_object_data
-from megapose.lib3d.transform import Transform
-from megapose.panda3d_renderer import Panda3dLightData
-from megapose.panda3d_renderer.panda3d_scene_renderer import Panda3dSceneRenderer
-from megapose.utils.conversion import convert_scene_observation_to_panda3d
-from megapose.utils.load_model import NAMED_MODELS, load_named_model
-from megapose.utils.logging import get_logger, set_logging_level
-from megapose.visualization.bokeh_plotter import BokehPlotter
-from megapose.visualization.utils import make_contour_overlay
+from happypose.pose_estimators.megapose.src.megapose.inference.utils import make_detections_from_object_data
+from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer import Panda3dLightData
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import Panda3dSceneRenderer
+from happypose.pose_estimators.megapose.src.megapose.utils.conversion import convert_scene_observation_to_panda3d
+from happypose.pose_estimators.megapose.src.megapose.utils.load_model import NAMED_MODELS, load_named_model
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger, set_logging_level
+from happypose.pose_estimators.megapose.src.megapose.visualization.bokeh_plotter import BokehPlotter
+from happypose.pose_estimators.megapose.src.megapose.visualization.utils import make_contour_overlay
 
 
 ##################################
@@ -71,6 +74,7 @@ cam = {
     'K': K_rs,
     'TWC': np.eye(4),
 }
+
 
 
 ##################################
@@ -193,7 +197,8 @@ def make_object_dataset(example_dir: Path) -> RigidObjectDataset:
         # TODO: fix mesh units
     rigid_object_dataset = RigidObjectDataset(rigid_objects)
     return rigid_object_dataset
-example_dir = Path("/home/emaitre/cosypose/local_data/bop_datasets/ycbv/examples/")
+
+example_dir = Path(str(LOCAL_DATA_DIR) + "/bop_datasets/ycbv/examples/")
 
 object_dataset = make_object_dataset(Path(example_dir / "cheetos" ))
 

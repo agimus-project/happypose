@@ -1,10 +1,10 @@
 import argparse
 import multiprocessing
 from copy import deepcopy
-from cosypose.config import RESULTS_DIR
-from cosypose.bop_config import BOP_CONFIG
-from cosypose.scripts.run_bop20_eval import run_evaluation
-from cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import RESULTS_DIR
+from happypose.pose_estimators.cosypose.cosypose.bop_config import BOP_CONFIG
+from happypose.pose_estimators.cosypose.cosypose.scripts.run_bop20_eval import run_evaluation
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 
 def main():

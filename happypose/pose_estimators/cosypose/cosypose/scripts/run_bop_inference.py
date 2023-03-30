@@ -6,35 +6,35 @@ import yaml
 import torch
 import argparse
 
-from cosypose.bop_config import BOP_CONFIG
-from cosypose.bop_config import PBR_COARSE, PBR_REFINER, PBR_DETECTORS
-from cosypose.bop_config import SYNT_REAL_COARSE, SYNT_REAL_REFINER, SYNT_REAL_DETECTORS
-from cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
+from happypose.pose_estimators.cosypose.cosypose.bop_config import BOP_CONFIG
+from happypose.pose_estimators.cosypose.cosypose.bop_config import PBR_COARSE, PBR_REFINER, PBR_DETECTORS
+from happypose.pose_estimators.cosypose.cosypose.bop_config import SYNT_REAL_COARSE, SYNT_REAL_REFINER, SYNT_REAL_DETECTORS
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
 
-from cosypose.evaluation.runner_utils import format_results
+from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import format_results
 
 # Pose estimator
-from cosypose.lib3d.rigid_mesh_database import MeshDataBase
-from cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse
-from cosypose.training.pose_models_cfg import check_update_config as check_update_config_pose
-from cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
-from cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
-from cosypose.integrated.icp_refiner import ICPRefiner
-from cosypose.integrated.multiview_predictor import MultiviewScenePredictor
-from cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
+from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import check_update_config as check_update_config_pose
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
+from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
+from happypose.pose_estimators.cosypose.cosypose.integrated.icp_refiner import ICPRefiner
+from happypose.pose_estimators.cosypose.cosypose.integrated.multiview_predictor import MultiviewScenePredictor
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
 
 # Detection
-from cosypose.training.detector_models_cfg import create_model_detector
-from cosypose.training.detector_models_cfg import check_update_config as check_update_config_detector
-from cosypose.integrated.detector import Detector
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import create_model_detector
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import check_update_config as check_update_config_detector
+from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 
-from cosypose.evaluation.pred_runner.bop_predictions import BopPredictionRunner
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.bop_predictions import BopPredictionRunner
 
-from cosypose.utils.distributed import get_tmp_dir, get_rank
-from cosypose.utils.distributed import init_distributed_mode
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_tmp_dir, get_rank
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import init_distributed_mode
 
-from cosypose.config import EXP_DIR, RESULTS_DIR
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, RESULTS_DIR
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 
 
 import torch.multiprocessing

@@ -4,7 +4,7 @@ import cv2
 import pickle
 import numpy as np
 from matplotlib import pyplot as plt
-from cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 # Standard Library
 import argparse
@@ -26,29 +26,29 @@ import sys
 
 import cosypose
 
-from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
-from cosypose.visualization.singleview import render_prediction_wrt_camera
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
+from happypose.pose_estimators.cosypose.cosypose.visualization.singleview import render_prediction_wrt_camera
 
 from cosypose_wrapper import CosyPoseWrapper
 
 # MegaPose
-from megapose.datasets.object_dataset import RigidObject, RigidObjectDataset
-from megapose.datasets.scene_dataset import CameraData, ObjectData
-from megapose.inference.types import (
+from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
+from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
+from happypose.pose_estimators.megapose.src.megapose.inference.types import (
     DetectionsType,
     ObservationTensor,
     PoseEstimatesType,
 )
-from megapose.inference.utils import make_detections_from_object_data
-from megapose.lib3d.transform import Transform
-from megapose.panda3d_renderer import Panda3dLightData
-from megapose.panda3d_renderer.panda3d_scene_renderer import Panda3dSceneRenderer
-from megapose.utils.conversion import convert_scene_observation_to_panda3d
-from megapose.utils.load_model import NAMED_MODELS, load_named_model
-from megapose.utils.logging import get_logger, set_logging_level
-from megapose.visualization.bokeh_plotter import BokehPlotter
-from megapose.visualization.utils import make_contour_overlay
-from megapose.datasets.datasets_cfg import make_object_dataset
+from happypose.pose_estimators.megapose.src.megapose.inference.utils import make_detections_from_object_data
+from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer import Panda3dLightData
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import Panda3dSceneRenderer
+from happypose.pose_estimators.megapose.src.megapose.utils.conversion import convert_scene_observation_to_panda3d
+from happypose.pose_estimators.megapose.src.megapose.utils.load_model import NAMED_MODELS, load_named_model
+from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger, set_logging_level
+from happypose.pose_estimators.megapose.src.megapose.visualization.bokeh_plotter import BokehPlotter
+from happypose.pose_estimators.megapose.src.megapose.visualization.utils import make_contour_overlay
+from happypose.pose_estimators.megapose.src.megapose.datasets.datasets_cfg import make_object_dataset
 
 
 import glob

@@ -5,8 +5,8 @@ from pathlib import Path
 
 import torch
 from cosypose_wrapper import CosyPoseWrapper
-from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
-from cosypose.visualization.singleview import render_prediction_wrt_camera
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
+from happypose.pose_estimators.cosypose.cosypose.visualization.singleview import render_prediction_wrt_camera
 import cosypose
 from torchvision.ops import box_iou
 from torch.testing import assert_close
@@ -207,7 +207,7 @@ def test_render_predicton_wrt_camera(ndarrays_regression):
 
 
 
-from cosypose.lib3d import Transform
+from happypose.pose_estimators.cosypose.cosypose.lib3d import Transform
 import pybullet as pb
 
 # Objectif : Tester individuellement que setup_scene et 
@@ -319,7 +319,7 @@ def test_setup_scene_modification_bodies(data_regression, ndarrays_regression):
 # Redondant avec le test complet ?
 def test_render_images():
     
-    from cosypose.simulator.camera import Camera
+    from happypose.pose_estimators.cosypose.cosypose.simulator.camera import Camera
     render_depth = False
     cam = {
     'resolution': IMG_RES,

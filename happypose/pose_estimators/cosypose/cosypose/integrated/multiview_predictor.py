@@ -3,11 +3,11 @@ import pandas as pd
 
 import cosypose.utils.tensor_collection as tc
 
-from cosypose.lib3d.transform_ops import invert_T
-from cosypose.multiview.ransac import multiview_candidate_matching
-from cosypose.multiview.bundle_adjustment import make_view_groups, MultiviewRefinement
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
+from happypose.pose_estimators.cosypose.cosypose.multiview.ransac import multiview_candidate_matching
+from happypose.pose_estimators.cosypose.cosypose.multiview.bundle_adjustment import make_view_groups, MultiviewRefinement
 
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 

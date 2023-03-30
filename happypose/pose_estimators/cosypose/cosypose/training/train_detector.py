@@ -10,15 +10,15 @@ from torchnet.meter import AverageValueMeter
 from collections import defaultdict
 import torch.distributed as dist
 
-from cosypose.config import EXP_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 
 from torch.utils.data import DataLoader, ConcatDataset
-from cosypose.utils.multiepoch_dataloader import MultiEpochDataLoader
+from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader import MultiEpochDataLoader
 from torchvision.models.utils import load_state_dict_from_url
 
-from cosypose.datasets.datasets_cfg import make_scene_dataset
-from cosypose.datasets.detection_dataset import DetectionDataset
-from cosypose.datasets.samplers import PartialSampler
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import DetectionDataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler
 
 from torchvision.models.detection.mask_rcnn import model_urls
 
@@ -26,13 +26,13 @@ from .maskrcnn_forward_loss import h_maskrcnn
 from .detector_models_cfg import create_model_detector, check_update_config
 
 
-from cosypose.utils.logging import get_logger
-from cosypose.utils.distributed import get_world_size, get_rank, sync_model, init_distributed_mode, reduce_dict
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_world_size, get_rank, sync_model, init_distributed_mode, reduce_dict
 from torch.backends import cudnn
 
 # Evaluation
-from cosypose.scripts.run_detection_eval import run_detection_eval
-from cosypose.integrated.detector import Detector
+from happypose.pose_estimators.cosypose.cosypose.scripts.run_detection_eval import run_detection_eval
+from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 
 cudnn.benchmark = True
 logger = get_logger(__name__)

@@ -2,8 +2,8 @@ import torch
 import random
 import numpy as np
 from dataclasses import dataclass
-from cosypose.lib3d import invert_T
-from cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.lib3d import invert_T
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 from .wrappers.visibility_wrapper import VisibilityWrapper
 from .augmentations import (

@@ -2,7 +2,7 @@ from pathlib import Path
 import torch
 from collections import defaultdict
 
-from cosypose.utils.distributed import get_world_size, get_rank
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_world_size, get_rank
 
 
 class Meter:

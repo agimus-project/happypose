@@ -7,15 +7,15 @@ import json
 import numpy as np
 import logging
 
-from cosypose.datasets.bop_object_datasets import BOPObjectDataset
-from cosypose.lib3d.rigid_mesh_database import MeshDataBase
-from cosypose.integrated.multiview_predictor import MultiviewScenePredictor
+from happypose.pose_estimators.cosypose.cosypose.datasets.bop_object_datasets import BOPObjectDataset
+from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.pose_estimators.cosypose.cosypose.integrated.multiview_predictor import MultiviewScenePredictor
 import cosypose.utils.tensor_collection as tc
-from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
-from cosypose.visualization.multiview import make_cosypose_plots
-from cosypose.visualization.multiview import make_scene_renderings, nms3d
-from cosypose.utils.logging import get_logger
-from cosypose.config import BOP_TOOLKIT_DIR, LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
+from happypose.pose_estimators.cosypose.cosypose.visualization.multiview import make_cosypose_plots
+from happypose.pose_estimators.cosypose.cosypose.visualization.multiview import make_scene_renderings, nms3d
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.config import BOP_TOOLKIT_DIR, LOCAL_DATA_DIR
 
 sys.path.append(str(BOP_TOOLKIT_DIR))
 from bop_toolkit_lib import inout  # noqa

@@ -2,8 +2,8 @@ from collections import OrderedDict
 import pandas as pd
 from collections import defaultdict
 
-from cosypose.utils.distributed import get_tmp_dir, get_rank
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_tmp_dir, get_rank
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

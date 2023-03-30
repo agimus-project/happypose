@@ -5,8 +5,8 @@ import wget
 import logging
 import subprocess
 from pathlib import Path
-from cosypose.config import PROJECT_DIR, LOCAL_DATA_DIR, BOP_DS_DIR
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.config import PROJECT_DIR, LOCAL_DATA_DIR, BOP_DS_DIR
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 RCLONE_CFG_PATH = (PROJECT_DIR / 'rclone.conf')
@@ -134,7 +134,7 @@ def main():
         gdrive_download(f'custom_scenarios/example/scene_camera.json', LOCAL_DATA_DIR / 'custom_scenarios/example')
 
     if args.all_bop20_models:
-        from cosypose.bop_config import (PBR_DETECTORS, PBR_COARSE, PBR_REFINER,
+        from happypose.pose_estimators.cosypose.cosypose.bop_config import (PBR_DETECTORS, PBR_COARSE, PBR_REFINER,
                                          SYNT_REAL_DETECTORS, SYNT_REAL_COARSE, SYNT_REAL_REFINER)
         for model_dict in (PBR_DETECTORS, PBR_COARSE, PBR_REFINER,
                            SYNT_REAL_DETECTORS, SYNT_REAL_COARSE, SYNT_REAL_REFINER):
@@ -142,7 +142,7 @@ def main():
                 gdrive_download(f'experiments/{model}', LOCAL_DATA_DIR / 'experiments')
 
     if args.all_bop20_results:
-        from cosypose.bop_config import (PBR_INFERENCE_ID, SYNT_REAL_INFERENCE_ID, SYNT_REAL_ICP_INFERENCE_ID,
+        from happypose.pose_estimators.cosypose.cosypose.bop_config import (PBR_INFERENCE_ID, SYNT_REAL_INFERENCE_ID, SYNT_REAL_ICP_INFERENCE_ID,
                                          SYNT_REAL_4VIEWS_INFERENCE_ID, SYNT_REAL_8VIEWS_INFERENCE_ID)
         for result_id in (PBR_INFERENCE_ID, SYNT_REAL_INFERENCE_ID, SYNT_REAL_ICP_INFERENCE_ID,
                           SYNT_REAL_4VIEWS_INFERENCE_ID, SYNT_REAL_8VIEWS_INFERENCE_ID):

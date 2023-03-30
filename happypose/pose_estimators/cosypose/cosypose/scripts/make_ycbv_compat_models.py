@@ -3,7 +3,7 @@ import shutil
 from copy import deepcopy
 import numpy as np
 import json
-from cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 
 if __name__ == '__main__':

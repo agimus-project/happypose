@@ -10,33 +10,33 @@ from torchnet.meter import AverageValueMeter
 from collections import defaultdict
 import torch.distributed as dist
 
-from cosypose.config import EXP_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 
 from torch.utils.data import DataLoader, ConcatDataset
-from cosypose.utils.multiepoch_dataloader import MultiEpochDataLoader
+from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader import MultiEpochDataLoader
 
-from cosypose.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
-from cosypose.datasets.pose_dataset import PoseDataset
-from cosypose.datasets.samplers import PartialSampler, ListSampler
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.pose_dataset import PoseDataset
+from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler, ListSampler
 
 # Evaluation
-from cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
-from cosypose.evaluation.pred_runner.multiview_predictions import MultiviewPredictionRunner
-from cosypose.evaluation.eval_runner.pose_eval import PoseEvaluation
-from cosypose.evaluation.runner_utils import run_pred_eval
-from cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
-from cosypose.scripts.run_cosypose_eval import (
+from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.multiview_predictions import MultiviewPredictionRunner
+from happypose.pose_estimators.cosypose.cosypose.evaluation.eval_runner.pose_eval import PoseEvaluation
+from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import run_pred_eval
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
+from happypose.pose_estimators.cosypose.cosypose.scripts.run_cosypose_eval import (
     load_pix2pose_results, load_posecnn_results, get_pose_meters)
 
-from cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
-from cosypose.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
+from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import MeshDataBase
 
 from .pose_forward_loss import h_pose
 from .pose_models_cfg import create_model_pose, check_update_config
 
 
-from cosypose.utils.logging import get_logger
-from cosypose.utils.distributed import get_world_size, get_rank, sync_model, init_distributed_mode, reduce_dict
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_world_size, get_rank, sync_model, init_distributed_mode, reduce_dict
 from torch.backends import cudnn
 
 cudnn.benchmark = True

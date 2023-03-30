@@ -7,15 +7,15 @@ from scipy.sparse.csgraph import connected_components
 
 import cosypose.utils.tensor_collection as tc
 
-from cosypose.lib3d.transform_ops import invert_T, compute_transform_from_pose9d
-from cosypose.lib3d.camera_geometry import project_points
-from cosypose.lib3d.symmetric_distances import symmetric_distance_reprojected
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T, compute_transform_from_pose9d
+from happypose.pose_estimators.cosypose.cosypose.lib3d.camera_geometry import project_points
+from happypose.pose_estimators.cosypose.cosypose.lib3d.symmetric_distances import symmetric_distance_reprojected
 
 from .ransac import make_obj_infos
 
 
-from cosypose.utils.logging import get_logger
-from cosypose.utils.timer import Timer
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.utils.timer import Timer
 logger = get_logger(__name__)
 
 

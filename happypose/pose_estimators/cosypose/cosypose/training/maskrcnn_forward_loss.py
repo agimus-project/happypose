@@ -1,4 +1,4 @@
-from cosypose.config import DEBUG_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import DEBUG_DATA_DIR
 import torch
 
 def cast(obj):

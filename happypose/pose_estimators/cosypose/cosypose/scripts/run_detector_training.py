@@ -3,8 +3,8 @@ import numpy as np
 import os
 from colorama import Fore, Style
 
-from cosypose.training.train_detector import train_detector
-from cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.training.train_detector import train_detector
+from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 
@@ -85,8 +85,8 @@ if __name__ == '__main__':
         raise ValueError
 
     if 'bop-' in args.config:
-        from cosypose.bop_config import BOP_CONFIG
-        from cosypose.bop_config import PBR_DETECTORS
+        from happypose.pose_estimators.cosypose.cosypose.bop_config import BOP_CONFIG
+        from happypose.pose_estimators.cosypose.cosypose.bop_config import PBR_DETECTORS
         bop_name, train_type = args.config.split('-')[1:]
         bop_cfg = BOP_CONFIG[bop_name]
         if train_type == 'pbr':

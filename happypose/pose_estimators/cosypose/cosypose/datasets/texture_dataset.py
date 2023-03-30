@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from cosypose.config import MEMORY
+from happypose.pose_estimators.cosypose.cosypose.config import MEMORY
 
 
 class TextureDataset:

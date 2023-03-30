@@ -12,8 +12,8 @@ from torch.testing import assert_close
 
 # Functions to test
 
-from cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
-from cosypose.visualization.singleview import render_prediction_wrt_camera
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
+from happypose.pose_estimators.cosypose.cosypose.visualization.singleview import render_prediction_wrt_camera
 
 
 

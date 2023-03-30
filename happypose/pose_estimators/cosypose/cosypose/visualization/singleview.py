@@ -2,8 +2,8 @@ import numpy as np
 
 from .plotter import Plotter
 
-from cosypose.datasets.wrappers.augmentation_wrapper import AugmentationWrapper
-from cosypose.datasets.augmentations import CropResizeToAspectAugmentation
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.augmentation_wrapper import AugmentationWrapper
+from happypose.pose_estimators.cosypose.cosypose.datasets.augmentations import CropResizeToAspectAugmentation
 
 
 def filter_predictions(preds, scene_id, view_id=None, th=None):
