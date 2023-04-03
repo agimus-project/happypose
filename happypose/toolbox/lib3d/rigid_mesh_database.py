@@ -29,9 +29,9 @@ import trimesh
 from happypose.toolbox.datasets.object_dataset import RigidObject
 
 
-from happypose.pose_estimators.megapose.src.megapose.lib3d.mesh_ops import get_meshes_bounding_boxes, sample_points
-from happypose.pose_estimators.megapose.src.megapose.lib3d.symmetries import make_symmetries_poses
-from happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection import TensorCollection
+from happypose.toolbox.lib3d.mesh_ops import get_meshes_bounding_boxes, sample_points
+from happypose.toolbox.lib3d.symmetries import make_symmetries_poses
+from happypose.toolbox.utils.tensor_collection import TensorCollection
 
 
 def as_mesh(scene_or_mesh):

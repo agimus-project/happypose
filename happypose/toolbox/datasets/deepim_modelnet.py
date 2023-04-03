@@ -27,7 +27,7 @@ from PIL import Image
 
 # MegaPose
 from happypose.toolbox.datasets.utils import make_detections_from_segmentation
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform import Transform
 
 # Local Folder
 from happypose.toolbox.datasets.scene_dataset import (

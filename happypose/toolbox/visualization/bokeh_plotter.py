@@ -30,9 +30,9 @@ from bokeh.models import ColumnDataSource, LabelSet
 from PIL import Image
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection import PandasTensorCollection
-from happypose.pose_estimators.megapose.src.megapose.visualization.bokeh_utils import make_image_figure, to_rgba
-from happypose.pose_estimators.megapose.src.megapose.visualization.utils import get_mask_from_rgb, image_to_np_uint8
+from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
+from happypose.toolbox.visualization.bokeh_utils import make_image_figure, to_rgba
+from happypose.toolbox.visualization.utils import get_mask_from_rgb, image_to_np_uint8
 
 
 class BokehPlotter:

@@ -33,11 +33,11 @@ import torch
 import webdataset as wds
 
 # MegaPose
-import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
-from happypose.pose_estimators.megapose.src.megapose.utils.random import make_seed
-from happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection import PandasTensorCollection
-from happypose.pose_estimators.megapose.src.megapose.utils.types import Resolution
+import happypose.toolbox.utils.tensor_collection as tc
+from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.utils.random import make_seed
+from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
+from happypose.toolbox.utils.types import Resolution
 
 ListBbox = List[int]
 ListPose = List[List[float]]

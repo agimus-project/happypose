@@ -38,18 +38,18 @@ from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRender
 # MegaPose
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
-from happypose.pose_estimators.megapose.src.megapose.inference.types import (
+from happypose.toolbox.inference.types import (
     DetectionsType,
     ObservationTensor,
     PoseEstimatesType,
 )
-from happypose.pose_estimators.megapose.src.megapose.inference.utils import make_detections_from_object_data
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
-from happypose.pose_estimators.megapose.src.megapose.utils.conversion import convert_scene_observation_to_panda3d
-from happypose.pose_estimators.megapose.src.megapose.utils.load_model import NAMED_MODELS, load_named_model
-from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger, set_logging_level
-from happypose.pose_estimators.megapose.src.megapose.visualization.bokeh_plotter import BokehPlotter
-from happypose.pose_estimators.megapose.src.megapose.visualization.utils import make_contour_overlay
+from happypose.toolbox.inference.utils import make_detections_from_object_data
+from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.utils.conversion import convert_scene_observation_to_panda3d
+from happypose.toolbox.utils.load_model import NAMED_MODELS, load_named_model
+from happypose.toolbox.utils.logging import get_logger, set_logging_level
+from happypose.toolbox.visualization.bokeh_plotter import BokehPlotter
+from happypose.toolbox.visualization.utils import make_contour_overlay
 
 
 

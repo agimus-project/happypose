@@ -30,8 +30,8 @@ from tqdm import tqdm
 
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.config import BOP_TOOLKIT_DIR, MEMORY
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
-from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
+from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.utils.logging import get_logger
 
 # Local Folder
 from happypose.toolbox.datasets.scene_dataset import (

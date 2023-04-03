@@ -55,7 +55,7 @@ from happypose.toolbox.datasets.augmentations import (
 from happypose.toolbox.datasets.augmentations import SceneObservationAugmentation as SceneObsAug
 from happypose.toolbox.datasets.augmentations import VOCBackgroundAugmentation
 from happypose.toolbox.datasets.scene_dataset_wrappers import remove_invisible_objects
-from happypose.pose_estimators.megapose.src.megapose.utils.types import Resolution
+from happypose.toolbox.utils.types import Resolution
 
 
 @dataclass

@@ -28,8 +28,8 @@ from scipy import ndimage
 from happypose.pose_estimators.megapose.src.megapose.config import DEBUG_DATA_DIR
 from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import DepthRefiner
 from happypose.pose_estimators.megapose.src.megapose.inference.refiner_utils import compute_masks
-from happypose.pose_estimators.megapose.src.megapose.inference.types import PoseEstimatesType
-from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import BatchedMeshes
+from happypose.toolbox.inference.types import PoseEstimatesType
+from happypose.toolbox.lib3d.rigid_mesh_database import BatchedMeshes
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.toolbox.renderer.types import Panda3dLightData
 

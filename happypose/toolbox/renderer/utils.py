@@ -25,7 +25,7 @@ import numpy.typing as npt
 import panda3d as p3d
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.renderer.geometry import make_axes, make_box, make_sphere
 
 def compute_view_mat(TWC):

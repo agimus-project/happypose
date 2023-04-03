@@ -26,7 +26,7 @@ import panda3d.core
 from direct.showbase.ShowBase import ShowBase
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform import Transform
 
 # Local Folder
 from .utils import depth_image_from_depth_buffer

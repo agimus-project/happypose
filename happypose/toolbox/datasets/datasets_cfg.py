@@ -47,7 +47,7 @@ from happypose.toolbox.datasets.modelnet_object_dataset import ModelNetObjectDat
 from happypose.toolbox.datasets.shapenet_object_dataset import ShapeNetObjectDataset
 from happypose.toolbox.datasets.urdf_dataset import UrdfDataset
 from happypose.toolbox.datasets.web_scene_dataset import WebSceneDataset
-from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
+from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

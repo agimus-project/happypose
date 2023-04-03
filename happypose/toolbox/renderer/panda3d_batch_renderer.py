@@ -30,9 +30,9 @@ from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform_ops import invert_transform_matrices
-from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
+from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
+from happypose.toolbox.utils.logging import get_logger
 
 # Local Folder
 from .panda3d_scene_renderer import Panda3dSceneRenderer

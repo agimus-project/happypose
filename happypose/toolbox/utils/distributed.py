@@ -30,7 +30,7 @@ from omegaconf import OmegaConf
 import omegaconf
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
+from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

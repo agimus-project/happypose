@@ -23,8 +23,8 @@ import transforms3d
 from panda3d.core import NodePath, RenderState, TransformState
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
-from happypose.pose_estimators.megapose.src.megapose.lib3d.transform_ops import invert_transform_matrices
+from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 from happypose.toolbox.renderer.utils import compute_view_mat
 
 

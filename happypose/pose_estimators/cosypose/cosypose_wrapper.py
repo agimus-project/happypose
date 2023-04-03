@@ -25,7 +25,7 @@ import pandas as pd
 from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
 
 # Pose estimator
-from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import check_update_config as check_update_config_pose
 from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer

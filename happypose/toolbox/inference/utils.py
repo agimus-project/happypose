@@ -32,12 +32,12 @@ from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
 
 # MegaPose
 import happypose.pose_estimators.megapose.src.megapose
-import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
+import happypose.toolbox.utils.tensor_collection as tc
 from happypose.pose_estimators.megapose.src.megapose.config import EXP_DIR
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 from happypose.pose_estimators.megapose.src.megapose.inference.detector import Detector
-from happypose.pose_estimators.megapose.src.megapose.inference.types import DetectionsType, PoseEstimatesType
-from happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.inference.types import DetectionsType, PoseEstimatesType
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.pose_estimators.megapose.src.megapose.models.pose_rigid import PosePredictor
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.pose_estimators.megapose.src.megapose.training.detector_models_cfg import (
@@ -49,9 +49,9 @@ from happypose.pose_estimators.megapose.src.megapose.training.pose_models_cfg im
 )
 from happypose.pose_estimators.megapose.src.megapose.training.pose_models_cfg import create_model_pose
 from happypose.pose_estimators.megapose.src.megapose.training.training_config import TrainingConfig
-from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
-from happypose.pose_estimators.megapose.src.megapose.utils.models_compat import change_keys_of_older_models
-from happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection import PandasTensorCollection
+from happypose.toolbox.utils.logging import get_logger
+from happypose.toolbox.utils.models_compat import change_keys_of_older_models
+from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 
 logger = get_logger(__name__)
 
@@ -87,7 +87,7 @@ def load_pose_models(
     force_panda3d_renderer: bool = False,
     renderer_kwargs: Optional[dict] = None,
     models_root: Path = EXP_DIR,
-) -> Tuple[torch.nn.Module, torch.nn.Module, happypose.pose_estimators.megapose.src.megapose.lib3d.rigid_mesh_database.BatchedMeshes]:
+) -> Tuple[torch.nn.Module, torch.nn.Module, happypose.toolbox.lib3d.rigid_mesh_database.BatchedMeshes]:
 
     coarse_run_dir = models_root / coarse_run_id
     coarse_cfg: TrainingConfig = load_cfg(coarse_run_dir / "config.yaml")

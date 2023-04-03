@@ -29,22 +29,23 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
+import happypose.toolbox.inference.utils
+
 # MegaPose
 import happypose.pose_estimators.megapose.src.megapose as megapose
-import happypose.pose_estimators.megapose.src.megapose.inference.utils
-import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
+import happypose.toolbox.utils.tensor_collection as tc
 from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import DepthRefiner
-from happypose.pose_estimators.megapose.src.megapose.inference.types import (
+from happypose.toolbox.inference.types import (
     DetectionsType,
     ObservationTensor,
     PoseEstimatesType,
 )
-from happypose.pose_estimators.megapose.src.megapose.lib3d.cosypose_ops import TCO_init_from_boxes_autodepth_with_R
+from happypose.toolbox.lib3d.cosypose_ops import TCO_init_from_boxes_autodepth_with_R
 from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer, SimpleTimer
-from happypose.pose_estimators.megapose.src.megapose.utils import transform_utils
-from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
-from happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection import PandasTensorCollection
-from happypose.pose_estimators.megapose.src.megapose.utils.timer import Timer
+from happypose.toolbox.utils import transform_utils
+from happypose.toolbox.utils.logging import get_logger
+from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
+from happypose.toolbox.utils.timer import Timer
 
 logger = get_logger(__name__)
 
@@ -338,7 +339,7 @@ class PoseEstimator(torch.nn.Module):
 
         start_time = time.time()
 
-        megapose.inference.types.assert_detections_valid(detections)
+        happypose.toolbox.inference.types.assert_detections_valid(detections)
 
         bsz_images = self.bsz_images
         coarse_model = self.coarse_model
@@ -565,11 +566,11 @@ class PoseEstimator(torch.nn.Module):
 
             # Ensure that detections has the instance_id column
             assert detections is not None
-            detections = megapose.inference.utils.add_instance_id(detections)
+            detections = happypose.toolbox.inference.utils.add_instance_id(detections)
 
             # Filter detections
             if detection_filter_kwargs is not None:
-                detections = megapose.inference.utils.filter_detections(
+                detections = happypose.toolbox.inference.utils.filter_detections(
                     detections, **detection_filter_kwargs
                 )
 

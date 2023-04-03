@@ -43,7 +43,7 @@ from happypose.toolbox.datasets.scene_dataset import (
     SceneDataset,
     SceneObservation,
 )
-from happypose.pose_estimators.megapose.src.megapose.utils.webdataset import tarfile_to_samples
+from happypose.toolbox.utils.webdataset import tarfile_to_samples
 
 
 def simple_collate_fn(batch: Any) -> Any:

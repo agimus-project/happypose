@@ -36,7 +36,7 @@ from happypose.toolbox.datasets.scene_dataset import Resolution, SceneObservatio
 
 # MegaPose
 from happypose.toolbox.datasets.utils import make_detections_from_segmentation
-from happypose.pose_estimators.megapose.src.megapose.lib3d.camera_geometry import get_K_crop_resize
+from happypose.toolbox.lib3d.camera_geometry import get_K_crop_resize
 
 
 class SceneObservationTransform:

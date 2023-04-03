@@ -25,7 +25,7 @@ from typing import List, Optional, Set, Tuple
 import numpy as np
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.lib3d.symmetries import (
+from happypose.toolbox.lib3d.symmetries import (
     ContinuousSymmetry,
     DiscreteSymmetry,
     make_symmetries_poses,

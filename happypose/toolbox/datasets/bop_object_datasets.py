@@ -24,7 +24,7 @@ from pathlib import Path
 import numpy as np
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.lib3d.symmetries import ContinuousSymmetry, DiscreteSymmetry
+from happypose.toolbox.lib3d.symmetries import ContinuousSymmetry, DiscreteSymmetry
 
 # Local Folder
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset

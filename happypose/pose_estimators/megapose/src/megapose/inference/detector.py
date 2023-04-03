@@ -27,8 +27,8 @@ import torch
 
 # MegaPose
 import happypose.pose_estimators.megapose.src.megapose
-import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
-from happypose.pose_estimators.megapose.src.megapose.inference.types import DetectionsType, ObservationTensor
+import happypose.toolbox.utils.tensor_collection as tc
+from happypose.toolbox.inference.types import DetectionsType, ObservationTensor
 
 
 class Detector(torch.nn.Module):
