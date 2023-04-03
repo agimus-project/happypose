@@ -25,9 +25,9 @@ import pandas as pd
 import torch
 
 # MegaPose
-import megapose.utils.tensor_collection as tc
-from happypose.pose_estimators.megapose.src.datasets.scene_dataset import SceneObservation
-from happypose.pose_estimators.megapose.src.utils.tensor_collection import PandasTensorCollection
+import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
+from happypose.toolbox.datasets.scene_dataset import SceneObservation
+from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 
 
 def parse_obs_data(

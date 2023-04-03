@@ -29,9 +29,9 @@ import numpy as np
 from tqdm import tqdm
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.config import SHAPENET_DIR
-from happypose.pose_estimators.megapose.src.datasets.datasets_cfg import make_object_dataset
-from happypose.pose_estimators.megapose.src.panda3d_renderer.panda3d_scene_renderer import App
+from happypose.pose_estimators.megapose.src.megapose.config import SHAPENET_DIR
+from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import App
 
 
 def measure_memory(gltf_path):

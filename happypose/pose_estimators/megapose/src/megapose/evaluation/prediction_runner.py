@@ -28,20 +28,20 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 # MegaPose
-import megapose
-import megapose.utils.tensor_collection as tc
-from happypose.pose_estimators.megapose.src.datasets.samplers import DistributedSceneSampler
-from happypose.pose_estimators.megapose.src.datasets.scene_dataset import SceneDataset, SceneObservation
-from happypose.pose_estimators.megapose.src.inference.pose_estimator import PoseEstimator
-from happypose.pose_estimators.megapose.src.inference.types import (
+import happypose.pose_estimators.megapose.src.megapose
+import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
+from happypose.toolbox.datasets.samplers import DistributedSceneSampler
+from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation
+from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import PoseEstimator
+from happypose.pose_estimators.megapose.src.megapose.inference.types import (
     DetectionsType,
     InferenceConfig,
     ObservationTensor,
     PoseEstimatesType,
 )
-from happypose.pose_estimators.megapose.src.training.utils import CudaTimer
-from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_tmp_dir, get_world_size
-from happypose.pose_estimators.megapose.src.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer
+from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, get_world_size
+from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -106,7 +106,7 @@ class PredictionRunner:
         if self.inference_cfg.coarse_estimation_type == "external":
             # TODO (ylabbe): This is hacky, clean this for modelnet eval.
             coarse_estimates = initial_estimates
-            coarse_estimates = megapose.inference.utils.add_instance_id(coarse_estimates)
+            coarse_estimates = happypose.toolbox.inference.utils.add_instance_id(coarse_estimates)
             coarse_estimates.infos["instance_id"] = 0
             run_detector = False
 

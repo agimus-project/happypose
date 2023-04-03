@@ -20,7 +20,7 @@ limitations under the License.
 import torch
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.lib3d.transform_ops import transform_pts
+from happypose.toolbox.lib3d.transform_ops import transform_pts
 
 
 def dists_add(TXO_pred, TXO_gt, points):

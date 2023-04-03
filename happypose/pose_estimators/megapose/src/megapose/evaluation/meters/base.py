@@ -24,7 +24,7 @@ from pathlib import Path
 import torch
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_world_size
+from happypose.toolbox.utils.distributed import get_rank, get_world_size
 
 
 class Meter:

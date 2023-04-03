@@ -23,8 +23,8 @@ from collections import OrderedDict, defaultdict
 import pandas as pd
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_tmp_dir
-from happypose.pose_estimators.megapose.src.utils.logging import get_logger
+from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir
+from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

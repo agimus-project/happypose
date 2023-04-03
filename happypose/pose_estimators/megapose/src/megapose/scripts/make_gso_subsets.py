@@ -26,8 +26,8 @@ import pandas as pd
 from tqdm import tqdm
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.config import GSO_DIR
-from happypose.pose_estimators.megapose.src.datasets.datasets_cfg import make_object_dataset
+from happypose.pose_estimators.megapose.src.megapose.config import GSO_DIR
+from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
 
 def get_labels_split(statistics, max_model_mem_kb, max_tot_mem_kb):

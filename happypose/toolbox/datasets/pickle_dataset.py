@@ -21,7 +21,7 @@ import pickle
 from pathlib import Path
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.datasets.utils import SceneData
+from happypose.toolbox.datasets.utils import SceneData
 
 
 class PickleDataset:

@@ -24,23 +24,23 @@ import torch
 from omegaconf import OmegaConf
 
 # MegaPose
-import megapose
-import megapose.datasets.datasets_cfg
-import megapose.evaluation.eval_runner
-import megapose.inference.utils
-from happypose.pose_estimators.megapose.src.datasets.datasets_cfg import make_object_dataset
-from happypose.pose_estimators.megapose.src.evaluation.eval_config import EvalConfig
-from happypose.pose_estimators.megapose.src.evaluation.evaluation_runner import EvaluationRunner
-from happypose.pose_estimators.megapose.src.evaluation.meters.modelnet_meters import ModelNetErrorMeter
-from happypose.pose_estimators.megapose.src.evaluation.prediction_runner import PredictionRunner
-from happypose.pose_estimators.megapose.src.evaluation.runner_utils import format_results
-from happypose.pose_estimators.megapose.src.inference.depth_refiner import DepthRefiner
-from happypose.pose_estimators.megapose.src.inference.icp_refiner import ICPRefiner
-from happypose.pose_estimators.megapose.src.inference.pose_estimator import PoseEstimator
-from happypose.pose_estimators.megapose.src.inference.teaserpp_refiner import TeaserppRefiner
-from happypose.pose_estimators.megapose.src.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_tmp_dir
-from happypose.pose_estimators.megapose.src.utils.logging import get_logger
+import happypose.pose_estimators.megapose.src.megapose as megapose
+import happypose.toolbox.datasets.datasets_cfg
+import happypose.pose_estimators.megapose.src.megapose.evaluation.eval_runner
+import happypose.toolbox.inference.utils
+from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
+from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config import EvalConfig
+from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation_runner import EvaluationRunner
+from happypose.pose_estimators.megapose.src.megapose.evaluation.meters.modelnet_meters import ModelNetErrorMeter
+from happypose.pose_estimators.megapose.src.megapose.evaluation.prediction_runner import PredictionRunner
+from happypose.pose_estimators.megapose.src.megapose.evaluation.runner_utils import format_results
+from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import DepthRefiner
+from happypose.pose_estimators.megapose.src.megapose.inference.icp_refiner import ICPRefiner
+from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import PoseEstimator
+from happypose.pose_estimators.megapose.src.megapose.inference.teaserpp_refiner import TeaserppRefiner
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir
+from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -106,7 +106,7 @@ def run_eval(
     # Load detector model
     if cfg.inference.detection_type == "detector":
         assert cfg.detector_run_id is not None
-        detector_model = megapose.inference.utils.load_detector(cfg.detector_run_id)
+        detector_model = happypose.toolbox.inference.utils.load_detector(cfg.detector_run_id)
     elif cfg.inference.detection_type == "gt":
         detector_model = None
     else:
@@ -117,7 +117,7 @@ def run_eval(
     # See https://stackoverflow.com/a/53287330
     assert cfg.coarse_run_id is not None
     assert cfg.refiner_run_id is not None
-    coarse_model, refiner_model, mesh_db = megapose.inference.utils.load_pose_models(
+    coarse_model, refiner_model, mesh_db = happypose.toolbox.inference.utils.load_pose_models(
         coarse_run_id=cfg.coarse_run_id,
         refiner_run_id=cfg.refiner_run_id,
         n_workers=cfg.n_rendering_workers,

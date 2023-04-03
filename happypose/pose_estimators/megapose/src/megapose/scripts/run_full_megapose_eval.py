@@ -26,9 +26,9 @@ from typing import Dict, Optional, Tuple
 from omegaconf import OmegaConf
 
 # MegaPose
-import megapose.evaluation.bop
-import megapose.evaluation.evaluation
-from happypose.pose_estimators.megapose.src.bop_config import (
+import happypose.pose_estimators.megapose.src.megapose.evaluation.bop
+import happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation
+from happypose.pose_estimators.megapose.src.megapose.bop_config import (
     PBR_COARSE,
     PBR_DETECTORS,
     PBR_REFINER,
@@ -36,21 +36,21 @@ from happypose.pose_estimators.megapose.src.bop_config import (
     SYNT_REAL_DETECTORS,
     SYNT_REAL_REFINER,
 )
-from happypose.pose_estimators.megapose.src.config import (
+from happypose.pose_estimators.megapose.src.megapose.config import (
     DEBUG_RESULTS_DIR,
     EXP_DIR,
     MODELNET_TEST_CATEGORIES,
     RESULTS_DIR,
 )
-from happypose.pose_estimators.megapose.src.evaluation.eval_config import (
+from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config import (
     BOPEvalConfig,
     EvalConfig,
     FullEvalConfig,
     HardwareConfig,
 )
-from happypose.pose_estimators.megapose.src.evaluation.evaluation import generate_save_key, run_eval
-from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_world_size, init_distributed_mode
-from happypose.pose_estimators.megapose.src.utils.logging import get_logger, set_logging_level
+from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation import generate_save_key, run_eval
+from happypose.toolbox.utils.distributed import get_rank, get_world_size, init_distributed_mode
+from happypose.toolbox.utils.logging import get_logger, set_logging_level
 
 logger = get_logger(__name__)
 

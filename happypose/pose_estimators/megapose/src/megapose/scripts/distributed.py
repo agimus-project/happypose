@@ -28,8 +28,8 @@ import torch.distributed as dist
 from omegaconf import OmegaConf
 
 # MegaPose
-import megapose.utils.hostlist as hostlist
-from happypose.pose_estimators.megapose.src.utils.logging import get_logger
+import happypose.pose_estimators.megapose.src.megapose.utils.hostlist as hostlist
+from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

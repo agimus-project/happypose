@@ -17,8 +17,8 @@ from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDa
 from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
 
 # MegaPose
-#from happypose.pose_estimators.megapose.src.datasets.object_dataset import RigidObject, RigidObjectDataset
-#from happypose.pose_estimators.megapose.src.datasets.scene_dataset import CameraData, ObjectData
+#from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
+#from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
 
 from happypose.toolbox.inference.types import (
     DetectionsType,

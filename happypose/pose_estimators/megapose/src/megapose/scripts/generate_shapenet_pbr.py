@@ -34,7 +34,7 @@ from omegaconf import OmegaConf
 from tqdm import tqdm
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.config import (
+from happypose.pose_estimators.megapose.src.megapose.config import (
     BLENDER_INSTALL_DIR,
     BLENDER_PROC_DIR,
     BOP_TOOLKIT_DIR,
@@ -47,16 +47,16 @@ from happypose.pose_estimators.megapose.src.config import (
     PYTHON_BIN_PATH,
     SHAPENET_DIR,
 )
-from happypose.pose_estimators.megapose.src.datasets.bop import BOPDataset
-from happypose.pose_estimators.megapose.src.datasets.gso_dataset import GoogleScannedObjectDataset, make_gso_infos
-from happypose.pose_estimators.megapose.src.datasets.hdf5_scene_dataset import write_scene_ds_as_hdf5
-from happypose.pose_estimators.megapose.src.datasets.shapenet_object_dataset import (
+from happypose.toolbox.datasets.bop import BOPDataset
+from happypose.toolbox.datasets.gso_dataset import GoogleScannedObjectDataset, make_gso_infos
+from happypose.toolbox.datasets.hdf5_scene_dataset import write_scene_ds_as_hdf5
+from happypose.toolbox.datasets.shapenet_object_dataset import (
     ShapeNetObjectDataset,
     make_shapenet_infos,
 )
-from happypose.pose_estimators.megapose.src.datasets.web_scene_dataset import write_scene_ds_as_wds
-from happypose.pose_estimators.megapose.src.utils.distributed import get_rank, get_tmp_dir, init_distributed_mode
-from happypose.pose_estimators.megapose.src.utils.logging import get_logger
+from happypose.toolbox.datasets.web_scene_dataset import write_scene_ds_as_wds
+from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, init_distributed_mode
+from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

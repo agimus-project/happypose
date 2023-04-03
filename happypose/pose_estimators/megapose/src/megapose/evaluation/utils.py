@@ -31,8 +31,8 @@ from bop_toolkit_lib.misc import get_symmetry_transformations
 
 # MegaPose
 # megapose
-from happypose.pose_estimators.megapose.src.config import LOCAL_DATA_DIR
-from happypose.pose_estimators.megapose.src.utils.tensor_collection import PandasTensorCollection
+from happypose.pose_estimators.megapose.src.megapose.config import LOCAL_DATA_DIR
+from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 
 
 def get_symmetry_transformations_torch(trans_list):

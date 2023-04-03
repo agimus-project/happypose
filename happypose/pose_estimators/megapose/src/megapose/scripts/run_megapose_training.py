@@ -46,11 +46,11 @@ from colorama import Fore, Style
 from omegaconf import OmegaConf
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.bop_config import BOP_CONFIG
-from happypose.pose_estimators.megapose.src.config import EXP_DIR
-from happypose.pose_estimators.megapose.src.training.train_megapose import DatasetConfig, train_megapose
-from happypose.pose_estimators.megapose.src.training.training_config import HardwareConfig, TrainingConfig
-from happypose.pose_estimators.megapose.src.utils.logging import get_logger, set_logging_level
+from happypose.pose_estimators.megapose.src.megapose.bop_config import BOP_CONFIG
+from happypose.pose_estimators.megapose.src.megapose.config import EXP_DIR
+from happypose.pose_estimators.megapose.src.megapose.training.train_megapose import DatasetConfig, train_megapose
+from happypose.pose_estimators.megapose.src.megapose.training.training_config import HardwareConfig, TrainingConfig
+from happypose.toolbox.utils.logging import get_logger, set_logging_level
 
 logger = get_logger(__name__)
 

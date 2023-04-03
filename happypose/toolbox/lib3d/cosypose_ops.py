@@ -84,7 +84,7 @@ def loss_refiner_CO_disentangled_reference_point(
     tCR,
 ):
     # MegaPose
-    from happypose.pose_estimators.megapose.src.lib3d.transform_ops import invert_transform_matrices
+    from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
     bsz = TCO_possible_gt.shape[0]
     assert TCO_possible_gt.shape[0] == bsz
@@ -262,7 +262,7 @@ def TCO_init_from_boxes_zup_autodepth(boxes_2d, model_points_3d, K):
 def TCO_init_from_boxes_v3(layer, boxes, K):
     # TODO: Clean these 2 functions
     # MegaPose
-    from happypose.pose_estimators.megapose.src.math_utils.meshes import get_T_offset
+    from happypose.pose_estimators.megapose.src.megapose.math_utils.meshes import get_T_offset
 
     bsz = len(boxes)
     assert len(K) == bsz

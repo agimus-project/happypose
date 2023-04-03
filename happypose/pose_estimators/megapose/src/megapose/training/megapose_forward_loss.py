@@ -27,21 +27,21 @@ from bokeh.layouts import gridplot
 from torch import nn
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.datasets.pose_dataset import BatchPoseData
-from happypose.pose_estimators.megapose.src.lib3d.camera_geometry import (
+from happypose.toolbox.datasets.pose_dataset import BatchPoseData
+from happypose.toolbox.lib3d.camera_geometry import (
     project_points_robust as project_points_robust,
 )
-from happypose.pose_estimators.megapose.src.lib3d.cosypose_ops import (
+from happypose.toolbox.lib3d.cosypose_ops import (
     TCO_init_from_boxes_zup_autodepth,
     loss_refiner_CO_disentangled_reference_point,
 )
-from happypose.pose_estimators.megapose.src.lib3d.multiview import make_TCO_multiview
-from happypose.pose_estimators.megapose.src.lib3d.rigid_mesh_database import BatchedMeshes
-from happypose.pose_estimators.megapose.src.lib3d.transform_ops import add_noise, invert_transform_matrices
-from happypose.pose_estimators.megapose.src.models.pose_rigid import PosePredictor
-from happypose.pose_estimators.megapose.src.training.training_config import TrainingConfig
-from happypose.pose_estimators.megapose.src.training.utils import cast, cast_images
-from happypose.pose_estimators.megapose.src.visualization.bokeh_plotter import BokehPlotter
+from happypose.toolbox.lib3d.multiview import make_TCO_multiview
+from happypose.toolbox.lib3d.rigid_mesh_database import BatchedMeshes
+from happypose.toolbox.lib3d.transform_ops import add_noise, invert_transform_matrices
+from happypose.pose_estimators.megapose.src.megapose.models.pose_rigid import PosePredictor
+from happypose.pose_estimators.megapose.src.megapose.training.training_config import TrainingConfig
+from happypose.pose_estimators.megapose.src.megapose.training.utils import cast, cast_images
+from happypose.toolbox.visualization.bokeh_plotter import BokehPlotter
 
 
 def megapose_forward_loss(

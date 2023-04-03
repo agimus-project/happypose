@@ -21,10 +21,10 @@ import torch
 import xarray as xr
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.lib3d.camera_geometry import project_points
-from happypose.pose_estimators.megapose.src.lib3d.distances import dists_add
-from happypose.pose_estimators.megapose.src.lib3d.transform import Transform
-from happypose.pose_estimators.megapose.src.lib3d.transform_ops import transform_pts
+from happypose.toolbox.lib3d.camera_geometry import project_points
+from happypose.toolbox.lib3d.distances import dists_add
+from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform_ops import transform_pts
 
 # Local Folder
 from .base import Meter

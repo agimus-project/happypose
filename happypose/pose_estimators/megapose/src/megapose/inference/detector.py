@@ -128,14 +128,14 @@ class Detector(torch.nn.Module):
 
         # Keep only the top-detection for each class label
         if one_instance_per_class:
-            outputs = megapose.inference.utils.filter_detections(
+            outputs = happypose.toolbox.inference.utils.filter_detections(
                 outputs, one_instance_per_class=True
             )
 
         # Add instance_id column to dataframe
         # Each detection is now associated with an `instance_id` that
         # identifies multiple instances of the same object
-        outputs = megapose.inference.utils.add_instance_id(outputs)
+        outputs = happypose.toolbox.inference.utils.add_instance_id(outputs)
         return outputs
 
     def __call__(self, *args: Any, **kwargs: Any) -> DetectionsType:
