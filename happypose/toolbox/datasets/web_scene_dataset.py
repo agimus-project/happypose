@@ -33,7 +33,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.datasets.samplers import ListSampler
+from happypose.toolbox.datasets.samplers import ListSampler
 from happypose.toolbox.datasets.scene_dataset import (
     CameraData,
     DataJsonType,

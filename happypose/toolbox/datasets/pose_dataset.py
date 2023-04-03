@@ -36,7 +36,7 @@ from happypose.toolbox.datasets.scene_dataset import (
 
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.config import LOCAL_DATA_DIR
-from happypose.pose_estimators.megapose.src.megapose.datasets.augmentations import (
+from happypose.toolbox.datasets.augmentations import (
     CropResizeToAspectTransform,
     DepthBackgroundDropoutTransform,
     DepthBlurTransform,
@@ -52,9 +52,9 @@ from happypose.pose_estimators.megapose.src.megapose.datasets.augmentations impo
     PillowContrast,
     PillowSharpness,
 )
-from happypose.pose_estimators.megapose.src.megapose.datasets.augmentations import SceneObservationAugmentation as SceneObsAug
-from happypose.pose_estimators.megapose.src.megapose.datasets.augmentations import VOCBackgroundAugmentation
-from happypose.pose_estimators.megapose.src.megapose.datasets.scene_dataset_wrappers import remove_invisible_objects
+from happypose.toolbox.datasets.augmentations import SceneObservationAugmentation as SceneObsAug
+from happypose.toolbox.datasets.augmentations import VOCBackgroundAugmentation
+from happypose.toolbox.datasets.scene_dataset_wrappers import remove_invisible_objects
 from happypose.pose_estimators.megapose.src.megapose.utils.types import Resolution
 
 

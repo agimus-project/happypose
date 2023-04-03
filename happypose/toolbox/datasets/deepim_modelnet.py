@@ -26,7 +26,7 @@ import torch
 from PIL import Image
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.datasets.utils import make_detections_from_segmentation
+from happypose.toolbox.datasets.utils import make_detections_from_segmentation
 from happypose.pose_estimators.megapose.src.megapose.lib3d.transform import Transform
 
 # Local Folder

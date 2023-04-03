@@ -41,12 +41,12 @@ from happypose.pose_estimators.megapose.src.megapose.config import (
 )
 from happypose.toolbox.datasets.bop_object_datasets import BOPObjectDataset
 from happypose.toolbox.datasets.bop_scene_dataset import BOPDataset, remap_bop_targets
-from happypose.pose_estimators.megapose.src.megapose.datasets.deepim_modelnet import DeepImModelNetDataset
-from happypose.pose_estimators.megapose.src.megapose.datasets.gso_dataset import GoogleScannedObjectDataset
-from happypose.pose_estimators.megapose.src.megapose.datasets.modelnet_object_dataset import ModelNetObjectDataset
-from happypose.pose_estimators.megapose.src.megapose.datasets.shapenet_object_dataset import ShapeNetObjectDataset
-from happypose.pose_estimators.megapose.src.megapose.datasets.urdf_dataset import UrdfDataset
-from happypose.pose_estimators.megapose.src.megapose.datasets.web_scene_dataset import WebSceneDataset
+from happypose.toolbox.datasets.deepim_modelnet import DeepImModelNetDataset
+from happypose.toolbox.datasets.gso_dataset import GoogleScannedObjectDataset
+from happypose.toolbox.datasets.modelnet_object_dataset import ModelNetObjectDataset
+from happypose.toolbox.datasets.shapenet_object_dataset import ShapeNetObjectDataset
+from happypose.toolbox.datasets.urdf_dataset import UrdfDataset
+from happypose.toolbox.datasets.web_scene_dataset import WebSceneDataset
 from happypose.pose_estimators.megapose.src.megapose.utils.logging import get_logger
 
 logger = get_logger(__name__)
