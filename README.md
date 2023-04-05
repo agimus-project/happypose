@@ -17,18 +17,24 @@ This installation procedure will be curated.
 
 ```
 git clone --recurse-submodules https://github.com/agimus-project/happypose.git
-conda create env -n happypose
-cd happypose/cosypose
-conda env update --name happypose --file environment_noversion.yml
-git lfs pull
+conda env create -f environment.yml
+cd happypose/happypose/pose_estimators/cosypose
 python setup.py install
-
-cd ../megapose6d
-conda env update --name happypose --file environment_full.yml
 pip install -e .
 ```
-One might have to run again `python setup.py install` in the `cosypose` folder after the installation of megapose. After the installation, make sur to create `local_data` in both the cosypose and megapose directories.
+# Data
 
-# Usage
 
-In the current state of this repository `megapose` should be usable as it. Concerning `cosypose`, please use the `minimal_version*.py` files. Other files may not be supported yet.
+```
+Create data dir in happypose/pose_estimators/cosypose/local_data
+export MEGAPOSE_DATA_DIR=happypose/pose_estimators/cosypose/local_data
+```
+
+download [barbecue sauce](https://drive.google.com/drive/folders/10BIvhnrKGbNr8EKGB3KUtkSNcp460k9S) and put it in `$MEGAPOSE_DATA_DIR/examples/barbecue-sauce/`
+
+# Testing the install
+
+```
+python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --vis-outputs
+python happypose/pose_estimators/cosypose/minimal_version_scene.py
+```
