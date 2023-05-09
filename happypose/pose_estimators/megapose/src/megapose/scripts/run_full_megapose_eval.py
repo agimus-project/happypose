@@ -26,8 +26,6 @@ from typing import Dict, Optional, Tuple
 from omegaconf import OmegaConf
 
 # MegaPose
-import happypose.pose_estimators.megapose.src.megapose.evaluation.bop
-import happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation
 from happypose.pose_estimators.megapose.src.megapose.bop_config import (
     PBR_COARSE,
     PBR_DETECTORS,

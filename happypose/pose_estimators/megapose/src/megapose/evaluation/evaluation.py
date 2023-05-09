@@ -24,20 +24,38 @@ import torch
 from omegaconf import OmegaConf
 
 # MegaPose
+import happypose
 import happypose.pose_estimators.megapose.src.megapose as megapose
+import happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation_runner
 import happypose.toolbox.datasets.datasets_cfg
-import happypose.pose_estimators.megapose.src.megapose.evaluation.eval_runner
 import happypose.toolbox.inference.utils
+from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config import (
+    EvalConfig,
+)
+from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation_runner import (
+    EvaluationRunner,
+)
+from happypose.pose_estimators.megapose.src.megapose.evaluation.meters.modelnet_meters import (
+    ModelNetErrorMeter,
+)
+from happypose.pose_estimators.megapose.src.megapose.evaluation.prediction_runner import (
+    PredictionRunner,
+)
+from happypose.pose_estimators.megapose.src.megapose.evaluation.runner_utils import (
+    format_results,
+)
+from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import (
+    DepthRefiner,
+)
+from happypose.pose_estimators.megapose.src.megapose.inference.icp_refiner import (
+    ICPRefiner,
+)
+from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import (
+    PoseEstimator,
+)
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
-from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config import EvalConfig
-from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation_runner import EvaluationRunner
-from happypose.pose_estimators.megapose.src.megapose.evaluation.meters.modelnet_meters import ModelNetErrorMeter
-from happypose.pose_estimators.megapose.src.megapose.evaluation.prediction_runner import PredictionRunner
-from happypose.pose_estimators.megapose.src.megapose.evaluation.runner_utils import format_results
-from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import DepthRefiner
-from happypose.pose_estimators.megapose.src.megapose.inference.icp_refiner import ICPRefiner
-from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import PoseEstimator
-from happypose.pose_estimators.megapose.src.megapose.inference.teaserpp_refiner import TeaserppRefiner
+
+# from happypose.pose_estimators.megapose.src.megapose.inference.teaserpp_refiner import TeaserppRefiner
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir
 from happypose.toolbox.utils.logging import get_logger
@@ -96,8 +114,8 @@ def run_eval(
 
     # Load the dataset
     ds_kwargs = dict(load_depth=True)
-    scene_ds = megapose.datasets.datasets_cfg.make_scene_dataset(cfg.ds_name, **ds_kwargs)
-    urdf_ds_name, obj_ds_name = megapose.datasets.datasets_cfg.get_obj_ds_info(cfg.ds_name)
+    scene_ds = happypose.toolbox.datasets.datasets_cfg.make_scene_dataset(cfg.ds_name, **ds_kwargs)
+    urdf_ds_name, obj_ds_name = happypose.toolbox.datasets.datasets_cfg.get_obj_ds_info(cfg.ds_name)
 
     # drop frames if this was specified
     if cfg.n_frames is not None:
