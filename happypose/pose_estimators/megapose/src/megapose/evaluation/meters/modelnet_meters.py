@@ -20,17 +20,20 @@ import numpy as np
 import torch
 import xarray as xr
 
+# Local Folder
+from happypose.pose_estimators.megapose.src.megapose.evaluation.meters.base import Meter
+from happypose.pose_estimators.megapose.src.megapose.evaluation.meters.lf_utils import (
+    angular_distance,
+)
+from happypose.pose_estimators.megapose.src.megapose.evaluation.meters.utils import (
+    one_to_one_matching,
+)
+
 # MegaPose
 from happypose.toolbox.lib3d.camera_geometry import project_points
 from happypose.toolbox.lib3d.distances import dists_add
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.lib3d.transform_ops import transform_pts
-
-# Local Folder
-from .base import Meter
-from .lf_utils import angular_distance
-from .utils import one_to_one_matching
-
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
