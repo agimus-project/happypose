@@ -135,6 +135,8 @@ def run_eval(
     # See https://stackoverflow.com/a/53287330
     assert cfg.coarse_run_id is not None
     assert cfg.refiner_run_id is not None
+    # TODO (emaitre): This fuction seems to take the wrong parameters. Trying to fix this
+    """
     coarse_model, refiner_model, mesh_db = happypose.toolbox.inference.utils.load_pose_models(
         coarse_run_id=cfg.coarse_run_id,
         refiner_run_id=cfg.refiner_run_id,
@@ -143,6 +145,17 @@ def run_eval(
         urdf_ds_name=urdf_ds_name,
         force_panda3d_renderer=True,
     )
+    """
+    object_ds = make_object_dataset(obj_ds_name)
+
+
+    coarse_model, refiner_model, mesh_db = happypose.toolbox.inference.utils.load_pose_models(
+        coarse_run_id=cfg.coarse_run_id,
+        refiner_run_id=cfg.refiner_run_id,
+        object_dataset=object_ds,
+        force_panda3d_renderer=True,
+    )
+
 
     renderer = refiner_model.renderer
 
