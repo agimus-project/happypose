@@ -97,7 +97,7 @@ class InferenceConfig:
     run_depth_refiner: bool = False
     depth_refiner: Optional[str] = None  # ['icp', 'teaserpp']
     bsz_objects: int = 16  # How many parallel refiners to run
-    bsz_images: int = 576  # How many images to push through coarse model
+    bsz_images: int = 288  # How many images to push through coarse model
 
 
 @dataclass
