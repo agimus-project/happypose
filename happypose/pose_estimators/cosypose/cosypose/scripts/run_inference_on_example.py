@@ -27,7 +27,7 @@ import torch
 from happypose.pose_estimators.cosypose.cosypose.visualization.singleview import render_prediction_wrt_camera
 from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
-from cosypose_wrapper import CosyPoseWrapper
+from happypose.pose_estimators.cosypose.cosypose.scripts.cosypose_wrapper import CosyPoseWrapper
 
 # HappyPose
 from happypose.toolbox.renderer import Panda3dLightData
@@ -70,6 +70,7 @@ def make_object_dataset(example_dir: Path) -> RigidObjectDataset:
     rigid_object_dataset = RigidObjectDataset(rigid_objects)
     return rigid_object_dataset
 
+
 def load_image(data_path: Path) -> List[ObjectData]:
     # imread stores color dim in the BGR order by default
     brg = cv2.imread(str(data_path) + "/cheezit_Color.png")
@@ -84,6 +85,7 @@ def load_camera() -> np.array:
     0.0, 615.2452392578125, 237.81765747070312, 
     0.0, 0.0, 1.0]).reshape((3,3))
     return K_rs
+
 
 def rendering(predictions, K_rs, img_res):
     object_dataset = make_object_dataset(example_dir)
@@ -114,6 +116,7 @@ def rendering(predictions, K_rs, img_res):
         copy_arrays=True,
     )[0]
     return renderings
+
 
 def save_predictions(example_dir, renderings, rgb):
     rgb_render = renderings.rgb
