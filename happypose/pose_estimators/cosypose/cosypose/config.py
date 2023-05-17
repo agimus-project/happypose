@@ -1,4 +1,5 @@
 import cosypose
+import happypose
 import os
 import yaml
 from joblib import Memory
@@ -11,10 +12,10 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 hostname = socket.gethostname()
 username = getpass.getuser()
 
-PROJECT_ROOT = Path(cosypose.__file__).parent.parent
+PROJECT_ROOT = Path(happypose.__file__).parent.parent
 PROJECT_DIR = PROJECT_ROOT
 DATA_DIR = PROJECT_DIR / 'data'
-LOCAL_DATA_DIR = PROJECT_DIR / 'local_data'
+LOCAL_DATA_DIR = Path(os.environ.get("MEGAPOSE_DATA_DIR", Path(PROJECT_DIR) / "local_data"))
 TEST_DATA_DIR = LOCAL_DATA_DIR
 DASK_LOGS_DIR = LOCAL_DATA_DIR / 'dasklogs'
 SYNT_DS_DIR = LOCAL_DATA_DIR / 'synt_datasets'
@@ -50,7 +51,7 @@ else:
     CONDA_BASE_DIR = os.environ['CONDA_PREFIX']
     CONDA_ENV = 'base'
 
-cfg = yaml.load((PROJECT_DIR / 'config_yann.yaml').read_text(), Loader=yaml.FullLoader)
+cfg = yaml.load((PROJECT_DIR / 'happypose/pose_estimators/cosypose/config_yann.yaml').read_text(), Loader=yaml.FullLoader)
 
 SLURM_GPU_QUEUE = cfg['slurm_gpu_queue']
 SLURM_QOS = cfg['slurm_qos']

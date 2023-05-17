@@ -25,9 +25,6 @@ import numpy as np
 import pinocchio as pin
 import torch
 
-eigenpy.switchToNumpyArray()
-
-
 class Transform:
     """A representation of a SE(3) object based on pinocchio's pin.SE3."""
 

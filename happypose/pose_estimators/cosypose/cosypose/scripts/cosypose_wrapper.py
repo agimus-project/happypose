@@ -185,6 +185,7 @@ class CosyPoseWrapper:
         box_detections = self.detector.get_detections(images=images, one_instance_per_class=False,
                                                       # detection_th=0.8, output_masks=False, mask_th=0.9)
                                                       detection_th=0.7, output_masks=False, mask_th=0.8)
+        
         # exit(10)
         # pose esitimition
         if len(box_detections) == 0:

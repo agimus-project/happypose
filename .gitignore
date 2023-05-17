@@ -1,0 +1,14 @@
+__pycache__
+.ipynb_checkpoints
+*.pyc
+*.lprof
+*.prof
+*egg-info*
+*.gv*
+.venv
+.dir-locals.el
+.mypy_cache
+*.so
+*.temp
+*tmp/
+*.cpython

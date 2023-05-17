@@ -15,7 +15,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import time
 from collections import defaultdict
@@ -29,10 +28,10 @@ from tqdm import tqdm
 
 # MegaPose
 import happypose.pose_estimators.megapose.src.megapose
-import happypose.pose_estimators.megapose.src.megapose.utils.tensor_collection as tc
-from happypose.toolbox.datasets.samplers import DistributedSceneSampler
-from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation
-from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import PoseEstimator
+import happypose.toolbox.utils.tensor_collection as tc
+from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import (
+    PoseEstimator,
+)
 from happypose.pose_estimators.megapose.src.megapose.inference.types import (
     DetectionsType,
     InferenceConfig,
@@ -40,6 +39,8 @@ from happypose.pose_estimators.megapose.src.megapose.inference.types import (
     PoseEstimatesType,
 )
 from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer
+from happypose.toolbox.datasets.samplers import DistributedSceneSampler
+from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, get_world_size
 from happypose.toolbox.utils.logging import get_logger
 
@@ -74,7 +75,6 @@ class PredictionRunner:
         self.batch_size = batch_size
         self.load_depth = scene_ds.load_depth
         self.dataloader = dataloader
-
 
     def run_inference_pipeline(
         self,

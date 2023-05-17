@@ -36,5 +36,5 @@ download [barbecue sauce](https://drive.google.com/drive/folders/10BIvhnrKGbNr8E
 
 ```
 python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --vis-outputs
-python happypose/pose_estimators/cosypose/minimal_version_scene.py
+python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example cheetos --run-inference
 ```
