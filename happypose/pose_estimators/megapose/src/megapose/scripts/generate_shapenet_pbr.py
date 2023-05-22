@@ -47,16 +47,26 @@ from happypose.pose_estimators.megapose.src.megapose.config import (
     PYTHON_BIN_PATH,
     SHAPENET_DIR,
 )
-from happypose.toolbox.datasets.bop import BOPDataset
-from happypose.toolbox.datasets.gso_dataset import GoogleScannedObjectDataset, make_gso_infos
-from happypose.toolbox.datasets.hdf5_scene_dataset import write_scene_ds_as_hdf5
+
+# from happypose.toolbox.datasets.bop import BOPDataset
+from happypose.toolbox.datasets.gso_dataset import (
+    GoogleScannedObjectDataset,
+    make_gso_infos,
+)
+
+# from happypose.toolbox.datasets.hdf5_scene_dataset import write_scene_ds_as_hdf5
 from happypose.toolbox.datasets.shapenet_object_dataset import (
     ShapeNetObjectDataset,
     make_shapenet_infos,
 )
 from happypose.toolbox.datasets.web_scene_dataset import write_scene_ds_as_wds
-from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, init_distributed_mode
+from happypose.toolbox.utils.distributed import (
+    get_rank,
+    get_tmp_dir,
+    init_distributed_mode,
+)
 from happypose.toolbox.utils.logging import get_logger
+from bop_toolkit_lib.dataset.convert_scenewise_to_imagewise import convert_scene_to_imagewise
 
 logger = get_logger(__name__)
 
@@ -572,9 +582,9 @@ def make_one_scene_script(cfg, output_dir, seed):
 def make_masks_and_gt_infos(chunk_dir, is_shapenet=True, verbose=True):
     bop_toolkit_dir = BOP_TOOLKIT_DIR
     env = os.environ.copy()
-    env["PYTHONPATH"] = env.get("PYTHONPATH", "") + ":" + str(bop_toolkit_dir)
-    env["COSYPOSE_DIR"] = str(PROJECT_DIR)
-    script_path = bop_toolkit_dir / "scripts/calc_masks_custom.py"
+    # env["PYTHONPATH"] = env.get("PYTHONPATH", "") + ":" + str(bop_toolkit_dir)
+    # env["COSYPOSE_DIR"] = str(PROJECT_DIR)
+    script_path = PROJECT_DIR / "src/megapose/scripts/bop_calc_masks.py"
     success = True
     cmd = ["python", str(script_path), "--chunk-dir", chunk_dir, "--overwrite-models"]
     if is_shapenet:
@@ -584,7 +594,7 @@ def make_masks_and_gt_infos(chunk_dir, is_shapenet=True, verbose=True):
     p = subprocess.run(cmd, env=env, **VERBOSE_KWARGS[verbose])
     success = success and p.returncode == 0
 
-    script_path = bop_toolkit_dir / "scripts/calc_gt_info_custom.py"
+    script_path = PROJECT_DIR / "src/megapose/scripts/bop_calc_gt_info.py"
     cmd = ["python", str(script_path), "--chunk-dir", chunk_dir, "--overwrite-models"]
     if is_shapenet:
         cmd += ["--shapenet-dir", str(SHAPENET_SCALED_DIR)]
@@ -597,7 +607,7 @@ def make_masks_and_gt_infos(chunk_dir, is_shapenet=True, verbose=True):
 
 def make_shapenet_model_infos():
     dataset = ShapeNetObjectDataset(SHAPENET_DIR, split="orig")
-    all_labels = [obj["label"] for obj in dataset.objects]
+    all_labels = [obj.label for obj in dataset.objects]
     return all_labels
 
 
@@ -714,55 +724,66 @@ def record_chunk(cfg, ds_dir, chunk_id):
     success = make_masks_and_gt_infos(
         output_dir, verbose=cfg.verbose, is_shapenet=cfg.model_type == "shapenet"
     )
-
-    # HDF5 dataset generation
-    if cfg.save_hdf5:
-        shutil.copy(
-            ds_dir / "shapenet_labels.json", output_dir / "bop_data" / "shapenet_labels.json"
+    # Third Party
+    if success:
+        chunk_scene_dir = output_dir / f"bop_data/train_pbr/{0:06d}"
+        convert_scene_to_imagewise(
+            chunk_scene_dir, 
+            ds_dir / "train_pbr_v2format",
+            f'{chunk_id:06d}_' + '{image_id:06d}'
         )
-        scene_ds = BOPDataset(
-            output_dir / "bop_data",
-            split="train_pbr",
-            load_depth=True,
-            allow_cache=False,
-            per_view_annotations=False,
-        )
-        write_scene_ds_as_hdf5(
-            scene_ds, output_dir / f"bop_data/train_pbr/{0:06d}/data.hdf5", n_reading_workers=4
-        )
-
-    if cfg.save_webdataset:
-        shutil.copy(
-            ds_dir / "shapenet_labels.json", output_dir / "bop_data" / "shapenet_labels.json"
-        )
-        scene_ds = BOPDataset(
-            output_dir / "bop_data",
-            split="train_pbr",
-            load_depth=True,
-            allow_cache=False,
-            per_view_annotations=False,
-        )
-        write_scene_ds_as_wds(
-            scene_ds, output_dir / f"bop_data/train_pbr/{0:06d}/", n_reading_workers=4
-        )
-
-    # Move everything to base directory
-    chunk_scene_dir = output_dir / f"bop_data/train_pbr/{0:06d}"
-    train_pbr_dir = ds_dir / "train_pbr"
-    target_dir = train_pbr_dir / f"{chunk_id:06d}"
-    if target_dir.exists():
-        shutil.rmtree(target_dir)
-    if cfg.save_files and success:
-        shutil.copytree(chunk_scene_dir, target_dir)
-    if cfg.save_hdf5 and success:
-        target_dir.mkdir(exist_ok=True)
-        shutil.copy(chunk_scene_dir / "data.hdf5", target_dir / "data.hdf5")
-    if cfg.save_webdataset and success:
-        target_dir.mkdir(exist_ok=True)
-        shutil.copy(chunk_scene_dir / "shard-00000000.tar", target_dir / "shard-00000000.tar")
-        shutil.copy(chunk_scene_dir / "ds_infos.json", target_dir / "ds_infos.json")
-    shutil.rmtree(output_dir)
+        shutil.rmtree(output_dir)
     return
+
+
+    # # HDF5 dataset generation
+    # if cfg.save_hdf5:
+    #     shutil.copy(
+    #         ds_dir / "shapenet_labels.json", output_dir / "bop_data" / "shapenet_labels.json"
+    #     )
+    #     scene_ds = BOPDataset(
+    #         output_dir / "bop_data",
+    #         split="train_pbr",
+    #         load_depth=True,
+    #         allow_cache=False,
+    #         per_view_annotations=False,
+    #     )
+    #     write_scene_ds_as_hdf5(
+    #         scene_ds, output_dir / f"bop_data/train_pbr/{0:06d}/data.hdf5", n_reading_workers=4
+    #     )
+
+    # if cfg.save_webdataset:
+    #     shutil.copy(
+    #         ds_dir / "shapenet_labels.json", output_dir / "bop_data" / "shapenet_labels.json"
+    #     )
+    #     scene_ds = BOPDataset(
+    #         output_dir / "bop_data",
+    #         split="train_pbr",
+    #         load_depth=True,
+    #         allow_cache=False,
+    #         per_view_annotations=False,
+    #     )
+    #     write_scene_ds_as_wds(
+    #         scene_ds, output_dir / f"bop_data/train_pbr/{0:06d}/", n_reading_workers=4
+    #     )
+
+    # # Move everything to base directory
+    # chunk_scene_dir = output_dir / f"bop_data/train_pbr/{0:06d}"
+    # train_pbr_dir = ds_dir / "train_pbr"
+    # target_dir = train_pbr_dir / f"{chunk_id:06d}"
+    # if target_dir.exists():
+    #     shutil.rmtree(target_dir)
+    # if cfg.save_files and success:
+    #     shutil.copytree(chunk_scene_dir, target_dir)
+    # if cfg.save_hdf5 and success:
+    #     target_dir.mkdir(exist_ok=True)
+    #     shutil.copy(chunk_scene_dir / "data.hdf5", target_dir / "data.hdf5")
+    # if cfg.save_webdataset and success:
+    #     target_dir.mkdir(exist_ok=True)
+    #     shutil.copy(chunk_scene_dir / "shard-00000000.tar", target_dir / "shard-00000000.tar")
+    #     shutil.copy(chunk_scene_dir / "ds_infos.json", target_dir / "ds_infos.json")
+    # shutil.rmtree(output_dir)
+    # return
 
 
 def find_chunks_to_record(cfg, chunk_ids):
