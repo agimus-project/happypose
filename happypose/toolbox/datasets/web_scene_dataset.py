@@ -19,6 +19,7 @@ limitations under the License.
 import io
 import json
 import tarfile
+from collections import defaultdict
 from functools import partial
 from hashlib import sha1
 from pathlib import Path
@@ -29,8 +30,11 @@ import imageio
 import numpy as np
 import pandas as pd
 import webdataset as wds
+from bop_toolkit_lib.dataset import bop_webdataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+
+from happypose.toolbox.datasets.bop_scene_dataset import data_from_bop_obs
 
 # MegaPose
 from happypose.toolbox.datasets.samplers import ListSampler
@@ -66,7 +70,8 @@ def write_scene_ds_as_wds(
 
     wds_dir.mkdir(exist_ok=True, parents=True)
     frame_index = scene_ds.frame_index.copy()
-    shard_writer = wds.ShardWriter(str(wds_dir / shard_format), maxcount=maxcount, start_shard=0)
+    shard_writer = wds.ShardWriter(
+        str(wds_dir / shard_format), maxcount=maxcount, start_shard=0)
 
     sampler = None
     n_frames = len(scene_ds)
@@ -177,20 +182,25 @@ class WebSceneDataset(SceneDataset):
         label_format: str = "{label}",
         load_frame_index: bool = False,
     ):
-        try:
-            ds_infos = json.loads((wds_dir / "infos.json").read_text())
-            self.depth_scale = ds_infos["depth_scale"]
-        except FileNotFoundError:
-            self.depth_scale = 1000
         self.label_format = label_format
         self.wds_dir = wds_dir
 
         frame_index = None
         if load_frame_index:
-            frame_index = pd.read_feather((wds_dir / "frame_index.feather"))
+            key_to_shard = json.loads((wds_dir / 'key_to_shard.json').read_text())
+            frame_index = defaultdict(list)
+            for key, shard_id in key_to_shard.items():
+                image_id, scene_id = map(int, key.split('_'))
+                frame_index['image_id'].append(image_id)
+                frame_index['scene_id'].append(scene_id)
+                frame_index['key'].append(key)
+                frame_index['shard_id'].append(shard_id)
+            frame_index = pd.DataFrame(frame_index)
 
         super().__init__(
-            frame_index=frame_index, load_depth=load_depth, load_segmentation=load_segmentation
+            frame_index=frame_index,
+            load_depth=load_depth,
+            load_segmentation=load_segmentation
         )
 
     def get_tar_list(self) -> List[str]:
@@ -201,24 +211,20 @@ class WebSceneDataset(SceneDataset):
     def __getitem__(self, idx: int) -> SceneObservation:
         assert self.frame_index is not None
         row = self.frame_index.iloc[idx]
-        shard_fname, key = row.shard_fname, row.key
-        tar = tarfile.open(self.wds_dir / shard_fname)
+        shard_id, key = row.shard_id, row.key
+        shard_path = self.wds_dir / f'shard-{shard_id:06d}.tar'
 
-        sample: Dict[str, Union[bytes, str]] = dict()
-        for k in (
-            "rgb.png",
-            "segmentation.png",
-            "depth.png",
-            "infos.json",
-            "object_datas.json",
-            "camera_data.json",
-        ):
-            tar_file = tar.extractfile(f"{key}.{k}")
-            assert tar_file is not None
-            sample[k] = tar_file.read()
-
-        obs = load_scene_ds_obs(sample, load_depth=self.load_depth)
-        tar.close()
+        bop_obs = bop_webdataset.load_image_data(
+            shard_path,
+            key,
+            load_rgb=True,
+            load_mask_visib=True,
+            load_gt=True,
+            load_gt_info=True,
+        )
+        obs = data_from_bop_obs(
+            bop_obs,
+            use_raw_object_id=True)
         return obs
 
 

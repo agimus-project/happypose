@@ -483,3 +483,4 @@ class IterableMultiSceneDataset(IterableSceneDataset):
         while True:
             idx = self.rng.randint(0, len(self.iterators) - 1)
             yield next(self.iterators[idx])
+
