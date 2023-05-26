@@ -1,0 +1,5 @@
+defaults:
+  - default
+few: True
+verbose: True
+debug: True

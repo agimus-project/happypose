@@ -50,7 +50,7 @@ def generate_chunks(ds_cfg: DatasetGenerationConfig):
 
 @hydra.main(
     version_base=None,
-    config_path='conf',
+    config_path='../configs',
     config_name='run_dsgen/default')
 def main(cfg: Config):
     print(omegaconf.OmegaConf.to_yaml(cfg))

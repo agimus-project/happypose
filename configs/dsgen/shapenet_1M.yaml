@@ -1,0 +1,3 @@
+defaults:
+  - default
+dataset_id: shapenet_1M
