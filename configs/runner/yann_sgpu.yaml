@@ -1,13 +1,15 @@
 defaults:
   - base_runner
+  - /local_node: lda
+  - /local_job: single_gpu
   - /slurm_queue: v100
   - /slurm_job:
     - yann
     - single_gpu
     - jz
-  - /node: lda
-  - /job: single_gpu
   - /job_env: 
     - happypose
     - lda
   - _self_
+
+log_dir: ${oc.env:HP_DATA_DIR}/logs

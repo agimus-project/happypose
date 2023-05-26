@@ -28,4 +28,9 @@ setup(
     version="0.0.1",
     description="A simple utility for running jobs.",
     packages=find_packages(),
+    entry_points={
+        "console_scripts": [
+            "runjob=job_runner.runjob:main",
+        ]
+    },
 )

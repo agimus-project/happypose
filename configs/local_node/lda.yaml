@@ -1,3 +1,5 @@
+defaults:
+  - base_local_node
 gpus_per_node: 1
 mem_per_gpu: '8GB'
 cpus_per_gpu: 12

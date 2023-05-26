@@ -1,7 +1,9 @@
 # @package _global_
 defaults:
   - base_run_dsgen
-  - /runner/yann_sgpu
+  - /runner: yann_sgpu
+  - /slurm_queue@runner.slurm_queue: v100
+  - /slurm_queue@runner.slurm_queue: v100
   - /dsgen@ds: default
   - _self_
   - /run_dsgen:
@@ -10,4 +12,8 @@ n_jobs: 128
 start_chunk: 0
 dry_run: False
 
-
+runner:
+  local_job:
+    cpus_per_task: 1
+  slurm_job:
+    cpus_per_task: 1

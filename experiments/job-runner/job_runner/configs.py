@@ -14,7 +14,7 @@ class NodeConfig:
 @dataclass
 class SlurmQueueConfig(NodeConfig):
     partition: str
-    constraint: tp.Optional[str]
+    constraint: tp.Optional[str] = None
 
 
 @dataclass
@@ -29,9 +29,8 @@ class JobConfig:
 class SlurmJobConfig(JobConfig):
     account: str
     qos: str
-    gres: str
     time: str
-    hint: str
+    additional_parameters: tp.Optional[tp.Dict[str, tp.Any]]
 
 
 @dataclass
@@ -43,18 +42,19 @@ class JobEnvironmentConfig:
 
 @dataclass
 class RunnerConfig:
-    node: tp.Optional[NodeConfig]
-    job: tp.Optional[JobConfig]
+    log_dir: str
     job_env: JobEnvironmentConfig
+    local_node: tp.Optional[NodeConfig]
+    local_job: tp.Optional[JobConfig]
     slurm_queue: tp.Optional[SlurmQueueConfig]
     slurm_job: tp.Optional[SlurmJobConfig]
     use_slurm: bool = False
 
 
 cs = ConfigStore.instance()
-cs.store(group="node", name="base_node", node=NodeConfig)
-cs.store(group="slurm_queue", name="base_slurm_queue", node=SlurmQueueConfig)
-cs.store(group="job", name="base_job", node=JobConfig)
 cs.store(group="job_env", name="base_job_env", node=JobEnvironmentConfig)
+cs.store(group="local_job", name="base_local_job", node=JobConfig)
+cs.store(group="local_node", name="base_local_node", node=NodeConfig)
 cs.store(group="slurm_job", name="base_slurm_job", node=SlurmJobConfig)
+cs.store(group="slurm_queue", name="base_slurm_queue", node=SlurmQueueConfig)
 cs.store(group="runner", name="base_runner", node=RunnerConfig)
