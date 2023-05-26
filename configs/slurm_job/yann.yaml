@@ -1,0 +1,3 @@
+defaults:
+  - base_slurm_job
+account: 'vuw@v100'

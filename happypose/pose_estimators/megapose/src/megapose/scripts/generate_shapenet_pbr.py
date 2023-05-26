@@ -787,28 +787,27 @@ def record_chunk(cfg, ds_dir, chunk_id):
 
 
 def find_chunks_to_record(cfg, chunk_ids):
-    this_chunk_ids = np.array_split(chunk_ids, cfg.hardware.world_size)[cfg.hardware.rank].tolist()
+    this_chunk_ids = np.array_split(
+        chunk_ids, cfg.hardware.world_size)[cfg.hardware.rank].tolist()
     chunk_ids = []
     for chunk_id in this_chunk_ids:
-        if not (ds_dir / f"train_pbr/{chunk_id:06d}").exists():
+        if not (Path(cfg.ds_dir) / f"train_pbr/{chunk_id:06d}").exists():
             chunk_ids.append(chunk_id)
     return chunk_ids
 
 
-if __name__ == "__main__":
+def main(cli_cfg):
     cfg = OmegaConf.create(
         dict(
             dataset_id="test",
             resume_dataset=None,
             debug=False,
             verbose=False,
-            run_comment="",
             overwrite=False,
             few=False,
             chunk_ids=None,
         )
     )
-    cli_cfg = OmegaConf.from_cli()
     if cli_cfg is not None:
         cfg = OmegaConf.merge(
             cfg,
@@ -857,6 +856,12 @@ if __name__ == "__main__":
         chunk_id = int(chunk_id)
         record_chunk(cfg, ds_dir, chunk_id)
     dist.barrier()
+    return
+
+
+if __name__ == "__main__":
+    cli_cfg = OmegaConf.from_cli()
+    main(cli_cfg)
 
 # TODO: Add multi process, multi-gpu, arguments for ti.
 # TODO: Generate some images for the meeting.

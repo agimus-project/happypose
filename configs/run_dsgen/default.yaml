@@ -1,0 +1,13 @@
+# @package _global_
+defaults:
+  - base_run_dsgen
+  - /runner/yann_sgpu
+  - /dsgen@ds: default
+  - _self_
+  - /run_dsgen:
+
+n_jobs: 128
+start_chunk: 0
+dry_run: False
+
+

@@ -1,0 +1,5 @@
+# @package _global_
+defaults:
+  - override /dsgen@ds: gso_1M
+
+n_chunks: 10000

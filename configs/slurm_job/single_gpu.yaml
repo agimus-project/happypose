@@ -1,0 +1,7 @@
+defaults:
+  - base_slurm_job
+
+nodes: 1
+tasks_per_node: 1
+gpus_per_node: 1
+gres: 'gpu:1'
