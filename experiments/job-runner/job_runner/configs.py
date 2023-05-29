@@ -34,9 +34,16 @@ class SlurmJobConfig(JobConfig):
 
 
 @dataclass
+class CodeSnapshotConfig:
+    snapshot_dir: tp.Optional[str]
+    exclude_path: tp.Optional[str]
+    python_packages_dir: tp.Optional[tp.List[str]] = None
+
+
+@dataclass
 class JobEnvironmentConfig:
     conda_env: str
-    python_packages_dir: tp.Optional[tp.List[str]] = None
+    code_snapshot: tp.Optional[CodeSnapshotConfig] = None
     env: tp.Optional[tp.Dict[str, str]] = None
 
 
@@ -52,6 +59,7 @@ class RunnerConfig:
 
 
 cs = ConfigStore.instance()
+cs.store(group="code_snapshot", name="base_code_snapshot", node=CodeSnapshotConfig)
 cs.store(group="job_env", name="base_job_env", node=JobEnvironmentConfig)
 cs.store(group="local_job", name="base_local_job", node=JobConfig)
 cs.store(group="local_node", name="base_local_node", node=NodeConfig)

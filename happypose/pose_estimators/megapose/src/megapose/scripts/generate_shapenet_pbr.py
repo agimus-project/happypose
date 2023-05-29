@@ -15,7 +15,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import json
 import os
@@ -36,7 +35,7 @@ from tqdm import tqdm
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.config import (
     BLENDER_INSTALL_DIR,
-    BLENDER_PROC_DIR,
+    BLENDERPROC_DIR,
     BOP_TOOLKIT_DIR,
     GSO_DIR,
     GSO_NORMALIZED_DIR,
@@ -522,7 +521,7 @@ def run_script(script, script_path, verbose=True):
     seed = script["seed"]
     env = os.environ.copy()
     env["BLENDER_PROC_RANDOM_SEED"] = str(seed)
-    run_path = BLENDER_PROC_DIR / "run.py"
+    run_path = BLENDERPROC_DIR / "run.py"
     subprocess.run(
         [str(PYTHON_BIN_PATH), str(run_path), str(script_path)], env=env, **VERBOSE_KWARGS[verbose]
     )
@@ -728,13 +727,10 @@ def record_chunk(cfg, ds_dir, chunk_id):
     if success:
         chunk_scene_dir = output_dir / f"bop_data/train_pbr/{0:06d}"
         convert_scene_to_imagewise(
-            chunk_scene_dir, 
-            ds_dir / "train_pbr_v2format",
-            f'{chunk_id:06d}_' + '{image_id:06d}'
+            chunk_scene_dir, ds_dir / "train_pbr_v2format", f"{chunk_id:06d}_" + "{image_id:06d}"
         )
         shutil.rmtree(output_dir)
     return
-
 
     # # HDF5 dataset generation
     # if cfg.save_hdf5:
@@ -787,8 +783,7 @@ def record_chunk(cfg, ds_dir, chunk_id):
 
 
 def find_chunks_to_record(cfg, chunk_ids):
-    this_chunk_ids = np.array_split(
-        chunk_ids, cfg.hardware.world_size)[cfg.hardware.rank].tolist()
+    this_chunk_ids = np.array_split(chunk_ids, cfg.hardware.world_size)[cfg.hardware.rank].tolist()
     chunk_ids = []
     for chunk_id in this_chunk_ids:
         if not (Path(cfg.ds_dir) / f"train_pbr/{chunk_id:06d}").exists():

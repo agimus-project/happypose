@@ -2,4 +2,4 @@
 defaults:
   - override /dsgen@ds: shapenet_1M
 
-n_chunks: 10000
+n_chunks: 50000

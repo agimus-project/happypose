@@ -93,7 +93,10 @@ def main(cfg: Config):
                 job = executor.submit(generate_chunks, ds_cfg)
             jobs.append(job)
 
-    submitit.helpers.monitor_jobs(jobs, poll_frequency=5, test_mode=True)
+    submitit.helpers.monitor_jobs(jobs)
+
+    for job in jobs:
+        job.result()
 
 
 if __name__ == "__main__":

@@ -8,13 +8,13 @@ pip install git+https://github.com/ylabbe/bop_renderer@dataset-tools
 - Install the bop renderer for generating masks and ground truth infos
 
 ```
-export WORK_DIR=/path/to/dir
-cd $WORK_DIR
+export CC=x86_64-conda_cos6-linux-gnu-gcc &&\
+export GCC=x86_64-conda_cos6-linux-gnu-g++ &&\
+export GXX=x86_64-conda_cos6-linux-gnu-g++ &&\
 git clone https://github.com/ylabbe/bop_renderer && \
   export OSMESA_PREFIX=$WORK_DIR/osmesa && \
   export LLVM_PREFIX=$WORK_DIR/llvm && \
   mkdir -p $OSMESA_PREFIX && mkdir -p $LLVM_PREFIX && \
-  conda install -c conda-forge autoconf automake libtool pkg-config cmake zlib -y && \
   export PYTHON_PREFIX=$CONDA_PREFIX && \
   cd $WORK_DIR/bop_renderer && mkdir -p osmesa-install/build && \
   cd osmesa-install/build && bash ../osmesa-install.sh && \
@@ -23,6 +23,7 @@ git clone https://github.com/ylabbe/bop_renderer && \
   cd $WORK_DIR/bop_renderer && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && make && \
   cp *.so $CONDA_PREFIX/lib/python3.9/site-packages
 ```
+If you are using gcc>10, you way need to apply [this patch](https://cgit.freedesktop.org/mesa/mesa/diff/?id=8dacf5f9d1df95c768016a1b92465bbabed37b54).
 
 - Install Blender, the datasets were generated with blender 2.39.8:
 
@@ -42,11 +43,11 @@ git clone https://github.com/ylabbe/blenderproc
 
 # Testing the install
 ```
-export BLENDER_PROC_DIR=/path/to/blenderproc
-export MEGAPOSE_DATA_DIR=/path/to/megapose_data_dir
-export BLENDER_INSTALL_DIR=/path/to/blender-2.93.8-linux-x64
-python -m happypose.pose_estimators.megapose.src.megapose.scripts.generate_shapenet_pbr dataset_id=shapenet_1M verbose=True few=True debug=True overwrite=True
+export HP_DATA_DIR=/path/to/blenderproc
+python generate_dataset.py "run_dsgen=[gso_1M,fastrun]" "job_env@runner.job_env=[happypose,lda]"
 ```
+Please check the configuration is correct using `-c job`
+
 
 
 # Known issues

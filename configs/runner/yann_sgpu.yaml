@@ -12,4 +12,4 @@ defaults:
     - lda
   - _self_
 
-log_dir: ${oc.env:HP_DATA_DIR}/logs
+log_dir: ${oc.env:HP_DATA_DIR}/submitit_logs

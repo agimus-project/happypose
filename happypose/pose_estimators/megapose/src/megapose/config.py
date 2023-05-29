@@ -38,13 +38,13 @@ BOP_TOOLKIT_DIR = PROJECT_ROOT / "deps" / "bop_toolkit_challenge"
 BLENDER_PBR_DS_DIR = LOCAL_DATA_DIR / "blender_pbr_datasets"
 CC_TEXTURE_FOLDER = str(LOCAL_DATA_DIR / "cctextures")
 
-if 'BLENDER_PROC_DIR' in os.environ:
-    BLENDER_PROC_DIR = Path(os.environ.get('BLENDER_PROC_DIR'))
+if "BLENDERPROC_DIR" in os.environ:
+    BLENDERPROC_DIR = Path(os.environ.get("BLENDERPROC_DIR"))
 else:
-    BLENDER_PROC_DIR = PROJECT_DIR.parent / "blenderproc"
+    BLENDERPROC_DIR = PROJECT_DIR.parent / "blenderproc"
 
-if 'BLENDER_INSTALL_DIR' in os.environ:
-    BLENDER_INSTALL_DIR = Path(os.environ['BLENDER_INSTALL_DIR'])
+if "BLENDER_INSTALL_DIR" in os.environ:
+    BLENDER_INSTALL_DIR = Path(os.environ["BLENDER_INSTALL_DIR"])
 else:
     BLENDER_VERSION = "blender-2.93.8-linux-x64"
     BLENDER_INSTALL_DIR = LOCAL_DATA_DIR / BLENDER_VERSION

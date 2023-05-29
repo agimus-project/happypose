@@ -3,7 +3,9 @@ defaults:
   - base_run_dsgen
   - /runner: yann_sgpu
   - /slurm_queue@runner.slurm_queue: v100
-  - /slurm_queue@runner.slurm_queue: v100
+  - /job_env@runner.job_env:
+    - happypose
+    - lda
   - /dsgen@ds: default
   - _self_
   - /run_dsgen:
@@ -17,3 +19,7 @@ runner:
     cpus_per_task: 1
   slurm_job:
     cpus_per_task: 1
+
+hydra:
+  run: 
+    dir: ${oc.env:HP_DATA_DIR}/hydra_outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}

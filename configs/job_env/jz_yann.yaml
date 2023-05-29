@@ -4,5 +4,5 @@ defaults:
 env:
   HP_DATA_DIR: $WORK/data/happypose
   MEGAPOSE_DATA_DIR: $WORK/data/megapose
-  BLENDER_INSTALL_DIR: $WORK/blender/blender-2.93.88-linux-x64
+  BLENDER_INSTALL_DIR: $WORK/blender/blender-2.93.0-linux-x64
   BLENDERPROC_DIR: $WORK/projects/blenderproc
