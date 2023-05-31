@@ -1,3 +1,0 @@
-defaults:
-  - /hydra/launcher/submitit_local@_here_
-  - lda

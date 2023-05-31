@@ -42,6 +42,16 @@ class ShapeNetModel:
         self.source_id = source_id
 
 
+def load_object_infos(models_infos_path):
+    with open(models_infos_path, "r") as f:
+        infos = json.load(f)
+    itos = dict()
+    for info in infos:
+        k = f"shapenet_{info['shapenet_synset_id']}_{info['shapenet_source_id']}"
+        itos[info["obj_id"]] = k
+    return itos
+
+
 @MEMORY.cache
 def make_shapenet_infos(shapenet_dir, model_name):
     # TODO: This probably has issues / is poorly implemented and very slow
@@ -76,7 +86,9 @@ def make_shapenet_infos(shapenet_dir, model_name):
             model_dirs = list(synset_dir.iterdir())
         else:
             model_dirs = []
-        model_names = [model_dir.name for model_dir in model_dirs if model_exists(model_dir)]
+        model_names = [
+            model_dir.name for model_dir in model_dirs if model_exists(model_dir)
+        ]
         synset.models = model_names
 
     def get_descendants(synset):
@@ -122,7 +134,11 @@ class ShapeNetObjectDataset(RigidObjectDataset):
 
             for source_id in synset.models_descendants:
                 model_path = (
-                    self.shapenet_dir / synset.synset_id / source_id / "models" / model_name
+                    self.shapenet_dir
+                    / synset.synset_id
+                    / source_id
+                    / "models"
+                    / model_name
                 )
                 label = f"shapenet_{synset.synset_id}_{source_id}"
                 category = synset.name

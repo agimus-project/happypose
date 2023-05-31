@@ -43,11 +43,16 @@ git clone https://github.com/ylabbe/blenderproc
 
 # Testing the install
 ```
-export HP_DATA_DIR=/path/to/blenderproc
+export HP_DATA_DIR=/path/to/hp_data_dir
 python generate_dataset.py "run_dsgen=[gso_1M,fastrun]" "job_env@runner.job_env=[happypose,lda]"
 ```
 Please check the configuration is correct using `-c job`
 
+
+# Running dataset recording on Jean-Zay
+````
+python generate_dataset.py "run_dsgen=[gso_1M]" "job_env@runner.job_env=[happypose,lda]" runner.use_slurm=true
+```
 
 
 # Known issues

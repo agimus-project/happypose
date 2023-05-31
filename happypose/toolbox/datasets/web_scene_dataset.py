@@ -71,7 +71,8 @@ def write_scene_ds_as_wds(
     wds_dir.mkdir(exist_ok=True, parents=True)
     frame_index = scene_ds.frame_index.copy()
     shard_writer = wds.ShardWriter(
-        str(wds_dir / shard_format), maxcount=maxcount, start_shard=0)
+        str(wds_dir / shard_format), maxcount=maxcount, start_shard=0
+    )
 
     sampler = None
     n_frames = len(scene_ds)
@@ -187,20 +188,20 @@ class WebSceneDataset(SceneDataset):
 
         frame_index = None
         if load_frame_index:
-            key_to_shard = json.loads((wds_dir / 'key_to_shard.json').read_text())
+            key_to_shard = json.loads((wds_dir / "key_to_shard.json").read_text())
             frame_index = defaultdict(list)
             for key, shard_id in key_to_shard.items():
-                image_id, scene_id = map(int, key.split('_'))
-                frame_index['image_id'].append(image_id)
-                frame_index['scene_id'].append(scene_id)
-                frame_index['key'].append(key)
-                frame_index['shard_id'].append(shard_id)
+                image_id, scene_id = map(int, key.split("_"))
+                frame_index["image_id"].append(image_id)
+                frame_index["scene_id"].append(scene_id)
+                frame_index["key"].append(key)
+                frame_index["shard_id"].append(shard_id)
             frame_index = pd.DataFrame(frame_index)
 
         super().__init__(
             frame_index=frame_index,
             load_depth=load_depth,
-            load_segmentation=load_segmentation
+            load_segmentation=load_segmentation,
         )
 
     def get_tar_list(self) -> List[str]:
@@ -212,7 +213,7 @@ class WebSceneDataset(SceneDataset):
         assert self.frame_index is not None
         row = self.frame_index.iloc[idx]
         shard_id, key = row.shard_id, row.key
-        shard_path = self.wds_dir / f'shard-{shard_id:06d}.tar'
+        shard_path = self.wds_dir / f"shard-{shard_id:06d}.tar"
 
         bop_obs = bop_webdataset.load_image_data(
             shard_path,
@@ -222,9 +223,7 @@ class WebSceneDataset(SceneDataset):
             load_gt=True,
             load_gt_info=True,
         )
-        obs = data_from_bop_obs(
-            bop_obs,
-            use_raw_object_id=True)
+        obs = data_from_bop_obs(bop_obs, use_raw_object_id=True)
         return obs
 
 
