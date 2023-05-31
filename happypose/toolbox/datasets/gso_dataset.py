@@ -15,7 +15,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import json
 from pathlib import Path
@@ -41,6 +40,16 @@ def make_gso_infos(gso_dir: Path, model_name: str = "model.obj") -> List[str]:
                 object_ids.append(object_id)
     object_ids.sort()
     return object_ids
+
+
+def load_object_infos(models_infos_path):
+    with open(models_infos_path, "r") as f:
+        infos = json.load(f)
+    itos = dict()
+    for info in infos:
+        k = f"gso_{info['gso_id']}"
+        itos[info["obj_id"]] = k
+    return itos
 
 
 class GoogleScannedObjectDataset(RigidObjectDataset):

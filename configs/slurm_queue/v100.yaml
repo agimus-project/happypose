@@ -1,0 +1,7 @@
+defaults:
+  - base_slurm_queue
+partition: "gpu_p13"
+gpus_per_node: 4
+cpus_per_gpu: 10
+mem_per_gpu: '32GB'
+mem_per_cpu: '10GB'

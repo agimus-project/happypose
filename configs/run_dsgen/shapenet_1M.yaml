@@ -1,0 +1,6 @@
+# @package _global_
+defaults:
+  - override /dsgen@ds: shapenet_1M
+
+n_jobs: 350
+n_chunks: 50000

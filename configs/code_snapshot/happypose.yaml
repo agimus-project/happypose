@@ -1,0 +1,9 @@
+defaults:
+  - base_code_snapshot
+
+python_packages_dir:
+  - ${oc.env:PROJECTS_DIR}/happypose
+
+snapshot_dir: ${oc.env:HP_DATA_DIR}/code_snapshots/${hydra:job.id}
+  
+exclude_path: ${oc.env:HP_ROOT_DIR}/configs/snapshot_ignore.txt

@@ -1,0 +1,9 @@
+# @package _global_
+start_chunk: 0
+n_jobs: 4
+n_chunks: 4
+ds: 
+  debug: True
+  verbose: True
+  overwrite: True
+  few: True

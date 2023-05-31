@@ -12,3 +12,4 @@ __pycache__
 *.temp
 *tmp/
 *.cpython
+experiments/outputs
