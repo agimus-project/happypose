@@ -54,6 +54,10 @@ Please check the configuration is correct using `-c job`
 python generate_dataset.py "run_dsgen=[gso_1M]" "job_env@runner.job_env=[happypose,lda]" runner.use_slurm=true
 ```
 
+# Post-processing script
+See `experiments/postprocess_dataset.py`:
+- Convert object ids from strings to integers to match the BOP format.
+- Check that all keys have all annotations (there may be some keys which have missing annotations due to a job being killed during copy of the files when recording).
 
 # Known issues
 - If you try to record a dataset on the nodes of a cluster that doesn't have an internet connexion, BlenderProc may crash because it cannot download some dependencies. To solve this, you will need to run the testing script on a node that has an internet connexion, then comment out the content of the method `setup_pip` of the `SetupUtilty.py` found in blenderproc.
