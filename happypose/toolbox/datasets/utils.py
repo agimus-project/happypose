@@ -39,3 +39,4 @@ def make_detections_from_segmentation(
             dets_n[int(unique_id)] = np.array([x1, y1, x2, y2])
         detections.append(dets_n)
     return detections
+

@@ -1,0 +1,3 @@
+defaults:
+  - base_job_env
+conda_env: 'happypose'

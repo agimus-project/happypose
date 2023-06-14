@@ -37,11 +37,20 @@ WDS_DS_DIR = LOCAL_DATA_DIR / "webdatasets"
 BOP_TOOLKIT_DIR = PROJECT_ROOT / "deps" / "bop_toolkit_challenge"
 BLENDER_PBR_DS_DIR = LOCAL_DATA_DIR / "blender_pbr_datasets"
 CC_TEXTURE_FOLDER = str(LOCAL_DATA_DIR / "cctextures")
-BLENDER_PROC_DIR = PROJECT_DIR.parent / "blenderproc"
-BLENDER_VERSION = "blender-2.93.8-linux-x64"
-BLENDER_INSTALL_DIR = LOCAL_DATA_DIR / BLENDER_VERSION
-if not BLENDER_INSTALL_DIR.exists():
-    BLENDER_INSTALL_DIR = Path(os.environ["HOME"]) / BLENDER_VERSION
+
+if "BLENDERPROC_DIR" in os.environ:
+    BLENDERPROC_DIR = Path(os.environ.get("BLENDERPROC_DIR"))
+else:
+    BLENDERPROC_DIR = PROJECT_DIR.parent / "blenderproc"
+
+if "BLENDER_INSTALL_DIR" in os.environ:
+    BLENDER_INSTALL_DIR = Path(os.environ["BLENDER_INSTALL_DIR"])
+else:
+    BLENDER_VERSION = "blender-2.93.8-linux-x64"
+    BLENDER_INSTALL_DIR = LOCAL_DATA_DIR / BLENDER_VERSION
+    if not BLENDER_INSTALL_DIR.exists():
+        BLENDER_INSTALL_DIR = Path(os.environ["HOME"]) / BLENDER_VERSION
+
 PYTHON_BIN_PATH = Path(os.environ["CONDA_PREFIX"]) / "bin/python"
 
 BOP_PANDA3D_DS_DIR = LOCAL_DATA_DIR / "bop_models_panda3d"

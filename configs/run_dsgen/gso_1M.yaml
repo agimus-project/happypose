@@ -1,0 +1,6 @@
+# @package _global_
+defaults:
+  - override /dsgen@ds: gso_1M
+
+n_jobs: 128
+n_chunks: 25000

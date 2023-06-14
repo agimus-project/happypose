@@ -1,0 +1,23 @@
+# @package _global_
+defaults:
+  - base_run_ds_postproc
+  - /runner: yann_sgpu
+  - /slurm_queue@runner.slurm_queue: v100
+  - /job_env@runner.job_env:
+    - happypose
+    - jz_yann
+  - _self_
+  - /run_ds_postproc:
+
+runner:
+  local_job:
+    cpus_per_task: 1
+  slurm_job:
+    cpus_per_task: 1
+
+hydra:
+  run: 
+    dir: ${oc.env:HP_DATA_DIR}/hydra_outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+n_jobs: 128
+ds_dir: ${oc.env:HP_DATA_DIR}/blender_pbr_datasets/gso_1M

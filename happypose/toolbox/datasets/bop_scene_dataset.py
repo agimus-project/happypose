@@ -15,7 +15,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import json
 import pickle
@@ -29,9 +28,10 @@ from PIL import Image
 from tqdm import tqdm
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.config import BOP_TOOLKIT_DIR, MEMORY
-from happypose.toolbox.lib3d.transform import Transform
-from happypose.toolbox.utils.logging import get_logger
+from happypose.pose_estimators.megapose.src.megapose.config import (
+    BOP_TOOLKIT_DIR,
+    MEMORY,
+)
 
 # Local Folder
 from happypose.toolbox.datasets.scene_dataset import (
@@ -41,6 +41,8 @@ from happypose.toolbox.datasets.scene_dataset import (
     SceneDataset,
     SceneObservation,
 )
+from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.utils.logging import get_logger
 
 sys.path.append(str(BOP_TOOLKIT_DIR))
 # Third Party
@@ -86,13 +88,19 @@ def build_index_and_annotations(
         for view_id in scene_annotation["scene_camera"].keys():
             if make_per_view_annotations:
                 this_annotation = dict()
-                this_annotation["camera"] = scene_annotation["scene_camera"][str(view_id)]
+                this_annotation["camera"] = scene_annotation["scene_camera"][
+                    str(view_id)
+                ]
                 if "scene_gt_info" in scene_annotation:
                     this_annotation["gt"] = scene_annotation["scene_gt"][str(view_id)]
-                    this_annotation["gt_info"] = scene_annotation["scene_gt_info"][str(view_id)]
+                    this_annotation["gt_info"] = scene_annotation["scene_gt_info"][
+                        str(view_id)
+                    ]
                 annotation_dir = base_dir / scene_id / "per_view_annotations"
                 annotation_dir.mkdir(exist_ok=True)
-                (annotation_dir / f"view={view_id}.json").write_text(json.dumps(this_annotation))
+                (annotation_dir / f"view={view_id}.json").write_text(
+                    json.dumps(this_annotation)
+                )
             scene_ids.append(int(scene_id))
             view_ids.append(int(view_id))
 
@@ -104,6 +112,82 @@ def build_index_and_annotations(
         save_file_annotations.write_bytes(pickle.dumps(annotations))
         save_file_annotations = None
     return frame_index, annotations
+
+
+def data_from_bop_obs(
+    bop_obs,
+    use_raw_object_id=False,
+    label_format="{label}",
+):
+    rgb = bop_obs["im_rgb"]
+    depth = bop_obs["im_depth"]
+
+    if "cam_R_w2c" in bop_obs["camera"]:
+        RCW = np.array(bop_obs["camera"]["cam_R_w2c"]).reshape(3, 3)
+        tCW = np.array(bop_obs["camera"]["cam_t_w2c"]) * 0.001
+        TCW = Transform(RCW, tCW)
+    else:
+        TCW = Transform(np.eye(3), np.zeros(3))
+    K = np.array(bop_obs["camera"]["cam_K"]).reshape(3, 3)
+    TWC = TCW.inverse()
+    camera_data = CameraData(TWC=TWC, K=K, resolution=rgb.shape[:2])
+
+    h, w = rgb.shape[:2]
+    segmentation = np.zeros((h, w), dtype=np.uint32)
+    object_datas = []
+    n_objects = len(bop_obs["gt"])
+    for n in range(n_objects):
+        RCO = np.array(bop_obs["gt"][n]["cam_R_m2c"]).reshape(3, 3)
+        tCO = np.array(bop_obs["gt"][n]["cam_t_m2c"]) * 0.001
+        TCO = Transform(RCO, tCO)
+        TWO = TWC * TCO
+        if use_raw_object_id:
+            name = str(bop_obs["gt"][n]["obj_id"])
+        else:
+            obj_id = bop_obs["gt"][n]["obj_id"]
+            name = f"obj_{int(obj_id):06d}"
+
+        bbox_visib = np.array(bop_obs["gt_info"][n]["bbox_visib"]).tolist()
+        x, y, w, h = bbox_visib
+        x1 = x
+        y1 = y
+        x2 = x + w
+        y2 = y + h
+        bbox_visib = [x1, y1, x2, y2]
+
+        bbox_obj = np.array(bop_obs["gt_info"][n]["bbox_obj"]).tolist()
+        x, y, w, h = bbox_obj
+        x1 = x
+        y1 = y
+        x2 = x + w
+        y2 = y + h
+        bbox_obj = [x1, y1, x2, y2]
+
+        label = label_format.format(label=name)
+        object_data = ObjectData(
+            label=label,
+            TWO=TWO,
+            visib_fract=bop_obs["gt_info"][n]["visib_fract"],
+            unique_id=n + 1,
+            bbox_modal=bbox_visib,
+            bbox_amodal=bbox_obj,
+        )
+        object_datas.append(object_data)
+
+    for n in range(n_objects):
+        binary_mask_n = bop_obs["mask_visib"][n]
+        segmentation[binary_mask_n] = n + 1
+
+    observation = SceneObservation(
+        rgb=rgb,
+        depth=depth,
+        segmentation=segmentation,
+        binary_masks=bop_obs["mask_visib"],
+        camera_data=camera_data,
+        infos=None,
+        object_datas=object_datas,
+    )
+    return observation
 
 
 class BOPDataset(SceneDataset):
@@ -160,7 +244,9 @@ class BOPDataset(SceneDataset):
             load_segmentation=True,
         )
 
-    def _load_scene_observation(self, image_infos: ObservationInfos) -> SceneObservation:
+    def _load_scene_observation(
+        self, image_infos: ObservationInfos
+    ) -> SceneObservation:
         scene_id, view_id = image_infos.scene_id, image_infos.view_id
         view_id = int(view_id)
         view_id_str = f"{view_id:06d}"
@@ -170,7 +256,9 @@ class BOPDataset(SceneDataset):
         # All stored in self.annotations (basic, problem with shared memory)
         # TODO: Also change the pandas numpy arrays to np.string_ instead of np.object
         # See https://github.com/pytorch/pytorch/issues/13246#issuecomment-905703662
-        this_annotation_path = scene_dir / "per_view_annotations" / f"view={str(view_id)}.json"
+        this_annotation_path = (
+            scene_dir / "per_view_annotations" / f"view={str(view_id)}.json"
+        )
         if this_annotation_path.exists():
             this_annotation = json.loads(this_annotation_path.read_text())
             this_gt = this_annotation.get("gt")
@@ -268,7 +356,9 @@ class BOPDataset(SceneDataset):
             else:
                 for n in range(n_objects):
                     binary_mask_n = np.array(
-                        Image.open(scene_dir / "mask_visib" / f"{view_id_str}_{n:06d}.png")
+                        Image.open(
+                            scene_dir / "mask_visib" / f"{view_id_str}_{n:06d}.png"
+                        )
                     )
                     segmentation[binary_mask_n == 255] = n + 1
 

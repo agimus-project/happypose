@@ -15,15 +15,14 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 from typing import Tuple, Union
 
 # Third Party
-import eigenpy
 import numpy as np
 import pinocchio as pin
 import torch
+
 
 class Transform:
     """A representation of a SE(3) object based on pinocchio's pin.SE3."""
@@ -33,7 +32,10 @@ class Transform:
         *args: Union[
             Union[pin.SE3, np.ndarray, torch.Tensor],  # T
             Union[
-                pin.Quaternion, np.ndarray, torch.Tensor, Tuple[float, float, float, float]
+                pin.Quaternion,
+                np.ndarray,
+                torch.Tensor,
+                Tuple[float, float, float, float],
             ],  # rotation
             Union[np.ndarray, torch.Tensor, Tuple[float, float, float]],  # translation
         ]
