@@ -5,6 +5,7 @@
 #     Author: Vladimir Petrik <vladimir.petrik@cvut.cz>
 #
 
+
 """
 TODO:
 - remove commented useless code
@@ -28,25 +29,20 @@ from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset, make_obj
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import check_update_config as check_update_config_pose
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
-from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
-from happypose.pose_estimators.cosypose.cosypose.integrated.multiview_predictor import MultiviewScenePredictor
-from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
-import cosypose.utils.tensor_collection as tc
 # Detection
 from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import create_model_detector
 from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import check_update_config as check_update_config_detector
 from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 
 from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.bop_predictions import BopPredictionRunner
-
+from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
+    PoseEstimator,
+)
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_tmp_dir, get_rank
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import init_distributed_mode
 
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, RESULTS_DIR
 
-from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
-from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
 
@@ -82,7 +78,7 @@ class CosyPoseWrapper:
     def __init__(self, dataset_name, n_workers=8, gpu_renderer=False) -> None:
         self.dataset_name = dataset_name
         super().__init__()
-        self.detector, self.pose_predictor = self.get_model(dataset_name, n_workers, gpu_renderer)
+        self.detector, self.pose_predictor = self.get_model(dataset_name, n_workers)
 
     @staticmethod
     def load_detector(run_id, ds_name):
@@ -102,8 +98,9 @@ class CosyPoseWrapper:
         return model
 
     @staticmethod
-    def load_pose_models(coarse_run_id, refiner_run_id, n_workers, gpu_renderer):
+    def load_pose_models(coarse_run_id, refiner_run_id, n_workers):
         run_dir = EXP_DIR / coarse_run_id
+
         # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
         cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.UnsafeLoader)
         cfg = check_update_config_pose(cfg)
@@ -120,6 +117,7 @@ class CosyPoseWrapper:
 
         def load_model(run_id):
             run_dir = EXP_DIR / run_id
+
             # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
             cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.UnsafeLoader)
             cfg = check_update_config_pose(cfg)
@@ -134,15 +132,13 @@ class CosyPoseWrapper:
             model.cfg = cfg
             model.config = cfg
             return model
-
+        
         coarse_model = load_model(coarse_run_id)
         refiner_model = load_model(refiner_run_id)
-        model = CoarseRefinePosePredictor(coarse_model=coarse_model,
-                                          refiner_model=refiner_model)
-        return model, mesh_db
+        return coarse_model, refiner_model, mesh_db
 
     @staticmethod
-    def get_model(dataset_name, n_workers, gpu_renderer):
+    def get_model(dataset_name, n_workers):
         # load models
         if dataset_name == 'tless':
             # TLESS setup
@@ -163,88 +159,34 @@ class CosyPoseWrapper:
         else:
             raise ValueError(f"Not prepared for {dataset_name} dataset")
         detector = CosyPoseWrapper.load_detector(detector_run_id, dataset_name)
-        pose_predictor, mesh_db = CosyPoseWrapper.load_pose_models(
-            coarse_run_id=coarse_run_id, refiner_run_id=refiner_run_id, n_workers=n_workers, gpu_renderer=gpu_renderer
+        coarse_model, refiner_model , mesh_db = CosyPoseWrapper.load_pose_models(
+            coarse_run_id=coarse_run_id, refiner_run_id=refiner_run_id, n_workers=n_workers
         )
-        return detector, pose_predictor
 
-    def inference(self, image, camera_k, coarse_guess=None):
-        # [1,540,720,3]->[1,3,540,720]
-        # print(image.shape)
-        # print(image.max())
-        # images = torch.from_numpy(image).cpu().float().unsqueeze_(0)
-        images = torch.from_numpy(image).float().unsqueeze_(0).to(device)
-        images = images.permute(0, 3, 1, 2) / 255
-        # print(images.shape)
-        # print(images.max())
-        # [1,3,3]
-        cameras_k = torch.from_numpy(camera_k).float().unsqueeze_(0).to(device)
-        # cameras_k = torch.from_numpy(camera_k).cpu().float().unsqueeze_(0)
-        # 2D detector
-        # print("start detect object.")
-        box_detections = self.detector.get_detections(images=images, one_instance_per_class=False,
-                                                      # detection_th=0.8, output_masks=False, mask_th=0.9)
-                                                      detection_th=0.7, output_masks=False, mask_th=0.8)
-        
-        # exit(10)
-        # pose esitimition
-        if len(box_detections) == 0:
-            return None
-        # print("start estimate pose.")
+        pose_estimator = PoseEstimator(
+            refiner_model=refiner_model,
+            coarse_model=coarse_model,
+            detector_model=detector,
+        )
+        return detector, pose_estimator
+
+    def inference(self, observation, coarse_guess=None):
+        detections = None
+        run_detector = True
         if coarse_guess is None:
-            final_preds, all_preds = self.pose_predictor.get_predictions(images, cameras_k, detections=box_detections,
-                                                                     n_coarse_iterations=1, n_refiner_iterations=4)
+            final_preds, all_preds = self.pose_predictor.run_inference_pipeline(
+                observation,
+                detections=detections,
+                run_detector=run_detector,
+                data_TCO_init=None,
+                n_coarse_iterations=1, n_refiner_iterations=4)
         else:
-            final_preds, all_preds = self.pose_predictor.get_predictions(images, cameras_k,
-                                                                                      data_TCO_init=coarse_guess,
-                                                                                      detections=box_detections,
-                                                                         n_coarse_iterations=0, n_refiner_iterations=4)
+            final_preds, all_preds = self.pose_predictor.run_inference_pipeline(
+                observation,
+                detections=detections,
+                run_detector=run_detector,
+                data_TCO_init=None,
+                n_coarse_iterations=0, n_refiner_iterations=4)
         print("inference successfully.")
         # result: this_batch_detections, final_preds
         return final_preds.cpu()
-
-    def inference_eval(self, image, camera_k, scene_id, view_id, coarse_guess=None):
-        # [1,540,720,3]->[1,3,540,720]
-        # print(image.shape)
-        # print(image.max())
-        # images = torch.from_numpy(image).cpu().float().unsqueeze_(0)
-        images = torch.from_numpy(image).float().unsqueeze_(0).to(device)
-        images = images.permute(0, 3, 1, 2) / 255
-        # print(images.shape)
-        # print(images.max())
-        # [1,3,3]
-        cameras_k = torch.from_numpy(camera_k).float().unsqueeze_(0).to(device)
-        # cameras_k = torch.from_numpy(camera_k).cpu().float().unsqueeze_(0)
-        # 2D detector
-        # print("start detect object.")
-        temp_box_detections = self.detector.get_detections(images=images, one_instance_per_class=False,
-                                                      # detection_th=0.8, output_masks=False, mask_th=0.9)
-                                                      detection_th=0.7, output_masks=False, mask_th=0.8)
-        # exit(10)
-        # pose esitimition
-        
-        infos = dict(batch_im_id=temp_box_detections.infos['batch_im_id'],
-                     label=temp_box_detections.infos['label'],
-                     score=temp_box_detections.infos['score'],
-                     scene_id=[int(scene_id)]*len(temp_box_detections.infos['score']),
-                     view_id=[int(view_id)]*len(temp_box_detections.infos['score']))
-        
-        box_detections = tc.PandasTensorCollection(
-            infos=pd.DataFrame(infos),
-            bboxes=temp_box_detections.bboxes
-        )
-        
-        if len(box_detections) == 0:
-            return None
-        # print("start estimate pose.")
-        if coarse_guess is None:
-            final_preds, all_preds = self.pose_predictor.get_predictions(images, cameras_k, detections=box_detections,
-                                                                     n_coarse_iterations=1, n_refiner_iterations=4)
-        else:
-            final_preds, all_preds = self.pose_predictor.get_predictions(images, cameras_k,
-                                                                                      data_TCO_init=coarse_guess,
-                                                                                      detections=box_detections,
-                                                                         n_coarse_iterations=0, n_refiner_iterations=4)
-        print("inference successfully.")
-        # result: this_batch_detections, final_preds
-        return final_preds.cpu(), all_preds

@@ -30,8 +30,9 @@ import happypose.pose_estimators.megapose.src.megapose
 import happypose.toolbox.utils.tensor_collection as tc
 from happypose.toolbox.inference.types import DetectionsType, ObservationTensor
 
+from happypose.toolbox.inference.detector import DetectorModule
 
-class Detector(torch.nn.Module):
+class Detector(DetectorModule):
     def __init__(self, model: torch.nn.Module) -> None:
         super().__init__()
         self.model = model

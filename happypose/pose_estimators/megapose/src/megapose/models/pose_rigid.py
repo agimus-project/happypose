@@ -48,6 +48,17 @@ from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
+@dataclass
+class PosePredictorOutputCosypose:
+    TCO_output: torch.Tensor
+    TCO_input: torch.Tensor
+    renders: torch.Tensor
+    images_crop: torch.Tensor
+    labels: List[str]
+    K: torch.Tensor
+    K_crop: torch.Tensor
+    boxes_rend: torch.Tensor
+    boxes_crop: torch.Tensor
 
 @dataclass
 class PosePredictorOutput:

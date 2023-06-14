@@ -46,12 +46,13 @@ from happypose.toolbox.utils import transform_utils
 from happypose.toolbox.utils.logging import get_logger
 from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 from happypose.toolbox.utils.timer import Timer
+from happypose.toolbox.inference.pose_estimator import PoseEstimationModule
 
 logger = get_logger(__name__)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-class PoseEstimator(torch.nn.Module):
+class PoseEstimator(PoseEstimationModule):
     """Performs inference for pose estimation."""
 
     def __init__(

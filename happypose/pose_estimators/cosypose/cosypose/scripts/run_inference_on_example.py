@@ -7,7 +7,7 @@ import argparse
 import json
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Tuple, Union
 
 # Third Party
 import numpy as np
@@ -27,7 +27,7 @@ import torch
 from happypose.pose_estimators.cosypose.cosypose.visualization.singleview import render_prediction_wrt_camera
 from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
-from happypose.pose_estimators.cosypose.cosypose.scripts.cosypose_wrapper import CosyPoseWrapper
+from happypose.pose_estimators.cosypose.cosypose.utils.cosypose_wrapper import CosyPoseWrapper
 
 # HappyPose
 from happypose.toolbox.renderer import Panda3dLightData
@@ -52,6 +52,31 @@ logger = get_logger(__name__)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+def load_observation(
+    example_dir: Path,
+    load_depth: bool = False,
+) -> Tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
+    camera_data = CameraData.from_json((example_dir / "camera_data.json").read_text())
+
+    rgb = np.array(Image.open(example_dir / "image_rgb.png"), dtype=np.uint8)
+    assert rgb.shape[:2] == camera_data.resolution
+
+    depth = None
+    if load_depth:
+        depth = np.array(Image.open(example_dir / "image_depth.png"), dtype=np.float32) / 1000
+        assert depth.shape[:2] == camera_data.resolution
+
+    return rgb, depth, camera_data
+
+
+def load_observation_tensor(
+    example_dir: Path,
+    load_depth: bool = False,
+) -> ObservationTensor:
+    rgb, depth, camera_data = load_observation(example_dir, load_depth)
+    observation = ObservationTensor.from_numpy(rgb, depth, camera_data.K)
+    observation.cuda()
+    return observation
 
 def make_object_dataset(example_dir: Path) -> RigidObjectDataset:
     rigid_objects = []
@@ -71,34 +96,14 @@ def make_object_dataset(example_dir: Path) -> RigidObjectDataset:
     return rigid_object_dataset
 
 
-def load_image(data_path: Path) -> List[ObjectData]:
-    # imread stores color dim in the BGR order by default
-    brg = cv2.imread(str(data_path) + "/cheezit_Color.png")
-    # CosyPose uses a RGB representation internally?
-    rgb = cv2.cvtColor(brg, cv2.COLOR_BGR2RGB)
-    IMG_RES = 480, 640
-    return rgb, IMG_RES
-
-
-def load_camera() -> np.array: 
-    K_rs = np.array([615.1529541015625, 0.0, 324.5750732421875, 
-    0.0, 615.2452392578125, 237.81765747070312, 
-    0.0, 0.0, 1.0]).reshape((3,3))
-    return K_rs
-
-
-def rendering(predictions, K_rs, img_res):
+def rendering(predictions, example_dir):
     object_dataset = make_object_dataset(example_dir)
     # rendering
+    rgb, _, camera_data = load_observation(example_dir, load_depth=False)
+    camera_data.TWC = Transform(np.eye(4))
     renderer = Panda3dSceneRenderer(object_dataset)
-    cam = {
-        'resolution': img_res,
-        'K': K_rs,
-        'TWC': np.eye(4),
-    }
     # Data necessary for image rendering
     object_datas = [ObjectData(label="cheetos", TWO=Transform(predictions.poses[0].numpy()))]
-    camera_data = CameraData(K=K_rs, resolution=cam["resolution"], TWC=Transform(cam["TWC"]))
     camera_data, object_datas = convert_scene_observation_to_panda3d(camera_data, object_datas)
     light_datas = [
         Panda3dLightData(
@@ -118,8 +123,9 @@ def rendering(predictions, K_rs, img_res):
     return renderings
 
 
-def save_predictions(example_dir, renderings, rgb):
+def save_predictions(example_dir, renderings):
     rgb_render = renderings.rgb
+    rgb, _, _ = load_observation(example_dir, load_depth=False)
     # render_prediction_wrt_camera calls BulletSceneRenderer.render_scene using only one camera at pose Identity and return only rgb values
     # BulletSceneRenderer.render_scene: gets a "object list" (prediction like object), a list of camera infos (with Km pose, res) and renders
     # a "camera observation" for each camera/viewpoint
@@ -156,12 +162,11 @@ def run_inference(
     model_name: str,
     dataset_to_use: str,
 ) -> None:
-    rgb, img_res = load_image(example_dir)
-    K_rs = load_camera()
+    observation = load_observation_tensor(example_dir)
     CosyPose = CosyPoseWrapper(dataset_name=dataset_to_use, n_workers=8)
-    predictions = CosyPose.inference(rgb, K_rs)
-    renderings = rendering(predictions, K_rs, img_res)
-    save_predictions(example_dir, renderings, rgb)
+    predictions = CosyPose.inference(observation)
+    renderings = rendering(predictions, example_dir)
+    save_predictions(example_dir, renderings)
 
 
 if __name__ == "__main__":

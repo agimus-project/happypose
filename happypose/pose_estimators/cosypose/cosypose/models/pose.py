@@ -11,6 +11,8 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import (
     compute_rotation_matrix_from_ortho6d, compute_rotation_matrix_from_quaternions)
 from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import apply_imagespace_predictions
 
+from happypose.pose_estimators.megapose.src.megapose.models.pose_rigid import PosePredictorOutputCosypose
+
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.renderer import Panda3dLightData
 logger = get_logger(__name__)
@@ -121,6 +123,18 @@ class PosePredictor(nn.Module):
                 'boxes_rend': boxes_rend,
                 'boxes_crop': boxes_crop,
             }
+
+            outputs[f"iteration={n+1}"] = PosePredictorOutputCosypose(
+                renders=renders,
+                images_crop=images_crop,
+                TCO_input=TCO_input,
+                TCO_output=TCO_output,
+                labels=labels,
+                K=K,
+                K_crop=K_crop,
+                boxes_rend=boxes_rend,
+                boxes_crop=boxes_crop,
+            )
 
             TCO_input = TCO_output
 

@@ -196,7 +196,7 @@ def run_evaluation(cfg: BOPEvalConfig) -> None:
         # this is what is expected by bop_toolkit_lib
         csv_path = eval_dir / f"{method}_{cfg.dataset.split('.')[0]}-{cfg.split}.csv"
 
-        convert_results_to_bop(results_path, csv_path, cfg.method)
+        convert_results_to_bop(results_path, csv_path, cfg.method, use_pose_score=False)
 
         if not cfg.convert_only:
             _run_bop_evaluation(csv_path, cfg.eval_dir, eval_detection=False)

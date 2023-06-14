@@ -140,6 +140,8 @@ def run_inference(
     observation = load_observation_tensor(
         example_dir, load_depth=model_info["requires_depth"]
     )
+    if torch.cuda.is_available():
+        observation.cuda()
     detections = load_detections(example_dir).to(device)
     object_dataset = make_object_dataset(example_dir)
 
