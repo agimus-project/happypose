@@ -1,37 +1,33 @@
-import os
-import cv2
-import numpy as np
-
 # Standard Library
 import argparse
 import json
 import os
-from pathlib import Path
-from typing import List, Tuple, Union
-
-# Third Party
-import numpy as np
-from bokeh.io import export_png
-from bokeh.plotting import gridplot
-from PIL import Image
 
 ########################
 # Add cosypose to my path -> dirty
 import sys
-########################
+from pathlib import Path
+from typing import List, Tuple, Union
 
 import cosypose
+import cv2
+
+# Third Party
+import numpy as np
 import torch
+from bokeh.io import export_png
+from bokeh.plotting import gridplot
+from PIL import Image
+
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.utils.cosypose_wrapper import (
+    CosyPoseWrapper,
+)
 
 #from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
-from happypose.pose_estimators.cosypose.cosypose.visualization.singleview import render_prediction_wrt_camera
-from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
-
-from happypose.pose_estimators.cosypose.cosypose.utils.cosypose_wrapper import CosyPoseWrapper
-
-# HappyPose
-from happypose.toolbox.renderer import Panda3dLightData
-from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
+from happypose.pose_estimators.cosypose.cosypose.visualization.singleview import (
+    render_prediction_wrt_camera,
+)
 
 # MegaPose
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
@@ -42,11 +38,22 @@ from happypose.toolbox.inference.types import (
     PoseEstimatesType,
 )
 from happypose.toolbox.lib3d.transform import Transform
+
+# HappyPose
+from happypose.toolbox.renderer import Panda3dLightData
+from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
 from happypose.toolbox.utils.conversion import convert_scene_observation_to_panda3d
 from happypose.toolbox.utils.load_model import NAMED_MODELS, load_named_model
 from happypose.toolbox.utils.logging import get_logger, set_logging_level
 from happypose.toolbox.visualization.bokeh_plotter import BokehPlotter
 from happypose.toolbox.visualization.utils import make_contour_overlay
+
+########################
+
+
+
+
+
 
 logger = get_logger(__name__)
 
@@ -75,7 +82,8 @@ def load_observation_tensor(
 ) -> ObservationTensor:
     rgb, depth, camera_data = load_observation(example_dir, load_depth)
     observation = ObservationTensor.from_numpy(rgb, depth, camera_data.K)
-    observation.cuda()
+    if torch.cuda.is_available():
+        observation.cuda()
     return observation
 
 def make_object_dataset(example_dir: Path) -> RigidObjectDataset:

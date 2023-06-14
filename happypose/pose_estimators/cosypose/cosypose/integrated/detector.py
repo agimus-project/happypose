@@ -1,18 +1,16 @@
-import torch
-import numpy as np
-import pandas as pd
-
 from typing import Any, Optional
 
-
 import cosypose.utils.tensor_collection as tc
+import numpy as np
+import pandas as pd
+import torch
 
 # MegaPose
 import happypose.pose_estimators.megapose.src.megapose
 import happypose.toolbox.utils.tensor_collection as tc
+from happypose.toolbox.inference.detector import DetectorModule
 from happypose.toolbox.inference.types import DetectionsType, ObservationTensor
 
-from happypose.toolbox.inference.detector import DetectorModule
 
 class Detector(DetectorModule):
     def __init__(self, model, ds_name):
@@ -77,12 +75,20 @@ class Detector(DetectorModule):
                 infos.append(info)
 
         if len(bboxes) > 0:
-            bboxes = torch.stack(bboxes).cuda().float()
-            masks = torch.stack(masks).cuda()
+            if torch.cuda.is_available():
+                bboxes = torch.stack(bboxes).cuda().float()
+                masks = torch.stack(masks).cuda()
+            else:
+                bboxes = torch.stack(bboxes).float()
+                masks = torch.stack(masks)
         else:
             infos = dict(score=[], label=[], batch_im_id=[])
-            bboxes = torch.empty(0, 4).cuda().float()
-            masks = torch.empty(0, images.shape[1], images.shape[2], dtype=torch.bool).cuda()
+            if torch.cuda.is_available():
+                bboxes = torch.empty(0, 4).cuda().float()
+                masks = torch.empty(0, images.shape[1], images.shape[2], dtype=torch.bool).cuda()
+            else:
+                bboxes = torch.empty(0, 4).float()
+                masks = torch.empty(0, images.shape[1], images.shape[2], dtype=torch.bool)
 
         outputs = tc.PandasTensorCollection(
             infos=pd.DataFrame(infos),

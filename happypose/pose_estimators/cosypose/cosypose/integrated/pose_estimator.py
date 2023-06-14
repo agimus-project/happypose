@@ -1,26 +1,30 @@
-from typing import Any, Optional, Tuple
 import time
-import torch
-import numpy as np
-
 from collections import defaultdict
-from torch.utils.data import TensorDataset, DataLoader
-from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import TCO_init_from_boxes, TCO_init_from_boxes_zup_autodepth
+from typing import Any, Optional, Tuple
 
 import cosypose.utils.tensor_collection as tc
-from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
+import numpy as np
+import torch
+from torch.utils.data import DataLoader, TensorDataset
 
+from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import (
+    TCO_init_from_boxes,
+    TCO_init_from_boxes_zup_autodepth,
+)
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.utils.timer import Timer
-from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer, SimpleTimer
-
+from happypose.pose_estimators.megapose.src.megapose.training.utils import (
+    CudaTimer,
+    SimpleTimer,
+)
 from happypose.toolbox.inference.pose_estimator import PoseEstimationModule
 from happypose.toolbox.inference.types import (
     DetectionsType,
     ObservationTensor,
     PoseEstimatesType,
 )
-from happypose.toolbox.inference.types import PoseEstimatesType
+from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
+
 logger = get_logger(__name__)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -151,7 +155,10 @@ class PoseEstimator(PoseEstimationModule):
             if detections is None and run_detector:
                 start_time = time.time()
                 detections = self.forward_detection_model(observation)
-                detections = detections.cuda()
+                if torch.cuda.is_available():
+                    detections = detections.cuda()
+                else:
+                    detections = detections
                 elapsed = time.time() - start_time
                 timing_str += f"detection={elapsed:.2f}, "
         
