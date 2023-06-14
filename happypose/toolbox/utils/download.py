@@ -10,10 +10,9 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 RCLONE_CFG_PATH = (PROJECT_DIR / 'rclone.conf')
-RCLONE_ROOT = 'cosypose:'
+RCLONE_ROOT = 'happypose:'
 DOWNLOAD_DIR = LOCAL_DATA_DIR / 'downloads'
 DOWNLOAD_DIR.mkdir(exist_ok=True)
-
 BOP_SRC = 'https://bop.felk.cvut.cz/media/data/bop_datasets/'
 BOP_DATASETS = {
     'ycbv': {
@@ -58,7 +57,8 @@ def main():
     parser.add_argument('--bop_dataset', default='', type=str, choices=BOP_DS_NAMES)
     parser.add_argument('--bop_src', default='bop', type=str, choices=['bop', 'gdrive'])
     parser.add_argument('--bop_extra_files', default='', type=str, choices=['ycbv', 'tless'])
-    parser.add_argument('--model', default='', type=str)
+    parser.add_argument('--cosypose_model', default='', type=str)
+    parser.add_argument('--megapose_model', default='', type=str)
     parser.add_argument('--urdf_models', default='', type=str)
     parser.add_argument('--ycbv_compat_models', action='store_true')
     parser.add_argument('--texture_dataset', action='store_true')
@@ -85,53 +85,57 @@ def main():
     if args.bop_extra_files:
         if args.bop_extra_files == 'tless':
             # https://github.com/kirumang/Pix2Pose#download-pre-trained-weights
-            gdrive_download(f'bop_datasets/tless/all_target_tless.json', BOP_DS_DIR / 'tless')
+            gdrive_download(f'cosypose/bop_datasets/tless/all_target_tless.json', BOP_DS_DIR / 'tless')
             os.symlink(BOP_DS_DIR / 'tless/models_eval', BOP_DS_DIR / 'tless/models')
         elif args.bop_extra_files == 'ycbv':
             # Friendly names used with YCB-Video
-            gdrive_download(f'bop_datasets/ycbv/ycbv_friendly_names.txt', BOP_DS_DIR / 'ycbv')
+            gdrive_download(f'cosypose/bop_datasets/ycbv/ycbv_friendly_names.txt', BOP_DS_DIR / 'ycbv')
             # Offsets between YCB-Video and BOP (extracted from BOP readme)
-            gdrive_download(f'bop_datasets/ycbv/offsets.txt', BOP_DS_DIR / 'ycbv')
+            gdrive_download(f'cosypose/bop_datasets/ycbv/offsets.txt', BOP_DS_DIR / 'ycbv')
             # Evaluation models for YCB-Video (used by other works)
-            gdrive_download(f'bop_datasets/ycbv/models_original', BOP_DS_DIR / 'ycbv')
+            gdrive_download(f'cosypose/bop_datasets/ycbv/models_original', BOP_DS_DIR / 'ycbv')
             # Keyframe definition
-            gdrive_download(f'bop_datasets/ycbv/keyframe.txt', BOP_DS_DIR / 'ycbv')
+            gdrive_download(f'cosypose/bop_datasets/ycbv/keyframe.txt', BOP_DS_DIR / 'ycbv')
 
     if args.urdf_models:
-        gdrive_download(f'urdfs/{args.urdf_models}', LOCAL_DATA_DIR / 'urdfs')
+        gdrive_download(f'cosypose/urdfs/{args.urdf_models}', LOCAL_DATA_DIR / 'urdfs')
 
     if args.ycbv_compat_models:
-        gdrive_download(f'bop_datasets/ycbv/models_bop-compat', BOP_DS_DIR / 'ycbv')
-        gdrive_download(f'bop_datasets/ycbv/models_bop-compat_eval', BOP_DS_DIR / 'ycbv')
+        gdrive_download(f'cosypose/bop_datasets/ycbv/models_bop-compat', BOP_DS_DIR / 'ycbv')
+        gdrive_download(f'cosypose/bop_datasets/ycbv/models_bop-compat_eval', BOP_DS_DIR / 'ycbv')
 
-    if args.model:
-        gdrive_download(f'experiments/{args.model}', LOCAL_DATA_DIR / 'experiments')
+    if args.cosypose_model:
+        gdrive_download(f'cosypose/experiments/{args.cosypose_model}', LOCAL_DATA_DIR / 'experiments')
+    
+    if args.megapose_model:
+        gdrive_download(f'megapose/megapose-models/{args.megapose_model}', LOCAL_DATA_DIR / 'megapose-models')
+
 
     if args.detections:
-        gdrive_download(f'saved_detections/{args.detections}.pkl', LOCAL_DATA_DIR / 'saved_detections')
+        gdrive_download(f'cosypose/saved_detections/{args.detections}.pkl', LOCAL_DATA_DIR / 'saved_detections')
 
     if args.result_id:
-        gdrive_download(f'results/{args.result_id}', LOCAL_DATA_DIR / 'results')
+        gdrive_download(f'cosypose/results/{args.result_id}', LOCAL_DATA_DIR / 'results')
 
     if args.bop_result_id:
         csv_name = args.bop_result_id + '.csv'
-        gdrive_download(f'bop_predictions/{csv_name}', LOCAL_DATA_DIR / 'bop_predictions')
-        gdrive_download(f'bop_eval_outputs/{args.bop_result_id}', LOCAL_DATA_DIR / 'bop_predictions')
+        gdrive_download(f'cosypose/bop_predictions/{csv_name}', LOCAL_DATA_DIR / 'bop_predictions')
+        gdrive_download(f'cosypose/bop_eval_outputs/{args.bop_result_id}', LOCAL_DATA_DIR / 'bop_predictions')
 
     if args.texture_dataset:
-        gdrive_download('zip_files/textures.zip', DOWNLOAD_DIR)
+        gdrive_download('cosypose/zip_files/textures.zip', DOWNLOAD_DIR)
         logger.info('Extracting textures ...')
         zipfile.ZipFile(DOWNLOAD_DIR / 'textures.zip').extractall(LOCAL_DATA_DIR / 'texture_datasets')
 
     if args.synt_dataset:
         zip_name = f'{args.synt_dataset}.zip'
-        gdrive_download(f'zip_files/{zip_name}', DOWNLOAD_DIR)
+        gdrive_download(f'cosypose/zip_files/{zip_name}', DOWNLOAD_DIR)
         logger.info('Extracting textures ...')
         zipfile.ZipFile(DOWNLOAD_DIR / zip_name).extractall(LOCAL_DATA_DIR / 'synt_datasets')
 
     if args.example_scenario:
-        gdrive_download(f'custom_scenarios/example/candidates.csv', LOCAL_DATA_DIR / 'custom_scenarios/example')
-        gdrive_download(f'custom_scenarios/example/scene_camera.json', LOCAL_DATA_DIR / 'custom_scenarios/example')
+        gdrive_download(f'cosypose/custom_scenarios/example/candidates.csv', LOCAL_DATA_DIR / 'custom_scenarios/example')
+        gdrive_download(f'cosypose/custom_scenarios/example/scene_camera.json', LOCAL_DATA_DIR / 'custom_scenarios/example')
 
     if args.all_bop20_models:
         from happypose.pose_estimators.cosypose.cosypose.bop_config import (PBR_DETECTORS, PBR_COARSE, PBR_REFINER,
@@ -139,19 +143,20 @@ def main():
         for model_dict in (PBR_DETECTORS, PBR_COARSE, PBR_REFINER,
                            SYNT_REAL_DETECTORS, SYNT_REAL_COARSE, SYNT_REAL_REFINER):
             for model in model_dict.values():
-                gdrive_download(f'experiments/{model}', LOCAL_DATA_DIR / 'experiments')
+                gdrive_download(f'cosypose/experiments/{model}', LOCAL_DATA_DIR / 'experiments')
 
     if args.all_bop20_results:
         from happypose.pose_estimators.cosypose.cosypose.bop_config import (PBR_INFERENCE_ID, SYNT_REAL_INFERENCE_ID, SYNT_REAL_ICP_INFERENCE_ID,
                                          SYNT_REAL_4VIEWS_INFERENCE_ID, SYNT_REAL_8VIEWS_INFERENCE_ID)
         for result_id in (PBR_INFERENCE_ID, SYNT_REAL_INFERENCE_ID, SYNT_REAL_ICP_INFERENCE_ID,
                           SYNT_REAL_4VIEWS_INFERENCE_ID, SYNT_REAL_8VIEWS_INFERENCE_ID):
-            gdrive_download(f'results/{result_id}', LOCAL_DATA_DIR / 'results')
+            gdrive_download(f'cosypose/results/{result_id}', LOCAL_DATA_DIR / 'results')
 
 
 def run_rclone(cmd, args, flags):
     rclone_cmd = ['rclone', cmd] + args + flags + ['--config', str(RCLONE_CFG_PATH)]
     logger.debug(' '.join(rclone_cmd))
+    print(rclone_cmd)
     subprocess.run(rclone_cmd)
 
 
