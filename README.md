@@ -34,8 +34,7 @@ git clone https://github.com/ylabbe/bop_toolkit/
 cd bop_toolkit
 git checkout -b dataset_tools
 pip install -r requirements.txt -e .
-``
-
+```
 
 # Testing the install
 
