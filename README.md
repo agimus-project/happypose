@@ -77,7 +77,7 @@ python -m happypose.toolbox.utils.download --urdf_models=tless.cad
 In the BOP format, the YCB objects `002_master_chef_can` and `040_large_marker` are considered symmetric, but not by previous works such as PoseCNN, PVNet and DeepIM. To ensure a fair comparison (using ADD instead of ADD-S for ADD-(S) for these objects), these objects must *not* be considered symmetric in the evaluation. To keep the uniformity of the models format, we generate a set of YCB objects `models_bop-compat_eval` that can be used to fairly compare our approach against previous works. You can download them directly:
 
 ```sh
-python -m happypose.toolbox.utils.download--ycbv_compat_models
+python -m happypose.toolbox.utils.download --ycbv_compat_models
 ```
 
 Notes:
@@ -85,8 +85,8 @@ Notes:
 - The URDF files were obtained using these commands (requires `meshlab` to be installed):
 
   ```sh
-  python -m happypose.toolbox.utils.download --models=ycbv
-  python -m happypose.toolbox.utils.download --models=tless.cad
+python -m happypose.pose_estimators.cosypose.cosypose.scripts.convert_models_to_urdf --models=ycbv
+python -m happypose.pose_estimators.cosypose.cosypose.scripts.convert_models_to_urdf --models=tless.cad
   ```
 
 - Compatibility models were obtained using the following script:
@@ -101,15 +101,15 @@ The pre-trained models of the single-view pose estimator can be downloaded using
 
 ```sh
 # YCB-V Single-view refiner
-python -m happypose.toolbox.utils.download --model=ycbv-refiner-finetune--251020
+python -m happypose.toolbox.utils.download --cosypose_model=ycbv-refiner-finetune--251020
 
 # YCB-V Single-view refiner trained on synthetic data only 
 # Only download this if you are interested in retraining the above model 
-python -m happypose.toolbox.utils.download --model=ycbv-refiner-syntonly--596719
+python -m happypose.toolbox.utils.download --cosypose_model=ycbv-refiner-syntonly--596719
 
 # T-LESS coarse and refiner models 
-python -m happypose.toolbox.utils.download --model=tless-coarse--10219
-python -m happypose.toolbox.utils.download --model=tless-refiner--585928
+python -m happypose.toolbox.utils.download --cosypose_model=tless-coarse--10219
+python -m happypose.toolbox.utils.download --cosypose_model=tless-refiner--585928
 ```
 
 ## 2D detections
