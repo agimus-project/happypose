@@ -56,6 +56,8 @@ python -m happypose.toolbox.utils.download --megapose_models
 
 ```
 python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs
+
+# CosyPose needs the datasets
 python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example crackers --run-inference
 ```
 
