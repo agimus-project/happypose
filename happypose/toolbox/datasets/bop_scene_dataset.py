@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -67,15 +66,14 @@ def build_index_and_annotations(
     save_file_annotations=None,
     make_per_view_annotations=True,
 ):
-
     scene_ids, view_ids = [], []
 
-    annotations = dict()
+    annotations = {}
     base_dir = ds_dir / split
 
     for scene_dir in tqdm(base_dir.iterdir()):
         scene_id = scene_dir.name
-        annotations_scene = dict()
+        annotations_scene = {}
         for f in ("scene_camera.json", "scene_gt_info.json", "scene_gt.json"):
             path = scene_dir / f
             if path.exists():
@@ -87,7 +85,7 @@ def build_index_and_annotations(
         scene_annotation = annotations_scene
         for view_id in scene_annotation["scene_camera"].keys():
             if make_per_view_annotations:
-                this_annotation = dict()
+                this_annotation = {}
                 this_annotation["camera"] = scene_annotation["scene_camera"][
                     str(view_id)
                 ]
@@ -99,7 +97,7 @@ def build_index_and_annotations(
                 annotation_dir = base_dir / scene_id / "per_view_annotations"
                 annotation_dir.mkdir(exist_ok=True)
                 (annotation_dir / f"view={view_id}.json").write_text(
-                    json.dumps(this_annotation)
+                    json.dumps(this_annotation),
                 )
             scene_ids.append(int(scene_id))
             view_ids.append(int(view_id))
@@ -192,7 +190,7 @@ def data_from_bop_obs(
 
 class BOPDataset(SceneDataset):
     """Read a dataset in the BOP format.
-    See https://github.com/thodan/bop_toolkit/blob/master/docs/bop_datasets_format.md
+    See https://github.com/thodan/bop_toolkit/blob/master/docs/bop_datasets_format.md.
 
     # TODO: Document whats happening with the per-view annotations.
     # TODO: Remove per-view annotations, recommend using WebDataset for performance ?
@@ -208,7 +206,6 @@ class BOPDataset(SceneDataset):
         allow_cache: bool = False,
         per_view_annotations: bool = False,
     ):
-
         self.ds_dir = ds_dir
         assert ds_dir.exists(), "Dataset does not exists."
 
@@ -232,7 +229,7 @@ class BOPDataset(SceneDataset):
                 self.annotations = pickle.loads(save_file_annotations.read_bytes())
         else:
             frame_index, self.annotations = build_index_and_annotations(
-                ds_dir, split, make_per_view_annotations=per_view_annotations
+                ds_dir, split, make_per_view_annotations=per_view_annotations,
             )
 
         self.use_raw_object_id = use_raw_object_id
@@ -245,7 +242,7 @@ class BOPDataset(SceneDataset):
         )
 
     def _load_scene_observation(
-        self, image_infos: ObservationInfos
+        self, image_infos: ObservationInfos,
     ) -> SceneObservation:
         scene_id, view_id = image_infos.scene_id, image_infos.view_id
         view_id = int(view_id)
@@ -257,7 +254,7 @@ class BOPDataset(SceneDataset):
         # TODO: Also change the pandas numpy arrays to np.string_ instead of np.object
         # See https://github.com/pytorch/pytorch/issues/13246#issuecomment-905703662
         this_annotation_path = (
-            scene_dir / "per_view_annotations" / f"view={str(view_id)}.json"
+            scene_dir / "per_view_annotations" / f"view={view_id!s}.json"
         )
         if this_annotation_path.exists():
             this_annotation = json.loads(this_annotation_path.read_text())
@@ -357,8 +354,8 @@ class BOPDataset(SceneDataset):
                 for n in range(n_objects):
                     binary_mask_n = np.array(
                         Image.open(
-                            scene_dir / "mask_visib" / f"{view_id_str}_{n:06d}.png"
-                        )
+                            scene_dir / "mask_visib" / f"{view_id_str}_{n:06d}.png",
+                        ),
                     )
                     segmentation[binary_mask_n == 255] = n + 1
 

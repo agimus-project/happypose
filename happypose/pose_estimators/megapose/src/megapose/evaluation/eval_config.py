@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +19,9 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.inference.types import InferenceConfig
+from happypose.pose_estimators.megapose.src.megapose.inference.types import (
+    InferenceConfig,
+)
 
 BOP_TEST_DATASETS = [
     "lmo.bop19",
@@ -41,7 +42,7 @@ class HardwareConfig:
 
 @dataclass
 class EvalConfig:
-    """Eval Config
+    """Eval Config.
 
     Two options for creating an eval configuration:
     1. Create it manually, and set `run_id`.
@@ -84,7 +85,6 @@ class EvalConfig:
 
 @dataclass
 class FullEvalConfig(EvalConfig):
-
     # Full eval
     detection_coarse_types: Optional[List] = None
     ds_names: Optional[List[str]] = None
@@ -94,7 +94,6 @@ class FullEvalConfig(EvalConfig):
 
 @dataclass
 class BOPEvalConfig:
-
     results_path: str
     dataset: str
     split: str

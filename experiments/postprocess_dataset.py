@@ -1,16 +1,15 @@
-import os
-import hydra
-from dataclasses import dataclass
-import submitit
-import numpy as np
 import json
 import pathlib as p
-from bop_toolkit_lib.dataset.bop_imagewise import io_load_gt
-from bop_toolkit_lib import inout
+from dataclasses import dataclass
 
-from job_runner.utils import make_submitit_executor
-from job_runner.configs import RunnerConfig
+import hydra
+import numpy as np
+import submitit
+from bop_toolkit_lib import inout
+from bop_toolkit_lib.dataset.bop_imagewise import io_load_gt
 from hydra.core.config_store import ConfigStore
+from job_runner.configs import RunnerConfig
+from job_runner.utils import make_submitit_executor
 
 
 def process_key(key, ds_dir, stoi_obj, out_dir):
@@ -37,7 +36,7 @@ def process_key(key, ds_dir, stoi_obj, out_dir):
 
     if is_valid:
         out_dir.mkdir(exist_ok=True)
-        with open(ds_dir / f"{key}.gt.json", "r") as f:
+        with open(ds_dir / f"{key}.gt.json") as f:
             gt = io_load_gt(f)
         for gt_n in gt:
             gt_n["obj_id"] = stoi_obj[gt_n["obj_id"]]
@@ -56,8 +55,8 @@ def load_stoi(ds_dir):
     if not p.exists():
         p = ds_dir / "shapenet_models.json"
     assert p.exists()
-    infos = json.load(open(p, "r"))
-    stoi = dict()
+    infos = json.load(open(p))
+    stoi = {}
     for info in infos:
         if "gso_id" in info:
             stoi[f"gso_{info['gso_id']}"] = info["obj_id"]
@@ -83,7 +82,7 @@ cs.store(
 
 
 @hydra.main(
-    version_base=None, config_path="../configs", config_name="run_ds_postproc/default"
+    version_base=None, config_path="../configs", config_name="run_ds_postproc/default",
 )
 def main(cfg: Config):
     executor = make_submitit_executor(cfg.runner)
@@ -92,7 +91,7 @@ def main(cfg: Config):
     stoi = load_stoi(ds_dir)
 
     paths = (ds_dir / "train_pbr_v2format").glob("*")
-    keys = list(set([str(p.name).split(".")[0] for p in paths]))
+    keys = list({str(p.name).split(".")[0] for p in paths})
     keys_splits = np.array_split(keys, cfg.n_jobs)
 
     jobs = []

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 
 
 # Standard Library
@@ -42,12 +40,12 @@ class RigidObject:
         mesh_units: str = "m",
         symmetries_discrete: List[DiscreteSymmetry] = [],
         symmetries_continuous: List[ContinuousSymmetry] = [],
-        ypr_offset_deg: Tuple[float, float, float] = (0., 0., 0.),
+        ypr_offset_deg: Tuple[float, float, float] = (0.0, 0.0, 0.0),
         scaling_factor: float = 1.0,
         scaling_factor_mesh_units_to_meters: Optional[float] = None,
     ):
-        """
-        Args:
+        """Args:
+        ----
             label (str): A unique label to identify an object.
             mesh_path (Path): Path to a mesh. Multiple object types are supported.
                 Please refer to downstream usage of this class for the supported formats.
@@ -87,14 +85,15 @@ class RigidObject:
                 instead of the mesh_units argument. This is the scale that converts
                 mesh units to meters.
         """
-
         self.label = label
         self.category = category
         self.mesh_path = mesh_path
         self.mesh_units = mesh_units
 
         if scaling_factor_mesh_units_to_meters is not None:
-            self.scaling_factor_mesh_units_to_meters = scaling_factor_mesh_units_to_meters
+            self.scaling_factor_mesh_units_to_meters = (
+                scaling_factor_mesh_units_to_meters
+            )
         else:
             self.scaling_factor_mesh_units_to_meters = {
                 "m": 1.0,
@@ -107,7 +106,9 @@ class RigidObject:
 
         if self._mesh_diameter is not None:
             self.mesh_diameter = mesh_diameter
-            self.diameter_meters = mesh_diameter * self.scaling_factor_mesh_units_to_meters
+            self.diameter_meters = (
+                mesh_diameter * self.scaling_factor_mesh_units_to_meters
+            )
 
         self.symmetries_discrete = symmetries_discrete
         self.symmetries_continuous = symmetries_continuous
@@ -122,11 +123,11 @@ class RigidObject:
         """Returns the scale factor that converts the mesh to desired units."""
         return self.scaling_factor_mesh_units_to_meters * self.scaling_factor
 
-    def make_symmetry_poses(
-        self, n_symmetries_continuous: int = 64) -> np.ndarray:
+    def make_symmetry_poses(self, n_symmetries_continuous: int = 64) -> np.ndarray:
         """Generates the set of object symmetries.
 
-        Returns:
+        Returns
+        -------
             (num_symmetries, 4, 4) array
         """
         return make_symmetries_poses(
@@ -145,7 +146,8 @@ class RigidObjectDataset:
         self.list_objects = objects
         self.label_to_objects = {obj.label: obj for obj in objects}
         if len(self.list_objects) != len(self.label_to_objects):
-            raise RuntimeError("There are objects with duplicate labels")
+            msg = "There are objects with duplicate labels"
+            raise RuntimeError(msg)
 
     def __getitem__(self, idx: int) -> RigidObject:
         return self.list_objects[idx]
@@ -167,7 +169,7 @@ class RigidObjectDataset:
 
 
 def append_dataset_name_to_object_labels(
-    ds_name: str, object_dataset: RigidObjectDataset
+    ds_name: str, object_dataset: RigidObjectDataset,
 ) -> RigidObjectDataset:
     for obj in object_dataset.list_objects:
         obj.label = f"ds_name={ds_name}_{obj.label}"

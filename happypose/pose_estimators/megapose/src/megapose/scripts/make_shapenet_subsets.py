@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import json
 from pathlib import Path
@@ -27,15 +25,13 @@ from tqdm import tqdm
 
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.config import SHAPENET_DIR
-from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
 
 def read_all_stats(obj_dataset):
-    gltf_paths = []
     statistics = []
-    for n, obj in tqdm(enumerate(obj_dataset.objects)):
+    for _n, obj in tqdm(enumerate(obj_dataset.objects)):
         mesh_path = Path(obj["mesh_path"])
-        infos = dict()
+        infos = {}
         stats_path = mesh_path.parent / "stats.json"
         pc_path = mesh_path.parent / "model_normalized_pointcloud.obj"
         infos["label"] = obj["label"]
@@ -56,7 +52,9 @@ def get_labels_split(statistics, max_model_mem_kb, max_tot_mem_kb):
     print(len(statistics), np.nansum(statistics["tot_mem_kb"]) / 1e6)
     statistics = statistics.iloc[np.where(np.isfinite(statistics["tot_mem_kb"]))[0]]
     print(len(statistics), np.nansum(statistics["tot_mem_kb"]) / 1e6)
-    statistics = statistics.iloc[np.where(statistics["tot_mem_kb"] <= max_model_mem_kb)[0]]
+    statistics = statistics.iloc[
+        np.where(statistics["tot_mem_kb"] <= max_model_mem_kb)[0]
+    ]
     print(len(statistics), np.nansum(statistics["tot_mem_kb"]) / 1e6)
 
     np_random = np.random.RandomState(0)
@@ -72,7 +70,9 @@ def get_labels_split_max_objects(statistics, max_model_mem_kb, max_num_objects):
     print(len(statistics), np.nansum(statistics["tot_mem_kb"]) / 1e6)
     statistics = statistics.iloc[np.where(np.isfinite(statistics["tot_mem_kb"]))[0]]
     print(len(statistics), np.nansum(statistics["tot_mem_kb"]) / 1e6)
-    statistics = statistics.iloc[np.where(statistics["tot_mem_kb"] <= max_model_mem_kb)[0]]
+    statistics = statistics.iloc[
+        np.where(statistics["tot_mem_kb"] <= max_model_mem_kb)[0]
+    ]
     print(len(statistics), np.nansum(statistics["tot_mem_kb"]) / 1e6)
 
     np_random = np.random.RandomState(0)
@@ -90,101 +90,101 @@ if __name__ == "__main__":
     statistics = pd.read_json(ds_stats_path)
 
     splits = [
-        dict(
-            name="shapenet_10mb_100",
-            max_model_mem_kb=10e3,
-            max_num_objects=100,
-        ),
-        dict(
-            name="shapenet_10mb_1k",
-            max_model_mem_kb=10e3,
-            max_num_objects=1000,
-        ),
-        dict(
-            name="shapenet_10mb_2k",
-            max_model_mem_kb=10e3,
-            max_num_objects=2500,
-        ),
-        dict(
-            name="shapenet_10mb_5k",
-            max_model_mem_kb=10e3,
-            max_num_objects=5000,
-        ),
-        dict(
-            name="shapenet_10mb_10k",
-            max_model_mem_kb=10e3,
-            max_num_objects=10000,
-        ),
-        dict(
-            name="shapenet_10mb_15k",
-            max_model_mem_kb=10e3,
-            max_num_objects=15000,
-        ),
-        dict(
-            name="shapenet_10mb_20k",
-            max_model_mem_kb=10e3,
-            max_num_objects=20000,
-        ),
-        dict(
-            name="shapenet_100mb_200gb",
-            max_model_mem_kb=100e3,
-            max_tot_mem_kb=200e6,
-        ),
-        dict(
-            name="shapenet_10mb_200gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=200e6,
-        ),
-        dict(
-            name="shapenet_10mb_50gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=50e6,
-        ),
-        dict(
-            name="shapenet_20mb_50gb",
-            max_model_mem_kb=20e3,
-            max_tot_mem_kb=50e6,
-        ),
-        dict(
-            name="shapenet_10mb_100gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=100e6,
-        ),
-        dict(
-            name="shapenet_10mb_32gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=32e6,
-        ),
-        dict(
-            name="shapenet_2mb_32gb",
-            max_model_mem_kb=2e3,
-            max_tot_mem_kb=32e6,
-        ),
-        dict(
-            name="shapenet_10mb_8gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=8e6,
-        ),
-        dict(
-            name="shapenet_10mb_1gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=1e6,
-        ),
-        dict(
-            name="shapenet_2mb_1gb",
-            max_model_mem_kb=2e3,
-            max_tot_mem_kb=1e6,
-        ),
+        {
+            "name": "shapenet_10mb_100",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 100,
+        },
+        {
+            "name": "shapenet_10mb_1k",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 1000,
+        },
+        {
+            "name": "shapenet_10mb_2k",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 2500,
+        },
+        {
+            "name": "shapenet_10mb_5k",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 5000,
+        },
+        {
+            "name": "shapenet_10mb_10k",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 10000,
+        },
+        {
+            "name": "shapenet_10mb_15k",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 15000,
+        },
+        {
+            "name": "shapenet_10mb_20k",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 20000,
+        },
+        {
+            "name": "shapenet_100mb_200gb",
+            "max_model_mem_kb": 100e3,
+            "max_tot_mem_kb": 200e6,
+        },
+        {
+            "name": "shapenet_10mb_200gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 200e6,
+        },
+        {
+            "name": "shapenet_10mb_50gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 50e6,
+        },
+        {
+            "name": "shapenet_20mb_50gb",
+            "max_model_mem_kb": 20e3,
+            "max_tot_mem_kb": 50e6,
+        },
+        {
+            "name": "shapenet_10mb_100gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 100e6,
+        },
+        {
+            "name": "shapenet_10mb_32gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 32e6,
+        },
+        {
+            "name": "shapenet_2mb_32gb",
+            "max_model_mem_kb": 2e3,
+            "max_tot_mem_kb": 32e6,
+        },
+        {
+            "name": "shapenet_10mb_8gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 8e6,
+        },
+        {
+            "name": "shapenet_10mb_1gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 1e6,
+        },
+        {
+            "name": "shapenet_2mb_1gb",
+            "max_model_mem_kb": 2e3,
+            "max_tot_mem_kb": 1e6,
+        },
     ]
 
     for split in splits:
         if "max_num_objects" in split:
             labels = get_labels_split_max_objects(
-                statistics, split["max_model_mem_kb"], split["max_num_objects"]
+                statistics, split["max_model_mem_kb"], split["max_num_objects"],
             )
         else:
             labels = get_labels_split(
-                statistics, split["max_model_mem_kb"], split["max_tot_mem_kb"]
+                statistics, split["max_model_mem_kb"], split["max_tot_mem_kb"],
             )
         split_path = (ds_dir / "stats" / split["name"]).with_suffix(".json")
         split_path.write_text(json.dumps(labels))

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 
 
 # Standard Library
@@ -41,10 +39,7 @@ from happypose.pose_estimators.megapose.src.megapose.training.pose_models_cfg im
 
 
 class Plotter:
-    def __init__(
-        self,
-        log_dir: Path
-    ):
+    def __init__(self, log_dir: Path):
         self.fill_config_fn = check_update_config_pose
         self.log_dir = Path(log_dir)
         assert self.log_dir.exists()
@@ -77,16 +72,19 @@ class Plotter:
             log_path = run_dir / "log.txt"
             if log_path.exists():
                 log_df = pd.read_json(run_dir / "log.txt", lines=True)
-                last_write = datetime.datetime.fromtimestamp((run_dir / "log.txt").stat().st_mtime)
+                last_write = datetime.datetime.fromtimestamp(
+                    (run_dir / "log.txt").stat().st_mtime,
+                )
             else:
                 log_df = None
                 last_write = datetime.datetime.now()
             configs[run_id]["delta_t"] = (
-                f"{(datetime.datetime.now() - last_write).seconds / 60:.1f}" + f"({len(log_df)})"
+                f"{(datetime.datetime.now() - last_write).seconds / 60:.1f}"
+                + f"({len(log_df)})"
             )
             log_dicts[run_id] = log_df
 
-            ds_eval = dict()
+            ds_eval = {}
             for f in run_dir.iterdir():
                 if "errors_" in f.name:
                     ds = f.with_suffix("").name.split("errors_")[1]
@@ -220,7 +218,9 @@ class Plotter:
                         name = f"{run_num}/{dataset}"
                         name = "\n ".join(textwrap.wrap(name, width=20))
                         if len(x) == 1:
-                            f.circle(x, y, color=color, line_dash=dash_pattern, name=name)
+                            f.circle(
+                                x, y, color=color, line_dash=dash_pattern, name=name,
+                            )
                             x = np.concatenate(([0], x))
                             y = np.concatenate((y, y))
                         f.line(
@@ -333,12 +333,13 @@ class Plotter:
         config_df = df.copy()
         self.config_df = config_df
 
-        name2color = {k: v for k, v in zip(self.run_ids, self.colors_uint8)}
+        name2color = dict(zip(self.run_ids, self.colors_uint8))
 
         def f_row(data):
             rgb = (np.array(name2color[data.name]) * 255).astype(np.uint8)
             return [
-                f"background-color: rgba({rgb[0]},{rgb[1]},{rgb[2]},1.0)" for _ in range(len(data))
+                f"background-color: rgba({rgb[0]},{rgb[1]},{rgb[2]},1.0)"
+                for _ in range(len(data))
             ]
 
         if "possible_roots" in df.columns:

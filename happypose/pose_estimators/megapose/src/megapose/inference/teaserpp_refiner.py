@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,12 +25,23 @@ import teaserpp_python
 import torch
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import DepthRefiner
-from happypose.pose_estimators.megapose.src.megapose.inference.refiner_utils import compute_masks, numpy_to_open3d
-from happypose.pose_estimators.megapose.src.megapose.inference.types import PoseEstimatesType
+from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import (
+    DepthRefiner,
+)
+from happypose.pose_estimators.megapose.src.megapose.inference.refiner_utils import (
+    compute_masks,
+    numpy_to_open3d,
+)
+from happypose.pose_estimators.megapose.src.megapose.inference.types import (
+    PoseEstimatesType,
+)
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_batch_renderer import (
+    Panda3dBatchRenderer,
+)
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.types import (
+    Panda3dLightData,
+)
 from happypose.toolbox.lib3d.rigid_mesh_database import BatchedMeshes
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.types import Panda3dLightData
 from happypose.toolbox.visualization.meshcat_utils import get_pointcloud
 
 
@@ -59,13 +69,14 @@ def compute_teaserpp_refinement(
     max_num_points=None,
     normals_src=None,
     use_farthest_point_sampling: bool = True,
-    **solver_params_kwargs
+    **solver_params_kwargs,
 ) -> dict:
-    """Compute registration using Teaser++
+    """Compute registration using Teaser++.
 
     Follows the example of https://github.com/MIT-SPARK/TEASER-plusplus#minimal-python-3-example
 
     Args:
+    ----
         depth_src: [H,W,3]
         depth_tgt: [H,W, 3]
         cam_K: [3,3] intrinsics matrix
@@ -74,12 +85,12 @@ def compute_teaserpp_refinement(
         normals_src: (optional) normals for the src pointcloud
 
     Returns:
+    -------
         A dict.
 
         - 'T_tgt_src': The rigid transform that aligns src to tgt.
 
     """
-
     if solver_params is None:
         solver_params = get_solver_params(**solver_params_kwargs)
 
@@ -127,11 +138,11 @@ def compute_teaserpp_refinement(
         pc_tgt = pc_src_mask
 
     solver = teaserpp_python.RobustRegistrationSolver(solver_params)
-    start = time.time()
+    time.time()
 
     # teaserpp wants [3,N] pointclouds
     solver.solve(pc_src.transpose(), pc_tgt.transpose())
-    end = time.time()
+    time.time()
 
     solution = solver.getSolution()
 
@@ -207,6 +218,7 @@ class TeaserppRefiner(DepthRefiner):
         3. Estimate a mask to filter out some outliers in our generated correspondences.
 
         Args:
+        ----
             predictions: PandasTensorCollection
                 Index into depth, K with batch_im_id
             depth: [B, H, W]
@@ -214,7 +226,6 @@ class TeaserppRefiner(DepthRefiner):
             K: [B,3,3]
 
         """
-
         assert depth is not None
         assert K is not None
 
@@ -281,7 +292,9 @@ class TeaserppRefiner(DepthRefiner):
                     TCO_refined = T_tgt_src @ TCO_pred
                     device = predictions_refined.poses_input[n].device
                     predictions_refined.poses_input[n] = predictions.poses[n].clone()
-                    predictions_refined.poses[n] = torch.tensor(TCO_refined, device=device)
+                    predictions_refined.poses[n] = torch.tensor(
+                        TCO_refined, device=device,
+                    )
 
                 self.debug = out
 

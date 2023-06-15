@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,9 +23,8 @@ from happypose.toolbox.renderer.types import Panda3dCameraData, Panda3dObjectDat
 
 
 def convert_scene_observation_to_panda3d(
-    camera_data: CameraData, object_datas: List[ObjectData]
+    camera_data: CameraData, object_datas: List[ObjectData],
 ) -> Tuple[Panda3dCameraData, List[Panda3dObjectData]]:
-
     assert camera_data.TWC is not None
     assert camera_data.K is not None
     assert camera_data.resolution is not None
@@ -44,6 +42,6 @@ def convert_scene_observation_to_panda3d(
             Panda3dObjectData(
                 label=object_data.label,
                 TWO=object_data.TWO,
-            )
+            ),
         )
     return panda3d_camera_data, panda3d_object_datas

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,18 +19,17 @@ import roma
 import torch
 
 # MegaPose
-import happypose.pose_estimators.megapose.src.megapose as megapose
 from happypose.pose_estimators.megapose.src.megapose.config import PROJECT_DIR
 
 
 def load_SO3_grid(resolution):
-    """
-    The data.qua files were generated with the following code
-    http://lavalle.pl/software/so3/so3.html
+    """The data.qua files were generated with the following code
+    http://lavalle.pl/software/so3/so3.html.
 
     They are in (x,y,z,w) ordering
 
-    Returns:
+    Returns
+    -------
         rotmats: [N,3,3]
     """
     data_fname = PROJECT_DIR / f"src/megapose/data/data_{resolution}.qua"
@@ -42,7 +40,7 @@ def load_SO3_grid(resolution):
     with open(data_fname) as fp:
         lines = fp.readlines()
         for line in lines:
-            x, y, z, w = [float(i) for i in line.split()]
+            x, y, z, w = (float(i) for i in line.split())
             quats.append([x, y, z, w])
 
     quats = torch.tensor(quats)
@@ -51,14 +49,11 @@ def load_SO3_grid(resolution):
 
 
 def compute_geodesic_distance(query, target):
-    """
-
-    Computes distance, in radians from query to target
+    """Computes distance, in radians from query to target
     Args:
         query: [N,3,3]
-        target: [M,3,3]
+        target: [M,3,3].
     """
-
     N = query.shape[0]
     M = target.shape[0]
     query_exp = query.unsqueeze(1).expand([-1, M, -1, -1]).flatten(0, 1)

@@ -1,8 +1,12 @@
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.megapose.src.megapose.inference.icp_refiner import (
+    ICPRefiner,
+)
+from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import (
+    PoseEstimator,
+)
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
-from happypose.pose_estimators.megapose.src.megapose.inference.icp_refiner import ICPRefiner
-from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import PoseEstimator
 from happypose.toolbox.inference.utils import load_pose_models
 
 NAMED_MODELS = {
@@ -53,7 +57,6 @@ def load_named_model(
     n_workers: int = 4,
     bsz_images: int = 128,
 ) -> PoseEstimator:
-
     model = NAMED_MODELS[model_name]
 
     renderer_kwargs = {

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,14 +14,10 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import shutil
-import time
 from collections import defaultdict
-from concurrent.futures import ProcessPoolExecutor as Pool
 from copy import deepcopy
-from multiprocessing import Process, Queue
 from pathlib import Path
 
 # Third Party
@@ -32,7 +27,6 @@ from tqdm import tqdm
 
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.config import (
-    GSO_DIR,
     GSO_NORMALIZED_DIR,
     GSO_ORIG_DIR,
     GSO_POINTCLOUD_DIR,
@@ -92,21 +86,20 @@ def rescale_mesh(mesh_path):
     vertices[:, 2] -= (zmax + zmin) / 2.0
     vertices[:, :3] /= scale
 
-    out = elements["mtllib"][0]
+    elements["mtllib"][0]
 
-
-    faces = elements["faces"]
+    elements["faces"]
 
     text = elements["mtllib"][0]
     text += "\n\n"
     for vertex_line in vertices.tolist():
-        line = ["v"] + list(map(str, vertex_line))
+        line = ["v", *list(map(str, vertex_line))]
         text += " ".join(line)
         text += "\n"
 
     text += "\n"
     for normal_line in normals.tolist():
-        line = ["vn"] + list(map(str, normal_line))
+        line = ["vn", *list(map(str, normal_line))]
         text += " ".join(line)
         text += "\n"
 
@@ -140,7 +133,10 @@ def make_ply_scaled(obj_id, scale=SCALE):
     new_mesh_dir = Path(GSO_SCALED_DIR) / obj_id / "meshes"
     new_mesh_path = new_mesh_dir / "model.ply"
     mesh = trimesh.load(
-        str(mesh_dir / "model.obj"), skip_materials=True, process=False, maintain_order=True
+        str(mesh_dir / "model.obj"),
+        skip_materials=True,
+        process=False,
+        maintain_order=True,
     )
     mesh = as_mesh(mesh)
     mesh.apply_scale(scale)
@@ -155,7 +151,10 @@ def make_obj_pc(obj_id):
     new_mesh_dir = Path(GSO_POINTCLOUD_DIR) / obj_id / "meshes"
     new_mesh_path = new_mesh_dir / "model.obj"
     mesh = trimesh.load(
-        str(mesh_dir / "model.obj"), skip_materials=True, process=False, maintain_order=True
+        str(mesh_dir / "model.obj"),
+        skip_materials=True,
+        process=False,
+        maintain_order=True,
     )
     mesh = as_mesh(mesh)
     points = trimesh.sample.sample_surface(mesh, n_points)[0]
@@ -167,7 +166,7 @@ def make_obj_pc(obj_id):
 if __name__ == "__main__":
     trimesh.util.log.setLevel("ERROR")
     obj_dataset = make_object_dataset("gso.orig")
-    for n, obj in tqdm(enumerate(obj_dataset.objects)):
+    for _n, obj in tqdm(enumerate(obj_dataset.objects)):
         obj_id = obj["label"].split("gso_")[1]
         make_obj_normalized(obj_id)
         make_ply_scaled(obj_id)

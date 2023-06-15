@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -47,7 +46,7 @@ class BokehPlotter:
         Contains an internal state `source_map` holding pointers to image data.
         This can be useful for updating images in real-time without re-creating figures.
         """
-        self.source_map: Dict[str, bokeh.models.sources.ColumnDataSource] = dict()
+        self.source_map: Dict[str, bokeh.models.sources.ColumnDataSource] = {}
         self.dump_image_dir = dump_image_dir
         self.read_image_dir = read_image_dir
         if is_notebook:
@@ -61,7 +60,9 @@ class BokehPlotter:
     def colors(self) -> Iterator[Tuple[float, float, float]]:
         return cycle(sns.color_palette(n_colors=40))
 
-    def get_source(self, name: str) -> Tuple[bokeh.models.sources.ColumnDataSource, bool]:
+    def get_source(
+        self, name: str,
+    ) -> Tuple[bokeh.models.sources.ColumnDataSource, bool]:
         if name in self.source_map:
             source = self.source_map[name]
             new = False
@@ -77,7 +78,6 @@ class BokehPlotter:
         figure: Optional[bokeh.plotting.figure] = None,
         name: str = "image",
     ) -> bokeh.plotting.figure:
-
         im_np = image_to_np_uint8(im)
 
         h, w, _ = im_np.shape
@@ -89,18 +89,20 @@ class BokehPlotter:
 
         if self.dump_image_dir is not None:
             if new:
-                figure.image_url("url", x=0, y=0, w=w, h=h, source=source, anchor="bottom_left")
+                figure.image_url(
+                    "url", x=0, y=0, w=w, h=h, source=source, anchor="bottom_left",
+                )
             im_np.flags.writeable = False
             im_hash = sha1(im_np.copy().data).hexdigest()
             im_path = str(self.dump_image_dir / f"{im_hash}.jpg")
             Image.fromarray(im_np).save(im_path)
             im_url = str(self.read_image_dir) + str(Path(im_path).name)
             print(im_url)
-            source.data = dict(url=[im_url])
+            source.data = {"url": [im_url]}
         else:
             if new:
                 figure.image_rgba("image", x=0, y=0, dw=w, dh=h, source=source)
-            source.data = dict(image=[to_rgba(im_np)])
+            source.data = {"image": [to_rgba(im_np)]}
         return figure
 
     def plot_overlay(
@@ -115,6 +117,7 @@ class BokehPlotter:
         All images are np.uint8 with values in (0, 255)
 
         Args:
+        ----
             rgb_input: (h, w, 3)
             rgb_rendered: (h, w, 3) with values <15 px as background.
             figure: Optional figure in which the data should be plotted.
@@ -140,11 +143,13 @@ class BokehPlotter:
         line_width: int = 2,
         source_id: str = "",
     ) -> bokeh.plotting.figure:
-
         boxes = detections.bboxes.cpu().numpy()
         if text_auto:
             if "score" in detections.infos.columns:
-                text = [f"{row.label} {row.score:.2f}" for _, row in detections.infos.iterrows()]
+                text = [
+                    f"{row.label} {row.score:.2f}"
+                    for _, row in detections.infos.iterrows()
+                ]
             else:
                 text = [f"{row.label}" for _, row in detections.infos.iterrows()]
 
@@ -196,7 +201,7 @@ class BokehPlotter:
                     text_font_size=text_font_size,
                 )
                 f.add_layout(labelset)
-        data = dict(xs=xs, ys=ys, colors=patch_colors)
+        data = {"xs": xs, "ys": ys, "colors": patch_colors}
         if text is not None:
             data.update(text_x=text_x, text_y=text_y, text=text)
         source.data = data

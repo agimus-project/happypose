@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -48,13 +47,12 @@ def get_symmetry_transformations_torch(trans_list):
 
 
 def compute_pose_error(T1, T2):
-    """
-    Args:
+    """Args:
+    ----
     Two sets of poses in world frame
         T1: [B,4,4]
-        T2: [B,4,4]
+        T2: [B,4,4].
     """
-
     trans_err = torch.linalg.norm(T1[..., :3, 3] - T2[..., :3, 3], dim=-1)
     R1 = T1[..., :3, :3]
     R2 = T2[..., :3, :3]
@@ -67,27 +65,25 @@ def compute_pose_error(T1, T2):
 
 
 def compute_errors(preds, method, obj_dataset, max_sym_rot_step_deg=1):
-    """
-    Compute the errors between gt_pose and predicted pose.
+    """Compute the errors between gt_pose and predicted pose.
 
     Args:
-
+    ----
         preds: This is results['predictions'] where results is from results.pth.tar
         method: The type of method we should use for evaluation
 
         methods: str, e.g. 'gt_detections+coarse_init'
 
     """
-
     preds_gt = preds[f"{method}/ground_truth"]
     TCO_gt = preds_gt.poses.cuda()  # [B,4,4]
     device = TCO_gt.device
-    TOC_gt = torch.linalg.inv(TCO_gt)
+    torch.linalg.inv(TCO_gt)
 
     for key, p in preds.items():
         if not key.startswith(method):
             continue
-        if re.search("refiner/iteration=\d*$", key) or re.search("refiner/init$", key):
+        if re.search("refiner/iteration=\\d*$", key) or re.search("refiner/init$", key):
             pass
         else:
             continue
@@ -97,7 +93,7 @@ def compute_errors(preds, method, obj_dataset, max_sym_rot_step_deg=1):
         object_labels = p.infos.label.unique()
         object_labels.sort()
 
-        obj_info_dict = dict()
+        obj_info_dict = {}
         for val in obj_dataset.objects:
             obj_info_dict[val["label"]] = val
 
@@ -109,7 +105,7 @@ def compute_errors(preds, method, obj_dataset, max_sym_rot_step_deg=1):
                 bop_info = obj_info["bop_info"]
                 max_sym_rot_step = np.deg2rad(max_sym_rot_step_deg)
                 trans_list = get_symmetry_transformations(
-                    bop_info, max_sym_disc_step=max_sym_rot_step
+                    bop_info, max_sym_disc_step=max_sym_rot_step,
                 )
                 syms = get_symmetry_transformations_torch(trans_list)
             else:
@@ -122,7 +118,6 @@ def compute_errors(preds, method, obj_dataset, max_sym_rot_step_deg=1):
             idx_list = df.index.tolist()
             TCO_pred_obj = p.poses[idx_list].cuda()
             TCO_gt_obj = TCO_gt[idx_list]
-
 
             # Assumes symmetries don't have any offsets
             pts = create_default_object_pts().to(device)
@@ -137,13 +132,11 @@ def compute_errors(preds, method, obj_dataset, max_sym_rot_step_deg=1):
             p.infos.loc[idx_list, "trans_err"] = trans_err.tolist()
             p.infos.loc[idx_list, "rot_err_deg"] = roterr_deg.tolist()
 
-
-
     p_init = preds[f"{method}/refiner/init"]
     for key, p in preds.items():
         if not key.startswith(method):
             continue
-        if re.search("refiner/iteration=\d*$", key):
+        if re.search("refiner/iteration=\\d*$", key):
             pass
         else:
             continue
@@ -155,7 +148,7 @@ def compute_errors(preds, method, obj_dataset, max_sym_rot_step_deg=1):
 
 
 def create_plots(result_name):
-    """Make the png figures from the"""
+    """Make the png figures from the."""
     pass
 
 
@@ -178,6 +171,7 @@ def mssd_torch(T_est, T_gt, pts, syms):
     Based on https://github.com/thodan/bop_toolkit/blob/master/bop_toolkit_lib/pose_error.py#L96
 
     Args:
+    ----
         T_est: [B,4,4] tensor, estimated pose
         T_gt: [B,4,4] tensor, ground-truth pose
         pts: [N,3] tensor, 3D model points
@@ -185,6 +179,7 @@ def mssd_torch(T_est, T_gt, pts, syms):
 
 
     Returns:
+    -------
         err: [B,] mssd
         T_gt_sym: [B,4,4] the closest symmetry aware transform
         sym: [B,4,4] symmetry transform that led to T_gt_sym
@@ -239,19 +234,20 @@ def mssd_torch(T_est, T_gt, pts, syms):
 
 
 def load_zephyr_hypotheses(ds_name, device="cuda", debug=False, hypotheses_type="all"):
-    """Load Zephyr ppf hypotheses (and SIFT)
+    """Load Zephyr ppf hypotheses (and SIFT).
 
     Args:
+    ----
         ds_name: str ['ycbv.bop19', 'lmo.bop19']
         hypotheses_type: ['all', 'ppf', 'sift']
 
     Returns:
+    -------
         PandasTensorCollection:
             poses: [N,4,4]
             infos: has columns ['pose_hypothesis_id']
 
     """
-
     assert hypotheses_type in ["ppf", "sift", "all"]
     zephyr_dir = LOCAL_DATA_DIR / "external_detections/zephyr"
     if ds_name == "ycbv.bop19":
@@ -259,7 +255,8 @@ def load_zephyr_hypotheses(ds_name, device="cuda", debug=False, hypotheses_type=
     elif ds_name == "lmo.bop19":
         fname = zephyr_dir / f"lmo_test_pose_hypotheses_{hypotheses_type}.pth"
     else:
-        raise ValueError(f"Unknown dataset {ds_name}")
+        msg = f"Unknown dataset {ds_name}"
+        raise ValueError(msg)
 
     p = torch.load(fname)
     p.infos = p.infos.rename(columns={"object_label": "label"})
@@ -268,7 +265,7 @@ def load_zephyr_hypotheses(ds_name, device="cuda", debug=False, hypotheses_type=
 
 
 def load_ppf_hypotheses(ds_name, device="cuda", debug=False):
-    """Load Zephyr ppf hypotheses
+    """Load Zephyr ppf hypotheses.
 
     The columns of the dataframe are
 
@@ -282,7 +279,8 @@ def load_ppf_hypotheses(ds_name, device="cuda", debug=False):
     elif ds_name == "lmo.bop19":
         fname = zephyr_dir / "lmo_list_bop_test_v1.txt"
     else:
-        raise ValueError(f"Unknown dataset {ds_name}")
+        msg = f"Unknown dataset {ds_name}"
+        raise ValueError(msg)
 
     df = pd.read_csv(fname, delim_whitespace=True)
 
@@ -341,14 +339,15 @@ def load_dtoid_detections(ds_name):
     elif ds_name == "lm.bop19":
         fname = dtoid_dir / "lm_preds.csv"
     else:
-        raise ValueError(f"Unknown dataset {ds_name}")
+        msg = f"Unknown dataset {ds_name}"
+        raise ValueError(msg)
     df = pd.read_csv(fname)
 
     def parse_image_fn(image_fn):
         ds, split, scene_id, modality, ext = image_fn.split("/")
         scene_id = int(scene_id)
         view_id = int(ext.split(".")[0])
-        return dict(scene_id=scene_id, view_id=view_id)
+        return {"scene_id": scene_id, "view_id": view_id}
 
     x1 = df.loc[:, "x"].values
     y1 = df.loc[:, "y"].values
@@ -358,7 +357,9 @@ def load_dtoid_detections(ds_name):
     infos = pd.DataFrame([parse_image_fn(image_fn) for image_fn in df["image_fn"]])
     infos.loc[:, "label"] = [f"obj_{object_id:06d}" for object_id in df["object_id"]]
     infos.loc[:, "score"] = -1
-    bboxes = np.concatenate([x1[:, None], y1[:, None], x2[:, None], y2[:, None]], axis=1)
+    bboxes = np.concatenate(
+        [x1[:, None], y1[:, None], x2[:, None], y2[:, None]], axis=1,
+    )
     bboxes = torch.tensor(bboxes).float()
     ids_valids = (bboxes >= 0).all(dim=1).nonzero().flatten().tolist()
     bboxes = bboxes[ids_valids]
@@ -368,21 +369,21 @@ def load_dtoid_detections(ds_name):
     return detections
 
 
-def compute_errors_single_object(TCO_gt, TCO_pred, obj_label, obj_dataset, max_sym_rot_step_deg=1):
-    """
-    Compute the errors between gt_pose and predicted pose.
+def compute_errors_single_object(
+    TCO_gt, TCO_pred, obj_label, obj_dataset, max_sym_rot_step_deg=1,
+):
+    """Compute the errors between gt_pose and predicted pose.
 
     Args:
-
+    ----
         TCO_gt: [4,4] The pose you want to compute error relative to
         poses: [B,4,4]
         obj_dataset:
 
     """
-
     device = TCO_pred.device
     B = TCO_pred.shape[0]
-    obj_info_dict = dict()
+    obj_info_dict = {}
     for val in obj_dataset.objects:
         obj_info_dict[val["label"]] = val
 
@@ -391,7 +392,9 @@ def compute_errors_single_object(TCO_gt, TCO_pred, obj_label, obj_dataset, max_s
     if obj_info["is_symmetric"]:
         bop_info = obj_info["bop_info"]
         max_sym_rot_step = np.deg2rad(max_sym_rot_step_deg)
-        trans_list = get_symmetry_transformations(bop_info, max_sym_disc_step=max_sym_rot_step)
+        trans_list = get_symmetry_transformations(
+            bop_info, max_sym_disc_step=max_sym_rot_step,
+        )
         syms = get_symmetry_transformations_torch(trans_list)
     else:
         syms = torch.eye(4, device=device).unsqueeze(0)

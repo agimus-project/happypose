@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 from typing import Tuple
 
@@ -29,16 +27,17 @@ from .rotations import compute_rotation_matrix_from_ortho6d
 
 
 def transform_pts(T: torch.Tensor, pts: torch.Tensor) -> torch.Tensor:
-    """
-
-    Args:
+    """Args:
+    ----
         T (torch.Tensor): (bsz, 4, 4) or (bsz, dim2, 4, 4)
-        pts (torch.Tensor): (bsz, n_pts, 3)
+        pts (torch.Tensor): (bsz, n_pts, 3).
 
-    Raises:
+    Raises
+    ------
         ValueError: _description_
 
-    Returns:
+    Returns
+    -------
         torch.Tensor: _description_
     """
     bsz = T.shape[0]
@@ -50,7 +49,8 @@ def transform_pts(T: torch.Tensor, pts: torch.Tensor) -> torch.Tensor:
     elif T.dim() == 3:
         assert T.shape == (bsz, 4, 4)
     else:
-        raise ValueError("Unsupported shape for T", T.shape)
+        msg = "Unsupported shape for T"
+        raise ValueError(msg, T.shape)
     pts = pts.unsqueeze(-1)
     T = T.unsqueeze(-3)
     pts_transformed = T[..., :3, :3] @ pts + T[..., :3, [-1]]
@@ -85,7 +85,9 @@ def add_noise(
     )
     euler_noise_rad = euler_noise_deg * np.pi / 180
     R_noise = (
-        torch.tensor(np.stack([transforms3d.euler.euler2mat(*xyz) for xyz in euler_noise_rad]))
+        torch.tensor(
+            np.stack([transforms3d.euler.euler2mat(*xyz) for xyz in euler_noise_rad]),
+        )
         .float()
         .to(device)
     )
