@@ -94,10 +94,25 @@ Notes:
   ```sh
   python -m happypose.pose_estimators.cosypose.cosypose.scripts.make_ycbv_compat_models
   ```
+  
+## Models for minimal version
+    
+```sh
+ #ycbv
+  python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
+  python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
+  python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
+  
+ #tless
+  python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-tless-pbr--873074
+  python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-tless-pbr--506801
+  python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-tless-pbr--233420
+``
 
 ## Pre-trained models for single-view estimator
 
 The pre-trained models of the single-view pose estimator can be downloaded using:
+
 
 ```sh
 # YCB-V Single-view refiner
