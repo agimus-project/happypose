@@ -19,11 +19,23 @@ This installation procedure will be curated.
 git clone --recurse-submodules https://github.com/agimus-project/happypose.git
 cd happypose
 conda env create -f environment.yml
+conda activate happypose
 cd happypose/pose_estimators/cosypose
 python setup.py install
 cd ../..
 pip install -e .
 ```
+
+Temporary :
+
+```
+conda activate happypose
+git clone https://github.com/ylabbe/bop_toolkit/
+cd bop_toolkit
+git checkout -b dataset_tools
+pip install -r requirements.txt -e .
+``
+
 
 # Testing the install
 
