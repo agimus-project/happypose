@@ -17,16 +17,20 @@ This installation procedure will be curated.
 
 ```
 git clone --recurse-submodules https://github.com/agimus-project/happypose.git
+cd happypose
 conda env create -f environment.yml
-cd happypose/happypose/pose_estimators/cosypose
+cd happypose/pose_estimators/cosypose
 python setup.py install
+cd ../..
 pip install -e .
 ```
 
 # Testing the install
 
+Please download the data beforehand if you don't already have them.
+
 ```
-python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --vis-outputs
+python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs
 python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example cheetos --run-inference
 ```
 
@@ -36,8 +40,8 @@ python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_e
 <summary>Click for details...</summary>
 
 ```
-Create data dir in happypose/pose_estimators/cosypose/local_data
-export MEGAPOSE_DATA_DIR=happypose/pose_estimators/cosypose/local_data
+Create data dir /somewhere/convenient. The dataset to store are quite large.
+export MEGAPOSE_DATA_DIR=/somewhere/convenient
 ```
 
 download [barbecue sauce](https://drive.google.com/drive/folders/10BIvhnrKGbNr8EKGB3KUtkSNcp460k9S) and put it in `$MEGAPOSE_DATA_DIR/examples/barbecue-sauce/`
