@@ -12,4 +12,4 @@
 	url = https://github.com/ylabbe/job-runner.git
 [submodule "megapose6d/deps/bop_toolkit_challenge"]
 	path = megapose6d/deps/bop_toolkit_challenge
-	url = https://github.com/ylabbe/bop_toolkit_challenge.git
+	url = https://github.com/ylabbe/bop_toolkit/tree/dataset-tools
