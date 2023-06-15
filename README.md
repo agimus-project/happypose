@@ -43,6 +43,9 @@ pip install -r requirements.txt -e .
 ```
 Create data dir /somewhere/convenient. The dataset to store are quite large.
 export MEGAPOSE_DATA_DIR=/somewhere/convenient
+cd $MEGAPOSE_DATA_DIR
+wget https://memmo-data.laas.fr/static/barbecue-sauce.tar.xz
+tar xvf barbecue-sauce.tar.xz
 ```
 
  ## 1. Download pre-trained MegaPose pose estimation models
