@@ -38,11 +38,25 @@ pip install -r requirements.txt -e .
 
 # Testing the install
 
-Please download the data beforehand if you don't already have them.
+## 0. Create data directory
+
+```
+Create data dir /somewhere/convenient. The dataset to store are quite large.
+export MEGAPOSE_DATA_DIR=/somewhere/convenient
+```
+
+ ## 1. Download pre-trained MegaPose pose estimation models
+Download pose estimation models to $MEGAPOSE_DATA_DIR/megapose-models:
+  
+```
+python -m happypose.toolbox.utils.download --megapose_models
+```
+
+ ## 2. Run MegaPose example
 
 ```
 python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs
-python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example cheetos --run-inference
+python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example crackers --run-inference
 ```
 
 # Downloading and preparing data
