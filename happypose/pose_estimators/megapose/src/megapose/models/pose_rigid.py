@@ -26,6 +26,11 @@ import numpy as np
 import torch
 from torch import nn
 
+from happypose.pose_estimators.megapose.src.megapose.training.utils import (
+    CudaTimer,
+    SimpleTimer,
+)
+
 # HappyPose
 from happypose.toolbox.datasets.scene_dataset import Resolution
 
@@ -43,7 +48,6 @@ from happypose.toolbox.lib3d.transform_ops import normalize_T
 from happypose.toolbox.renderer import Panda3dLightData
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.toolbox.renderer.panda3d_scene_renderer import make_scene_lights
-from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer
 from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -633,8 +637,10 @@ class PosePredictor(nn.Module):
         assert (
             self.predict_rendered_views_logits
         ), "Method only valid if coarse classification model"
-
-        timer = CudaTimer(enabled=cuda_timer)
+        if torch.cuda.is_available():
+            timer = CudaTimer(enabled=cuda_timer)
+        else:
+            timer = SimpleTimer()
         timer.start()
 
         logits = self.net_forward(x)["renderings_logits"]

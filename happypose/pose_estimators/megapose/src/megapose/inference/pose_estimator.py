@@ -29,24 +29,28 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-import happypose.toolbox.inference.utils
-
 # MegaPose
 import happypose.pose_estimators.megapose.src.megapose as megapose
+import happypose.toolbox.inference.utils
 import happypose.toolbox.utils.tensor_collection as tc
-from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import DepthRefiner
+from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import (
+    DepthRefiner,
+)
+from happypose.pose_estimators.megapose.src.megapose.training.utils import (
+    CudaTimer,
+    SimpleTimer,
+)
+from happypose.toolbox.inference.pose_estimator import PoseEstimationModule
 from happypose.toolbox.inference.types import (
     DetectionsType,
     ObservationTensor,
     PoseEstimatesType,
 )
 from happypose.toolbox.lib3d.cosypose_ops import TCO_init_from_boxes_autodepth_with_R
-from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer, SimpleTimer
 from happypose.toolbox.utils import transform_utils
 from happypose.toolbox.utils.logging import get_logger
 from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 from happypose.toolbox.utils.timer import Timer
-from happypose.toolbox.inference.pose_estimator import PoseEstimationModule
 
 logger = get_logger(__name__)
 
@@ -163,8 +167,10 @@ class PoseEstimator(PoseEstimationModule):
 
             images_ = observation.images[batch_im_ids_]
             K_ = observation.K[batch_im_ids_]
-
-            timer_ = CudaTimer(enabled=cuda_timer)
+            if torch.cuda.is_available():
+                timer_ = CudaTimer(enabled=cuda_timer)
+            else:
+                timer_ = SimpleTimer()
             timer_.start()
             outputs_ = self.refiner_model(
                 images=images_,

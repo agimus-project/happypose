@@ -7,25 +7,19 @@ from typing import List, Tuple, Union
 
 # Third Party
 import numpy as np
+import torch
 from bokeh.io import export_png
 from bokeh.plotting import gridplot
 from PIL import Image
-import torch
 
 # HappyPose
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
-
-# MegaPose
-#from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
-#from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
-
 from happypose.toolbox.inference.types import (
     DetectionsType,
     ObservationTensor,
     PoseEstimatesType,
 )
-
 from happypose.toolbox.inference.utils import make_detections_from_object_data
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.renderer import Panda3dLightData
@@ -35,6 +29,12 @@ from happypose.toolbox.utils.load_model import NAMED_MODELS, load_named_model
 from happypose.toolbox.utils.logging import get_logger, set_logging_level
 from happypose.toolbox.visualization.bokeh_plotter import BokehPlotter
 from happypose.toolbox.visualization.utils import make_contour_overlay
+
+# MegaPose
+#from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
+#from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
+
+
 
 logger = get_logger(__name__)
 
