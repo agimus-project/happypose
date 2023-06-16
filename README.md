@@ -22,7 +22,7 @@ conda env create -f environment.yml
 conda activate happypose
 cd happypose/pose_estimators/cosypose
 python setup.py install
-cd ../..
+cd ../../..
 pip install -e .
 ```
 
