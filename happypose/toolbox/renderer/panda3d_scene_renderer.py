@@ -102,6 +102,10 @@ class App(ShowBase):
         self.render.set_antialias(p3d.core.AntialiasAttrib.MAuto)
         self.render.set_two_sided(True)
 
+    def finalizeExit(self):
+        """Overwrite to not call sys.exit()"""
+        pass
+
 
 def make_scene_lights(
     ambient_light_color: RgbaColor = (0.1, 0.1, 0.1, 1.0),
@@ -170,6 +174,9 @@ class Panda3dSceneRenderer:
         assert isinstance(preload_labels, set)
         for label in tqdm(preload_labels, disable=not verbose):
             self.get_object_node(label)
+
+    def __del__(self):
+        self._app.destroy()
 
     def create_new_camera(self, resolution: Resolution) -> Panda3dCamera:
         idx = sum([len(x) for x in self._cameras_pool.values()])
