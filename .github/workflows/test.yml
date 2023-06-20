@@ -13,19 +13,25 @@ jobs:
         python-version: ["3.9"]
     steps:
       - uses: actions/checkout@v3
+      - name: Install EGL mesa - required for Panda3D renderer
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y -qq libegl1-mesa libegl1-mesa-dev
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: happypose
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
-      - run: |
+      - name: Install happypose
+        run: |
           cd happypose/pose_estimators/cosypose
           python setup.py install
           cd ../../..
           pip install -e .
           
-      - run: |
+      - name: Install bop toolkit (temporal fix)
+        run: |
           mkdir libs
           cd libs
           git clone https://github.com/ylabbe/bop_toolkit/ -b dataset-tools
@@ -33,7 +39,8 @@ jobs:
           sed 's/==.*$//' requirements.txt > req_nover.txt
           pip install -r req_nover.txt -e .
 
-      - run: | 
+      - name: Run tests
+        run: | 
           pip install pytest coverage
           coverage run -m pytest tests
       - uses: codecov/codecov-action@v3
