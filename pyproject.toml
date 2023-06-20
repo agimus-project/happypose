@@ -27,7 +27,7 @@ version = "0.1.0"
 panda3d = {optional = true, version = "=1.10.13"}
 pin = "^2.6.17"
 pybullet = {optional = true, version = "^3.2.5"}
-python = "^3.8"
+python = ">=3.8,<3.11"
 
 
 [tool.poetry.extras]
