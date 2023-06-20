@@ -20,41 +20,20 @@ jobs:
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
       - run: |
-          conda info
-          conda list
           cd happypose/pose_estimators/cosypose
           python setup.py install
           cd ../../..
           pip install -e .
+          
+      - run: |
+          mkdir libs
+          cd libs
+          git clone https://github.com/ylabbe/bop_toolkit/ -b dataset-tools
+          cd bop_toolkit
+          sed 's/==.*$//' requirements.txt > req_nover.txt
+          pip install -r req_nover.txt -e .
 
-#      - shell: bash -el {0}
-#        run: |
-#          pip install .
-#          pip install pytest
-#          pytest tests
-#
-#      - run: pipx install poetry
-#      - uses: actions/setup-python@v4
-#        with:
-#          python-version: ${{ matrix.python-version }}
-#          cache: poetry
-#      - run: poetry install --with dev -E render
-#      - run: poetry run coverage run -m unittest
-#      - uses: codecov/codecov-action@v3
-
-#name: PyPhysX install in conda
-#on: [ push ]
-#jobs:
-#  build:
-#    runs-on: "ubuntu-latest"
-#    steps:
-#      - uses: actions/checkout@v2
-#      - uses: conda-incubator/setup-miniconda@v2
-#        with:
-#          auto-update-conda: true
-#          python-version: "3.8"
-#      - shell: bash -el {0}
-#        run: |
-#          pip install .
-#          pip install pytest
-#          pytest tests
+      - run: | 
+          pip install pytest coverage
+          coverage run -m pytest tests
+      - uses: codecov/codecov-action@v3
