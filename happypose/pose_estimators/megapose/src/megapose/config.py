@@ -17,6 +17,7 @@ limitations under the License.
 
 # Standard Library
 import os
+import sys
 from pathlib import Path
 
 # Third Party
@@ -51,7 +52,11 @@ else:
     if not BLENDER_INSTALL_DIR.exists():
         BLENDER_INSTALL_DIR = Path(os.environ["HOME"]) / BLENDER_VERSION
 
-PYTHON_BIN_PATH = Path(os.environ["CONDA_PREFIX"]) / "bin/python"
+PYTHON_BIN_PATH = (
+        Path(os.environ["CONDA_PREFIX"]) / "bin/python"
+        if "CONDA_PREFIX" in os.environ
+        else Path(sys.executable)
+        )
 
 BOP_PANDA3D_DS_DIR = LOCAL_DATA_DIR / "bop_models_panda3d"
 
