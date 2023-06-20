@@ -29,6 +29,7 @@ from functools import partial
 from typing import Dict, List, Optional, Set
 
 # Third Party
+import torch
 import numpy as np
 import panda3d as p3d
 from direct.showbase.ShowBase import ShowBase
@@ -80,20 +81,21 @@ class App(ShowBase):
             "audio-library-name null\n"
             "model-cache-dir\n",
         )
-        assert "CUDA_VISIBLE_DEVICES" in os.environ
-        devices = os.environ["CUDA_VISIBLE_DEVICES"].split(",")
-        assert len(devices) == 1
-        if "EGL_VISIBLE_DEVICES" not in os.environ:
-            out = subprocess.check_output(
-                ["nvidia-smi", "--id=" + str(devices[0]), "-q", "--xml-format"]
-            )
-            tree = ET.fromstring(out)
-            gpu = tree.findall("gpu")[0]
-            assert gpu is not None
-            minor_number_el = gpu.find("minor_number")
-            assert minor_number_el is not None
-            dev_id = minor_number_el.text
-            os.environ["EGL_VISIBLE_DEVICES"] = str(dev_id)
+        if torch.cuda.is_available():
+            assert "CUDA_VISIBLE_DEVICES" in os.environ
+            devices = os.environ["CUDA_VISIBLE_DEVICES"].split(",")
+            assert len(devices) == 1
+            if "EGL_VISIBLE_DEVICES" not in os.environ:
+                out = subprocess.check_output(
+                    ["nvidia-smi", "--id=" + str(devices[0]), "-q", "--xml-format"]
+                )
+                tree = ET.fromstring(out)
+                gpu = tree.findall("gpu")[0]
+                assert gpu is not None
+                minor_number_el = gpu.find("minor_number")
+                assert minor_number_el is not None
+                dev_id = minor_number_el.text
+                os.environ["EGL_VISIBLE_DEVICES"] = str(dev_id)
 
         super().__init__(windowType="offscreen")
         self.render.set_shader_auto()
