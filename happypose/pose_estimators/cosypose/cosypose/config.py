@@ -43,13 +43,14 @@ ASSET_DIR = DATA_DIR / 'assets'
 MEMORY = Memory(CACHE_DIR, verbose=2)
 
 
-CONDA_PREFIX = os.environ['CONDA_PREFIX']
-if 'CONDA_PREFIX_1' in os.environ:
-    CONDA_BASE_DIR = os.environ['CONDA_PREFIX_1']
-    CONDA_ENV = os.environ['CONDA_DEFAULT_ENV']
-else:
-    CONDA_BASE_DIR = os.environ['CONDA_PREFIX']
-    CONDA_ENV = 'base'
+if 'CONDA_PREFIX' in os.environ:
+    CONDA_PREFIX = os.environ['CONDA_PREFIX']
+    if 'CONDA_PREFIX_1' in os.environ:
+        CONDA_BASE_DIR = os.environ['CONDA_PREFIX_1']
+        CONDA_ENV = os.environ['CONDA_DEFAULT_ENV']
+    else:
+        CONDA_BASE_DIR = os.environ['CONDA_PREFIX']
+        CONDA_ENV = 'base'
 
 cfg = yaml.load((PROJECT_DIR / 'happypose/pose_estimators/cosypose/config_yann.yaml').read_text(), Loader=yaml.FullLoader)
 
