@@ -27,7 +27,7 @@ version = "0.1.0"
 panda3d = {optional = true, version = "=1.10.13"}
 pin = "^2.6.20"
 pybullet = {optional = true, version = "^3.2.5"}
-python = "^3.9, <3.11"
+python = ">=3.9,<3.11"
 torch = [
   {source = "torch_cpu", version = "1.11.0+cpu"},
   #{markers = "extra!='cuda'", source = "torch_cpu", version = "1.11.0+cpu"},
