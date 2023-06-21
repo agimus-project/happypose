@@ -53,6 +53,7 @@ transforms3d = "^0.4.1"
 trimesh = "^3.22.1"
 webdataset = "^0.2.48"
 wget = "^3.2"
+selenium = "^4.10.0"
 
 [tool.poetry.group.dev]
 optional = true
