@@ -12,4 +12,6 @@ __pycache__
 *.temp
 *tmp/
 *.cpython
-experiments/outputs
+experiments/outputsdata_dir
+happypose/pose_estimators/cosypose/build/
+data_dir
