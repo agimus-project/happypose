@@ -46,8 +46,8 @@ scikit-learn = "^1.2.2"
 scipy = "^1.10.1"
 seaborn = "^0.12.2"
 simplejson = "^3.19.1"
-torch = "<2"
-torchvision = "<0.15.2" # for torch<2
+torch = {source = "cpu", version = "<2"}
+torchvision = {source = "cpu", version = "<0.15.2"}
 tqdm = "^4.65.0"
 transforms3d = "^0.4.1"
 trimesh = "^3.22.1"
@@ -71,6 +71,11 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 myst-parser = "^1.0.0"
 sphinx = "^6.2.1"
+
+[[tool.poetry.source]]
+name = "cpu"
+priority = "explicit"
+url = "https://download.pytorch.org/whl/cpu"
 
 [tool.poetry.urls]
 changelog = "https://github.com/agimus-project/happypose/blob/main/CHANGELOG.md"
