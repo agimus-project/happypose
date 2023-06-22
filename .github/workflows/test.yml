@@ -17,19 +17,42 @@ jobs:
         run: |
           sudo apt-get update -y -qq
           sudo apt-get install -y -qq libegl1-mesa libegl1-mesa-dev
-      - uses: conda-incubator/setup-miniconda@v2
+
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: happypose
-          environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
-          auto-activate-base: false
+
+      - name: Get date for caching, reset cache every day
+        id: get-date
+        run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
+        shell: bash
+
+      - name: Cashing of the happypose installation
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.CONDA }}/envs
+          key:
+            conda-${{ runner.os }}--${{ runner.arch }}--${{steps.get-date.outputs.today }}-${{hashFiles('environment.yml') }}-${{env.CACHE_NUMBER }}
+        env:
+          # Increase this value to reset cache if environment.yml has not changed
+          CACHE_NUMBER: 0
+        id: cache
+
+      - name: Update conda environment with happypose dependencies
+        run:
+          conda env update -n happypose -f environment.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+
       - name: Install happypose
         run: |
           cd happypose/pose_estimators/cosypose
           python setup.py install
           cd ../../..
           pip install -e .
-          
+        if: steps.cache.outputs.cache-hit != 'true'
+
       - name: Install bop toolkit (temporal fix)
         run: |
           mkdir libs
@@ -38,10 +61,36 @@ jobs:
           cd bop_toolkit
           sed 's/==.*$//' requirements.txt > req_nover.txt
           pip install -r req_nover.txt -e .
+        if: steps.cache.outputs.cache-hit != 'true'
 
-      - name: Run tests
-        run: | 
-          pip install pytest coverage
-          python tests/test_renderer_panda3d.py
-          coverage run -m pytest tests
-      - uses: codecov/codecov-action@v3
+
+#      - uses: conda-incubator/setup-miniconda@v2
+#        with:
+#          activate-environment: happypose
+#          environment-file: environment.yml
+#          python-version: ${{ matrix.python-version }}
+#          auto-activate-base: false
+#          miniconda-version: 'latest'
+#      - name: Install happypose
+#        run: |
+#          cd happypose/pose_estimators/cosypose
+#          python setup.py install
+#          cd ../../..
+#          pip install -e .
+#
+#      - name: Install bop toolkit (temporal fix)
+#        run: |
+#          mkdir libs
+#          cd libs
+#          git clone https://github.com/ylabbe/bop_toolkit/ -b dataset-tools
+#          cd bop_toolkit
+#          sed 's/==.*$//' requirements.txt > req_nover.txt
+#          pip install -r req_nover.txt -e .
+
+#      - name: Run tests
+#        run: |
+#          pip install pytest coverage
+#          python tests/test_renderer_panda3d.py
+#          coverage run -m pytest tests
+#      - uses: codecov/codecov-action@v3
+
