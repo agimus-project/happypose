@@ -30,7 +30,9 @@ class TestRendererPanda3D(unittest.TestCase):
 
         object_datas = [
             Panda3dObjectData(
-                label="obj", TWO=Transform((0, 0, 0, 1), (0, 0, 1)), color=(1, 0, 0, 1),
+                label="obj",
+                TWO=Transform((0, 0, 0, 1), (0, 0, 1)),
+                color=(1, 0, 0, 1),
             ),
         ]
         camera_datas = [
