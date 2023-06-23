@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -52,6 +51,7 @@ from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
+
 @dataclass
 class PosePredictorOutputCosypose:
     TCO_output: torch.Tensor
@@ -63,6 +63,7 @@ class PosePredictorOutputCosypose:
     K_crop: torch.Tensor
     boxes_rend: torch.Tensor
     boxes_crop: torch.Tensor
+
 
 @dataclass
 class PosePredictorOutput:
@@ -134,7 +135,7 @@ class PosePredictor(nn.Module):
         assert isinstance(n_features, int)
 
         # TODO: Change to torch ModuleDict
-        self.heads: Dict[str, Union[torch.nn.Linear, Callable]] = dict()
+        self.heads: Dict[str, Union[torch.nn.Linear, Callable]] = {}
         self.predict_pose_update = predict_pose_update
         if self.predict_pose_update:
             self._pose_dim = 9
@@ -143,7 +144,9 @@ class PosePredictor(nn.Module):
 
         self.predict_rendered_views_logits = predict_rendered_views_logits
         if self.predict_rendered_views_logits:
-            self.views_logits_head = nn.Linear(n_features, self.n_rendered_views, bias=True)
+            self.views_logits_head = nn.Linear(
+                n_features, self.n_rendered_views, bias=True,
+            )
             self.heads["renderings_logits"] = self.views_logits_head
 
         # Dimensions for indexing into input and rendered images
@@ -210,6 +213,7 @@ class PosePredictor(nn.Module):
         box for cropping.
 
         Args:
+        ----
             images (torch.Tensor): (bsz, ndims, h, w) where ndims is 3 or 4.
             K (torch.Tensor): (bsz, 3, 3), intrinsics of input images
             TCO (torch.Tensor): (bsz, 4, 4)
@@ -217,13 +221,13 @@ class PosePredictor(nn.Module):
             labels (List[str]): Object labels
 
         Returns:
+        -------
             images_cropped: Images cropped and resized to self.render_size
             K_crop: Intrinsics of the fictive cropped camera.
             boxes_rend: smallest bounding box defined by the reprojection of object points in
                 pose TCO.
             boxes_crop: bounding box used to crop the input image.
         """
-
         bsz = images.shape[0]
         assert K.shape == (bsz, 3, 3)
         assert tCR.shape == (bsz, 3)
@@ -246,20 +250,23 @@ class PosePredictor(nn.Module):
         )
 
         K_crop = get_K_crop_resize(
-            K=K.clone(), boxes=boxes_crop, orig_size=images.shape[-2:], crop_resize=self.render_size
+            K=K.clone(),
+            boxes=boxes_crop,
+            orig_size=images.shape[-2:],
+            crop_resize=self.render_size,
         ).detach()
 
         if self.debug:
             TCR = TCO.clone()
             TCR[:, :3, -1] = tCR
             self.debug_data.ref_point_uv = project_points_robust(
-                torch.zeros(bsz, 1, 3).to(K.device), K, TCR
+                torch.zeros(bsz, 1, 3).to(K.device), K, TCR,
             )
             self.debug_data.origin_uv = project_points_robust(
-                torch.zeros(bsz, 1, 3).to(K.device), K, TCO
+                torch.zeros(bsz, 1, 3).to(K.device), K, TCO,
             )
             self.debug_data.origin_uv_crop = project_points_robust(
-                torch.zeros(bsz, 1, 3).to(K.device), K_crop, TCO
+                torch.zeros(bsz, 1, 3).to(K.device), K_crop, TCO,
             )
         return images_cropped, K_crop, boxes_rend, boxes_crop
 
@@ -275,6 +282,7 @@ class PosePredictor(nn.Module):
             render the additional viewpoints.
 
         Args:
+        ----
             images (torch.Tensor): _description_
             K (torch.Tensor): _description_
             TCV_O (torch.Tensor): _description_
@@ -282,9 +290,9 @@ class PosePredictor(nn.Module):
             labels (List[str]): _description_
 
         Returns:
+        -------
             K_crop
         """
-
         labels_mv = []
         bsz = len(labels)
         n_views = TCV_O.shape[1]
@@ -314,13 +322,20 @@ class PosePredictor(nn.Module):
             return_crops=False,
         )
         K_crop = get_K_crop_resize(
-            K=K.clone(), boxes=boxes_crop, orig_size=images.shape[-2:], crop_resize=self.render_size
+            K=K.clone(),
+            boxes=boxes_crop,
+            orig_size=images.shape[-2:],
+            crop_resize=self.render_size,
         )
         K_crop = K_crop.view(bsz, n_views, 3, 3)
         return K_crop
 
     def update_pose(
-        self, TCO: torch.Tensor, K_crop: torch.Tensor, pose_outputs: torch.Tensor, tCR: torch.Tensor
+        self,
+        TCO: torch.Tensor,
+        K_crop: torch.Tensor,
+        pose_outputs: torch.Tensor,
+        tCR: torch.Tensor,
     ) -> torch.Tensor:
         assert pose_outputs.shape[-1] == 9
         dR = compute_rotation_matrix_from_ortho6d(pose_outputs[:, 0:6])
@@ -332,9 +347,11 @@ class PosePredictor(nn.Module):
         """Forward pass of the neural network.
 
         Args:
+        ----
             x (torch.Tensor): input tensor (images + renderings)
 
         Returns:
+        -------
             Dict[str, torch.Tensor]: Output of each network head.
         """
         x = self.backbone(x)
@@ -345,7 +362,7 @@ class PosePredictor(nn.Module):
             x = x.flatten(2).mean(dim=-1)
         else:
             raise ValueError
-        outputs = dict()
+        outputs = {}
         for k, head in self.heads.items():
             outputs[k] = head(x)
         return outputs
@@ -360,15 +377,16 @@ class PosePredictor(nn.Module):
         """Render multiple images.
 
         Args:
+        ----
             labels: list[str] with length bsz
             TCV_O: [bsz, n_views, 4, 4] pose of the cameras defining each view
             KV: [bsz, n_views, 4, 4] intrinsics of the associated cameras
             random_ambient_light: Whether to use randomize ambient light parameter.
 
-        Returns
+        Returns:
+        -------
             renders: [bsz, n_views*n_channels, H, W]
         """
-
         labels_mv = []
         bsz = len(labels)
         n_views = TCV_O.shape[1]
@@ -384,12 +402,14 @@ class PosePredictor(nn.Module):
                     Panda3dLightData(
                         light_type="ambient",
                         color=(intensity, intensity, intensity, 1.0),
-                    )
+                    ),
                 ]
                 light_datas.append(lights)
         else:
             if self.render_normals:
-                ambient_light = Panda3dLightData(light_type="ambient", color=(1.0, 1.0, 1.0, 1.0))
+                ambient_light = Panda3dLightData(
+                    light_type="ambient", color=(1.0, 1.0, 1.0, 1.0),
+                )
                 light_datas = [[ambient_light] for _ in range(len(labels_mv))]
             else:
                 light_datas = [make_scene_lights() for _ in range(len(labels_mv))]
@@ -421,7 +441,9 @@ class PosePredictor(nn.Module):
         renders = torch.cat(cat_list, dim=1)
         n_channels = renders.shape[1]
 
-        renders = renders.view(bsz, n_views, n_channels, *renders.shape[-2:]).flatten(1, 2)
+        renders = renders.view(bsz, n_views, n_channels, *renders.shape[-2:]).flatten(
+            1, 2,
+        )
         return renders  # [bsz, n_views*n_channels, H, W]
 
     def normalize_images(
@@ -432,17 +454,17 @@ class PosePredictor(nn.Module):
         images_inplace: bool = False,
         renders_inplace: bool = False,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Normalize the depth images by the distance from the camera
+        """Normalize the depth images by the distance from the camera.
 
         If we are using depth then this involves inplace ops so to be
         safe we will make copies of the tensors
 
         Args:
+        ----
             images: [bsz, C, H, W]
             renders: [bsz, n_view*n_render_channels, H, W]
             tCR: [bsz, 3] anchor point for rendering
         """
-
         # NOTE (lmanuelli): Avoid errors with inplace ops as the same
         # input might be used in multiple iterations. Since we re-crop
         # on each iteration this might not be a problem but err'ing on
@@ -454,7 +476,6 @@ class PosePredictor(nn.Module):
             renders = renders.clone()
 
         if self.input_depth:
-
             if not images_inplace:
                 images = images.clone()
             C = images.shape[1]
@@ -467,13 +488,12 @@ class PosePredictor(nn.Module):
             images[:, self._input_depth_dims] = depth_norm
 
         if self.render_depth:
-
             # Need to index into the right channels, assuming no normals
             # 1-view --> depth_dims = [3]
             # 2-view --> depth_dims = [3,7]
-            depth_dims = self._render_depth_dims[0] + self._n_single_render_channels * torch.arange(
-                0, self.n_rendered_views
-            )
+            depth_dims = self._render_depth_dims[
+                0
+            ] + self._n_single_render_channels * torch.arange(0, self.n_rendered_views)
 
             depth = renders[:, depth_dims]
             renders[:, depth_dims] = self.normalize_depth(depth, tCR)
@@ -481,15 +501,15 @@ class PosePredictor(nn.Module):
         return images, renders
 
     def normalize_depth(self, depth: torch.Tensor, tCR: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
+        """Args:
+        ----
             depth: [B,-1,1,H,W]
-            tCR: [B,3]
+            tCR: [B,3].
 
-        Returns:
+        Returns
+        -------
             depth_norm: same shape as depth
         """
-
         # [B,]
         z_norm = tCR[:, 2]
 
@@ -504,11 +524,15 @@ class PosePredictor(nn.Module):
         elif self.depth_normalization_type == "tCR_center_clamp":
             depth_norm = torch.clamp(depth - z_norm_unsqz, -2, 2)
         elif self.depth_normalization_type == "tCR_center_obj_diam":
-            raise NotImplementedError("Not yet implemented")
+            msg = "Not yet implemented"
+            raise NotImplementedError(msg)
         elif self.depth_normalization_type == "none":
             depth_norm = depth
         else:
-            raise ValueError(f"Unknown depth_normalization_type = {self.depth_normalization_type}")
+            msg = f"Unknown depth_normalization_type = {self.depth_normalization_type}"
+            raise ValueError(
+                msg,
+            )
 
         return depth_norm
 
@@ -521,7 +545,6 @@ class PosePredictor(nn.Module):
         n_iterations: int = 1,
         random_ambient_light: bool = False,
     ) -> Dict[str, PosePredictorOutput]:
-
         timing_dict: Dict[str, float] = defaultdict(float)
 
         if not self.input_depth:
@@ -535,7 +558,7 @@ class PosePredictor(nn.Module):
         dtype = TCO.dtype
         device = TCO.device
 
-        outputs = dict()
+        outputs = {}
         TCO_input = TCO
         for n in range(n_iterations):
             TCO_input = normalize_T(TCO_input).detach()
@@ -556,21 +579,23 @@ class PosePredictor(nn.Module):
 
             n_views = TCV_O_input.shape[1]
             tCV_R = TCV_O_input_flatten[..., :3, [-1]] + TCV_O_input_flatten[
-                ..., :3, :3
+                ..., :3, :3,
             ] @ tOR.unsqueeze(1).repeat(1, n_views, 1).flatten(0, 1).unsqueeze(-1)
             tCV_R = tCV_R.squeeze(-1).view(bsz, TCV_O_input.shape[1], 3)
 
             images_crop, K_crop, boxes_rend, boxes_crop = self.crop_inputs(
-                images, K, TCO_input, tCR, labels
+                images, K, TCO_input, tCR, labels,
             )
 
-            KV_crop = self.compute_crops_multiview(images, K, TCV_O_input, tCV_R, labels)
+            KV_crop = self.compute_crops_multiview(
+                images, K, TCV_O_input, tCV_R, labels,
+            )
             if not self.remove_TCO_rendering:
                 KV_crop[:, 0] = K_crop
 
             t = time.time()
             renders = self.render_images_multiview(
-                labels, TCV_O_input, KV_crop, random_ambient_light=random_ambient_light
+                labels, TCV_O_input, KV_crop, random_ambient_light=random_ambient_light,
             )
             render_time = time.time() - t
             timing_dict["render"] = render_time
@@ -586,7 +611,9 @@ class PosePredictor(nn.Module):
             # would expect this to error out
             network_outputs = self.net_forward(x)
             if self.predict_pose_update:
-                TCO_output = self.update_pose(TCO_input, K_crop, network_outputs["pose"], tCR)
+                TCO_output = self.update_pose(
+                    TCO_input, K_crop, network_outputs["pose"], tCR,
+                )
             else:
                 TCO_output = TCO_input.detach().clone()
 
@@ -595,7 +622,7 @@ class PosePredictor(nn.Module):
                 assert not self.predict_pose_update
             else:
                 renderings_logits = torch.empty(
-                    bsz, self.n_rendered_views, dtype=dtype, device=device
+                    bsz, self.n_rendered_views, dtype=dtype, device=device,
                 )
 
             outputs[f"iteration={n+1}"] = PosePredictorOutput(
@@ -621,15 +648,15 @@ class PosePredictor(nn.Module):
         return outputs
 
     def forward_coarse_tensor(
-        self, x: torch.Tensor, cuda_timer: bool = False
+        self, x: torch.Tensor, cuda_timer: bool = False,
     ) -> Dict[str, Union[torch.Tensor, float]]:
-
         """Forward pass on coarse model given an input tensor.
 
         The input already contains the concatenated input + rendered images and has
         been appropriately normalized.
 
         Args:
+        ----
             x: [B,C,H,W] where C=9 typically. This is the concatenated
                 input + rendered image
 
@@ -660,12 +687,13 @@ class PosePredictor(nn.Module):
         return_debug_data: bool = False,
     ) -> Dict[str, Any]:
         # TODO: Is this still necessary ?
-        """Run the coarse model given images + poses
+        """Run the coarse model given images + poses.
 
         Only valid if we are using the coarse model.
 
 
         Args:
+        ----
             images: [B,C,H,W] torch tensor, should already be normalized to
                 [0,255] --> [0,1]
             K: [B,3,3] camera intrinsics
@@ -674,13 +702,13 @@ class PosePredictor(nn.Module):
 
 
         Returns:
+        -------
             dict:
                 - logits: tensor [B,]
                 - scores tensor [B,]
 
 
         """
-
         assert (
             self.predict_rendered_views_logits
         ), "Method only valid if coarse classification model"
@@ -697,7 +725,7 @@ class PosePredictor(nn.Module):
         TCO_input = normalize_T(TCO_input).detach()
         tCR = TCO_input[..., :3, -1]
         images_crop, K_crop, boxes_rend, boxes_crop = self.crop_inputs(
-            images, K, TCO_input, tCR, labels
+            images, K, TCO_input, tCR, labels,
         )
 
         # [B,1,4,4], hack to use the multi-view function

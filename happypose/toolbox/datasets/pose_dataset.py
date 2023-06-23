@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import random
 import time
@@ -25,14 +23,6 @@ from typing import Iterator, List, Optional, Set, Union
 # Third Party
 import numpy as np
 import torch
-
-# HappyPose
-from happypose.toolbox.datasets.scene_dataset import (
-    IterableSceneDataset,
-    ObjectData,
-    SceneDataset,
-    SceneObservation,
-)
 
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.config import LOCAL_DATA_DIR
@@ -52,20 +42,29 @@ from happypose.toolbox.datasets.augmentations import (
     PillowContrast,
     PillowSharpness,
 )
-from happypose.toolbox.datasets.augmentations import SceneObservationAugmentation as SceneObsAug
+from happypose.toolbox.datasets.augmentations import (
+    SceneObservationAugmentation as SceneObsAug,
+)
 from happypose.toolbox.datasets.augmentations import VOCBackgroundAugmentation
+
+# HappyPose
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableSceneDataset,
+    ObjectData,
+    SceneDataset,
+    SceneObservation,
+)
 from happypose.toolbox.datasets.scene_dataset_wrappers import remove_invisible_objects
 from happypose.toolbox.utils.types import Resolution
 
 
 @dataclass
 class PoseData:
-    """
-    rgb: (h, w, 3) uint8
+    """rgb: (h, w, 3) uint8
     depth: (bsz, h, w) float32
     bbox: (4, ) int
     K: (3, 3) float32
-    TCO: (4, 4) float32
+    TCO: (4, 4) float32.
     """
 
     rgb: np.ndarray
@@ -78,12 +77,11 @@ class PoseData:
 
 @dataclass
 class BatchPoseData:
-    """
-    rgbs: (bsz, 3, h, w) uint8
+    """rgbs: (bsz, 3, h, w) uint8
     depths: (bsz, h, w) float32
     bboxes: (bsz, 4) int
     TCO: (bsz, 4, 4) float32
-    K: (bsz, 3, 3) float32
+    K: (bsz, 3, 3) float32.
     """
 
     rgbs: torch.Tensor
@@ -123,7 +121,6 @@ class PoseDataset(torch.utils.data.IterableDataset):
         keep_labels_set: Optional[Set[str]] = None,
         depth_augmentation_level: int = 1,
     ):
-
         self.scene_ds = scene_ds
         self.resize_transform = CropResizeToAspectTransform(resize=resize)
         self.min_area = min_area
@@ -131,7 +128,11 @@ class PoseDataset(torch.utils.data.IterableDataset):
         self.background_augmentations = []
         if apply_background_augmentation:
             self.background_augmentations += [
-                (SceneObsAug(VOCBackgroundAugmentation(LOCAL_DATA_DIR / "VOC2012"), p=0.3))
+                (
+                    SceneObsAug(
+                        VOCBackgroundAugmentation(LOCAL_DATA_DIR / "VOC2012"), p=0.3,
+                    )
+                ),
             ]
 
         self.rgb_augmentations = []
@@ -140,13 +141,17 @@ class PoseDataset(torch.utils.data.IterableDataset):
                 SceneObsAug(
                     [
                         SceneObsAug(PillowBlur(factor_interval=(1, 3)), p=0.4),
-                        SceneObsAug(PillowSharpness(factor_interval=(0.0, 50.0)), p=0.3),
+                        SceneObsAug(
+                            PillowSharpness(factor_interval=(0.0, 50.0)), p=0.3,
+                        ),
                         SceneObsAug(PillowContrast(factor_interval=(0.2, 50.0)), p=0.3),
-                        SceneObsAug(PillowBrightness(factor_interval=(0.1, 6.0)), p=0.5),
+                        SceneObsAug(
+                            PillowBrightness(factor_interval=(0.1, 6.0)), p=0.5,
+                        ),
                         SceneObsAug(PillowColor(factor_interval=(0.0, 20.0)), p=0.3),
                     ],
                     p=0.8,
-                )
+                ),
             ]
 
         self.depth_augmentations = []
@@ -167,7 +172,9 @@ class PoseDataset(torch.utils.data.IterableDataset):
                     SceneObsAug(DepthBlurTransform(), p=0.3),
                     SceneObsAug(
                         DepthCorrelatedGaussianNoiseTransform(
-                            gp_rescale_factor_min=15.0, gp_rescale_factor_max=40.0, std_dev=0.01
+                            gp_rescale_factor_min=15.0,
+                            gp_rescale_factor_max=40.0,
+                            std_dev=0.01,
                         ),
                         p=0.3,
                     ),
@@ -194,13 +201,20 @@ class PoseDataset(torch.utils.data.IterableDataset):
 
                 # Set the depth image to zero occasionally.
                 if depth_augmentation_level == 2:
-                    self.depth_augmentations.append(SceneObsAug(DepthDropoutTransform(), p=0.3))
                     self.depth_augmentations.append(
-                        SceneObsAug(DepthBackgroundDropoutTransform(), p=0.2)
+                        SceneObsAug(DepthDropoutTransform(), p=0.3),
                     )
-                self.depth_augmentations = [SceneObsAug(self.depth_augmentations, p=0.8)]
+                    self.depth_augmentations.append(
+                        SceneObsAug(DepthBackgroundDropoutTransform(), p=0.2),
+                    )
+                self.depth_augmentations = [
+                    SceneObsAug(self.depth_augmentations, p=0.8),
+                ]
             else:
-                raise ValueError(f"Unknown depth augmentation type {depth_augmentation_level}")
+                msg = f"Unknown depth augmentation type {depth_augmentation_level}"
+                raise ValueError(
+                    msg,
+                )
 
         self.return_first_object = return_first_object
 
@@ -210,7 +224,9 @@ class PoseDataset(torch.utils.data.IterableDataset):
 
     def collate_fn(self, list_data: List[PoseData]) -> BatchPoseData:
         batch_data = BatchPoseData(
-            rgbs=torch.from_numpy(np.stack([d.rgb for d in list_data])).permute(0, 3, 1, 2),
+            rgbs=torch.from_numpy(np.stack([d.rgb for d in list_data])).permute(
+                0, 3, 1, 2,
+            ),
             bboxes=torch.from_numpy(np.stack([d.bbox for d in list_data])),
             K=torch.from_numpy(np.stack([d.K for d in list_data])),
             TCO=torch.from_numpy(np.stack([d.TCO for d in list_data])),
@@ -229,11 +245,10 @@ class PoseDataset(torch.utils.data.IterableDataset):
             2. if `keep_objects_set` isn't None, the object must belong to this set
         If there are no objects that satisfy this condition in the observation, returns None.
         """
-
         obs = remove_invisible_objects(obs)
 
         start = time.time()
-        timings = dict()
+        timings = {}
 
         s = time.time()
         obs = self.resize_transform(obs)
@@ -326,7 +341,8 @@ class PoseDataset(torch.utils.data.IterableDataset):
                 return data
             n_attempts += 1
             if n_attempts > 200:
-                raise ValueError("Cannot find valid image in the dataset")
+                msg = "Cannot find valid image in the dataset"
+                raise ValueError(msg)
 
     def __iter__(self) -> Iterator[PoseData]:
         assert isinstance(self.scene_ds, IterableSceneDataset)

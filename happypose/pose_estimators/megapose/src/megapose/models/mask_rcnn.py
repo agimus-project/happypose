@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,7 +28,6 @@ class DetectorMaskRCNN(MaskRCNN):
         backbone_str="resnet50-fpn",
         anchor_sizes=((32,), (64,), (128,), (256,), (512,)),
     ):
-
         assert backbone_str == "resnet50-fpn"
         backbone = resnet_fpn_backbone("resnet50", pretrained=False)
 

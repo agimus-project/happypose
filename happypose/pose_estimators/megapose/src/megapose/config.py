@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,7 +27,9 @@ import happypose.pose_estimators.megapose.src.megapose as megapose
 
 PROJECT_ROOT = Path(megapose.__file__).parent.parent.parent
 PROJECT_DIR = PROJECT_ROOT
-LOCAL_DATA_DIR = Path(os.environ.get("MEGAPOSE_DATA_DIR", Path(PROJECT_DIR) / "local_data"))
+LOCAL_DATA_DIR = Path(
+    os.environ.get("MEGAPOSE_DATA_DIR", Path(PROJECT_DIR) / "local_data"),
+)
 BOP_DS_DIR = LOCAL_DATA_DIR / "bop_datasets"
 NB_DATA_DIR = LOCAL_DATA_DIR / "notebook_data"
 SHAPENET_DIR = LOCAL_DATA_DIR / "shapenetcorev2"
@@ -101,14 +102,12 @@ MODELNET_TEST_CATEGORIES = [
     "tv_stand",
 ]
 
-SHAPENET_MODELNET_CATEGORIES = set(
-    [
+SHAPENET_MODELNET_CATEGORIES = {
         "guitar",
         "bathtub,bathing tub,bath,tub",
         "bookshelf",
         "sofa,couch,lounge",
-    ]
-)
+    }
 
 YCBV_OBJECT_NAMES = [
     ["obj_000001", "01_master_chef_can"],

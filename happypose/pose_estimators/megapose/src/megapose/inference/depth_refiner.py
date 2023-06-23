@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,6 +37,7 @@ class DepthRefiner(ABC):
         """Run the depth refinement.
 
         Args:
+        ----
             predictions: len(predictions) = N, index into depth, masks, K using
                 the batch_im_id field.
             depth: [B, H, W]

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +17,6 @@ limitations under the License.
 # Standard Library
 import io
 import json
-import tarfile
 from collections import defaultdict
 from functools import partial
 from hashlib import sha1
@@ -65,13 +63,12 @@ def write_scene_ds_as_wds(
     frame_ids: Optional[List[int]] = None,
     depth_scale: int = 1000,
 ) -> None:
-
     assert scene_ds.frame_index is not None
 
     wds_dir.mkdir(exist_ok=True, parents=True)
     frame_index = scene_ds.frame_index.copy()
     shard_writer = wds.ShardWriter(
-        str(wds_dir / shard_format), maxcount=maxcount, start_shard=0
+        str(wds_dir / shard_format), maxcount=maxcount, start_shard=0,
     )
 
     sampler = None
@@ -96,7 +93,7 @@ def write_scene_ds_as_wds(
 
         if keep_labels_set is not None:
             assert obs.object_datas is not None
-            object_labels = set([obj.label for obj in obs.object_datas])
+            object_labels = {obj.label for obj in obs.object_datas}
             n_objects_valid = len(object_labels.intersection(keep_labels_set))
             if n_objects_valid == 0:
                 continue
@@ -127,9 +124,9 @@ def write_scene_ds_as_wds(
     frame_index = frame_index.loc[:, ["scene_id", "view_id", "key", "shard_fname"]]
     shard_writer.close()
     frame_index.to_feather(wds_dir / "frame_index.feather")
-    ds_infos = dict(
-        depth_scale=depth_scale,
-    )
+    ds_infos = {
+        "depth_scale": depth_scale,
+    }
     (wds_dir / "infos.json").write_text(json.dumps(ds_infos))
     return
 
@@ -140,7 +137,6 @@ def load_scene_ds_obs(
     load_depth: bool = False,
     label_format: str = "{label}",
 ) -> SceneObservation:
-
     assert isinstance(sample["rgb.png"], bytes)
     assert isinstance(sample["segmentation.png"], bytes)
     assert isinstance(sample["depth.png"], bytes)

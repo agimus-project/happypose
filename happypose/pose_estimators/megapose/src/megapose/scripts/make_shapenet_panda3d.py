@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,12 +14,10 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import shutil
 import subprocess
 import time
-from concurrent.futures import ProcessPoolExecutor as Pool
 from multiprocessing import Process
 from pathlib import Path
 
@@ -46,12 +43,12 @@ def fix_normals(obj_path):
     is_block = False
 
     def make_new_block():
-        return dict(
-            g="",
-            usemtl="",
-            f=[],
-            l=[],
-        )
+        return {
+            "g": "",
+            "usemtl": "",
+            "f": [],
+            "l": [],
+        }
 
     for line in lines:
         if line.startswith("mtllib"):
@@ -105,7 +102,9 @@ def fix_normals(obj_path):
         for line_f in block["f"]:
             face = line_f[3:].split(" ")
             face = [f.split("/") for f in face]
-            face_flipped = " ".join([f"{x[0]}/{x[1]}/{int(x[2])+n_vn_orig}" for x in face])
+            face_flipped = " ".join(
+                [f"{x[0]}/{x[1]}/{int(x[2])+n_vn_orig}" for x in face],
+            )
             f_flipped.append(f"f  {face_flipped}")
         block["f"] += f_flipped
 
@@ -143,9 +142,9 @@ def convert_obj_to_gltf(obj_path):
     print(n, obj_path)
     obj_path = Path(obj_path)
     new_obj = fix_normals(obj_path)
-    binormals_obj_path = Path((str(obj_path.with_suffix("")) + "_binormals.obj"))
+    binormals_obj_path = Path(str(obj_path.with_suffix("")) + "_binormals.obj")
     binormals_obj_path.write_text(new_obj)
-    proc = subprocess.run(["obj2gltf", "-i", str(binormals_obj_path)])
+    subprocess.run(["obj2gltf", "-i", str(binormals_obj_path)])
     gltf_path = binormals_obj_path.with_suffix(".gltf")
     p = Process(target=convert_gltf, args=(gltf_path,))
     p.start()
@@ -153,7 +152,9 @@ def convert_obj_to_gltf(obj_path):
     bam_path = gltf_path.with_suffix(".bam")
     bam_exists = bam_path.exists()
     if bam_exists:
-        new_models_dir = Path(str(obj_path.parent).replace("models_orig", "models_panda3d_bam"))
+        new_models_dir = Path(
+            str(obj_path.parent).replace("models_orig", "models_panda3d_bam"),
+        )
         Path(new_models_dir).mkdir(exist_ok=True, parents=True)
         img_dir = obj_path.parent.parent / "images"
         new_img_dir = new_models_dir

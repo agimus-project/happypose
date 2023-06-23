@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,9 +42,9 @@ class ShapeNetModel:
 
 
 def load_object_infos(models_infos_path):
-    with open(models_infos_path, "r") as f:
+    with open(models_infos_path) as f:
         infos = json.load(f)
-    itos = dict()
+    itos = {}
     for info in infos:
         k = f"shapenet_{info['shapenet_synset_id']}_{info['shapenet_source_id']}"
         itos[info["obj_id"]] = k
@@ -59,7 +58,7 @@ def make_shapenet_infos(shapenet_dir, model_name):
     taxonomy_path = shapenet_dir / "taxonomy.json"
     taxonomy = json.loads(taxonomy_path.read_text())
 
-    synset_id_to_synset = dict()
+    synset_id_to_synset = {}
 
     def get_synset(synset_id):
         if synset_id not in synset_id_to_synset:
@@ -120,7 +119,8 @@ class ShapeNetObjectDataset(RigidObjectDataset):
             model_name = "model_normalized_pointcloud.obj"
             ypr_offset_deg = (0.0, 0.0, 0.0)
         else:
-            raise ValueError("split")
+            msg = "split"
+            raise ValueError(msg)
 
         synsets = make_shapenet_infos(self.shapenet_dir, model_name)
         main_synsets = [
@@ -131,7 +131,6 @@ class ShapeNetObjectDataset(RigidObjectDataset):
         objects = []
 
         for synset in main_synsets:
-
             for source_id in synset.models_descendants:
                 model_path = (
                     self.shapenet_dir

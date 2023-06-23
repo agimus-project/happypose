@@ -3,24 +3,21 @@
 
 """Evaluation script for the BOP Challenge 2019/2020."""
 
-import os
 import argparse
+import os
 
-from bop_toolkit_lib import config
-from bop_toolkit_lib import inout
-from bop_toolkit_lib import misc
-
+from bop_toolkit_lib import config, inout, misc
 
 # PARAMETERS (some can be overwritten by the command line arguments below).
 ################################################################################
 p = {
-  # Names of files with results for which to calculate the errors (assumed to be
-  # stored in folder config.eval_path). See docs/bop_challenge_2019.md for a
-  # description of the format. Example results can be found at:
-  # http://ptak.felk.cvut.cz/6DB/public/bop_sample_results/bop_challenge_2019/
-  'result_filenames': [
-    '/path/to/csv/with/results',
-  ],
+    # Names of files with results for which to calculate the errors (assumed to be
+    # stored in folder config.eval_path). See docs/bop_challenge_2019.md for a
+    # description of the format. Example results can be found at:
+    # http://ptak.felk.cvut.cz/6DB/public/bop_sample_results/bop_challenge_2019/
+    "result_filenames": [
+        "/path/to/csv/with/results",
+    ],
 }
 ################################################################################
 
@@ -28,19 +25,19 @@ p = {
 # Command line arguments.
 # ------------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
-parser.add_argument('--result_filenames',
-                    default=','.join(p['result_filenames']),
-                    help='Comma-separated names of files with results.')
+parser.add_argument(
+    "--result_filenames",
+    default=",".join(p["result_filenames"]),
+    help="Comma-separated names of files with results.",
+)
 args = parser.parse_args()
 
-p['result_filenames'] = args.result_filenames.split(',')
+p["result_filenames"] = args.result_filenames.split(",")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    for result_filename in p["result_filenames"]:
+        result_path = os.path.join(config.results_path, result_filename)
+        check_passed, check_msg = inout.check_bop_results(result_path, version="bop19")
 
-  for result_filename in p['result_filenames']:
-    result_path = os.path.join(config.results_path, result_filename)
-    check_passed, check_msg = inout.check_bop_results(
-      result_path, version='bop19')
-
-    misc.log('Check msg: {}'.format(check_msg))
+        misc.log(f"Check msg: {check_msg}")

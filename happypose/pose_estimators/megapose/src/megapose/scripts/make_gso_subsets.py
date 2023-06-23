@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,19 +14,15 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import json
-from pathlib import Path
 
 # Third Party
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.config import GSO_DIR
-from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
 
 def get_labels_split(statistics, max_model_mem_kb, max_tot_mem_kb):
@@ -35,7 +30,9 @@ def get_labels_split(statistics, max_model_mem_kb, max_tot_mem_kb):
     print(len(statistics), np.nansum(statistics["tot_mem_kb"]) / 1e6)
     statistics = statistics.iloc[np.where(np.isfinite(statistics["tot_mem_kb"]))[0]]
     print(len(statistics), np.nansum(statistics["tot_mem_kb"]) / 1e6)
-    statistics = statistics.iloc[np.where(statistics["tot_mem_kb"] <= max_model_mem_kb)[0]]
+    statistics = statistics.iloc[
+        np.where(statistics["tot_mem_kb"] <= max_model_mem_kb)[0]
+    ]
     print(len(statistics), np.nansum(statistics["tot_mem_kb"]) / 1e6)
 
     np_random = np.random.RandomState(0)
@@ -63,76 +60,76 @@ if __name__ == "__main__":
     statistics = pd.read_json(ds_stats_path)
 
     splits = [
-        dict(
-            name="gso",
-            max_model_mem_kb=10e3,
-            max_num_objects=1000,
-        ),
-        dict(
-            name="shapenet_10mb_5k",
-            max_model_mem_kb=10e3,
-            max_num_objects=5000,
-        ),
-        dict(
-            name="shapenet_10mb_10k",
-            max_model_mem_kb=10e3,
-            max_num_objects=10000,
-        ),
-        dict(
-            name="shapenet_10mb_15k",
-            max_model_mem_kb=10e3,
-            max_num_objects=15000,
-        ),
-        dict(
-            name="shapenet_100mb_200gb",
-            max_model_mem_kb=100e3,
-            max_tot_mem_kb=200e6,
-        ),
-        dict(
-            name="shapenet_10mb_200gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=200e6,
-        ),
-        dict(
-            name="shapenet_10mb_50gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=50e6,
-        ),
-        dict(
-            name="shapenet_20mb_50gb",
-            max_model_mem_kb=20e3,
-            max_tot_mem_kb=50e6,
-        ),
-        dict(
-            name="shapenet_10mb_100gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=100e6,
-        ),
-        dict(
-            name="shapenet_10mb_32gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=32e6,
-        ),
-        dict(
-            name="shapenet_2mb_32gb",
-            max_model_mem_kb=2e3,
-            max_tot_mem_kb=32e6,
-        ),
-        dict(
-            name="shapenet_10mb_8gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=8e6,
-        ),
-        dict(
-            name="shapenet_10mb_1gb",
-            max_model_mem_kb=10e3,
-            max_tot_mem_kb=1e6,
-        ),
-        dict(
-            name="shapenet_2mb_1gb",
-            max_model_mem_kb=2e3,
-            max_tot_mem_kb=1e6,
-        ),
+        {
+            "name": "gso",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 1000,
+        },
+        {
+            "name": "shapenet_10mb_5k",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 5000,
+        },
+        {
+            "name": "shapenet_10mb_10k",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 10000,
+        },
+        {
+            "name": "shapenet_10mb_15k",
+            "max_model_mem_kb": 10e3,
+            "max_num_objects": 15000,
+        },
+        {
+            "name": "shapenet_100mb_200gb",
+            "max_model_mem_kb": 100e3,
+            "max_tot_mem_kb": 200e6,
+        },
+        {
+            "name": "shapenet_10mb_200gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 200e6,
+        },
+        {
+            "name": "shapenet_10mb_50gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 50e6,
+        },
+        {
+            "name": "shapenet_20mb_50gb",
+            "max_model_mem_kb": 20e3,
+            "max_tot_mem_kb": 50e6,
+        },
+        {
+            "name": "shapenet_10mb_100gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 100e6,
+        },
+        {
+            "name": "shapenet_10mb_32gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 32e6,
+        },
+        {
+            "name": "shapenet_2mb_32gb",
+            "max_model_mem_kb": 2e3,
+            "max_tot_mem_kb": 32e6,
+        },
+        {
+            "name": "shapenet_10mb_8gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 8e6,
+        },
+        {
+            "name": "shapenet_10mb_1gb",
+            "max_model_mem_kb": 10e3,
+            "max_tot_mem_kb": 1e6,
+        },
+        {
+            "name": "shapenet_2mb_1gb",
+            "max_model_mem_kb": 2e3,
+            "max_tot_mem_kb": 1e6,
+        },
     ]
 
     for split in splits:

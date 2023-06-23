@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import json
 from pathlib import Path
@@ -23,11 +21,11 @@ from pathlib import Path
 # Third Party
 import numpy as np
 
-# MegaPose
-from happypose.toolbox.lib3d.symmetries import ContinuousSymmetry, DiscreteSymmetry
-
 # Local Folder
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
+
+# MegaPose
+from happypose.toolbox.lib3d.symmetries import ContinuousSymmetry, DiscreteSymmetry
 
 
 class BOPObjectDataset(RigidObjectDataset):

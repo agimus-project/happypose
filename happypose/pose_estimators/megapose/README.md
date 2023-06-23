@@ -1,5 +1,5 @@
 # MegaPose
-This repository contains code, models and dataset for our MegaPose paper. 
+This repository contains code, models and dataset for our MegaPose paper.
 
 Yann Labbé, Lucas Manuelli, Arsalan Mousavian, Stephen Tyree, Stan Birchfield, Jonathan Tremblay, Justin Carpentier, Mathieu Aubry, Dieter Fox, Josef Sivic. “MegaPose: 6D Pose Estimation of Novel Objects via Render & Compare.” In: CoRL 2022.
 
@@ -33,15 +33,15 @@ This repository contains pre-trained models for pose estimation of novel objects
 ## Pose estimation of novel objects
 <img src="images/pose-estimation.png" width="800">
 
-We provide pre-trained models for 6D pose estimation of novel objects. 
+We provide pre-trained models for 6D pose estimation of novel objects.
 
-Given as inputs: 
+Given as inputs:
 - an RGB image (depth can also be used but is optional),
 - the intrinsic parameters of the camera,
 - a mesh of the object,
 - a bounding box of that object in the image,
 
-our approach estimates the 6D pose of the object (3D rotation + 3D translation) with respect to the camera. 
+our approach estimates the 6D pose of the object (3D rotation + 3D translation) with respect to the camera.
 
 We provide a script and an example for inference on novel objects. After installation, please see the [Inference tutorial](#inference-tutorial).
 
@@ -52,7 +52,7 @@ We provide the synthetic dataset we used to train MegaPose. The dataset contains
 
 
 # Installation
-Once you are done with the installation, we recommend you head to the [Inference tutorial](#inference-tutorial). 
+Once you are done with the installation, we recommend you head to the [Inference tutorial](#inference-tutorial).
 
 The first step is to clone the repo and submodules:
 ```
@@ -84,7 +84,7 @@ pip install -e .
 <summary>Click for details...</summary>
 
 ### Create a conda environment
-Creat a conda environment with `python==3.9`. We will use this conda environment to manage a small number of dependencies needed for 
+Creat a conda environment with `python==3.9`. We will use this conda environment to manage a small number of dependencies needed for
 
 ```
 conda env create -f conda/environment.yaml
@@ -257,7 +257,7 @@ python -m megapose.scripts.run_inference_on_example barbecue-sauce --vis-detecti
 ## 3. Run pose estimation and visualize results
 Run inference with the following command:
 ```
-python -m megapose.scripts.run_inference_on_example barbecue-sauce --run-inference 
+python -m megapose.scripts.run_inference_on_example barbecue-sauce --run-inference
 ```
 by default, the model only uses the RGB input. You can use of our RGB-D megapose models using the `--model` argument. Please see our [Model Zoo](#model-zoo) for all models available.
 
@@ -272,7 +272,7 @@ This file contains a list of objects with their estimated poses . For each objec
 
     [{"label": "barbecue-sauce", "TWO": [[0.5453961536730983, 0.6226545207599095, -0.43295293693197473, 0.35692612413663855], [0.10723329335451126, 0.07313819974660873, 0.45735278725624084]]}]
 
-Finally, you can visualize the results using: 
+Finally, you can visualize the results using:
 
 ```
 python -m megapose.scripts.run_inference_on_example barbecue-sauce --vis-outputs
@@ -312,7 +312,7 @@ For optimal performance, we recommend using `megapose-1.0-RGB-multi-hypothesis` 
 ## Dataset information
 The dataset is available at this [url](https://drive.google.com/drive/folders/1CXc_GG11jNVMeGr-Mb4o4iiNjYeKDkKd?usp=sharing). It is split into two datasets: `gso_1M` (Google Scanned Objects) and `shapenet_1M` (ShapeNet objects). Each dataset has 1 million images which were generated using [BlenderProc](https://github.com/DLR-RM/BlenderProc).
 
-Datasets are released in the [webdataset](https://github.com/webdataset/webdataset) format for high reading performance. Each dataset is split into chunks of size ~600MB containing 1000 images each. 
+Datasets are released in the [webdataset](https://github.com/webdataset/webdataset) format for high reading performance. Each dataset is split into chunks of size ~600MB containing 1000 images each.
 
 We provide the pre-processed meshes ready to be used for rendering and training in this [directory](https://drive.google.com/drive/folders/1AYxkv7jpDniOnTcMAxiWbdhPo8WBJaZG):
 - `google_scanned_objects.zip`

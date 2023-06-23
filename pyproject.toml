@@ -29,7 +29,6 @@ pin = "^2.6.17"
 pybullet = {optional = true, version = "^3.2.5"}
 python = "^3.8"
 
-
 [tool.poetry.extras]
 render = ["panda3d", "pybullet"]
 

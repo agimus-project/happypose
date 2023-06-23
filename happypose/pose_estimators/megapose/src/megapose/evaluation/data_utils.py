@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,11 +35,13 @@ def parse_obs_data(
     """Parses object data into PandasTensorCollection.
 
     Args:
+    ----
         obs: The scene observation.
         object_labels: If specified will only parse information for these
             object labels.
 
     Returns:
+    -------
         PandasTensorCollection
             infos: pd.DataFrame with fields ['label',
                 'scene_id', 'view_id', 'visib_fract']
@@ -52,23 +53,23 @@ def parse_obs_data(
                 masks: (optional)
 
     """
-
-    raise ValueError("This function is deprecated.")
+    msg = "This function is deprecated."
+    raise ValueError(msg)
     infos = []
     TWO = []
     bboxes = []
     masks = []
     TWC = torch.as_tensor(obs.camera_data.TWC.matrix).float()
-    for n, obj_data in enumerate(obs.object_datas):
+    for _n, obj_data in enumerate(obs.object_datas):
         if object_labels is not None and obj_data.label not in object_labels:
             continue
 
-        info = dict(
-            label=obj_data.label,
-            scene_id=obs.infos.scene_id,
-            view_id=obs.infos.view_id,
-            visib_fract=getattr(obj_data, "visib_fract", 1),
-        )
+        info = {
+            "label": obj_data.label,
+            "scene_id": obs.infos.scene_id,
+            "view_id": obs.infos.view_id,
+            "visib_fract": getattr(obj_data, "visib_fract", 1),
+        }
         infos.append(info)
         TWO.append(torch.tensor(obj_data.TWO.matrix).float())
         bboxes.append(torch.tensor(obj_data.bbox_modal).float())

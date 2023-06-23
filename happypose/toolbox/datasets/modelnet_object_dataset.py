@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,7 +30,6 @@ class ModelNetObjectDataset(RigidObjectDataset):
         rescaled: bool = True,
         n_objects: int = 30,
     ):
-
         object_ids = (
             Path(modelnet_dir / "model_set" / f"{category}_{split}.txt")
             .read_text()
@@ -42,10 +40,16 @@ class ModelNetObjectDataset(RigidObjectDataset):
         for object_id in object_ids:
             if rescaled:
                 mesh_path = (
-                    modelnet_dir / "ModelNet40" / category / split / f"{object_id}_rescaled.obj"
+                    modelnet_dir
+                    / "ModelNet40"
+                    / category
+                    / split
+                    / f"{object_id}_rescaled.obj"
                 )
             else:
-                mesh_path = modelnet_dir / "ModelNet40" / category / split / f"{object_id}.obj"
+                mesh_path = (
+                    modelnet_dir / "ModelNet40" / category / split / f"{object_id}.obj"
+                )
             obj = RigidObject(
                 label=object_id,
                 category=category,

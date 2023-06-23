@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,22 +14,22 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import contextlib
 import os
-import time
 import random
-import webdataset as wds
+import time
 
-# Third Party
-import torch
 import numpy as np
 import pinocchio as pin
 
+# Third Party
+import torch
+import webdataset as wds
+
 
 def make_seed(*args):
-    """Copied from webdataset"""
+    """Copied from webdataset."""
     seed = 0
     for arg in args:
         seed = (seed * 31 + hash(arg)) & 0x7FFFFFFF

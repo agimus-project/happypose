@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,17 +26,21 @@ from tqdm import tqdm
 
 # MegaPose
 import happypose.toolbox.utils.tensor_collection as tc
-from happypose.pose_estimators.megapose.src.megapose.evaluation.data_utils import (
-    parse_obs_data,
-)
 from happypose.toolbox.datasets.samplers import DistributedSceneSampler
-from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation
+from happypose.toolbox.datasets.scene_dataset import SceneObservation
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, get_world_size
 
 
 class EvaluationRunner:
-    def __init__(self, scene_ds, meters, batch_size=64, cache_data=True, n_workers=4, sampler=None):
-
+    def __init__(
+        self,
+        scene_ds,
+        meters,
+        batch_size=64,
+        cache_data=True,
+        n_workers=4,
+        sampler=None,
+    ):
         self.rank = get_rank()
         self.world_size = get_world_size()
         self.tmp_dir = get_tmp_dir()
@@ -45,7 +48,7 @@ class EvaluationRunner:
         self.scene_ds = scene_ds
         if sampler is None:
             sampler = DistributedSceneSampler(
-                scene_ds, num_replicas=self.world_size, rank=self.rank, shuffle=True
+                scene_ds, num_replicas=self.world_size, rank=self.rank, shuffle=True,
             )
         dataloader = DataLoader(
             scene_ds,
@@ -62,17 +65,17 @@ class EvaluationRunner:
 
         self.meters = meters
         self.meters = OrderedDict(
-            {k: v for k, v in sorted(self.meters.items(), key=lambda item: item[0])}
+            dict(sorted(self.meters.items(), key=lambda item: item[0])),
         )
 
     @staticmethod
     def make_empty_predictions():
-        infos = dict(
-            view_id=np.empty(0, dtype=np.int),
-            scene_id=np.empty(0, dtype=np.int),
-            label=np.empty(0, dtype=np.object),
-            score=np.empty(0, dtype=np.float),
-        )
+        infos = {
+            "view_id": np.empty(0, dtype=np.int),
+            "scene_id": np.empty(0, dtype=np.int),
+            "label": np.empty(0, dtype=np.object),
+            "score": np.empty(0, dtype=np.float),
+        }
         poses = torch.empty(0, 4, 4, dtype=torch.float)
         return tc.PandasTensorCollection(infos=pd.DataFrame(infos), poses=poses)
 
@@ -83,12 +86,12 @@ class EvaluationRunner:
             meter.reset()
         obj_predictions = obj_predictions.to(device)
         for data in tqdm(self.dataloader):
-            for k, meter in self.meters.items():
+            for _k, meter in self.meters.items():
                 meter.add(obj_predictions, data["gt_data"].to(device))
         return self.summary()
 
     def summary(self):
-        summary, dfs = dict(), dict()
+        summary, dfs = {}, {}
         for meter_k, meter in self.meters.items():
             if len(meter.datas) > 0:
                 meter.gather_distributed(tmp_dir=self.tmp_dir)

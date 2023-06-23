@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,7 +25,7 @@ from PIL import ImageEnhance
 
 
 def image_to_np_uint8(im: Union[torch.Tensor, np.ndarray]) -> np.ndarray:
-    """Returns a np.uint8 image"""
+    """Returns a np.uint8 image."""
     if isinstance(im, torch.Tensor):
         im_np = im.detach().cpu().numpy()
     else:
@@ -59,7 +58,6 @@ def make_contour_overlay(
     color: Optional[Tuple[int, int, int]] = None,
     dilate_iterations: int = 1,
 ) -> Dict[str, Any]:
-
     if color is None:
         color = (0, 255, 0)
 
@@ -120,7 +118,8 @@ def get_ds_info(ds_name):
         urdf_ds_name = None  # not sure if this exists
         obj_ds_name = "custom.panda3d"
     else:
-        raise ValueError("Unknown dataset")
+        msg = "Unknown dataset"
+        raise ValueError(msg)
 
     return urdf_ds_name, obj_ds_name
 
@@ -134,9 +133,9 @@ def draw_bounding_box(
     """Draw a bounding box onto a numpy array image.
 
     Args:
+    ----
         bbox: [xmin, ymin, xmax, ymax]
     """
-
     if color is None:
         color = [255, 0, 0]
 

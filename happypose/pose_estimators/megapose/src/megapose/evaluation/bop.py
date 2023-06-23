@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 
 
 # Standard Library
@@ -31,8 +29,14 @@ import torch
 from tqdm import tqdm
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.config import BOP_TOOLKIT_DIR, LOCAL_DATA_DIR, PROJECT_DIR
-from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config import BOPEvalConfig
+from happypose.pose_estimators.megapose.src.megapose.config import (
+    BOP_TOOLKIT_DIR,
+    LOCAL_DATA_DIR,
+    PROJECT_DIR,
+)
+from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config import (
+    BOPEvalConfig,
+)
 
 # Note we are actually using the bop_toolkit_lib that is directly conda installed
 # inside the docker image. This is just to access the scripts.
@@ -42,7 +46,6 @@ DUMMY_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_dummy.py"
 
 
 # Third Party
-import bop_toolkit_lib
 from bop_toolkit_lib import inout  # noqa
 
 
@@ -84,22 +87,21 @@ def convert_results_to_coco(results_path, out_json_path, detection_method):
         category_id = int(row.label.split("_")[-1])
         mask = predictions.masks[n].numpy().astype(np.uint8)
         rle = binary_mask_to_polygon(mask)
-        info = dict(
-            scene_id=int(row.scene_id),
-            view_id=int(row.view_id),
-            category_id=category_id,
-            bbox=[x, y, w, h],
-            score=score,
-            segmentation=rle,
-        )
+        info = {
+            "scene_id": int(row.scene_id),
+            "view_id": int(row.view_id),
+            "category_id": category_id,
+            "bbox": [x, y, w, h],
+            "score": score,
+            "segmentation": rle,
+        }
         infos.append(info)
     Path(out_json_path).write_text(json.dumps(infos))
     return
 
 
 def convert_results_to_bop(
-    results_path: Path, out_csv_path: Path, method: str,
-    use_pose_score: bool = True
+    results_path: Path, out_csv_path: Path, method: str, use_pose_score: bool = True,
 ):
     predictions = torch.load(results_path)["predictions"]
     predictions = predictions[method]
@@ -122,27 +124,28 @@ def convert_results_to_bop(
             time = row.time
         else:
             time = -1
-        pred = dict(
-            scene_id=row.scene_id,
-            im_id=row.view_id,
-            obj_id=obj_id,
-            score=score,
-            t=t,
-            R=R,
-            time=time,
-        )
+        pred = {
+            "scene_id": row.scene_id,
+            "im_id": row.view_id,
+            "obj_id": obj_id,
+            "score": score,
+            "t": t,
+            "R": R,
+            "time": time,
+        }
         preds.append(pred)
     print("Wrote:", out_csv_path)
     Path(out_csv_path).parent.mkdir(exist_ok=True)
     inout.save_bop_results(out_csv_path, preds)
     return out_csv_path
 
+
 def _run_bop_evaluation(filename, eval_dir, eval_detection=False, dummy=False):
     myenv = os.environ.copy()
     myenv["PYTHONPATH"] = BOP_TOOLKIT_DIR.as_posix()
-    ld_library_path = os.environ['LD_LIBRARY_PATH']
-    conda_prefix = os.environ['CONDA_PREFIX']
-    myenv["LD_LIBRARY_PATH"] = f'{conda_prefix}/lib:{ld_library_path}'
+    ld_library_path = os.environ["LD_LIBRARY_PATH"]
+    conda_prefix = os.environ["CONDA_PREFIX"]
+    myenv["LD_LIBRARY_PATH"] = f"{conda_prefix}/lib:{ld_library_path}"
     myenv["BOP_DATASETS_PATH"] = str(LOCAL_DATA_DIR / "bop_datasets")
     myenv["BOP_RESULTS_PATH"] = str(eval_dir)
     myenv["BOP_EVAL_PATH"] = str(eval_dir)
@@ -200,7 +203,9 @@ def run_evaluation(cfg: BOPEvalConfig) -> None:
 
         if not cfg.convert_only:
             _run_bop_evaluation(csv_path, cfg.eval_dir, eval_detection=False)
-        scores_pose_path = eval_dir / csv_path.with_suffix("").name / "scores_bop19.json"
+        scores_pose_path = (
+            eval_dir / csv_path.with_suffix("").name / "scores_bop19.json"
+        )
 
     scores_detection_path = None
     if cfg.detection_method is not None:

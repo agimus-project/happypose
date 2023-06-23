@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,8 +44,13 @@ class PickleDataset:
         data["scene_id"] = 0
         data["im_idx"] = idx
         mask = None
-        infos = dict()
+        infos = {}
         infos["camera"] = {"TWC": data["world_t_camera"], "K": data["intrinsics"]}
-        infos["frame_info"] = {"scene_id": 0, "view_id": idx, "cam_name": "cam", "cam_id": "cam"}
+        infos["frame_info"] = {
+            "scene_id": 0,
+            "view_id": idx,
+            "cam_name": "cam",
+            "cam_id": "cam",
+        }
         scene_data = SceneData(data["rgb"], data["depth"], mask, infos)
         return scene_data

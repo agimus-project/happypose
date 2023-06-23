@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 
 
 # Standard Library
@@ -126,8 +124,7 @@ def init_distributed_mode():
 
 
 def reduce_dict(input_dict, average=True):
-    """
-    https://github.com/pytorch/vision/blob/master/references/detection/utils.py
+    """https://github.com/pytorch/vision/blob/master/references/detection/utils.py
     Args:
         input_dict (dict): all the values will be reduced
         average (bool): whether to do average or sum

@@ -1,18 +1,14 @@
-import typing as tp
-import hydra
-import omegaconf
-import tqdm
-import time
 import copy
-import numpy as np
-import submitit
+import time
+import typing as tp
 from dataclasses import dataclass
+
+import hydra
+import numpy as np
+import omegaconf
+import submitit
 from hydra.core.config_store import ConfigStore
-
-
-from job_runner.configs import (
-    RunnerConfig,
-)
+from job_runner.configs import RunnerConfig
 from job_runner.utils import make_setup
 
 
@@ -52,10 +48,9 @@ def generate_chunks(ds_cfg: DatasetGenerationConfig):
 
 
 @hydra.main(
-    version_base=None, config_path="../configs", config_name="run_dsgen/default"
+    version_base=None, config_path="../configs", config_name="run_dsgen/default",
 )
 def main(cfg: Config):
-
     if cfg.runner.use_slurm:
         executor = submitit.AutoExecutor(folder=cfg.runner.log_dir)
         executor.update_parameters(
@@ -84,7 +79,7 @@ def main(cfg: Config):
 
     jobs = []
     with executor.batch():
-        for n, chunk_split_ in enumerate(chunk_splits):
+        for _n, chunk_split_ in enumerate(chunk_splits):
             ds_cfg = copy.deepcopy(cfg.ds)
             ds_cfg.chunk_ids = chunk_split_.tolist()
             if cfg.dry_run:

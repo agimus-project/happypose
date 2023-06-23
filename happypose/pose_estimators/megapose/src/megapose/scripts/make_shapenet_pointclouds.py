@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,12 +14,10 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import shutil
 import time
-from concurrent.futures import ProcessPoolExecutor as Pool
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 from pathlib import Path
 
 # Third Party
@@ -45,7 +42,11 @@ def make_obj_pc(mesh_path):
     new_mesh_path = new_mesh_path.replace("models_orig", SPLIT_NAME)
 
     mesh = trimesh.load(
-        mesh_path, group_material=False, process=False, skip_materials=True, maintain_order=True
+        mesh_path,
+        group_material=False,
+        process=False,
+        skip_materials=True,
+        maintain_order=True,
     )
     mesh = as_mesh(mesh)
     points = trimesh.sample.sample_surface(mesh, n_points)[0]
@@ -68,7 +69,8 @@ if __name__ == "__main__":
         shutil.rmtree(TARGETS_MODEL_DIR)
     TARGETS_MODEL_DIR.mkdir()
     shutil.copy(
-        (SHAPENET_DIR / "models_orig" / "taxonomy.json"), TARGETS_MODEL_DIR / "taxonomy.json"
+        (SHAPENET_DIR / "models_orig" / "taxonomy.json"),
+        TARGETS_MODEL_DIR / "taxonomy.json",
     )
     n_procs = 20
     mesh_paths = []

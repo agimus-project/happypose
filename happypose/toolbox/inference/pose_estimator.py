@@ -10,21 +10,14 @@ from happypose.toolbox.inference.types import PoseEstimatesType
 
 
 class PoseEstimationModule(torch.nn.Module, metaclass=ABCMeta):
-
     @abstractmethod
-    def forward_coarse_model(
-        self
-    ) -> Tuple[PoseEstimatesType, dict]:
+    def forward_coarse_model(self) -> Tuple[PoseEstimatesType, dict]:
         pass
 
     @abstractmethod
-    def forward_refiner(
-        self
-    ) -> Tuple[dict, dict]:
+    def forward_refiner(self) -> Tuple[dict, dict]:
         pass
 
     @abstractmethod
-    def run_inference_pipeline(
-        self
-    ) -> Tuple[PoseEstimatesType, dict]:
+    def run_inference_pipeline(self) -> Tuple[PoseEstimatesType, dict]:
         pass

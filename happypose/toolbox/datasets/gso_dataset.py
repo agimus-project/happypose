@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,9 +42,9 @@ def make_gso_infos(gso_dir: Path, model_name: str = "model.obj") -> List[str]:
 
 
 def load_object_infos(models_infos_path):
-    with open(models_infos_path, "r") as f:
+    with open(models_infos_path) as f:
         infos = json.load(f)
-    itos = dict()
+    itos = {}
     for info in infos:
         k = f"gso_{info['gso_id']}"
         itos[info["obj_id"]] = k
