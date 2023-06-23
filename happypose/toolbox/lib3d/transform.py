@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,14 +37,13 @@ class Transform:
                 Tuple[float, float, float, float],
             ],  # rotation
             Union[np.ndarray, torch.Tensor, Tuple[float, float, float]],  # translation
-        ]
+        ],
     ):
-        """
-        - Transform(T): SE3 or (4, 4) array
+        """- Transform(T): SE3 or (4, 4) array
         - Transform(quaternion, translation), where
             quaternion: pin.Quaternion, 4-array representing a xyzw quaternion,
                 or a 3x3 rotation matrix
-            translation: 3-array
+            translation: 3-array.
         """
         if len(args) == 1:
             arg_T = args[0]
@@ -118,5 +116,5 @@ class Transform:
 
     @property
     def matrix(self) -> np.ndarray:
-        """Returns 4x4 homogeneous matrix representations"""
+        """Returns 4x4 homogeneous matrix representations."""
         return self._T.homogeneous

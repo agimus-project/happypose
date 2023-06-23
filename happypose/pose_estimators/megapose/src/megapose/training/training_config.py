@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -47,7 +46,7 @@ class TrainingConfig(omegaconf.dictconfig.DictConfig):
     Two options for creating a training configuration:
     1. Create it manually, and set `run_id`.
     2. If `run_id` is None, then use `config_id`, `run_comment`and
-    `run_postfix` to create a `run_id`
+    `run_postfix` to create a `run_id`.
 
     In 2., the parameters of the config are set-up using the function `update_cfg_with_config_id`.
     """

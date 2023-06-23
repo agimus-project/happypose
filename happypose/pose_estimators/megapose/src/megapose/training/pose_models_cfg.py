@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,18 +15,24 @@ limitations under the License.
 
 
 # Standard Library
-from typing import Union
 
 # MegaPose
 # Backbones
 import happypose.pose_estimators.megapose.src.megapose.models.torchvision_resnet as models
-from happypose.toolbox.lib3d.rigid_mesh_database import BatchedMeshes
 
 # Pose models
-from happypose.pose_estimators.megapose.src.megapose.models.pose_rigid import PosePredictor
-from happypose.pose_estimators.megapose.src.megapose.models.wide_resnet import WideResNet18, WideResNet34
+from happypose.pose_estimators.megapose.src.megapose.models.pose_rigid import (
+    PosePredictor,
+)
+from happypose.pose_estimators.megapose.src.megapose.models.wide_resnet import (
+    WideResNet18,
+    WideResNet34,
+)
+from happypose.pose_estimators.megapose.src.megapose.training.training_config import (
+    TrainingConfig,
+)
+from happypose.toolbox.lib3d.rigid_mesh_database import BatchedMeshes
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from happypose.pose_estimators.megapose.src.megapose.training.training_config import TrainingConfig
 from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -35,7 +40,6 @@ logger = get_logger(__name__)
 
 def check_update_config(cfg: TrainingConfig) -> TrainingConfig:
     """Useful for loading models previously trained with different configurations."""
-
     cfg.is_coarse_compat = False
     # Detect old coarse model definition
     if hasattr(cfg, "input_strategy") and cfg.input_strategy == "input=obs+one_render":
@@ -99,13 +103,16 @@ def create_model_pose(
     # Assumes that if you are rendering depth you are also
     # inputting it from the model
     n_inputs = (n_channels + n_depth_channels) + (
-        (n_channels + n_normals_channels + n_rendered_depth_channels) * cfg.n_rendered_views
+        (n_channels + n_normals_channels + n_rendered_depth_channels)
+        * cfg.n_rendered_views
     )
     backbone_str = cfg.backbone_str
     render_size = (240, 320)
     if "vanilla_resnet34" == backbone_str:
         n_features = 512
-        backbone = models.__dict__["resnet34"](num_classes=n_features, n_input_channels=n_inputs)
+        backbone = models.__dict__["resnet34"](
+            num_classes=n_features, n_input_channels=n_inputs,
+        )
         backbone.n_features = n_features
     elif "resnet34" == backbone_str:
         backbone = WideResNet34(n_inputs=n_inputs)
@@ -115,7 +122,8 @@ def create_model_pose(
         width = int(backbone_str.split("resnet34_width=")[1])
         backbone = WideResNet34(n_inputs=n_inputs, width=width)
     else:
-        raise ValueError("Unknown backbone", backbone_str)
+        msg = "Unknown backbone"
+        raise ValueError(msg, backbone_str)
 
     logger.debug(f"Backbone: {backbone_str}")
     backbone.n_inputs = n_inputs

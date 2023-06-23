@@ -1,10 +1,10 @@
-import os
-import pandas as pd
-from collections import deque
 import json
-import typing as tp
+import os
 import pathlib as p
+import typing as tp
+from collections import deque
 from dataclasses import dataclass
+
 
 
 @dataclass
@@ -25,14 +25,14 @@ class ModelInfo:
 
 def read_models(shapenet_dir):
     # TODO: This probably has issues / is poorly implemented and very slow
-    taxonomy = json.load(open(shapenet_dir / "taxonomy.json", "r"))
+    taxonomy = json.load(open(shapenet_dir / "taxonomy.json"))
 
-    id_to_synset: tp.Dict[int, ShapeNetSynset] = dict()
+    id_to_synset: tp.Dict[int, ShapeNetSynset] = {}
 
     for synset in taxonomy:
         synset_id = synset["synsetId"]
         id_to_synset[synset_id] = ShapeNetSynset(
-            id=synset_id, name=synset["name"], children=synset["children"], parents=[]
+            id=synset_id, name=synset["name"], children=synset["children"], parents=[],
         )
 
     for synset in taxonomy:
@@ -60,12 +60,12 @@ def read_models(shapenet_dir):
         names = get_names(synset_id, id_to_synset)
         names = ",".join(names)
         models.append(
-            dict(
-                obj_id=n,
-                shapenet_synset_id=synset_id,
-                shapenet_source_id=source_id,
-                shapenet_name=names,
-            )
+            {
+                "obj_id": n,
+                "shapenet_synset_id": synset_id,
+                "shapenet_source_id": source_id,
+                "shapenet_name": names,
+            },
         )
     return models
 

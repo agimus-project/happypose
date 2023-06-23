@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,13 +14,11 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import io
 import json
-from concurrent.futures import ProcessPoolExecutor as Pool
 from contextlib import redirect_stdout
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 from pathlib import Path
 
 # Third Party
@@ -30,8 +27,10 @@ from tqdm import tqdm
 
 # MegaPose
 from happypose.pose_estimators.megapose.src.megapose.config import SHAPENET_DIR
+from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import (
+    App,
+)
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
-from happypose.pose_estimators.megapose.src.megapose.panda3d_renderer.panda3d_scene_renderer import App
 
 
 def measure_memory(gltf_path):
@@ -60,9 +59,9 @@ def measure_memory(gltf_path):
             idx = [n for n, w in enumerate(l_) if w == "minimum"][0]
             mems.append(float(l_[idx + 1]))
     tot_mem_kb = sum(mems)
-    stats = dict(
-        tot_mem_kb=tot_mem_kb,
-    )
+    stats = {
+        "tot_mem_kb": tot_mem_kb,
+    }
     (gltf_path.parent / "stats.json").write_text(json.dumps(stats))
     return
 
@@ -76,15 +75,15 @@ def measure_memory_(gltf_path):
 if __name__ == "__main__":
     panda3d_obj_dataset = make_object_dataset("shapenet.panda3d_bam")
     panda3d_map = {obj["label"]: obj for obj in panda3d_obj_dataset.objects}
-    panda3d_objects = set(list(panda3d_map.keys()))
+    panda3d_objects = set(panda3d_map.keys())
     pc_obj_dataset = make_object_dataset("shapenet.pointcloud")
     pc_map = {obj["label"]: obj for obj in pc_obj_dataset.objects}
-    pc_objects = set(list(pc_map.keys()))
+    pc_objects = set(pc_map.keys())
     vanilla_obj_dataset = make_object_dataset("shapenet.orig")
-    vanilla_objects = set([obj["label"] for obj in vanilla_obj_dataset.objects])
+    vanilla_objects = {obj["label"] for obj in vanilla_obj_dataset.objects}
     stats = []
-    for n, obj in enumerate(tqdm(vanilla_obj_dataset.objects)):
-        stats_ = dict()
+    for _n, obj in enumerate(tqdm(vanilla_obj_dataset.objects)):
+        stats_ = {}
         label = obj["label"]
         stats_["label"] = label
         stats_["has_pointcloud"] = label in pc_objects
@@ -92,7 +91,11 @@ if __name__ == "__main__":
         if stats_["has_panda3d"] and stats_["has_pointcloud"]:
             panda3d_obj_dir = Path(panda3d_map[label]["mesh_path"]).parent
             tot_mem_kb = sum(
-                [f.stat().st_size / 1024 for f in panda3d_obj_dir.iterdir() if f.is_file()]
+                [
+                    f.stat().st_size / 1024
+                    for f in panda3d_obj_dir.iterdir()
+                    if f.is_file()
+                ],
             )
         else:
             tot_mem_kb = np.nan

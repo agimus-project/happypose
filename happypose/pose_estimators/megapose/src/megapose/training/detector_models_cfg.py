@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +15,9 @@ limitations under the License.
 
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.models.mask_rcnn import DetectorMaskRCNN
+from happypose.pose_estimators.megapose.src.megapose.models.mask_rcnn import (
+    DetectorMaskRCNN,
+)
 from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -24,7 +25,9 @@ logger = get_logger(__name__)
 
 def check_update_config(cfg):
     obj_prefix = cfg.train_ds_names[0][0].split(".")[0]
-    cfg.label_to_category_id = {f"{obj_prefix}-{k}": v for k, v in cfg.label_to_category_id.items()}
+    cfg.label_to_category_id = {
+        f"{obj_prefix}-{k}": v for k, v in cfg.label_to_category_id.items()
+    }
     return cfg
 
 

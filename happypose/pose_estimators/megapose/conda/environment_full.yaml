@@ -31,7 +31,7 @@ dependencies:
       - selenium
       - omegaconf
       - simplejson
-      - line_profiler 
+      - line_profiler
       - opencv-python
       - torchnet
       - tqdm
@@ -39,24 +39,24 @@ dependencies:
       - transforms3d
       - panda3d
       - joblib
-      - xarray 
+      - xarray
       - pandas
       - matplotlib
       - bokeh
-      - plyfile 
-      - trimesh 
-      - ipdb 
+      - plyfile
+      - trimesh
+      - ipdb
       - panda3d-gltf
       - colorama
       - pyyaml
       - ipykernel
       - scipy
       - pypng
-      - h5py 
+      - h5py
       - seaborn
-      - kornia 
-      - pyarrow 
-      - dt_apriltags 
+      - kornia
+      - pyarrow
+      - dt_apriltags
       - open3d
       - structlog
       - imageio
@@ -64,6 +64,6 @@ dependencies:
       - pyyaml
       - psutil
       - webdataset
-      - opencv-contrib-python 
-      - roma 
+      - opencv-contrib-python
+      - roma
       - torchgeometry

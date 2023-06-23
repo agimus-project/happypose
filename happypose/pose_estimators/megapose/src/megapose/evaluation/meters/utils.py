@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,9 +14,7 @@ limitations under the License.
 """
 
 
-
 # Standard Library
-from collections import OrderedDict
 
 # Third Party
 import numpy as np
@@ -25,7 +22,7 @@ import pandas as pd
 
 
 def one_to_one_matching(
-    pred_infos, gt_infos, keys=("scene_id", "view_id"), allow_pred_missing=False
+    pred_infos, gt_infos, keys=("scene_id", "view_id"), allow_pred_missing=False,
 ):
     keys = list(keys)
     pred_infos["pred_id"] = np.arange(len(pred_infos))
@@ -36,30 +33,34 @@ def one_to_one_matching(
     print("matches_gb =", matches_gb)
     for v in matches_gb.values():
         print("v matched = ", v)
-    assert all([len(v) == 1 for v in matches_gb.values()])
+    assert all(len(v) == 1 for v in matches_gb.values())
     if not allow_pred_missing:
         assert len(matches) == len(gt_infos)
     return matches
 
 
-def add_inst_num(infos, group_keys=["scene_id", "view_id", "label"], key="pred_inst_num"):
-
+def add_inst_num(
+    infos, group_keys=["scene_id", "view_id", "label"], key="pred_inst_num",
+):
     inst_num = np.empty(len(infos), dtype=int)
-    for group_name, group_ids in infos.groupby(group_keys).groups.items():
+    for _group_name, group_ids in infos.groupby(group_keys).groups.items():
         inst_num[group_ids.values] = np.arange(len(group_ids))
     infos[key] = inst_num
     return infos
 
 
 def get_top_n_ids(
-    infos, group_keys=("scene_id", "view_id", "label"), top_key="score", n_top=-1, targets=None
+    infos,
+    group_keys=("scene_id", "view_id", "label"),
+    top_key="score",
+    n_top=-1,
+    targets=None,
 ):
-
     infos["id_before_top_n"] = np.arange(len(infos))
     group_keys = list(group_keys)
 
     if targets is not None:
-        targets_inst_count = dict()
+        targets_inst_count = {}
         for k, ids in targets.groupby(group_keys).groups.items():
             targets_inst_count[k] = targets.loc[ids[0], "inst_count"]
 
@@ -87,18 +88,17 @@ def get_top_n_ids(
 
 
 def add_valid_gt(
-    gt_infos, group_keys=("scene_id", "view_id", "label"), visib_gt_min=-1, targets=None
+    gt_infos, group_keys=("scene_id", "view_id", "label"), visib_gt_min=-1, targets=None,
 ):
-
     if visib_gt_min > 0:
         gt_infos["valid"] = gt_infos["visib_fract"] >= visib_gt_min
         if targets is not None:
             gt_infos["valid"] = np.logical_and(
-                gt_infos["valid"], np.isin(gt_infos["label"], targets["label"])
+                gt_infos["valid"], np.isin(gt_infos["label"], targets["label"]),
             )
     elif targets is not None:
         valid_ids = get_top_n_ids(
-            gt_infos, group_keys=group_keys, top_key="visib_fract", targets=targets
+            gt_infos, group_keys=group_keys, top_key="visib_fract", targets=targets,
         )
         gt_infos["valid"] = False
         gt_infos.loc[valid_ids, "valid"] = True
@@ -108,7 +108,7 @@ def add_valid_gt(
 
 
 def get_candidate_matches(
-    pred_infos, gt_infos, group_keys=["scene_id", "view_id", "label"], only_valids=True
+    pred_infos, gt_infos, group_keys=["scene_id", "view_id", "label"], only_valids=True,
 ):
     pred_infos["pred_id"] = np.arange(len(pred_infos))
     gt_infos["gt_id"] = np.arange(len(gt_infos))

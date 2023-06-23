@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -51,9 +50,11 @@ def group_by_keys(data, keys=base_plus_ext, lcase=True, suffixes=None, handler=N
         if current_sample is None or prefix != current_sample["__key__"]:
             if valid_sample(current_sample):
                 yield current_sample
-            current_sample = dict(__key__=prefix, __url__=filesample["__url__"])
+            current_sample = {"__key__": prefix, "__url__": filesample["__url__"]}
         if suffix in current_sample:
-            print(f"{fname}: duplicate file name in tar file {suffix} {current_sample.keys()}")
+            print(
+                f"{fname}: duplicate file name in tar file {suffix} {current_sample.keys()}",
+            )
             current_sample["__bad__"] = True
         if suffixes is None or suffix in suffixes:
             current_sample[suffix] = value
