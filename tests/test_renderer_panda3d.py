@@ -1,3 +1,4 @@
+"""Set of unit tests for Panda3D renderer."""
 import unittest
 from pathlib import Path
 
@@ -15,7 +16,10 @@ from happypose.toolbox.renderer.types import (
 
 
 class TestRendererPanda3D(unittest.TestCase):
+    """Unit tests for Panda3D renderer."""
+
     def test_simple_render(self):
+        """Render an example object and check that output image match expectation."""
         renderer = Panda3dSceneRenderer(
             asset_dataset=RigidObjectDataset(
                 objects=[
