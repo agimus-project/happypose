@@ -18,21 +18,9 @@ This installation procedure will be curated.
 ```
 git clone --recurse-submodules https://github.com/agimus-project/happypose.git
 cd happypose
-conda env create -f environment.yml
-conda activate happypose
-cd happypose/pose_estimators/cosypose
-python setup.py install
-cd ../../..
-pip install -e .
-```
-
-Installation of bop_toolkit :
-
-```
-conda activate happypose
-cd happypose/pose_estimators/megapose/deps/bop_toolkit_challenge/
-# Remove all versions enforcing on requirements.txt
-pip install -r requirements.txt -e .
+poetry install
+poetry shell
+pip install happypose/pose_estimators/cosypose
 ```
 
 # Testing the install
@@ -44,26 +32,26 @@ Create data dir /somewhere/convenient. The dataset to store are quite large.
 export MEGAPOSE_DATA_DIR=/somewhere/convenient
 cd $MEGAPOSE_DATA_DIR
 wget https://memmo-data.laas.fr/static/examples.tar.xz
-tar xf examples.tar.xz 
+tar xf examples.tar.xz
 ```
 
  ## 1. Download pre-trained pose estimation models
 
 ### Megapose
 Download pose estimation models to $MEGAPOSE_DATA_DIR/megapose-models:
-  
+
 ```
 python -m happypose.toolbox.utils.download --megapose_models
 ```
 
 ### Cosypose
-    
+
 ```sh
  #ycbv
   python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
   python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
   python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
-  
+
  #tless
   python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-tless-pbr--873074
   python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-tless-pbr--506801
@@ -99,7 +87,7 @@ download [barbecue sauce](https://drive.google.com/drive/folders/10BIvhnrKGbNr8E
 
 <details>
 <summary>Cosypose</summary>
-  
+
 All data used (datasets, models, results, ...) are stored in a directory `local_data` at the root of the repository. Create it with `mkdir local_data` or use a symlink if you want the data to be stored at a different place. We provide the utility `cosypose/scripts/download.py` for downloading required data and models. All of the files can also be [downloaded manually](https://drive.google.com/drive/folders/1JmOYbu1oqN81Dlj2lh6NCAMrC8pEdAtD?usp=sharing).
 
 ## BOP Datasets
@@ -145,15 +133,15 @@ Notes:
   ```sh
   python -m happypose.pose_estimators.cosypose.cosypose.scripts.make_ycbv_compat_models
   ```
-  
+
 ## Models for minimal version
-    
+
 ```sh
  #ycbv
   python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
   python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
   python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
-  
+
  #tless
   python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-tless-pbr--873074
   python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-tless-pbr--506801
@@ -169,11 +157,11 @@ The pre-trained models of the single-view pose estimator can be downloaded using
 # YCB-V Single-view refiner
 python -m happypose.toolbox.utils.download --cosypose_model=ycbv-refiner-finetune--251020
 
-# YCB-V Single-view refiner trained on synthetic data only 
-# Only download this if you are interested in retraining the above model 
+# YCB-V Single-view refiner trained on synthetic data only
+# Only download this if you are interested in retraining the above model
 python -m happypose.toolbox.utils.download --cosypose_model=ycbv-refiner-syntonly--596719
 
-# T-LESS coarse and refiner models 
+# T-LESS coarse and refiner models
 python -m happypose.toolbox.utils.download --cosypose_model=tless-coarse--10219
 python -m happypose.toolbox.utils.download --cosypose_model=tless-refiner--585928
 ```
@@ -203,13 +191,13 @@ Notes:
 - The Pix2pose detections were extracted using [pix2pose's](https://github.com/kirumang/Pix2Pose) code. We used the detection model from their paper, see [here](https://github.com/kirumang/Pix2Pose#download-pre-trained-weights). For the ViVo detections, their code was slightly modified. The code used to extract detections can be found [here](https://github.com/ylabbe/pix2pose_cosypose).
 
 </details>
-  
+
 <details>
 <summary>Megapose</summary>
 
  ## 1. Download pre-trained pose estimation models
 Download pose estimation models to $MEGAPOSE_DATA_DIR/megapose-models:
-  
+
 ```
 python -m happypose.toolbox.utils.download --megapose_models
 ```
@@ -232,7 +220,7 @@ Two installation steps are needed : [bop_toolkit](https://github.com/thodan/bop_
 cd /happypose/pose_estimators/megapose/deps/bop_toolkit_challenge
 # You need to remove all the versions from the requirements.txt file, then :
 pip install -r requirements.txt -e .
-``` 
+```
 
 Then, you need to modify the following lines in `bop_toolkit_lib/config.py`, replace :
 
@@ -254,9 +242,9 @@ results_path = r'/path/to/folder/with/results'
 eval_path = r'/path/to/eval/folder'
 ```
 
-with 
+with
 
-``` 
+```
 ######## Basic ########
 
 # Folder with the BOP datasets.
@@ -266,7 +254,7 @@ eval_path = str(os.environ['BOP_EVAL_PATH'])
 ```
 
 
-This part is deprecated and will be removed : Also, replace 
+This part is deprecated and will be removed : Also, replace
 ```
 # For offscreen C++ rendering: Path to the build folder of bop_renderer (github.com/thodan/bop_renderer).
 bop_renderer_path = r'/path/to/bop_renderer/build'
