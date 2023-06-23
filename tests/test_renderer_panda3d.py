@@ -51,21 +51,17 @@ class TestRendererPanda3D(unittest.TestCase):
                 color=(1.0, 1, 1, 1),
             ),
         ]
-        print('rendering start')
         renderings = renderer.render_scene(object_datas, camera_datas, light_datas)
         # import matplotlib.pyplot as plt
         # fig, ax = plt.subplots(1, 1, squeeze=True)  # type: plt.Figure, plt.Axes
         # ax.imshow(renderings[0].rgb)
         # plt.show()
-        print('rendering done')
 
         self.assertEqual(len(renderings), 1)
         rgb = renderings[0].rgb
 
         assert_equal(rgb[rgb.shape[0] // 2, rgb.shape[1] // 2], (255, 0, 0))
         assert_equal(rgb[0, 0], (0, 0, 0))
-        print('test done')
-
 
 
 if __name__ == "__main__":
