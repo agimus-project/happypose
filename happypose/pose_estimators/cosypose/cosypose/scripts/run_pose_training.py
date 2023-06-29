@@ -27,7 +27,7 @@ def make_cfg(args):
 
     # Data
     cfg.urdf_ds_name = 'ycbv'
-    cfg.object_ds_name = 'ycbv.bop-compat'
+    cfg.object_ds_name = 'ycbv'
     cfg.n_symmetries_batch = 64
 
     cfg.train_ds_names = [('synt.ycbv-1M', 1), ('ycbv.real.train', 3), ('ycbv.synthetic.train', 3)]
@@ -105,7 +105,7 @@ def make_cfg(args):
 
     elif 'ycbv-' in args.config:
         cfg.urdf_ds_name = 'ycbv'
-        cfg.object_ds_name = 'ycbv.bop-compat'
+        cfg.object_ds_name = 'ycbv'
         cfg.train_ds_names = [('synthetic.ycbv-1M.train', 1),
                               ('ycbv.train.synt', 1),
                               ('ycbv.train.real', 3)]

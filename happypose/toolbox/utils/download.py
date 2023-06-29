@@ -112,7 +112,7 @@ def main():
         download(f'cosypose/bop_datasets/ycbv/models_bop-compat_eval', BOP_DS_DIR / 'ycbv')
 
     if args.cosypose_models:
-        download(f'cosypose/experiments/{args.cosypose_model}', LOCAL_DATA_DIR / 'experiments')
+        download(f'cosypose/experiments/{args.cosypose_models}', LOCAL_DATA_DIR / 'experiments')
     
     if args.megapose_models:
         # rclone copyto inria_data:megapose-models/ megapose-models/

@@ -6,7 +6,7 @@ import yaml
 import cv2
 from io import BytesIO
 from .utils import make_detections_from_segmentation
-from .datasets_cfg import make_urdf_dataset
+from happypose.toolbox.datasets.datasets_cfg import make_urdf_dataset
 from pathlib import Path
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -19,13 +19,13 @@ class SyntheticSceneDataset:
 
         keys_path = ds_dir / (('train' if train else 'val') + '_keys.pkl')
         keys = pkl.loads(keys_path.read_bytes())
-        self.cfg = yaml.load((ds_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
+        self.cfg = yaml.load((ds_dir / 'config.yaml').read_text(), Loader=yaml.Loader)
         self.object_set = self.cfg.scene_kwargs['urdf_ds']
         self.keys = keys
 
         urdf_ds_name = self.cfg.scene_kwargs['urdf_ds']
         urdf_ds = make_urdf_dataset(urdf_ds_name)
-        self.all_labels = [obj['label'] for _, obj in urdf_ds.index.iterrows()]
+        self.all_labels = [obj.label for obj in urdf_ds]
         self.frame_index = pd.DataFrame(dict(scene_id=np.arange(len(keys)), view_id=np.arange(len(keys))))
 
     def __len__(self):
@@ -53,6 +53,8 @@ class SyntheticSceneDataset:
         mask = self._deserialize_im_cv2(cam['mask'], rgb=False)
         cam = {k: v for k, v in cam.items() if k not in {'rgb', 'mask'}}
         objects = dic['objects']
+        for object in objects:
+            object['name'] = '{}-{}'.format(self.cfg.scene_kwargs['urdf_ds'], object['name'])
         dets_gt = make_detections_from_segmentation(torch.as_tensor(mask).unsqueeze(0))[0]
         mask_uniqs = set(np.unique(mask[mask > 0]))
         for obj in objects:

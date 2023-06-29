@@ -3,7 +3,7 @@ import PIL
 import torch
 import random
 from PIL import ImageEnhance, ImageFilter
-from torchvision.datasets import ImageFolder
+from torchvision.datasets import VOCSegmentation
 import torch.nn.functional as F
 from copy import deepcopy
 
@@ -127,7 +127,8 @@ class BackgroundAugmentation:
 
 class VOCBackgroundAugmentation(BackgroundAugmentation):
     def __init__(self, voc_root, p=0.3):
-        image_dataset = ImageFolder(voc_root)
+        print("voc_root =", voc_root)
+        image_dataset = VOCSegmentation(root=voc_root, year='2012', image_set='trainval', download=False)
         super().__init__(image_dataset=image_dataset, p=p)
 
     def get_bg_image(self, idx):

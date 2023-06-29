@@ -15,12 +15,20 @@ from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 from torch.utils.data import DataLoader, ConcatDataset
 from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader import MultiEpochDataLoader
 
-from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
+from happypose.toolbox.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
 from happypose.pose_estimators.cosypose.cosypose.datasets.pose_dataset import PoseDataset
 from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler, ListSampler
 
 # Evaluation
-from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
+from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
+    PoseEstimator,
+)
+from happypose.pose_estimators.cosypose.cosypose.evaluation.prediction_runner import (
+    PredictionRunner,
+)
+from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation_runner import (
+    EvaluationRunner,
+)
 from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.multiview_predictions import MultiviewPredictionRunner
 from happypose.pose_estimators.cosypose.cosypose.evaluation.eval_runner.pose_eval import PoseEvaluation
 from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import run_pred_eval
@@ -29,11 +37,12 @@ from happypose.pose_estimators.cosypose.cosypose.scripts.run_cosypose_eval impor
     load_pix2pose_results, load_posecnn_results, get_pose_meters)
 
 from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
-from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 
 from .pose_forward_loss import h_pose
 from .pose_models_cfg import create_model_pose, check_update_config
 
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_world_size, get_rank, sync_model, init_distributed_mode, reduce_dict
@@ -100,11 +109,13 @@ def make_eval_bundle(args, model_training):
     else:
         raise ValueError
 
-    predictor = CoarseRefinePosePredictor(coarse_model=coarse_model,
-                                          refiner_model=refiner_model)
+    pose_estimator = PoseEstimator(
+        refiner_model=refiner_model,
+        coarse_model=coarse_model,
+    )
 
     base_pred_kwargs = dict(
-        pose_predictor=predictor,
+        pose_predictor=pose_estimator,
         mv_predictor=None,
         skip_mv=True,
     )
@@ -112,11 +123,23 @@ def make_eval_bundle(args, model_training):
         assert ds_name in {'ycbv.test.keyframes', 'tless.primesense.test'}
         scene_ds = make_scene_dataset(ds_name, n_frames=args.n_test_frames)
         logger.info(f'TEST: Loaded {ds_name} with {len(scene_ds)} images.')
-        scene_ds_pred = MultiViewWrapper(scene_ds, n_views=1)
+        #scene_ds_pred = MultiViewWrapper(scene_ds, n_views=1)
 
         # Predictions
-        pred_runner = MultiviewPredictionRunner(scene_ds_pred, batch_size=1,
-                                                n_workers=args.n_dataloader_workers, cache_data=False)
+        #pred_runner = MultiviewPredictionRunner(scene_ds_pred, batch_size=1,
+        #                                        n_workers=args.n_dataloader_workers, cache_data=False)
+        
+        inference =  {'detection_type': 'gt', 'coarse_estimation_type': 'S03_grid', 'SO3_grid_size': 576,
+                      'n_refiner_iterations': 5, 'n_pose_hypotheses': 5, 'run_depth_refiner': False,
+                       'depth_refiner': None, 'bsz_objects': 16, 'bsz_images': 288}
+
+        pred_runner = PredictionRunner(
+            scene_ds=scene_ds,
+            inference_cfg=inference,
+            batch_size=1,
+            n_workers=args.n_dataloader_workers,
+        )
+
         detections = None
         pred_kwargs = dict()
 
@@ -160,13 +183,20 @@ def make_eval_bundle(args, model_training):
             })
 
         # Evaluation
-        meters = get_pose_meters(scene_ds)
+        meters = get_pose_meters(scene_ds, ds_name)
         meters = {k.split('_')[0]: v for k, v in meters.items()}
         mv_group_ids = list(iter(pred_runner.sampler))
-        scene_ds_ids = np.concatenate(scene_ds_pred.frame_index.loc[mv_group_ids, 'scene_ds_ids'].values)
-        sampler = ListSampler(scene_ds_ids)
-        eval_runner = PoseEvaluation(scene_ds, meters, batch_size=1, cache_data=True,
-                                     n_workers=args.n_dataloader_workers, sampler=sampler)
+        print(scene_ds.frame_index)
+        #scene_ds_ids = np.concatenate(scene_ds.frame_index.loc[mv_group_ids, 'scene_ds_ids'].values)
+        #sampler = ListSampler(scene_ds_ids)
+        eval_runner = EvaluationRunner(
+            scene_ds,
+            meters,
+            n_workers=args.n_dataloader_workers,
+            cache_data=False,
+            batch_size=1,
+            sampler=pred_runner.sampler,
+        )
 
         save_dir = Path(args.save_dir) / 'eval' / ds_name
         save_dir.mkdir(exist_ok=True, parents=True)
@@ -249,8 +279,8 @@ def train_pose(args):
     ds_iter_val = MultiEpochDataLoader(ds_iter_val)
 
     # Make model
-    renderer = BulletBatchRenderer(object_set=args.urdf_ds_name, n_workers=args.n_rendering_workers)
     object_ds = make_object_dataset(args.object_ds_name)
+    renderer = Panda3dBatchRenderer(object_ds, n_workers=args.n_rendering_workers, preload_cache=False)
     mesh_db = MeshDataBase.from_object_ds(object_ds).batched(n_sym=args.n_symmetries_batch).cuda().float()
 
     model = create_model_pose(cfg=args, renderer=renderer, mesh_db=mesh_db).cuda()

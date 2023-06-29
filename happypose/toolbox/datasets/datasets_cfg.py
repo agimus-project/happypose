@@ -126,9 +126,31 @@ def make_scene_dataset(
     elif ds_name == "ycbv.train.real":
         ds_dir = BOP_DS_DIR / "ycbv"
         ds = BOPDataset(ds_dir, split="train_real", label_format="ycbv-{label}")
+    elif ds_name == 'ycbv.train.synt':
+        ds_dir = BOP_DS_DIR / 'ycbv'
+        ds = BOPDataset(ds_dir, split='train_synt', label_format="ycbv-{label}")
+    elif ds_name == "ycbv.real.train":
+        ds_dir = BOP_DS_DIR / "ycbv"
+        ds = BOPDataset(ds_dir, split="train_real", label_format="ycbv-{label}")
+    elif ds_name == 'ycbv.synt.train':
+        ds_dir = BOP_DS_DIR / 'ycbv'
+        ds = BOPDataset(ds_dir, split="train_synt", label_format="ycbv-{label}")
     elif ds_name == "ycbv.test":
         ds_dir = BOP_DS_DIR / "ycbv"
         ds = BOPDataset(ds_dir, split="test", label_format="ycbv-{label}")
+    elif ds_name == 'ycbv.test.keyframes':
+        ds_dir = BOP_DS_DIR / 'ycbv'
+        ds = BOPDataset(ds_dir, split='test', label_format="ycbv-{label}")
+        keyframes_path = ds_dir / 'keyframe.txt'
+        ls = keyframes_path.read_text().split('\n')[:-1]
+        frame_index = ds.frame_index
+        ids = []
+        for l_n in ls:
+            scene_id, view_id = l_n.split('/')
+            scene_id, view_id = int(scene_id), int(view_id)
+            mask = (frame_index['scene_id'] == scene_id) & (frame_index['view_id'] == view_id)
+            ids.append(np.where(mask)[0].item())
+        ds.frame_index = frame_index.iloc[ids].reset_index(drop=True)
     elif ds_name == "lmo.test":
         ds_dir = BOP_DS_DIR / "lmo"
         ds = BOPDataset(ds_dir, split="test", label_format="lm-{label}")
@@ -186,6 +208,16 @@ def make_scene_dataset(
     elif ds_name.startswith("webdataset."):
         ds_name = ds_name[len("webdataset.") :]
         ds = WebSceneDataset(WDS_DS_DIR / ds_name)
+
+    # Synthetic datasets
+    elif 'synthetic.' in ds_name:
+        from happypose.pose_estimators.cosypose.cosypose.datasets.synthetic_dataset import SyntheticSceneDataset
+        assert '.train' in ds_name or '.val' in ds_name
+        is_train = 'train' in ds_name.split('.')[-1]
+        ds_name = ds_name.split('.')[1]
+        print("ds_name synthetic =", ds_name)
+        ds = SyntheticSceneDataset(ds_dir=LOCAL_DATA_DIR / 'synt_datasets' / ds_name, train=is_train)
+
 
     else:
         raise ValueError(ds_name)

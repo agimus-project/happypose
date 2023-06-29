@@ -36,8 +36,8 @@ from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config impo
 
 # Note we are actually using the bop_toolkit_lib that is directly conda installed
 # inside the docker image. This is just to access the scripts.
-POSE_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19.py"
-DETECTION_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop_coco.py"
+POSE_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_pose.py"
+DETECTION_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop22_coco.py"
 DUMMY_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_dummy.py"
 
 
@@ -172,7 +172,6 @@ def _run_bop_evaluation(filename, eval_dir, eval_detection=False, dummy=False):
                 "--renderer_type",
                 "cpp",
             ]
-
     subprocess.call(cmd, env=myenv, cwd=BOP_TOOLKIT_DIR.as_posix())
 
 
