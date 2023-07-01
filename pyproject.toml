@@ -47,7 +47,7 @@ ruff = "^0.0.270"
 optional = true
 
 [tool.poetry.group.docs.dependencies]
-myst-parser = "^1.0.0"
+myst-parser = "^2.0.0"
 sphinx = "^6.2.1"
 
 [tool.poetry.urls]
