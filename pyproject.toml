@@ -28,7 +28,7 @@ panda3d = {optional = true, version = "=1.10.13"}
 pin = "^2.6.17"
 pybullet = {optional = true, version = "^3.2.5"}
 python = "^3.8"
-torch = "^2.0.0"
+torch = "^2.0.1"
 
 [tool.poetry.extras]
 render = ["panda3d", "pybullet"]
