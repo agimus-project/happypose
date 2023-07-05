@@ -201,7 +201,7 @@ python -m happypose.toolbox.utils.download --megapose_models
 <details>
 <summary>Click for details...</summary>
 
-Two installation steps are needed : one for bop_toolkit_challenge, one for bop_renderer.
+Two installation steps are needed : [bop_toolkit](https://github.com/thodan/bop_toolkit) and [bop_renderer](https://github.com/thodan/bop_renderer/). These repository are stored in `happypose/pose_estimators/megapose/deps/`.
 
 ## 1. Bop_toolkit_challenge
 
