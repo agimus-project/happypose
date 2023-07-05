@@ -74,7 +74,6 @@ if __name__ == '__main__':
     cfg.classifier_alpha = 1
     cfg.mask_alpha = 1
     cfg.box_reg_alpha = 1
-
     if 'tless' in args.config:
         cfg.input_resize = (540, 720)
     elif 'ycbv' in args.config:

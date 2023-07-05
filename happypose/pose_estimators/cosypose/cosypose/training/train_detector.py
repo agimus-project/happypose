@@ -14,9 +14,9 @@ from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 
 from torch.utils.data import DataLoader, ConcatDataset
 from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader import MultiEpochDataLoader
-from torchvision.models.utils import load_state_dict_from_url
+from torch.hub import load_state_dict_from_url
 
-from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset
+from happypose.toolbox.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
 from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import DetectionDataset
 from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler
 
