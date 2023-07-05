@@ -211,7 +211,7 @@ cd /happypose/pose_estimators/megapose/deps/bop_toolkit_challenge
 pip install -r requirements.txt -e .
 ``` 
 
-Then, you need to modify the following lines in ̀bop_toolkit_lib/config.py`, replace :
+Then, you need to modify the following lines in `bop_toolkit_lib/config.py`, replace :
 
 
 ```
