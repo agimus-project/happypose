@@ -211,7 +211,7 @@ cd /happypose/pose_estimators/megapose/deps/bop_toolkit_challenge
 pip install -r requirements.txt -e .
 ``` 
 
-Then, you need to modify the following lines in ̀ bop_toolkit_lib/config.py`, replace :
+Then, you need to modify the following lines in ̀bop_toolkit_lib/config.py`, replace :
 
 
 ```
@@ -246,7 +246,8 @@ bop_renderer_path = r'/path/to/bop_renderer/build'
 
 with
 ```
-/path/to/happypose/happypose/pose_estimators/megapose/deps/bop_renderer/build
+# For offscreen C++ rendering: Path to the build folder of bop_renderer (github.com/thodan/bop_renderer).
+bop_renderer_path = /path/to/happypose/happypose/pose_estimators/megapose/deps/bop_renderer/build
 ```
 
 ## 2. Bop_renderer
