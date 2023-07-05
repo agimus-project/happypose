@@ -1,15 +1,12 @@
-[submodule "cosypose/deps/bop_toolkit_cosypose"]
-	path = cosypose/deps/bop_toolkit_cosypose
+[submodule "happypose/pose_estimators/megapose/deps/bop_toolkit"]
+	path = happypose/pose_estimators/megapose/deps/bop_toolkit
+	url = https://github.com/thodan/bop_toolkit
+[submodule "happypose/pose_estimators/cosypose/deps/bop_toolkit_challenge"]
+	path = happypose/pose_estimators/cosypose/deps/bop_toolkit_challenge
+	url = https://github.com/ylabbe/bop_toolkit_challenge20.git
+[submodule "happypose/pose_estimators/cosypose/deps/bop_toolkit_cosypose"]
+	path = happypose/pose_estimators/cosypose/deps/bop_toolkit_cosypose
 	url = https://github.com/ylabbe/bop_toolkit_cosypose.git
-[submodule "cosypose/deps/bop_toolkit_challenge"]
-	path = cosypose/deps/bop_toolkit_challenge
-	url = https://github.com/thodan/bop_toolkit
-[submodule "cosypose/deps/bullet3"]
-	path = cosypose/deps/bullet3
-	url = https://github.com/ylabbe/bullet3.git
-[submodule "cosypose/deps/job-runner"]
-	path = cosypose/deps/job-runner
+[submodule "happypose/pose_estimators/cosypose/deps/job-runner"]
+	path = happypose/pose_estimators/cosypose/deps/job-runner
 	url = https://github.com/ylabbe/job-runner.git
-[submodule "megapose6d/deps/bop_toolkit_challenge"]
-	path = megapose6d/deps/bop_toolkit_challenge
-	url = https://github.com/thodan/bop_toolkit
