@@ -13,3 +13,6 @@
 [submodule "megapose6d/deps/bop_toolkit_challenge"]
 	path = megapose6d/deps/bop_toolkit_challenge
 	url = https://github.com/thodan/bop_toolkit
+[submodule "happypose/pose_estimators/megapose/deps/bop_toolkit"]
+	path = happypose/pose_estimators/megapose/deps/bop_toolkit
+	url = https://github.com/thodan/bop_toolkit
