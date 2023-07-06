@@ -135,10 +135,14 @@ def train_detector(args):
         datasets = []
         all_labels = set()
         for (ds_name, n_repeat) in dataset_names:
+            labels = []
             assert 'test' not in ds_name
             ds = make_scene_dataset(ds_name)
             logger.info(f'Loaded {ds_name} with {len(ds)} images.')
-            all_labels = all_labels.union(set(ds.all_labels))
+            for i in range(len(ds)):
+                for obj in ds[i].object_datas:
+                    labels.append(obj.label)
+            all_labels = all_labels.union(set(labels))
             for _ in range(n_repeat):
                 datasets.append(ds)
         return ConcatDataset(datasets), all_labels

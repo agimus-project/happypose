@@ -207,5 +207,4 @@ if __name__ == "__main__":
 
     if cfg.debug:
         cfg = update_cfg_debug(cfg)
-    print(cfg)
     run_full_eval(cfg)
