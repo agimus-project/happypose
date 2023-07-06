@@ -201,9 +201,11 @@ python -m happypose.toolbox.utils.download --megapose_models
 <details>
 <summary>Click for details...</summary>
 
+## Install
+
 Two installation steps are needed : [bop_toolkit](https://github.com/thodan/bop_toolkit) and [bop_renderer](https://github.com/thodan/bop_renderer/). These repository are stored in `happypose/pose_estimators/megapose/deps/`.
 
-## 1. Bop_toolkit_challenge
+### 1. Bop_toolkit_challenge
 
 ```
 cd /happypose/pose_estimators/megapose/deps/bop_toolkit_challenge
@@ -250,7 +252,7 @@ with
 bop_renderer_path = /path/to/happypose/happypose/pose_estimators/megapose/deps/bop_renderer/build
 ```
 
-## 2. Bop_renderer
+### 2. Bop_renderer
 
 This installation is tested only on Ubuntu/Debian system. Please refer to [bop_renderer](https://github.com/thodan/bop_renderer/) if needed.
 
@@ -260,4 +262,12 @@ sudo apt install libosmesa6-dev
 conda install -c conda-forge mesalib
 cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 cmake --build build
+```
+
+## Usage
+
+This needs to be adapted (SO3_grid not used for CosyPose)
+
+```
+python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_full_cosypose_eval_new detector_run_id=bop_pbr coarse_run_id=coarse-bop-ycbv-pbr--724183 refiner_run_id=refiner-bop-ycbv-pbr--604090 ds_names=["ycbv.bop19"] result_id=ycbv-debug detection_coarse_types=[["detector","S03_grid"]]
 ```
