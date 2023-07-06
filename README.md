@@ -291,9 +291,6 @@ python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_pose_training 
 
 ```
 python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_detector_training --config bop-ycbv-synt+real
-``
-
-</details>
-
+```
 
 </details>
