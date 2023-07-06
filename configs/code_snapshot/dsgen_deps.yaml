@@ -5,4 +5,3 @@ python_packages_dir:
   - ${oc.env:PROJECTS_DIR}/happypose
   - ${oc.env:PROJECTS_DIR}/blenderproc
   - ${oc.env:PROJECTS_DIR}/bop_toolkit_lib
-

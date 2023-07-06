@@ -7,7 +7,7 @@ defaults:
     - yann
     - single_gpu
     - jz
-  - /job_env: 
+  - /job_env:
     - happypose
     - lda
   - _self_
