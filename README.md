@@ -275,8 +275,9 @@ python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_full_cosypose_
 </details>
 
 # Training Cosypose
-<summary>Click for details...</summary>
+
 <details>
+<summary>Click for details...</summary>
 
 ## Training Pose Estimator
 
