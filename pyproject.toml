@@ -54,6 +54,8 @@ trimesh = "^3.22.1"
 webdataset = "^0.2.48"
 wget = "^3.2"
 selenium = "^4.10.0"
+ipython = "^8.12.0"
+pybind11 = "^2.10.4"
 
 [tool.poetry.group.dev]
 optional = true
@@ -61,9 +63,7 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
 coverage = {extras = ["toml"], version = "^7.2.5"}
-ipython = "^8.12.0"
 pre-commit = "^3.2.1"
-pybind11 = "^2.10.4"
 ruff = "^0.0.260"
 
 [tool.poetry.group.docs]
