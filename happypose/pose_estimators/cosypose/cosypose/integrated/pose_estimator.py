@@ -277,8 +277,10 @@ class PoseEstimator(PoseEstimationModule):
 
             images_ = observation.images[batch_im_ids_]
             K_ = observation.K[batch_im_ids_]
-
-            timer_ = CudaTimer(enabled=cuda_timer)
+            if torch.cuda.is_available():
+                timer_ = CudaTimer(enabled=cuda_timer)
+            else: 
+                timer_ = SimpleTimer()
             timer_.start()
             outputs_ = self.coarse_model(
                 images=images_,
@@ -385,8 +387,10 @@ class PoseEstimator(PoseEstimationModule):
 
             images_ = observation.images[batch_im_ids_]
             K_ = observation.K[batch_im_ids_]
-
-            timer_ = CudaTimer(enabled=cuda_timer)
+            if torch.cuda.is_available():
+                timer_ = CudaTimer(enabled=cuda_timer)
+            else: 
+                timer_ = SimpleTimer()
             timer_.start()
             outputs_ = self.refiner_model(
                 images=images_,
