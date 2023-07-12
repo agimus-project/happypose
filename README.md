@@ -30,8 +30,7 @@ Temporary :
 
 ```
 conda activate happypose
-git clone https://github.com/ylabbe/bop_toolkit/ -b dataset-tools
-cd bop_toolkit
+cd happypose/pose_estimators/megapose/deps/bop_toolkit_challenge/
 # Remove all versions enforcing on requirements.txt
 pip install -r requirements.txt -e .
 ```
