@@ -26,7 +26,7 @@ cd ../../..
 pip install -e .
 ```
 
-Temporary :
+Installation of bop_toolkit :
 
 ```
 conda activate happypose
