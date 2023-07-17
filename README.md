@@ -79,6 +79,8 @@ python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_
 
 ### CosyPose
 
+You need to download the ycbv dataset to run this example. Please see the download section.
+
 ```
 python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example crackers --run-inference
 ```
