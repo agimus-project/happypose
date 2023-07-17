@@ -47,19 +47,39 @@ wget https://memmo-data.laas.fr/static/examples.tar.xz
 tar xf examples.tar.xz 
 ```
 
- ## 1. Download pre-trained MegaPose pose estimation models
+ ## 1. Download pre-trained pose estimation models
+
+### Megapose
 Download pose estimation models to $MEGAPOSE_DATA_DIR/megapose-models:
   
 ```
 python -m happypose.toolbox.utils.download --megapose_models
 ```
 
- ## 2. Run MegaPose example
+### Cosypose
+    
+```sh
+ #ycbv
+  python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
+  python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
+  python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
+  
+ #tless
+  python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-tless-pbr--873074
+  python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-tless-pbr--506801
+  python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-tless-pbr--233420
+```
+ ## 2. Run examples
+
+### Megapose
 
 ```
 python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs
+```
 
-# CosyPose needs the datasets
+### CosyPose
+
+```
 python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example crackers --run-inference
 ```
 
