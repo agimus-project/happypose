@@ -187,7 +187,10 @@ def download(download_path, local_path, flags=[]):
     download_path = Path(download_path)
     if download_path.name != local_path.name:
         local_path = local_path / download_path.name
-    rclone_path = RCLONE_ROOT + str(download_path) + "/"
+    if '.' in str(download_path):
+        rclone_path = RCLONE_ROOT + str(download_path)
+    else:
+        rclone_path = RCLONE_ROOT + str(download_path) + "/"
     local_path = str(local_path)
     logger.info(f"Copying {rclone_path} to {local_path}")
     run_rclone("copyto", [rclone_path, local_path], flags=flags + ["-P"])

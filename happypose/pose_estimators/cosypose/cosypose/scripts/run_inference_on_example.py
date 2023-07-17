@@ -111,7 +111,7 @@ def rendering(predictions, example_dir):
     camera_data.TWC = Transform(np.eye(4))
     renderer = Panda3dSceneRenderer(object_dataset)
     # Data necessary for image rendering
-    object_datas = [ObjectData(label="cheetos", TWO=Transform(predictions.poses[0].numpy()))]
+    object_datas = [ObjectData(label="crackers", TWO=Transform(predictions.poses[0].numpy()))]
     camera_data, object_datas = convert_scene_observation_to_panda3d(camera_data, object_datas)
     light_datas = [
         Panda3dLightData(
