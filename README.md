@@ -136,7 +136,7 @@ Notes:
   python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-tless-pbr--873074
   python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-tless-pbr--506801
   python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-tless-pbr--233420
-``
+```
 
 ## Pre-trained models for single-view estimator
 
