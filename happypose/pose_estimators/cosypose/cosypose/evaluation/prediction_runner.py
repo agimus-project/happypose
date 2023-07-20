@@ -111,7 +111,6 @@ class PredictionRunner:
             run_detector = False
 
         t = time.time()
-        print("obs_tensor =", obs_tensor.channel_dim)
         preds, extra_data = pose_estimator.run_inference_pipeline(
             obs_tensor,
             detections=detections,

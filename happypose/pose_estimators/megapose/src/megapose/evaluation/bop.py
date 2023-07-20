@@ -170,7 +170,7 @@ def _run_bop_evaluation(filename, eval_dir, eval_detection=False, dummy=False):
                 "--result_filenames",
                 filename,
                 "--renderer_type",
-                "cpp",
+                "vispy",
             ]
     subprocess.call(cmd, env=myenv, cwd=BOP_TOOLKIT_DIR.as_posix())
 
