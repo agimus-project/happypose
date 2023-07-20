@@ -240,6 +240,7 @@ Then, you need to modify the following lines in `bop_toolkit_lib/config.py`, rep
 ```
 ######## Basic ########
 
+
 # Folder with the BOP datasets.
 if 'BOP_PATH' in os.environ:
   datasets_path = os.environ['BOP_PATH']
@@ -248,6 +249,9 @@ else:
 
 # Folder with pose results to be evaluated.
 results_path = r'/path/to/folder/with/results'
+
+# Folder for the calculated pose errors and performance scores.
+eval_path = r'/path/to/eval/folder'
 ```
 
 with 
@@ -261,7 +265,8 @@ results_path = str(os.environ['BOP_RESULTS_PATH'])
 eval_path = str(os.environ['BOP_EVAL_PATH'])
 ```
 
-Also, replace 
+
+This part is deprecated and will be removed : Also, replace 
 ```
 # For offscreen C++ rendering: Path to the build folder of bop_renderer (github.com/thodan/bop_renderer).
 bop_renderer_path = r'/path/to/bop_renderer/build'
