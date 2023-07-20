@@ -275,6 +275,10 @@ bop_renderer_path = /path/to/happypose/happypose/pose_estimators/megapose/deps/b
 
 ### 2. Bop_renderer
 
+<details>
+<summary>This part is deprecated and will be removed</summary>
+
+
 This installation is tested only on Ubuntu/Debian system. Please refer to [bop_renderer](https://github.com/thodan/bop_renderer/) if needed.
 
 ```
@@ -284,6 +288,7 @@ conda install -c conda-forge mesalib
 cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
+</details>
 
 ## Usage
 
