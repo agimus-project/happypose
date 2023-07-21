@@ -40,6 +40,10 @@ from happypose.pose_estimators.megapose.src.megapose.inference.types import (
     ObservationTensor,
     PoseEstimatesType,
 )
+from happypose.pose_estimators.megapose.src.megapose.config import (
+    BOP_DS_DIR
+)
+
 from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer
 from happypose.toolbox.datasets.samplers import DistributedSceneSampler
 from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation, ObjectData
@@ -184,9 +188,13 @@ class PredictionRunner:
 
         predictions_list = defaultdict(list)
 
+        ######
+        # This section opens the detections stored in "baseline.json"
+        # format it and store it in a dataframe that will be accessed later
+        ######
         # Temporary solution
         if self.inference_cfg.detection_type == "sam":
-            data_path = Path("/home/emaitre/local_data/bop23/baseline/ycbv/baseline.json")
+            data_path = BOP_DS_DIR / "bop23/baseline/ycbv/baseline.json"
             object_data = json.loads(data_path.read_text())
             for object in object_data:
                 object['bbox'] = [float(i) for i in object['bbox']]
@@ -200,6 +208,10 @@ class PredictionRunner:
             depth = data["depth"]
             K = data["cameras"].K
             
+            ######
+            # Filter the dataframe according to scene id and view id
+            # Transform the data in ObjectData and then Detections
+            ######
             # Temporary solution
             if self.inference_cfg.detection_type == "sam":
                 list_object_data = []
