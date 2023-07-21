@@ -16,7 +16,7 @@ Toolbox and trackers for object pose-estimation. Based on the work [CosyPose](ht
 This installation procedure will be curated.
 
 ```
-git clone --recurse-submodules https://github.com/agimus-project/happypose.git
+git clone --branch dev --recurse-submodules https://github.com/agimus-project/happypose.git
 cd happypose
 conda env create -f environment.yml
 conda activate happypose
