@@ -19,6 +19,8 @@ limitations under the License.
 import time
 from collections import defaultdict
 from typing import Dict, Optional
+from pathlib import Path
+
 
 # Third Party
 import numpy as np
@@ -40,11 +42,19 @@ from happypose.pose_estimators.megapose.src.megapose.inference.types import (
 )
 from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer
 from happypose.toolbox.datasets.samplers import DistributedSceneSampler
-from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation
+from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation, ObjectData
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, get_world_size
 from happypose.toolbox.utils.logging import get_logger
 
+
+# Temporary
+from happypose.toolbox.inference.utils import make_detections_from_object_data
+import pandas as pd
+import json
+
 logger = get_logger(__name__)
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 class PredictionRunner:
@@ -81,6 +91,7 @@ class PredictionRunner:
         pose_estimator: PoseEstimator,
         obs_tensor: ObservationTensor,
         gt_detections: DetectionsType,
+        sam_detections: DetectionsType,
         initial_estimates: Optional[PoseEstimatesType] = None,
     ) -> Dict[str, PoseEstimatesType]:
         """Runs inference pipeline, extracts the results.
@@ -95,10 +106,15 @@ class PredictionRunner:
 
         if self.inference_cfg.detection_type == "gt":
             detections = gt_detections
+            print("gt detections =", gt_detections.bboxes)
             run_detector = False
         elif self.inference_cfg.detection_type == "detector":
             detections = None
             run_detector = True
+        elif self.inference_cfg.detection_type == "sam":
+            print("sam_detections =", sam_detections.bboxes)
+            detections = sam_detections
+            run_detector = False
         else:
             raise ValueError(f"Unknown detection type {self.inference_cfg.detection_type}")
 
@@ -167,14 +183,37 @@ class PredictionRunner:
         """
 
         predictions_list = defaultdict(list)
-        for n, data in enumerate(tqdm(self.dataloader)):
 
+        # Temporary solution
+        if self.inference_cfg.detection_type == "sam":
+            data_path = Path("/home/emaitre/local_data/bop23/baseline/ycbv/baseline.json")
+            object_data = json.loads(data_path.read_text())
+            for object in object_data:
+                object['bbox'] = [float(i) for i in object['bbox']]
+                object['bbox_modal'] = object['bbox']
+                object['label'] = "ycbv-obj_{}".format(str(object['category_id']).zfill(6))
+            object_data = pd.DataFrame.from_records(object_data)
+
+        for n, data in enumerate(tqdm(self.dataloader)):
             # data is a dict
             rgb = data["rgb"]
             depth = data["depth"]
             K = data["cameras"].K
+            
+            # Temporary solution
+            if self.inference_cfg.detection_type == "sam":
+                list_object_data = []
+                scene_id = data['im_infos'][0]['scene_id']
+                view_id = data['im_infos'][0]['view_id']
+                print("scene and view :", scene_id, view_id)
+                list_object = object_data.loc[(object_data['scene_id'] == scene_id) & (object_data['image_id'] == view_id)].to_dict('records')
+                for object in list_object:
+                    list_object_data.append(ObjectData.from_json(object))
+                sam_detections = make_detections_from_object_data(list_object_data).to(device)
+                print("sam_detections =", sam_detections)
+            else:
+                sam_detections = None
             gt_detections = data["gt_detections"].cuda()
-
             initial_data = None
             if data["initial_data"]:
                 initial_data = data["initial_data"].cuda()
@@ -186,14 +225,14 @@ class PredictionRunner:
             if n == 0:
                 with torch.no_grad():
                     self.run_inference_pipeline(
-                        pose_estimator, obs_tensor, gt_detections, initial_estimates=initial_data
+                        pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
                     )
 
             cuda_timer = CudaTimer()
             cuda_timer.start()
             with torch.no_grad():
                 all_preds = self.run_inference_pipeline(
-                    pose_estimator, obs_tensor, gt_detections, initial_estimates=initial_data
+                    pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
                 )
             cuda_timer.end()
             duration = cuda_timer.elapsed()

@@ -127,6 +127,8 @@ def run_eval(
         detector_model = happypose.toolbox.inference.utils.load_detector(cfg.detector_run_id)
     elif cfg.inference.detection_type == "gt":
         detector_model = None
+    elif cfg.inference.detection_type == "sam":
+        detector_model = None
     else:
         raise ValueError(f"Unknown detection_type={cfg.inference.detection_type}")
 

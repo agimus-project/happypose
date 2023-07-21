@@ -715,6 +715,8 @@ class PosePredictor(nn.Module):
         images_crop, renders = self.normalize_images(images_crop, renders, tCR)
         x = torch.cat((images_crop, renders), dim=1)
 
+
+        print("x =", x)
         out = self.forward_coarse_tensor(x, cuda_timer=cuda_timer)
 
         out["render_time"] = render_time
