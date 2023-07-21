@@ -268,7 +268,9 @@ eval_path = str(os.environ['BOP_EVAL_PATH'])
 
 <details>
 <summary>This part is deprecated and will be removed </summary>
+ 
 Also, replace 
+
 ```
 # For offscreen C++ rendering: Path to the build folder of bop_renderer (github.com/thodan/bop_renderer).
 bop_renderer_path = r'/path/to/bop_renderer/build'
