@@ -101,6 +101,8 @@ def create_eval_cfg(
             cfg.detector_run_id = PBR_DETECTORS[ds_name_root]
     elif detection_type == "gt":
         pass
+    elif detection_type == "sam":
+        pass
     else:
         raise ValueError(f"Unknown detector type {cfg.detector_type}")
 
