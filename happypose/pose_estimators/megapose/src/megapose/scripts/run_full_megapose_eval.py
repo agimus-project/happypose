@@ -46,7 +46,9 @@ from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config impo
     FullEvalConfig,
     HardwareConfig,
 )
-from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation import generate_save_key, run_eval
+
+from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation import get_save_dir, generate_save_key, run_eval
+from happypose.pose_estimators.megapose.src.megapose.evaluation.bop import run_evaluation
 from happypose.toolbox.utils.distributed import get_rank, get_world_size, init_distributed_mode
 from happypose.toolbox.utils.logging import get_logger, set_logging_level
 
@@ -141,7 +143,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
             # would have produced so that we can run the bop_eval
             else:  # Otherwise hack the output so we can run the BOP eval
                 if get_rank() == 0:
-                    results_dir = megapose.evaluation.evaluation.get_save_dir(eval_cfg)
+                    results_dir = get_save_dir(eval_cfg)
                     pred_keys = ["refiner/final"]
                     if eval_cfg.inference.run_depth_refiner:
                         pred_keys.append("depth_refiner")
@@ -181,7 +183,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
     if get_rank() == 0:
         if cfg.run_bop_eval:
             for bop_eval_cfg in bop_eval_cfgs:
-                megapose.evaluation.bop.run_evaluation(bop_eval_cfg)
+                run_evaluation(bop_eval_cfg)
 
     logger.info(f"Process {get_rank()} reached end of script")
 
@@ -201,6 +203,8 @@ if __name__ == "__main__":
 
     cli_cfg = OmegaConf.from_cli()
     logger.info(f"CLI config: \n {OmegaConf.to_yaml(cli_cfg)}")
+
+    print("full eval config =", FullEvalConfig.ds_names)
 
     cfg: FullEvalConfig = OmegaConf.structured(FullEvalConfig)
     cfg.hardware = HardwareConfig(
