@@ -53,7 +53,7 @@ else:
 
 PYTHON_BIN_PATH = Path(os.environ["CONDA_PREFIX"]) / "bin/python"
 
-BOP_PANDA3D_DS_DIR = LOCAL_DATA_DIR / "bop_models_panda3d"
+BOP_PANDA3D_DS_DIR = LOCAL_DATA_DIR / "bop_datasets"
 
 GSO_DIR = LOCAL_DATA_DIR / "google_scanned_objects"
 GSO_ORIG_DIR = GSO_DIR / "models_orig"
