@@ -146,12 +146,13 @@ def _run_bop_evaluation(filename, eval_dir, eval_detection=False, dummy=False):
     myenv["BOP_DATASETS_PATH"] = str(LOCAL_DATA_DIR / "bop_datasets")
     myenv["BOP_RESULTS_PATH"] = str(eval_dir)
     myenv["BOP_EVAL_PATH"] = str(eval_dir)
+    renderer_type = 'vispy'  # other options: 'cpp', 'python'
     if dummy:
         cmd = [
             "python",
             str(DUMMY_EVAL_SCRIPT_PATH),
             "--renderer_type",
-            "cpp",
+            renderer_type,
             "--result_filenames",
             filename,
         ]
@@ -170,7 +171,7 @@ def _run_bop_evaluation(filename, eval_dir, eval_detection=False, dummy=False):
                 "--result_filenames",
                 filename,
                 "--renderer_type",
-                "cpp",
+                renderer_type,
             ]
     subprocess.call(cmd, env=myenv, cwd=BOP_TOOLKIT_DIR.as_posix())
 
