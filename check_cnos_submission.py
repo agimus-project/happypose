@@ -8,15 +8,29 @@ import matplotlib.pyplot as plt
 MEGAPOSE_DATA_DIR = Path(os.environ.get('MEGAPOSE_DATA_DIR'))
 CNOS_SUBMISSION_DIR = Path(os.environ.get('CNOS_SUBMISSION_DIR'))
 
+# CNOS_SUBMISSION_FILES = {
+#     "ycbv": 'baseline-sam-dinov2-blenderproc4bop_ycbv-test_a491e9fe-1137-4585-9c80-0a2056a3eb9c.json',
+#     "lmo": 'baseline-sam-dinov2-blenderproc4bop_lmo-test_2f321533-59ae-4541-b65e-6b4e4fb9d391.json',
+#     "tless": 'baseline-sam-dinov2-blenderproc4bop_tless-test_3305b238-3d93-4954-81ba-3ff3786265d9.json',
+#     "tudl": 'baseline-sam-dinov2-blenderproc4bop_tudl-test_c6cd05c1-89a1-4fe5-88b9-c1b57ef15694.json',
+#     "icbin": 'baseline-sam-dinov2-blenderproc4bop_icbin-test_f58b6868-7e70-4ab2-9332-65220849f8c1.json',
+#     # "itodd": 'baseline-sam-dinov2-blenderproc4bop_itodd-test_82442e08-1e79-4f54-8e88-7ad6b986dd96.json',
+#     # "hb": 'baseline-sam-dinov2-blenderproc4bop_hb-test_f32286f9-05f5-4123-862f-18f00e67e685.json',
+# }
+
 CNOS_SUBMISSION_FILES = {
-    "ycbv": 'baseline-sam-dinov2-blenderproc4bop_ycbv-test_a491e9fe-1137-4585-9c80-0a2056a3eb9c.json',
-    "lmo": 'baseline-sam-dinov2-blenderproc4bop_lmo-test_2f321533-59ae-4541-b65e-6b4e4fb9d391.json',
-    "tless": 'baseline-sam-dinov2-blenderproc4bop_tless-test_3305b238-3d93-4954-81ba-3ff3786265d9.json',
-    "tudl": 'baseline-sam-dinov2-blenderproc4bop_tudl-test_c6cd05c1-89a1-4fe5-88b9-c1b57ef15694.json',
-    "icbin": 'baseline-sam-dinov2-blenderproc4bop_icbin-test_f58b6868-7e70-4ab2-9332-65220849f8c1.json',
-    # "itodd": 'baseline-sam-dinov2-blenderproc4bop_itodd-test_82442e08-1e79-4f54-8e88-7ad6b986dd96.json',
-    # "hb": 'baseline-sam-dinov2-blenderproc4bop_hb-test_f32286f9-05f5-4123-862f-18f00e67e685.json',
+    "ycbv": 'sam_pbr_ycbv.json', 
+    "lmo": 'sam_pbr_lmo.json', 
+    "tless": 'sam_pbr_tless.json', 
+    "tudl": 'sam_pbr_tudl.json', 
+    "icbin": 'sam_pbr_icbin.json', 
+    "itodd": 'sam_pbr_itodd.json', 
+    "hb": 'sam_pbr_hb.json', 
 }
+
+
+
+
 
 TEST_DIRS = {
     'ycbv': 'test',
@@ -71,7 +85,6 @@ for ds_name in CNOS_SUBMISSION_FILES:
     test_targets = json.loads(test_targets_path.read_text())
     df_test_targets = pd.DataFrame.from_records(test_targets)
 
-
     scene_image_ids = {}
     scene_nb_obj = {}
     for sid_str in all_scene_ids:
@@ -118,7 +131,8 @@ for ds_name in CNOS_SUBMISSION_FILES:
 
     # which submissions are missing??
     d_missing = {}
-    for sid in scene_image_ids:
+    # for sid in scene_image_ids:
+    for sid in scene_image_ids_cnos:
         img_ids_set_bop = set(scene_image_ids[sid])
         img_ids_set_cnos = set(scene_image_ids_cnos[sid])
         missing_ids = img_ids_set_bop - img_ids_set_cnos
@@ -133,13 +147,14 @@ for ds_name in CNOS_SUBMISSION_FILES:
     ## How many detections per image?
     ######################
 
-    cat_ids_per_sid_iid = df_all_dets.groupby(['scene_id', 'image_id']).category_id.nunique()
-    all_obj_nb = cat_ids_per_sid_iid.to_list()
+    nb_object_per_img_cnos = df_all_dets.groupby(['scene_id', 'image_id']).category_id.count().to_list()
+    nb_object_per_img_test = df_test_targets.groupby(['scene_id', 'im_id']).inst_count.sum().to_list()
 
     ##################
     plt.figure()
     plt.title(f'Number of detections per image {ds_name}')
-    plt.boxplot(all_obj_nb)
+    data = [nb_object_per_img_cnos, nb_object_per_img_test]
+    plt.boxplot(data, vert=False, labels=['cnos', 'gt'])
     fig_name = f'cnos_nb_img_{ds_name}.png'
     print('Saving', fig_name)
     plt.savefig(fig_name)
