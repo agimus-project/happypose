@@ -681,7 +681,6 @@ class PosePredictor(nn.Module):
 
         """
 
-        print('FW coarse')
         ### DEBUG
         has_nans = lambda tensor: bool(tensor.isnan().any())
 

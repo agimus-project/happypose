@@ -419,12 +419,6 @@ class PoseEstimator(PoseEstimationModule):
 
             del points_
             
-            print("images = ", images_)
-            print("K_ =", K_)
-            print("labels_ =", labels_)
-            print("TCO_input =", TCO_init_)
-            print("cuda_timer", cuda_timer)
-            print("return_debug_data =", return_debug_data)
             out_ = coarse_model.forward_coarse(
                 images=images_,
                 K=K_,
@@ -588,7 +582,7 @@ class PoseEstimator(PoseEstimationModule):
                     detections, **detection_filter_kwargs
                 )
 
-            # Run the coarse estimator using gt_detections
+            # Run the coarse estimator using detections
             print("detections coarse =", detections)
             data_TCO_coarse, coarse_extra_data = self.forward_coarse_model(
                 observation=observation,
