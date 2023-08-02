@@ -29,9 +29,6 @@ CNOS_SUBMISSION_FILES = {
 }
 
 
-
-
-
 TEST_DIRS = {
     'ycbv': 'test',
     'lmo': 'test',
