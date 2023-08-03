@@ -425,7 +425,7 @@ def get_obj_ds_info(ds_name: str) -> Tuple[Optional[str], str]:
         urdf_ds_name = "lm"
         obj_ds_name = "lm.panda3d"
     elif ds_name == "tless.bop19":
-        obj_ds_name = "tless.panda3d"
+        obj_ds_name = "tless.cad.panda3d"
     elif ds_name == "hope.bop19":
         obj_ds_name = "hope.panda3d"
     elif ds_name == "hb.bop19":
