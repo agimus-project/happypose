@@ -4,13 +4,15 @@ import pandas as pd
 from pathlib import Path
 import matplotlib.pyplot as plt
 
+TMP_DIR = Path('tmp_cnos/')
+TMP_DIR.mkdir(exist_ok=True)
 
 MEGAPOSE_DATA_DIR = Path(os.environ.get('MEGAPOSE_DATA_DIR'))
 CNOS_SUBMISSION_DIR = Path(os.environ.get('CNOS_SUBMISSION_DIR'))
 
 # CNOS_SUBMISSION_FILES = {
 #     "ycbv": 'baseline-sam-dinov2-blenderproc4bop_ycbv-test_a491e9fe-1137-4585-9c80-0a2056a3eb9c.json',
-#     "lmo": 'baseline-sam-dinov2-blenderproc4bop_lmo-test_2f321533-59ae-4541-b65e-6b4e4fb9d391.json',
+#     "lmo": 'baseline-sam-ditnov2-blenderproc4bop_lmo-test_2f321533-59ae-4541-b65e-6b4e4fb9d391.json',
 #     "tless": 'baseline-sam-dinov2-blenderproc4bop_tless-test_3305b238-3d93-4954-81ba-3ff3786265d9.json',
 #     "tudl": 'baseline-sam-dinov2-blenderproc4bop_tudl-test_c6cd05c1-89a1-4fe5-88b9-c1b57ef15694.json',
 #     "icbin": 'baseline-sam-dinov2-blenderproc4bop_icbin-test_f58b6868-7e70-4ab2-9332-65220849f8c1.json',
@@ -18,14 +20,15 @@ CNOS_SUBMISSION_DIR = Path(os.environ.get('CNOS_SUBMISSION_DIR'))
 #     # "hb": 'baseline-sam-dinov2-blenderproc4bop_hb-test_f32286f9-05f5-4123-862f-18f00e67e685.json',
 # }
 
+
 CNOS_SUBMISSION_FILES = {
-    "ycbv": 'sam_pbr_ycbv.json', 
-    "lmo": 'sam_pbr_lmo.json', 
-    "tless": 'sam_pbr_tless.json', 
-    "tudl": 'sam_pbr_tudl.json', 
-    "icbin": 'sam_pbr_icbin.json', 
-    "itodd": 'sam_pbr_itodd.json', 
-    "hb": 'sam_pbr_hb.json', 
+    "ycbv": 'fastSAM_pbr_ycbv.json', 
+    "lmo": 'fastSAM_pbr_lmo.json', 
+    "tless": 'fastSAM_pbr_tless.json', 
+    "tudl": 'fastSAM_pbr_tudl.json', 
+    "icbin": 'fastSAM_pbr_icbin.json', 
+    "itodd": 'fastSAM_pbr_itodd.json', 
+    "hb": 'fastSAM_pbr_hb.json', 
 }
 
 
@@ -152,9 +155,9 @@ for ds_name in CNOS_SUBMISSION_FILES:
     plt.title(f'Number of detections per image {ds_name}')
     data = [nb_object_per_img_cnos, nb_object_per_img_test]
     plt.boxplot(data, vert=False, labels=['cnos', 'gt'])
-    fig_name = f'cnos_nb_img_{ds_name}.png'
-    print('Saving', fig_name)
-    plt.savefig(fig_name)
+    fig_path = TMP_DIR / f'cnos_nb_img_{ds_name}.png'
+    print('Saving', fig_path)
+    plt.savefig(fig_path.as_posix())
 
     ##################
     scene_ids = list(scene_image_ids_cnos.keys())
@@ -169,9 +172,9 @@ for ds_name in CNOS_SUBMISSION_FILES:
     plt.xlabel('Scene id')
     plt.ylabel('Image ids')
     # plt.legend()
-    fig_name = f'cnos_dets_{ds_name}.png'
-    print('Saving', fig_name)
-    plt.savefig(fig_name)
+    fig_path = TMP_DIR / f'cnos_dets_{ds_name}.png'
+    print('Saving', fig_path)
+    plt.savefig(fig_path.as_posix())
 
 if SHOW:
     plt.show()
