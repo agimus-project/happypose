@@ -16,7 +16,7 @@ Toolbox and trackers for object pose-estimation. Based on the work [CosyPose](ht
 This installation procedure will be curated.
 
 ```
-git clone --recurse-submodules https://github.com/agimus-project/happypose.git
+git clone --branch dev --recurse-submodules https://github.com/agimus-project/happypose.git
 cd happypose
 conda env create -f environment.yml
 conda activate happypose
@@ -240,6 +240,7 @@ Then, you need to modify the following lines in `bop_toolkit_lib/config.py`, rep
 ```
 ######## Basic ########
 
+
 # Folder with the BOP datasets.
 if 'BOP_PATH' in os.environ:
   datasets_path = os.environ['BOP_PATH']
@@ -248,6 +249,9 @@ else:
 
 # Folder with pose results to be evaluated.
 results_path = r'/path/to/folder/with/results'
+
+# Folder for the calculated pose errors and performance scores.
+eval_path = r'/path/to/eval/folder'
 ```
 
 with 
@@ -261,7 +265,12 @@ results_path = str(os.environ['BOP_RESULTS_PATH'])
 eval_path = str(os.environ['BOP_EVAL_PATH'])
 ```
 
+
+<details>
+<summary>This part is deprecated and will be removed </summary>
+ 
 Also, replace 
+
 ```
 # For offscreen C++ rendering: Path to the build folder of bop_renderer (github.com/thodan/bop_renderer).
 bop_renderer_path = r'/path/to/bop_renderer/build'
@@ -272,8 +281,13 @@ with
 # For offscreen C++ rendering: Path to the build folder of bop_renderer (github.com/thodan/bop_renderer).
 bop_renderer_path = /path/to/happypose/happypose/pose_estimators/megapose/deps/bop_renderer/build
 ```
+</details>
 
 ### 2. Bop_renderer
+
+<details>
+<summary>This part is deprecated and will be removed</summary>
+
 
 This installation is tested only on Ubuntu/Debian system. Please refer to [bop_renderer](https://github.com/thodan/bop_renderer/) if needed.
 
@@ -284,6 +298,7 @@ conda install -c conda-forge mesalib
 cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
+</details>
 
 ## Usage
 
