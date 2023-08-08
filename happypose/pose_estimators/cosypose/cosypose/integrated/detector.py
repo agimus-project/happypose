@@ -10,6 +10,7 @@ import happypose.pose_estimators.megapose.src.megapose
 import happypose.toolbox.utils.tensor_collection as tc
 from happypose.toolbox.inference.detector import DetectorModule
 from happypose.toolbox.inference.types import DetectionsType, ObservationTensor
+from happypose.toolbox.inference.utils import filter_detections, add_instance_id
 
 
 class Detector(DetectorModule):
@@ -102,14 +103,14 @@ class Detector(DetectorModule):
 
         # Keep only the top-detection for each class label
         if one_instance_per_class:
-            outputs = happypose.toolbox.inference.utils.filter_detections(
+            outputs = filter_detections(
                 outputs, one_instance_per_class=True
             )
 
         # Add instance_id column to dataframe
         # Each detection is now associated with an `instance_id` that
         # identifies multiple instances of the same object
-        outputs = happypose.toolbox.inference.utils.add_instance_id(outputs)
+        outputs = add_instance_id(outputs)
         return outputs
     
     def __call__(self, *args, **kwargs):
