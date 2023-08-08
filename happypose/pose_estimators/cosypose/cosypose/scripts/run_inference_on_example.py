@@ -106,12 +106,16 @@ def make_object_dataset(example_dir: Path) -> RigidObjectDataset:
 
 def rendering(predictions, example_dir):
     object_dataset = make_object_dataset(example_dir)
+
+    obj_label = object_dataset.list_objects[0].label
+    pred = predictions.poses[0].numpy()
+
     # rendering
-    rgb, _, camera_data = load_observation(example_dir, load_depth=False)
+    camera_data = CameraData.from_json((example_dir / "camera_data.json").read_text())
     camera_data.TWC = Transform(np.eye(4))
     renderer = Panda3dSceneRenderer(object_dataset)
     # Data necessary for image rendering
-    object_datas = [ObjectData(label="crackers", TWO=Transform(predictions.poses[0].numpy()))]
+    object_datas = [ObjectData(label=obj_label, TWO=Transform(pred))]
     camera_data, object_datas = convert_scene_observation_to_panda3d(camera_data, object_datas)
     light_datas = [
         Panda3dLightData(
@@ -171,6 +175,7 @@ def run_inference(
     dataset_to_use: str,
 ) -> None:
     observation = load_observation_tensor(example_dir)
+    # TODO: remove this wrapper from code base
     CosyPose = CosyPoseWrapper(dataset_name=dataset_to_use, n_workers=8)
     predictions = CosyPose.inference(observation)
     renderings = rendering(predictions, example_dir)
@@ -181,7 +186,7 @@ if __name__ == "__main__":
     set_logging_level("info")
     parser = argparse.ArgumentParser()
     parser.add_argument("example_name")
-    parser.add_argument("--model", type=str, default="megapose-1.0-RGB-multi-hypothesis")
+    # parser.add_argument("--model", type=str, default="megapose-1.0-RGB-multi-hypothesis")
     parser.add_argument("--dataset", type=str, default="ycbv")
     #parser.add_argument("--vis-detections", action="store_true")
     parser.add_argument("--run-inference", action="store_true", default=True)
@@ -197,7 +202,7 @@ if __name__ == "__main__":
     #    make_detections_visualization(example_dir)
 
     if args.run_inference:
-        run_inference(example_dir, args.model, dataset_to_use)
+        run_inference(example_dir, None, dataset_to_use)
 
     #if args.vis_outputs:
     #    make_output_visualization(example_dir)
