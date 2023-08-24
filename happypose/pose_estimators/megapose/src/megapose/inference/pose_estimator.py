@@ -583,7 +583,6 @@ class PoseEstimator(PoseEstimationModule):
                 )
 
             # Run the coarse estimator using detections
-            print("detections coarse =", detections)
             data_TCO_coarse, coarse_extra_data = self.forward_coarse_model(
                 observation=observation,
                 detections=detections,
