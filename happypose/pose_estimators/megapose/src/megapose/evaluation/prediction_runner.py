@@ -66,17 +66,6 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 ##################################
 import os
 
-# OFFICIAL BOP initial CNOS submission, missing some detections
-# CNOS_SUBMISSION_FILES = {
-#     "ycbv": 'baseline-sam-dinov2-blenderproc4bop_ycbv-test_a491e9fe-1137-4585-9c80-0a2056a3eb9c.json',
-#     "lmo": 'baseline-sam-dinov2-blenderproc4bop_lmo-test_2f321533-59ae-4541-b65e-6b4e4fb9d391.json',
-#     "tless": 'baseline-sam-dinov2-blenderproc4bop_tless-test_3305b238-3d93-4954-81ba-3ff3786265d9.json',
-#     "tudl": 'baseline-sam-dinov2-blenderproc4bop_tudl-test_c6cd05c1-89a1-4fe5-88b9-c1b57ef15694.json',
-#     "icbin": 'baseline-sam-dinov2-blenderproc4bop_icbin-test_f58b6868-7e70-4ab2-9332-65220849f8c1.json',
-#     "itodd": 'baseline-sam-dinov2-blenderproc4bop_itodd-test_82442e08-1e79-4f54-8e88-7ad6b986dd96.json',
-#     "hb": 'baseline-sam-dinov2-blenderproc4bop_hb-test_f32286f9-05f5-4123-862f-18f00e67e685.json',
-# }
-
 # New CNOS detection from Nguyen drive
 # CNOS_SUBMISSION_FILES = {
 #     "ycbv": 'sam_pbr_ycbv.json', 
@@ -88,15 +77,27 @@ import os
 #     "hb": 'sam_pbr_hb.json', 
 # }
 
+# CNOS_SUBMISSION_FILES = {
+#     "ycbv": 'fastSAM_pbr_ycbv.json', 
+#     "lmo": 'fastSAM_pbr_lmo.json', 
+#     "tless": 'fastSAM_pbr_tless.json', 
+#     "tudl": 'fastSAM_pbr_tudl.json', 
+#     "icbin": 'fastSAM_pbr_icbin.json', 
+#     "itodd": 'fastSAM_pbr_itodd.json', 
+#     "hb": 'fastSAM_pbr_hb.json', 
+# }
+
+# New official default detections -> fastSAM method, same as nguyen's drive
 CNOS_SUBMISSION_FILES = {
-    "ycbv": 'fastSAM_pbr_ycbv.json', 
-    "lmo": 'fastSAM_pbr_lmo.json', 
-    "tless": 'fastSAM_pbr_tless.json', 
-    "tudl": 'fastSAM_pbr_tudl.json', 
-    "icbin": 'fastSAM_pbr_icbin.json', 
-    "itodd": 'fastSAM_pbr_itodd.json', 
-    "hb": 'fastSAM_pbr_hb.json', 
+    "ycbv": 'cnos-fastsam_ycbv-test_f4f2127c-6f59-447c-95b3-28e1e591f1a1.json', 
+    "lmo": 'cnos-fastsam_lmo-test_3cb298ea-e2eb-4713-ae9e-5a7134c5da0f.json', 
+    "tless": 'cnos-fastsam_tless-test_8ca61cb0-4472-4f11-bce7-1362a12d396f.json', 
+    "tudl": 'cnos-fastsam_tudl-test_c48a2a95-1b41-4a51-9920-a667cb3d7149.json', 
+    "icbin": 'cnos-fastsam_icbin-test_f21a9faf-7ef2-4325-885f-f4b6460f4432.json', 
+    "itodd": 'cnos-fastsam_itodd-test_df32d45b-301c-4fc9-8769-797904dd9325.json', 
+    "hb": 'cnos-fastsam_hb-test_db836947-020a-45bd-8ec5-c95560b68011.json', 
 }
+
 
 
 CNOS_SUBMISSION_DIR = os.environ.get('CNOS_SUBMISSION_DIR')
@@ -160,22 +161,21 @@ class PredictionRunner:
         print("gt detections =\n", gt_detections)
         print("sam detections =\n", sam_detections)
 
-
-
+        # TODO: this check could be done outside of run_inference_pipeline
+        # and then only check if detections are None
         if self.inference_cfg.detection_type == "gt":
             detections = gt_detections
-            print("gt detections =", gt_detections.bboxes)
             run_detector = False
-        elif self.inference_cfg.detection_type == "detector":
-            detections = None
-            run_detector = True
         elif self.inference_cfg.detection_type == "sam":
             # print("sam_detections =", sam_detections.bboxes)
             detections = sam_detections
             run_detector = False
+        elif self.inference_cfg.detection_type == "detector":
+            detections = None
+            run_detector = True
+
         else:
             raise ValueError(f"Unknown detection type {self.inference_cfg.detection_type}")
-
 
         coarse_estimates = None
         if self.inference_cfg.coarse_estimation_type == "external":
@@ -219,14 +219,9 @@ class PredictionRunner:
         if self.inference_cfg.run_depth_refiner:
             all_preds[f"depth_refiner"] = extra_data["depth_refiner"]["preds"]
 
-        # __import__("IPython").embed()
-
-        # Remove any mask tensors
         for k, v in all_preds.items():
-            # PROBLEM: for itodd and hb gt_detections is empty
-            v.infos["scene_id"] = np.unique(gt_detections.infos["scene_id"]).item()
-            v.infos["view_id"] = np.unique(gt_detections.infos["view_id"]).item()
             if "mask" in v.tensors:
+                breakpoint()
                 v.delete_tensor("mask")
 
         return all_preds
@@ -283,9 +278,7 @@ class PredictionRunner:
 
             df_all_dets = pd.DataFrame.from_records(dets_lst)
 
-
-            targets = pd.read_json(self.scene_ds.ds_dir / "test_targets_bop19.json")
-
+            df_targets = pd.read_json(self.scene_ds.ds_dir / "test_targets_bop19.json")
 
         for n, data in enumerate(tqdm(self.dataloader)):
             print('\n\n\n\n################')
@@ -297,10 +290,10 @@ class PredictionRunner:
             depth = data["depth"]
             K = data["cameras"].K
 
-
             # ############ RUN ONLY BEGINNING OF DATASET
-            # if n > 0:
-            # # if n < 150:
+            # # if n > 0:
+            # if n < 298:
+            # # if n != 582:
             #     print('################')
             #     print('Prediction runner SKIP')
             #     print('################')
@@ -321,30 +314,39 @@ class PredictionRunner:
                 scene_id, view_id = im_info['scene_id'], im_info['view_id']
 
                 df_dets_scene_img = df_all_dets.loc[(df_all_dets['scene_id'] == scene_id) & (df_all_dets['image_id'] == view_id)]
+                df_targets_scene_img = df_targets[(df_targets['scene_id'] == scene_id) & (df_targets['im_id'] == view_id)]
+
+                dt_det += df_dets_scene_img.time.iloc[0]
 
                 #################
-                # Retain detections with best cnos scores 
-                # based on expected number of objects in the scene (from groundtruth)
-                # 
-                # This should not change the resulting evaluation of Megapose as it
-                # is based on the evaluation of the K "best" predictions but should
-                # reduce dramatically the computational burden (some images have ~ 100 detection propositions)  
+                # Filter detections based on 2 criteria
+                # - 1) Localization 6D task: we can assume that we know which object category and how many instances 
+                # are present in the image
+                obj_ids = df_targets_scene_img.obj_id.to_list()
+                df_dets_scene_img_obj_filt = df_dets_scene_img[df_dets_scene_img['category_id'].isin(obj_ids)]
+                # In case none of the detections category ids match the ones present in the scene,
+                # keep only one detection to avoid downstream error
+                if len(df_dets_scene_img_obj_filt) > 0:
+                    df_dets_scene_img = df_dets_scene_img_obj_filt
+                else:
+                    df_dets_scene_img = df_dets_scene_img[:1]
 
-                # sum all instance counts across objects for a particular image to get groundtruth detection number
-                nb_gt_dets = targets[(targets['scene_id'] == scene_id) & (targets['im_id'] == view_id)].inst_count.sum()
+                # TODO: retain only corresponding inst_count number for each detection category_id  
+
+                # - 2) Retain detections with best cnos scores (kind of redundant with finalized 1) )
+                # based on expected number of objects in the scene (from groundtruth)
+                nb_gt_dets = df_targets_scene_img.inst_count.sum()
                 
                 # TODO: put that as a parameter somewhere?
-                MARGIN = 0  
+                MARGIN = 1  # if 0, some images will have no detections
                 K_MULT = 1
                 nb_det = K_MULT*nb_gt_dets + MARGIN
                 df_dets_scene_img = df_dets_scene_img.sort_values('score', ascending=False).head(nb_det)
                 #################
 
-                dt_det += df_dets_scene_img.time.iloc[0]
-
                 lst_dets_scene_img = df_dets_scene_img.to_dict('records')
 
-                if (len(lst_dets_scene_img)) == 0:
+                if len(lst_dets_scene_img) == 0:
                     raise(ValueError('lst_dets_scene_img empty!: ', f'scene_id: {scene_id}, image_id/view_id: {view_id}'))                
 
                 # Do not forget the scores that are not present in object data
@@ -384,8 +386,11 @@ class PredictionRunner:
 
             total_duration = duration + dt_det
 
+            # Add metadata to the predictions for later evaluation
             for k, v in all_preds.items():
                 v.infos['time'] = total_duration
+                v.infos['scene_id'] = scene_id
+                v.infos['view_id'] = view_id
                 predictions_list[k].append(v)
 
         # Concatenate the lists of PandasTensorCollections
