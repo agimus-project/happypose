@@ -345,8 +345,6 @@ class SceneObservation:
             if obj_data.TWO_init:
                 TWO_init.append(torch.tensor(obj_data.TWO_init.matrix).float())
 
-        TWO = torch.stack(TWO)
-        bboxes = torch.stack(bboxes)
         infos = pd.DataFrame(infos)
         if len(masks) > 0:
             masks = torch.stack(masks)
@@ -357,8 +355,17 @@ class SceneObservation:
 
         TCW = torch.linalg.inv(TWC)  # [4,4]
 
-        # [B,4,4]
-        TCO = TCW.unsqueeze(0) @ TWO
+        # Deals with case where no object label is provided (hb,itodd)
+        if len(obs.object_datas) > 0:
+            TWO = torch.stack(TWO)
+            # [B,4,4]
+            TCO = TCW.unsqueeze(0) @ TWO
+            bboxes = torch.stack(bboxes)
+        else:
+            TWO = torch.Tensor()
+            TCO = torch.Tensor()
+            bboxes = torch.Tensor()
+
         TCO_init = None
         if len(TWO_init):
             TCO_init = torch.linalg.inv(TWC_init).unsqueeze(0) @ torch.stack(TWO_init)
