@@ -25,7 +25,7 @@ from omegaconf import OmegaConf
 
 # MegaPose
 import happypose
-import happypose.pose_estimators.megapose.src.megapose as megapose
+# import happypose.pose_estimators.megapose.src.megapose as megapose
 import happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation_runner
 import happypose.toolbox.datasets.datasets_cfg
 import happypose.toolbox.inference.utils
@@ -55,7 +55,6 @@ from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator im
 )
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
-# from happypose.pose_estimators.megapose.src.megapose.inference.teaserpp_refiner import TeaserppRefiner
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir
 from happypose.toolbox.utils.logging import get_logger
@@ -165,6 +164,7 @@ def run_eval(
         if cfg.inference.depth_refiner == "icp":
             depth_refiner: Optional[DepthRefiner] = ICPRefiner(mesh_db, renderer)
         elif cfg.inference.depth_refiner == "teaserpp":
+            from happypose.pose_estimators.megapose.src.megapose.inference.teaserpp_refiner import TeaserppRefiner
             depth_refiner = TeaserppRefiner(mesh_db, renderer)
         else:
             depth_refiner = None
