@@ -136,6 +136,8 @@ class PoseEstimator(PoseEstimationModule):
         bsz_images: Optional[int] = None,
         bsz_objects: Optional[int] = None,
         coarse_estimates: Optional[PoseEstimatesType] = None,
+        detection_th: float = 0.7,
+        mask_th: float = 0.8,
     ) -> Tuple[PoseEstimatesType, dict]:
         
         timing_str = ""
@@ -154,7 +156,7 @@ class PoseEstimator(PoseEstimationModule):
             )
             if detections is None and run_detector:
                 start_time = time.time()
-                detections = self.forward_detection_model(observation)
+                detections = self.forward_detection_model(observation, detection_th, mask_th)
                 if torch.cuda.is_available():
                     detections = detections.cuda()
                 else:
@@ -203,6 +205,8 @@ class PoseEstimator(PoseEstimationModule):
     def forward_detection_model(
         self,
         observation: ObservationTensor,
+        detection_th: float = 0.7,
+        mask_th: float = 0.8,
         *args: Any,
         **kwargs: Any,
     ) -> DetectionsType:
@@ -212,8 +216,9 @@ class PoseEstimator(PoseEstimationModule):
         detections = self.detector_model.get_detections(
             observation=observation,
             one_instance_per_class=False,
-            detection_th=0.7, output_masks=False,
-            mask_th=0.8
+            detection_th=detection_th, 
+            output_masks=False,
+            mask_th=mask_th
         )
         return detections
 
