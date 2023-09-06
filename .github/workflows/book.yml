@@ -11,12 +11,12 @@ jobs:
     container:
       image: nim65s/cargo-binstall:mdbook
     steps:
+      - name: Install deploy tools
+        run: apt update && apt install -qy git rsync
       - name: Checkout 🛎️
         uses: actions/checkout@v3
       - name: Build
         run: mdbook build
-      - name: Install deploy tools
-        run: apt update && apt install -qy git rsync
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
