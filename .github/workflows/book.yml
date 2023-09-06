@@ -1,0 +1,23 @@
+name: Build and Deploy book
+
+on: [push]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: nim65s/cargo-binstall:mdbook
+    steps:
+      - name: Install deploy tools
+        run: apt update && apt install -qy git rsync
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+      - name: Build
+        run: mdbook build
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: book
