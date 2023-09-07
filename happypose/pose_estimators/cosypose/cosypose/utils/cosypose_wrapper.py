@@ -182,7 +182,7 @@ class CosyPoseWrapper:
             raise ValueError(f"Not prepared for {dataset_name} dataset")
         detector = CosyPoseWrapper.load_detector(detector_run_id, dataset_name)
         coarse_model, refiner_model , mesh_db = CosyPoseWrapper.load_pose_models(
-            coarse_run_id=coarse_run_id, refiner_run_id=refiner_run_id, n_workers=n_workers, renderer_name
+            coarse_run_id=coarse_run_id, refiner_run_id=refiner_run_id, n_workers=n_workers, renderer_name=renderer_name
         )
 
         pose_estimator = PoseEstimator(
