@@ -110,7 +110,7 @@ class CosyPoseWrapper:
         #renderer = BulletBatchRenderer(object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer)
         #
         
-        object_dataset = make_object_dataset("ycbv")
+        object_dataset = make_object_dataset("tless.cad")
         mesh_db = MeshDataBase.from_object_ds(object_dataset)
         renderer = Panda3dBatchRenderer(object_dataset, n_workers=n_workers, preload_cache=False)
         mesh_db_batched = mesh_db.batched().to(device)
