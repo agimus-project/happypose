@@ -26,8 +26,9 @@ version = "0.1.0"
 [tool.poetry.dependencies]
 addict = "^2.4.0"
 bokeh = "^3.1.1"
-#bop-toolkit-lib = {path = "bop_toolkit"}
+# bop-toolkit-lib = {path = "bop_toolkit"}
 imageio = "^2.31.1"
+ipython = "^8.12.0"
 joblib = "^1.2.0"
 omegaconf = "^2.3.0"
 # cosypose = {path = "happypose/pose_estimators/cosypose"} TODO: pep517
@@ -36,6 +37,7 @@ opencv-contrib-python = "^4.7.0.72"
 opencv-python = "^4.7.0.72"
 panda3d = "=1.10.13"
 pin = "^2.6.17"
+pybind11 = "^2.10.4"
 pybullet = "^3.2.5"
 pypng = "^0.20220715.0"
 python = ">=3.8,<3.11"
@@ -45,6 +47,7 @@ scikit-image = "^0.21.0"
 scikit-learn = "^1.2.2"
 scipy = "^1.10.1"
 seaborn = "^0.12.2"
+selenium = "^4.10.0"
 simplejson = "^3.19.1"
 torch = {source = "cpu", version = "<2"}
 torchvision = {source = "cpu", version = "<0.15.2"}
@@ -53,9 +56,6 @@ transforms3d = "^0.4.1"
 trimesh = "^3.22.1"
 webdataset = "^0.2.48"
 wget = "^3.2"
-selenium = "^4.10.0"
-ipython = "^8.12.0"
-pybind11 = "^2.10.4"
 
 [tool.poetry.group.dev]
 optional = true
