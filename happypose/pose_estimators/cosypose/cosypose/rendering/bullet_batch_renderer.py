@@ -1,6 +1,9 @@
 import torch
 import numpy as np
 import multiprocessing
+from dataclasses import dataclass
+from typing import Optional
+
 
 from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 from .bullet_scene_renderer import BulletSceneRenderer
@@ -36,6 +39,21 @@ def worker_loop(worker_id, in_queue, out_queue, object_set, preload=True, gpu_re
             images = np.zeros((1, min(res), max(res), 3), dtype=np.uint8)
             depth = np.zeros((1, min(res), max(res)), dtype=np.float32)
         out_queue.put((kwargs['data_id'], images, depth))
+
+
+# same API as Panda3d
+# TODO: refactor to happypose_toolbox 
+@dataclass
+class BatchRenderOutput:
+    """
+    rgb: (bsz, 3, h, w) float, values in [0, 1]
+    normals: (bsz, 3, h, w) float, values in [0, 1]
+    depth: (bsz, 1, h, w) float, in meters.
+    """
+
+    rgbs: torch.Tensor
+    normals: Optional[torch.Tensor] = None
+    depths: Optional[torch.Tensor] = None
 
 
 class BulletBatchRenderer:
@@ -93,9 +111,9 @@ class BulletBatchRenderer:
             else:
                 depths = torch.as_tensor(np.stack(depths, axis=0))
             depths = depths.float()
-            return images, depths
+            return BatchRenderOutput(images, depths)
         else:
-            return images
+            return BatchRenderOutput(images)
 
     def init_plotters(self, preload_cache, gpu_renderer):
         self.plotters = []

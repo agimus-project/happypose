@@ -101,13 +101,27 @@ class PosePredictor(nn.Module):
             TCO_input = TCO_input.detach()
             images_crop, K_crop, boxes_rend, boxes_crop = self.crop_inputs(images, K, TCO_input, labels)
             
-            ambient_light = Panda3dLightData(light_type="ambient", color=(1.0, 1.0, 1.0, 1.0))
-            light_datas = [[ambient_light] for _ in range(len(labels))]
-            
-            renders = self.renderer.render(labels=labels,
-                                           TCO=TCO_input,
-                                           K=K_crop, resolution=self.render_size,
-                                           light_datas=light_datas,)
+            # HACK: ugly solution, API of the renderer should be uniformized 
+            if type(self.renderer).__name__ == 'Panda3dBatchRenderer':
+                ambient_light = Panda3dLightData(light_type="ambient", color=(1.0, 1.0, 1.0, 1.0))
+                light_datas = [[ambient_light] for _ in range(len(labels))]
+                
+                renders = self.renderer.render(labels=labels,
+                                            TCO=TCO_input,
+                                            K=K_crop, resolution=self.render_size,
+                                            light_datas=light_datas,)
+
+            elif type(self.renderer).__name__ == 'BulletBatchRenderer':
+                # labels: ['ycbv-obj_000006', 'ycbv-obj_000009', 'ycbv-obj_000003', 'ycbv-obj_000013']
+                # but BulletBatchRenderer expects ['obj_{0000:id}']
+                labels_render = [l.split('-')[1] for l in labels]
+                renders = self.renderer.render(obj_infos=[dict(name=l) for l in labels_render],
+                                            TCO=TCO_input,
+                                            K=K_crop, resolution=self.render_size)
+
+            else:
+                ValueError(f'{type(self.renderer).__name__} renderer type not supported by cosypose')
+
             renders = renders.rgbs
             x = torch.cat((images_crop, renders), dim=1)
 

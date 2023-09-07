@@ -13,36 +13,55 @@ TODO:
 - refactor hardcoded model weight checkpoints
 """
 
-from PIL import Image
-import numpy as np
+import argparse
 from copy import deepcopy
 from pathlib import Path
-import yaml
-import torch
-import argparse
+
+import numpy as np
 import pandas as pd
+import torch
+import yaml
+from PIL import Image
 
-# from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
-from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
-
-# Pose estimator
-from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse
-from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import check_update_config as check_update_config_pose
-# Detection
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import create_model_detector
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import check_update_config as check_update_config_detector
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, RESULTS_DIR
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.bop_predictions import (
+    BopPredictionRunner,
+)
 from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
-
-from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.bop_predictions import BopPredictionRunner
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
     PoseEstimator,
 )
-from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_tmp_dir, get_rank
-from happypose.pose_estimators.cosypose.cosypose.utils.distributed import init_distributed_mode
 
-from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, RESULTS_DIR
+# Detection
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
+    check_update_config as check_update_config_detector,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
+    create_model_detector,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
+    check_update_config as check_update_config_pose,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
+    create_model_coarse,
+    create_model_refiner,
+)
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
+    get_rank,
+    get_tmp_dir,
+    init_distributed_mode,
+)
 
+# from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
+from happypose.toolbox.datasets.datasets_cfg import (
+    make_object_dataset,
+    make_scene_dataset,
+)
+
+# Pose estimator
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
 
@@ -75,10 +94,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 class CosyPoseWrapper:
-    def __init__(self, dataset_name, n_workers=8, gpu_renderer=False) -> None:
+    def __init__(self, dataset_name, n_workers=8, renderer_name='bullet') -> None:
+        self.renderer_name = renderer_name
         self.dataset_name = dataset_name
         super().__init__()
-        self.detector, self.pose_predictor = self.get_model(dataset_name, n_workers)
+        self.detector, self.pose_predictor = self.get_model(dataset_name, n_workers, renderer_name)
 
     @staticmethod
     def load_detector(run_id, ds_name):
@@ -98,21 +118,23 @@ class CosyPoseWrapper:
         return model
 
     @staticmethod
-    def load_pose_models(coarse_run_id, refiner_run_id, n_workers):
+    def load_pose_models(coarse_run_id, refiner_run_id, n_workers, renderer_name):
         run_dir = EXP_DIR / coarse_run_id
 
         # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
         cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.UnsafeLoader)
         cfg = check_update_config_pose(cfg)
-        # object_ds = BOPObjectDataset(BOP_DS_DIR / 'tless/models_cad')
-        #object_ds = make_object_dataset(cfg.object_ds_name)
-        #mesh_db = MeshDataBase.from_object_ds(object_ds)
-        #renderer = BulletBatchRenderer(object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer)
-        #
-        
+        # object_dataset = BOPObjectDataset(BOP_DS_DIR / 'tless/models_cad')
+        # object_dataset = make_object_dataset(cfg.object_ds_name)
         object_dataset = make_object_dataset("ycbv")
         mesh_db = MeshDataBase.from_object_ds(object_dataset)
-        renderer = Panda3dBatchRenderer(object_dataset, n_workers=n_workers, preload_cache=False)
+        
+        if renderer_name == 'bullet':
+            renderer = BulletBatchRenderer(object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=device.type == 'cuda')
+        elif renderer_name == 'panda':
+            renderer = Panda3dBatchRenderer(object_dataset, n_workers=n_workers, preload_cache=False)
+        else:
+            raise ValueError(f'{renderer_name} is not supported, choose between "bullet" and "panda"')
         mesh_db_batched = mesh_db.batched().to(device)
 
         def load_model(run_id):
@@ -138,7 +160,7 @@ class CosyPoseWrapper:
         return coarse_model, refiner_model, mesh_db
 
     @staticmethod
-    def get_model(dataset_name, n_workers):
+    def get_model(dataset_name, n_workers, renderer_name):
         # load models
         if dataset_name == 'tless':
             # TLESS setup
@@ -160,7 +182,7 @@ class CosyPoseWrapper:
             raise ValueError(f"Not prepared for {dataset_name} dataset")
         detector = CosyPoseWrapper.load_detector(detector_run_id, dataset_name)
         coarse_model, refiner_model , mesh_db = CosyPoseWrapper.load_pose_models(
-            coarse_run_id=coarse_run_id, refiner_run_id=refiner_run_id, n_workers=n_workers
+            coarse_run_id=coarse_run_id, refiner_run_id=refiner_run_id, n_workers=n_workers, renderer_name
         )
 
         pose_estimator = PoseEstimator(
