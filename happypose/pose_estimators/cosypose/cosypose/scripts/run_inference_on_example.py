@@ -169,12 +169,21 @@ def run_inference(
     example_dir: Path,
     model_name: str,
     dataset_to_use: str,
+    example_name: str,
+    render: bool = True,
 ) -> None:
-    observation = load_observation_tensor(example_dir)
-    CosyPose = CosyPoseWrapper(dataset_name=dataset_to_use, n_workers=8)
-    predictions = CosyPose.inference(observation)
-    renderings = rendering(predictions, example_dir)
-    save_predictions(example_dir, renderings)
+    try:
+        observation = load_observation_tensor(example_dir)
+        CosyPose = CosyPoseWrapper(dataset_name=dataset_to_use, n_workers=8)
+        predictions = CosyPose.inference(observation)
+        if render:
+            renderings = rendering(predictions, example_dir, example_name)
+            save_predictions(example_dir, renderings)
+
+        return predictions.poses, predictions.infos
+    except AttributeError as err:
+        print("found nothing")
+        return [],[]
 
 
 if __name__ == "__main__":
@@ -182,10 +191,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("example_name")
     parser.add_argument("--model", type=str, default="megapose-1.0-RGB-multi-hypothesis")
-    parser.add_argument("--dataset", type=str, default="ycbv")
+    parser.add_argument("--dataset", type=str, default="tless")
     #parser.add_argument("--vis-detections", action="store_true")
     parser.add_argument("--run-inference", action="store_true", default=True)
     #parser.add_argument("--vis-outputs", action="store_true")
+    parser.add_argument("--render", action="store_true", default=False)
     args = parser.parse_args()
 
     data_dir = os.getenv("MEGAPOSE_DATA_DIR")
@@ -197,7 +207,7 @@ if __name__ == "__main__":
     #    make_detections_visualization(example_dir)
 
     if args.run_inference:
-        run_inference(example_dir, args.model, dataset_to_use)
+        run_inference(example_dir, args.model, dataset_to_use, args.example_name, args.render)
 
     #if args.vis_outputs:
     #    make_output_visualization(example_dir)

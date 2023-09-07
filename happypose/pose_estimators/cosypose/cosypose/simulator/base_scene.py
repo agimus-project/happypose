@@ -12,7 +12,7 @@ class BaseScene:
     _connected = False
     _simulation_step = 1/240.
 
-    def connect(self, gpu_renderer=True, gui=False):
+    def connect(self, gpu_renderer=False, gui=False):
         assert not self._connected, 'Already connected'
         if gui:
             self._client_id = pb.connect(pb.GUI, '--width=640 --height=480')
