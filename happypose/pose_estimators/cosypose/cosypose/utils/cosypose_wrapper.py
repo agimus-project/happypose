@@ -94,11 +94,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 class CosyPoseWrapper:
-    def __init__(self, dataset_name, n_workers=8, renderer_name='bullet') -> None:
+    def __init__(self, dataset_name, n_workers=8, renderer_name='bullet', training_type='pbr') -> None:
         self.renderer_name = renderer_name
         self.dataset_name = dataset_name
         super().__init__()
-        self.detector, self.pose_predictor = self.get_model(dataset_name, n_workers, renderer_name)
+        self.detector, self.pose_predictor = self.get_model(dataset_name, n_workers, renderer_name, training_type)
 
     @staticmethod
     def load_detector(run_id, ds_name):
@@ -160,26 +160,27 @@ class CosyPoseWrapper:
         return coarse_model, refiner_model, mesh_db
 
     @staticmethod
-    def get_model(dataset_name, n_workers, renderer_name):
+    def get_model(dataset_name, n_workers, renderer_name, training_type='pbr'):
+        # python -m happypose.toolbox.utils.download --model=detector-bop-<model-name>
+        # python -m happypose.toolbox.utils.download --model=coarse-bop-<model-name>
+        # python -m happypose.toolbox.utils.download --model=refiner-bop-<model-name>
+
         # load models
-        if dataset_name == 'tless':
-            # TLESS setup
-            # python -m cosypose.scripts.download --model=detector-bop-tless-pbr--873074
-            # python -m cosypose.scripts.download --model=coarse-bop-tless-pbr--506801
-            # python -m cosypose.scripts.download --model=refiner-bop-tless-pbr--233420
+        if dataset_name == 'tless' and training_type == 'pbr':
             detector_run_id = 'detector-bop-tless-pbr--873074'
             coarse_run_id = 'coarse-bop-tless-pbr--506801'
             refiner_run_id = 'refiner-bop-tless-pbr--233420'
-        elif dataset_name == 'ycbv':
-            # YCBV setup
-            # python -m cosypose.scripts.download --model=detector-bop-ycbv-pbr--970850
-            # python -m cosypose.scripts.download --model=coarse-bop-ycbv-pbr--724183
-            # python -m cosypose.scripts.download --model=refiner-bop-ycbv-pbr--604090
+        elif dataset_name == 'ycbv' and training_type == 'pbr':
             detector_run_id = 'detector-bop-ycbv-pbr--970850'
             coarse_run_id = 'coarse-bop-ycbv-pbr--724183'
             refiner_run_id = 'refiner-bop-ycbv-pbr--604090'
+        elif dataset_name == 'ycbv' and training_type == 'synt+real':
+            detector_run_id = 'detector-bop-ycbv-synt+real--292971'
+            coarse_run_id = 'coarse-bop-ycbv-synt+real--822463'
+            refiner_run_id = 'refiner-bop-ycbv-synt+real--631598'
         else:
             raise ValueError(f"Not prepared for {dataset_name} dataset")
+
         detector = CosyPoseWrapper.load_detector(detector_run_id, dataset_name)
         coarse_model, refiner_model , mesh_db = CosyPoseWrapper.load_pose_models(
             coarse_run_id=coarse_run_id, refiner_run_id=refiner_run_id, n_workers=n_workers, renderer_name=renderer_name
