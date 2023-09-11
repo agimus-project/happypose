@@ -63,6 +63,10 @@ class PosePredictorOutputCosypose:
     K_crop: torch.Tensor
     boxes_rend: torch.Tensor
     boxes_crop: torch.Tensor
+    model_outputs: torch.Tensor
+
+    def __getitem__(self, item):
+        return getattr(self, item)
 
 @dataclass
 class PosePredictorOutput:

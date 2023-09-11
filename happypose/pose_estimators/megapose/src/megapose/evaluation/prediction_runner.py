@@ -292,12 +292,12 @@ class PredictionRunner:
 
             # ############ RUN ONLY BEGINNING OF DATASET
             # # if n > 0:
-            # if n < 298:
+            if n > 10:
             # # if n != 582:
-            #     print('################')
-            #     print('Prediction runner SKIP')
-            #     print('################')
-            #     continue
+                 print('################')
+                 print('Prediction runner SKIP')
+                 print('################')
+                 continue
             # ############ RUN ONLY BEGINNING OF DATASET
 
             # Dirty but avoids creating error when running with real detector

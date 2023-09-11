@@ -18,6 +18,9 @@ from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader imp
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
 from happypose.pose_estimators.cosypose.cosypose.datasets.pose_dataset import PoseDataset
 from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler, ListSampler
+from happypose.pose_estimators.megapose.src.megapose.inference.types import (
+    InferenceConfig
+)
 
 # Evaluation
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
@@ -47,6 +50,9 @@ from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRender
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_world_size, get_rank, sync_model, init_distributed_mode, reduce_dict
 from torch.backends import cudnn
+
+# temp
+from torch.utils.data import Subset
 
 cudnn.benchmark = True
 logger = get_logger(__name__)
@@ -90,7 +96,7 @@ def make_eval_bundle(args, model_training):
         if run_id is None:
             return None
         run_dir = EXP_DIR / run_id
-        cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
+        cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.Loader)
         cfg = check_update_config(cfg)
         model = create_model_pose(cfg, renderer=model_training.renderer,
                                   mesh_db=model_training.mesh_db).cuda().eval()
@@ -99,7 +105,7 @@ def make_eval_bundle(args, model_training):
         model.eval()
         model.cfg = cfg
         return model
-
+    
     if args.train_refiner:
         refiner_model = model_training
         coarse_model = load_model(args.coarse_run_id_for_test)
@@ -108,7 +114,7 @@ def make_eval_bundle(args, model_training):
         refiner_model = load_model(args.refiner_run_id_for_test)
     else:
         raise ValueError
-
+    
     pose_estimator = PoseEstimator(
         refiner_model=refiner_model,
         coarse_model=coarse_model,
@@ -129,9 +135,19 @@ def make_eval_bundle(args, model_training):
         #pred_runner = MultiviewPredictionRunner(scene_ds_pred, batch_size=1,
         #                                        n_workers=args.n_dataloader_workers, cache_data=False)
         
-        inference =  {'detection_type': 'gt', 'coarse_estimation_type': 'S03_grid', 'SO3_grid_size': 576,
-                      'n_refiner_iterations': 5, 'n_pose_hypotheses': 5, 'run_depth_refiner': False,
-                       'depth_refiner': None, 'bsz_objects': 16, 'bsz_images': 288}
+        #inference =  {'detection_type': 'gt', 'coarse_estimation_type': 'S03_grid', 'SO3_grid_size': 576,
+        #              'n_refiner_iterations': 5, 'n_pose_hypotheses': 5, 'run_depth_refiner': False,
+        #               'depth_refiner': None, 'bsz_objects': 16, 'bsz_images': 288}
+
+        inference =  InferenceConfig(detection_type= 'gt', 
+                                     coarse_estimation_type='S03_grid',
+                                     SO3_grid_size= 576,
+                                     n_refiner_iterations=5, 
+                                     n_pose_hypotheses= 5, 
+                                     run_depth_refiner= False,
+                                     depth_refiner= None,
+                                     bsz_objects= 16,
+                                     bsz_images= 288)
 
         pred_runner = PredictionRunner(
             scene_ds=scene_ds,
@@ -255,7 +271,7 @@ def train_pose(args):
 
     scene_ds_train = make_datasets(args.train_ds_names)
     scene_ds_val = make_datasets(args.val_ds_names)
-
+    
     ds_kwargs = dict(
         resize=args.input_resize,
         rgb_augmentation=args.rgb_augmentation,
@@ -265,6 +281,7 @@ def train_pose(args):
     )
     ds_train = PoseDataset(scene_ds_train, **ds_kwargs)
     ds_val = PoseDataset(scene_ds_val, **ds_kwargs)
+
 
     train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(ds_train, sampler=train_sampler, batch_size=args.batch_size,
@@ -341,30 +358,31 @@ def train_pose(args):
             iterator = tqdm(ds_iter_train, ncols=80)
             t = time.time()
             for n, sample in enumerate(iterator):
-                if n > 0:
-                    meters_time['data'].add(time.time() - t)
+                if n<5:
+                    if n > 0:
+                        meters_time['data'].add(time.time() - t)
 
-                optimizer.zero_grad()
+                    optimizer.zero_grad()
 
-                t = time.time()
-                loss = h(data=sample, meters=meters_train)
-                meters_time['forward'].add(time.time() - t)
-                iterator.set_postfix(loss=loss.item())
-                meters_train['loss_total'].add(loss.item())
+                    t = time.time()
+                    loss = h(data=sample, meters=meters_train)
+                    meters_time['forward'].add(time.time() - t)
+                    iterator.set_postfix(loss=loss.item())
+                    meters_train['loss_total'].add(loss.item())
 
-                t = time.time()
-                loss.backward()
-                total_grad_norm = torch.nn.utils.clip_grad_norm_(
-                    model.parameters(), max_norm=args.clip_grad_norm, norm_type=2)
-                meters_train['grad_norm'].add(torch.as_tensor(total_grad_norm).item())
+                    t = time.time()
+                    loss.backward()
+                    total_grad_norm = torch.nn.utils.clip_grad_norm_(
+                        model.parameters(), max_norm=args.clip_grad_norm, norm_type=2)
+                    meters_train['grad_norm'].add(torch.as_tensor(total_grad_norm).item())
 
-                optimizer.step()
-                meters_time['backward'].add(time.time() - t)
-                meters_time['memory'].add(torch.cuda.max_memory_allocated() / 1024. ** 2)
+                    optimizer.step()
+                    meters_time['backward'].add(time.time() - t)
+                    meters_time['memory'].add(torch.cuda.max_memory_allocated() / 1024. ** 2)
 
-                if epoch < args.n_epochs_warmup:
-                    lr_scheduler_warmup.step()
-                t = time.time()
+                    if epoch < args.n_epochs_warmup:
+                        lr_scheduler_warmup.step()
+                    t = time.time()
             if epoch >= args.n_epochs_warmup:
                 lr_scheduler.step()
 
@@ -374,7 +392,7 @@ def train_pose(args):
             for sample in tqdm(ds_iter_val, ncols=80):
                 loss = h(data=sample, meters=meters_val)
                 meters_val['loss_total'].add(loss.item())
-
+        
         @torch.no_grad()
         def test():
             model.eval()
@@ -383,11 +401,11 @@ def train_pose(args):
         train_epoch()
         if epoch % args.val_epoch_interval == 0:
             validation()
-
+        
         test_dict = None
         if epoch % args.test_epoch_interval == 0:
             test_dict = test()
-
+        
         log_dict = dict()
         log_dict.update({
             'grad_norm': meters_train['grad_norm'].mean,
@@ -405,7 +423,7 @@ def train_pose(args):
         for string, meters in zip(('train', 'val'), (meters_train, meters_val)):
             for k in dict(meters).keys():
                 log_dict[f'{string}_{k}'] = meters[k].mean
-
+        test_dict = {}
         log_dict = reduce_dict(log_dict)
         if get_rank() == 0:
             log(config=args, model=model, epoch=epoch,
