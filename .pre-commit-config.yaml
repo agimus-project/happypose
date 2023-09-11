@@ -23,7 +23,7 @@ repos:
     hooks:
     -   id: isort
 -   repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 23.9.1
     hooks:
     -   id: black
 -   repo: https://github.com/pappasam/toml-sort
@@ -31,8 +31,8 @@ repos:
     hooks:
     - id: toml-sort-fix
       exclude: 'poetry.lock'
--   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.272
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.288
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
