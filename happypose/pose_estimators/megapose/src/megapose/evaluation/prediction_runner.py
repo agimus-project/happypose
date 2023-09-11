@@ -106,6 +106,9 @@ CNOS_SUBMISSION_DIR = Path(CNOS_SUBMISSION_DIR)
 
 CNOS_SUBMISSION_PATHS = {ds_name: CNOS_SUBMISSION_DIR / fname for ds_name, fname in CNOS_SUBMISSION_FILES.items()}
 # Check if all paths exist
+print("cnos values =", CNOS_SUBMISSION_PATHS.values())
+print("len cnos =", len(CNOS_SUBMISSION_FILES))
+print("sum=", sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()))
 assert( sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()) == len(CNOS_SUBMISSION_FILES))
 ##################################
 ##################################
@@ -292,7 +295,7 @@ class PredictionRunner:
 
             # ############ RUN ONLY BEGINNING OF DATASET
             # # if n > 0:
-            # if n < 298:
+            #if n < 220:
             # # if n != 582:
             #     print('################')
             #     print('Prediction runner SKIP')

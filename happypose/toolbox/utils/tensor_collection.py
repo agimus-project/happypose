@@ -26,6 +26,9 @@ import torch
 # MegaPose
 from happypose.toolbox.utils.distributed import get_rank, get_world_size
 
+from happypose.pose_estimators.megapose.src.megapose.config import (
+    RESULTS_DIR,
+)
 
 def concatenate(datas):
     datas = [data for data in datas if len(data) > 0]
@@ -168,6 +171,7 @@ class PandasTensorCollection(TensorCollection):
 
         if rank > 0:
             tmp_file = tmp_file_template.format(rank=rank)
+            print("tmp_file =", tmp_file)
             torch.save(self, tmp_file)
 
         if world_size > 1:

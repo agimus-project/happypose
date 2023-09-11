@@ -120,7 +120,7 @@ def init_distributed_mode():
         backend="nccl",
         rank=rank,
         world_size=world_size,
-        timeout=datetime.timedelta(seconds=1800 * 4),
+        timeout=datetime.timedelta(seconds=1800 * 16),
     )
     torch.distributed.barrier()
 
