@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../index.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="cosypose/test-install.html"><strong aria-hidden="true">2.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="cosypose/download-data.html"><strong aria-hidden="true">3.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="cosypose/evaluate.html"><strong aria-hidden="true">4.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="cosypose/train.html"><strong aria-hidden="true">5.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="megapose/todo.html"><strong aria-hidden="true">6.</strong> TODO</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../index.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="cosypose/test-install.html"><strong aria-hidden="true">2.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="cosypose/download-data.html"><strong aria-hidden="true">3.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="cosypose/evaluate.html"><strong aria-hidden="true">4.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="cosypose/train.html"><strong aria-hidden="true">5.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="megapose/test-install.html"><strong aria-hidden="true">6.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="megapose/download-data.html"><strong aria-hidden="true">7.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="megapose/evaluate.html"><strong aria-hidden="true">8.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -173,7 +173,7 @@
 <a href="https://happypose.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/happypose/badge/?version=latest" alt="Documentation Status" /></a>
 <a href="https://codecov.io/gh/agimus-project/happypose"><img src="https://codecov.io/gh/agimus-project/happypose/branch/main/graph/badge.svg?token=TODO" alt="codecov" /></a>
 <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a></p>
-<p>Toolbox and trackers for object pose-estimation. Based on the work <a href="https://github.com/Simple-Robotics/cosypose">CosyPose</a> and <a href="https://github.com/megapose6d/megapose6d">MegaPose</a>. This directory is currently under development.</p>
+<p>Toolbox and trackers for object pose-estimation. Based on the work <a href="https://github.com/Simple-Robotics/cosypose">CosyPose</a> and <a href="https://github.com/megapose6d/megapose6d">MegaPose</a>. This directory is currently under development. Please refer to the <a href="https://agimus-project.github.io/happypose/">documentation</a> for more details.</p>
 <h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
 <p>This installation procedure will be curated.</p>
 <pre><code>git clone --branch dev --recurse-submodules https://github.com/agimus-project/happypose.git
@@ -190,6 +190,36 @@ pip install -e .
 cd happypose/pose_estimators/megapose/deps/bop_toolkit_challenge/
 # Remove all versions enforcing on requirements.txt
 pip install -r requirements.txt -e .
+</code></pre>
+<h1 id="create-data-directory"><a class="header" href="#create-data-directory">Create data directory</a></h1>
+<pre><code>Create data dir /somewhere/convenient. The dataset to store are quite large.
+export MEGAPOSE_DATA_DIR=/somewhere/convenient
+
+</code></pre>
+<h1 id="configuration-for-the-evaluation"><a class="header" href="#configuration-for-the-evaluation">Configuration for the evaluation</a></h1>
+<p>If you plan on evaluating CosyPose and Megapose, you need to modify the following lines in <code>bop_toolkit_lib/config.py</code>, replace :</p>
+<pre><code>######## Basic ########
+
+
+# Folder with the BOP datasets.
+if 'BOP_PATH' in os.environ:
+  datasets_path = os.environ['BOP_PATH']
+else:
+  datasets_path = r'/path/to/bop/datasets'
+
+# Folder with pose results to be evaluated.
+results_path = r'/path/to/folder/with/results'
+
+# Folder for the calculated pose errors and performance scores.
+eval_path = r'/path/to/eval/folder'
+</code></pre>
+<p>with</p>
+<pre><code>######## Basic ########
+
+# Folder with the BOP datasets.
+datasets_path = str(os.environ['BOP_DATASETS_PATH'])
+results_path = str(os.environ['BOP_RESULTS_PATH'])
+eval_path = str(os.environ['BOP_EVAL_PATH'])
 </code></pre>
 
                     </main>

@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/test-install.html"><strong aria-hidden="true">2.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../cosypose/download-data.html"><strong aria-hidden="true">3.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html" class="active"><strong aria-hidden="true">4.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">5.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/todo.html"><strong aria-hidden="true">6.</strong> TODO</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/test-install.html"><strong aria-hidden="true">2.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../cosypose/download-data.html"><strong aria-hidden="true">3.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html" class="active"><strong aria-hidden="true">4.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">5.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/test-install.html"><strong aria-hidden="true">6.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../megapose/download-data.html"><strong aria-hidden="true">7.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">8.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -167,60 +167,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="evaluating-cosypose"><a class="header" href="#evaluating-cosypose">Evaluating CosyPose</a></h1>
-<h2 id="install"><a class="header" href="#install">Install</a></h2>
-<p>Two installation steps are needed : <a href="https://github.com/thodan/bop_toolkit">bop_toolkit</a> and <a href="https://github.com/thodan/bop_renderer/">bop_renderer</a>. These repository are stored in <code>happypose/pose_estimators/megapose/deps/</code>.</p>
-<h3 id="1-bop_toolkit_challenge"><a class="header" href="#1-bop_toolkit_challenge">1. Bop_toolkit_challenge</a></h3>
-<pre><code>cd /happypose/pose_estimators/megapose/deps/bop_toolkit_challenge
-# You need to remove all the versions from the requirements.txt file, then :
-pip install -r requirements.txt -e .
-</code></pre>
-<p>Then, you need to modify the following lines in <code>bop_toolkit_lib/config.py</code>, replace :</p>
-<pre><code>######## Basic ########
-
-
-# Folder with the BOP datasets.
-if 'BOP_PATH' in os.environ:
-  datasets_path = os.environ['BOP_PATH']
-else:
-  datasets_path = r'/path/to/bop/datasets'
-
-# Folder with pose results to be evaluated.
-results_path = r'/path/to/folder/with/results'
-
-# Folder for the calculated pose errors and performance scores.
-eval_path = r'/path/to/eval/folder'
-</code></pre>
-<p>with</p>
-<pre><code>######## Basic ########
-
-# Folder with the BOP datasets.
-datasets_path = str(os.environ['BOP_DATASETS_PATH'])
-results_path = str(os.environ['BOP_RESULTS_PATH'])
-eval_path = str(os.environ['BOP_EVAL_PATH'])
-</code></pre>
-<details>
-<summary>This part is deprecated and will be removed </summary>
-<p>Also, replace</p>
-<pre><code># For offscreen C++ rendering: Path to the build folder of bop_renderer (github.com/thodan/bop_renderer).
-bop_renderer_path = r'/path/to/bop_renderer/build'
-</code></pre>
-<p>with</p>
-<pre><code># For offscreen C++ rendering: Path to the build folder of bop_renderer (github.com/thodan/bop_renderer).
-bop_renderer_path = /path/to/happypose/happypose/pose_estimators/megapose/deps/bop_renderer/build
-</code></pre>
-</details>
-<h3 id="2-bop_renderer"><a class="header" href="#2-bop_renderer">2. Bop_renderer</a></h3>
-<details>
-<summary>This part is deprecated and will be removed</summary>
-<p>This installation is tested only on Ubuntu/Debian system. Please refer to <a href="https://github.com/thodan/bop_renderer/">bop_renderer</a> if needed.</p>
-<pre><code>cd /happypose/pose_estimators/megapose/deps/bop_renderer
-sudo apt install libosmesa6-dev
-conda install -c conda-forge mesalib
-cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-</code></pre>
-</details>
-<h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
+<p>Please make sure you followed the steps relative to the evaluation in the main readme.</p>
 <p>This needs to be adapted (SO3_grid not used for CosyPose)</p>
 <pre><code>python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_full_cosypose_eval_new detector_run_id=bop_pbr coarse_run_id=coarse-bop-ycbv-pbr--724183 refiner_run_id=refiner-bop-ycbv-pbr--604090 ds_names=[&quot;ycbv.bop19&quot;] result_id=ycbv-debug detection_coarse_types=[[&quot;detector&quot;,&quot;S03_grid&quot;]]
 </code></pre>
