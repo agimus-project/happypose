@@ -5,7 +5,7 @@ All data used (datasets, models, results, ...) are stored in a directory `$MEGAP
 
 ## BOP Datasets
 
-For both T-LESS and YCB-Video, we use the datasets in the [BOP format](https://bop.felk.cvut.cz/datasets/). If you already have them on your disk, place them in `local_data/bop_datasets`. Alternatively, you can download it using :
+For both T-LESS and YCB-Video, we use the datasets in the [BOP format](https://bop.felk.cvut.cz/datasets/). If you already have them on your disk, place them in `$MEGAPOSE_DATA_DIR/bop_datasets`. Alternatively, you can download it using :
 
 ```sh
 python -m happypose.toolbox.utils.download --bop_dataset=ycbv

@@ -41,12 +41,11 @@ pip install -r requirements.txt -e .
 ```
 Create data dir /somewhere/convenient. The dataset to store are quite large.
 export MEGAPOSE_DATA_DIR=/somewhere/convenient
-
 ```
 
 # Configuration for the evaluation
 
-If you plan on evaluating CosyPose and Megapose, you need to modify the following lines in `bop_toolkit_lib/config.py`, replace :
+If you plan on evaluating CosyPose and Megapose, you need to modify the following lines in `bop_toolkit_lib/config.py`, replace
 
 ```
 ######## Basic ########
