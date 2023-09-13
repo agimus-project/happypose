@@ -56,16 +56,16 @@ jobs:
           sed 's/==.*$//' requirements.txt > req_nover.txt
           pip install -r req_nover.txt -e .
         if: steps.cache.outputs.cache-hit != 'true'
-#
-#      - name: Install happypose
-#        run: |
-#          cd happypose/pose_estimators/cosypose
-#          pip install .
-#          cd ../../..
-#          pip install -e .
-#
-#      - name: Run tests
-#        run: |
-#          pip install pytest coverage
-#          coverage run -m pytest tests
-#      - uses: codecov/codecov-action@v3
+
+      - name: Install happypose
+        run: |
+          cd happypose/pose_estimators/cosypose
+          pip install .
+          cd ../../..
+          pip install -e .
+
+      - name: Run tests
+        run: |
+          pip install pytest coverage
+          coverage run -m pytest tests
+      - uses: codecov/codecov-action@v3
