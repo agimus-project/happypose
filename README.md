@@ -8,7 +8,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
-Toolbox and trackers for object pose-estimation. Based on the work [CosyPose](https://github.com/Simple-Robotics/cosypose) and [MegaPose](https://github.com/megapose6d/megapose6d). This directory is currently under development.
+Toolbox and trackers for object pose-estimation. Based on the work [CosyPose](https://github.com/Simple-Robotics/cosypose) and [MegaPose](https://github.com/megapose6d/megapose6d). This directory is currently under development. Please refer to the [documentation](https://agimus-project.github.io/happypose/) for more details.
 
 
 # Installation
@@ -33,4 +33,45 @@ conda activate happypose
 cd happypose/pose_estimators/megapose/deps/bop_toolkit_challenge/
 # Remove all versions enforcing on requirements.txt
 pip install -r requirements.txt -e .
+```
+
+
+# Create data directory
+
+```
+Create data dir /somewhere/convenient. The dataset to store are quite large.
+export MEGAPOSE_DATA_DIR=/somewhere/convenient
+
+```
+
+# Configuration for the evaluation
+
+If you plan on evaluating CosyPose and Megapose, you need to modify the following lines in `bop_toolkit_lib/config.py`, replace :
+
+```
+######## Basic ########
+
+
+# Folder with the BOP datasets.
+if 'BOP_PATH' in os.environ:
+  datasets_path = os.environ['BOP_PATH']
+else:
+  datasets_path = r'/path/to/bop/datasets'
+
+# Folder with pose results to be evaluated.
+results_path = r'/path/to/folder/with/results'
+
+# Folder for the calculated pose errors and performance scores.
+eval_path = r'/path/to/eval/folder'
+```
+
+with
+
+```
+######## Basic ########
+
+# Folder with the BOP datasets.
+datasets_path = str(os.environ['BOP_DATASETS_PATH'])
+results_path = str(os.environ['BOP_RESULTS_PATH'])
+eval_path = str(os.environ['BOP_EVAL_PATH'])
 ```

@@ -1,15 +1,7 @@
 # Downloading and preparing the data
 
 
-```
-Create data dir /somewhere/convenient. The dataset to store are quite large.
-export MEGAPOSE_DATA_DIR=/somewhere/convenient
-```
-
-download [barbecue sauce](https://drive.google.com/drive/folders/10BIvhnrKGbNr8EKGB3KUtkSNcp460k9S) and put it in `$MEGAPOSE_DATA_DIR/examples/barbecue-sauce/`
-
-
-All data used (datasets, models, results, ...) are stored in a directory `local_data` at the root of the repository. Create it with `mkdir local_data` or use a symlink if you want the data to be stored at a different place. We provide the utility `cosypose/scripts/download.py` for downloading required data and models. All of the files can also be [downloaded manually](https://drive.google.com/drive/folders/1JmOYbu1oqN81Dlj2lh6NCAMrC8pEdAtD?usp=sharing).
+All data used (datasets, models, results, ...) are stored in a directory `$MEGAPOSE_DATA_DIR` that you created in the Readsme. We provide the utilities for downloading required data and models. All of the files can also be [downloaded manually](https://www.paris.inria.fr/archive_ylabbeprojectsdata/).
 
 ## BOP Datasets
 
@@ -111,16 +103,4 @@ Notes:
 - The PoseCNN detections (and coarse pose estimates) on YCB-Video were extracted and converted from [these PoseCNN results](https://github.com/yuxng/YCB_Video_toolbox/blob/master/results_PoseCNN_RSS2018.zip).
 - The Pix2pose detections were extracted using [pix2pose's](https://github.com/kirumang/Pix2Pose) code. We used the detection model from their paper, see [here](https://github.com/kirumang/Pix2Pose#download-pre-trained-weights). For the ViVo detections, their code was slightly modified. The code used to extract detections can be found [here](https://github.com/ylabbe/pix2pose_cosypose).
 
-</details>
-
-<details>
-<summary>Megapose</summary>
-
- ## 1. Download pre-trained pose estimation models
-Download pose estimation models to $MEGAPOSE_DATA_DIR/megapose-models:
-
-```
-python -m happypose.toolbox.utils.download --megapose_models
-```
-</details>
 </details>

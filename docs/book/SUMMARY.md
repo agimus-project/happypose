@@ -11,4 +11,6 @@
 
 # MegaPose
 
-- [TODO](./megapose/todo.md)
+- [Testing your installation](./megapose/test-install.md)
+- [Downloading and preparing the data](./megapose/download-data.md)
+- [Evaluate MegaPose](./megapose/evaluate.md)
