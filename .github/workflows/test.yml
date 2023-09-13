@@ -12,7 +12,9 @@ jobs:
       matrix:
         python-version: ["3.9"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
       - name: Install EGL mesa - required for Panda3D renderer
         run: |
           sudo apt-get update -y -qq
@@ -50,10 +52,11 @@ jobs:
 
       - name: Install bop toolkit (temporal fix)
         run: |
-          mkdir libs
-          cd libs
-          git clone https://github.com/ylabbe/bop_toolkit/ -b dataset-tools
-          cd bop_toolkit
+          cd happypose/pose_estimators/megapose/deps/bop_toolkit_challenge/
+#          mkdir libs
+#          cd libs
+#          git clone https://github.com/ylabbe/bop_toolkit/ -b dataset-tools
+#          cd bop_toolkit
           sed 's/==.*$//' requirements.txt > req_nover.txt
           pip install -r req_nover.txt -e .
         if: steps.cache.outputs.cache-hit != 'true'
@@ -61,7 +64,8 @@ jobs:
       - name: Install happypose
         run: |
           cd happypose/pose_estimators/cosypose
-          python setup.py install
+#          python setup.py install
+          pip install .
           cd ../../..
           pip install -e .
       - name: Run tests

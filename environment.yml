@@ -17,9 +17,9 @@ dependencies:
   - ipython
   - ipykernel
   - jupyterlab
-  - notebook
-  - nb_conda_kernels
-  - jupyter_contrib_nbextensions
+#  - notebook
+#  - nb_conda_kernels
+#  - jupyter_contrib_nbextensions
   - pinocchio
   - rclone
   - pillow
