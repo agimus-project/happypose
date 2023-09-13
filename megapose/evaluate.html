@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/test-install.html"><strong aria-hidden="true">2.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../cosypose/download-data.html"><strong aria-hidden="true">3.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">4.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">5.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/test-install.html"><strong aria-hidden="true">6.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../megapose/download-data.html"><strong aria-hidden="true">7.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html" class="active"><strong aria-hidden="true">8.</strong> Evaluate MegaPose</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/download-data.html"><strong aria-hidden="true">2.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/test-install.html"><strong aria-hidden="true">3.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">4.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">5.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/download-data.html"><strong aria-hidden="true">6.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/test-install.html"><strong aria-hidden="true">7.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html" class="active"><strong aria-hidden="true">8.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,13 +166,17 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="evaluate-megapose"><a class="header" href="#evaluate-megapose">Evaluate MegaPose</a></h1>
+                        <h1 id="evaluating-megapose"><a class="header" href="#evaluating-megapose">Evaluating Megapose</a></h1>
+<p>Please make sure you followed the steps relative to the evaluation in the main readme.</p>
+<p>An example to run the evaluation on <code>YCBV</code> dataset. Several datasets can be added to the list.</p>
+<pre><code>python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[ycbv.bop19] result_id=fastsam_kbestdet_1posehyp detection_coarse_types=[[&quot;sam&quot;,&quot;SO3_grid&quot;]] inference.n_pose_hypotheses=1 skip_inference=true run_bop_eval=true
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../megapose/download-data.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../megapose/test-install.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
@@ -183,7 +187,7 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../megapose/download-data.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../megapose/test-install.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
