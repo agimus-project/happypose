@@ -67,7 +67,7 @@ jobs:
       - name: Run tests
         run: |
           pip install pytest coverage
-          coverage run -m pytest tests
+          coverage run --source=happypose -m pytest tests
           coverage xml
       - uses: codecov/codecov-action@v3
         env:
