@@ -13,4 +13,4 @@ __pycache__
 *tmp/
 *.cpython
 experiments/outputs
-book
+/book
