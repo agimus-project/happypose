@@ -34,7 +34,7 @@ jobs:
         run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
         shell: bash
 
-      - name: Cashing of the happypose installation
+      - name: Caching of the happypose installation
         uses: actions/cache@v3
         with:
           path: ${{ env.CONDA }}/envs
@@ -69,3 +69,5 @@ jobs:
           pip install pytest coverage
           coverage run -m pytest tests
       - uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
