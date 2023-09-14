@@ -5,16 +5,70 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9"]
     steps:
-      - uses: actions/checkout@v3
-      - run: pipx install poetry
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
         with:
+          submodules: 'recursive'
+      - name: Install EGL mesa - required for Panda3D renderer
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y -qq libegl1-mesa libegl1-mesa-dev
+
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: happypose
           python-version: ${{ matrix.python-version }}
-          cache: poetry
-      - run: poetry install --with dev -E render
-      - run: poetry run coverage run -m unittest
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          use-mamba: true
+
+      - name: Get date for caching, reset cache every day
+        id: get-date
+        run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
+        shell: bash
+
+      - name: Caching of the happypose installation
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CONDA }}/envs
+          key:
+            conda-${{ runner.os }}--${{ runner.arch }}--${{steps.get-date.outputs.today }}-${{hashFiles('environment.yml') }}-${{env.CACHE_NUMBER }}
+        env:
+          # Increase this value to reset cache manually
+          CACHE_NUMBER: 0
+        id: cache
+
+      - name: Update conda environment with happypose dependencies
+        run:
+          mamba env update -n happypose -f environment.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Install bop toolkit (temporal fix)
+        run: |
+          cd happypose/pose_estimators/megapose/deps/bop_toolkit_challenge/
+          sed 's/==.*$//' requirements.txt > req_nover.txt
+          pip install -r req_nover.txt -e .
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Install happypose
+        run: |
+          cd happypose/pose_estimators/cosypose
+          pip install .
+          cd ../../..
+          pip install -e .
+
+      - name: Run tests
+        run: |
+          pip install pytest coverage
+          coverage run --source=happypose -m pytest tests
+          coverage xml
       - uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
