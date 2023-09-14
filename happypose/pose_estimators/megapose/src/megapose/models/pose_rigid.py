@@ -730,7 +730,6 @@ class PosePredictor(nn.Module):
         x = torch.cat((images_crop, renders), dim=1)
         if has_nans(x): print('x has NANS')
 
-        
         out = self.forward_coarse_tensor(x, cuda_timer=cuda_timer)
 
         out["render_time"] = render_time
