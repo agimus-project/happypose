@@ -39,7 +39,7 @@ def get_tmp_dir() -> Path:
     if "JOB_DIR" in os.environ:
         tmp_dir = Path(os.environ["JOB_DIR"]) / "tmp"
     else:
-        tmp_dir = Path("/gpfsscratch/rech/zja/udg82mu/happypose_datasets/results/tmp/megapose_job")
+        tmp_dir = Path("/tmp/megapose_job")
     tmp_dir.parent.mkdir(exist_ok=True)
     tmp_dir.mkdir(exist_ok=True)
     return tmp_dir
@@ -149,6 +149,6 @@ def init_distributed_mode() -> None:
         backend="nccl",
         rank=rank,
         world_size=world_size,
-        timeout=datetime.timedelta(seconds=16 * 1800),  # 2 hours
+        timeout=datetime.timedelta(seconds=4 * 1800),  # 2 hours
     )
     torch.distributed.barrier()

@@ -106,9 +106,6 @@ CNOS_SUBMISSION_DIR = Path(CNOS_SUBMISSION_DIR)
 
 CNOS_SUBMISSION_PATHS = {ds_name: CNOS_SUBMISSION_DIR / fname for ds_name, fname in CNOS_SUBMISSION_FILES.items()}
 # Check if all paths exist
-print("cnos values =", CNOS_SUBMISSION_PATHS.values())
-print("len cnos =", len(CNOS_SUBMISSION_FILES))
-print("sum=", sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()))
 assert( sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()) == len(CNOS_SUBMISSION_FILES))
 ##################################
 ##################################
@@ -284,24 +281,10 @@ class PredictionRunner:
             df_targets = pd.read_json(self.scene_ds.ds_dir / "test_targets_bop19.json")
 
         for n, data in enumerate(tqdm(self.dataloader)):
-            print('\n\n\n\n################')
-            print(f'DATA FROM DATALOADER {self.scene_ds.ds_dir.name}', f'{n}/{len(self.dataloader)}')
-            print('data["im_infos"]:', data['im_infos'])
-            print('################')
             # data is a dict
             rgb = data["rgb"]
             depth = data["depth"]
             K = data["cameras"].K
-
-            # ############ RUN ONLY BEGINNING OF DATASET
-            # # if n > 0:
-            #if n < 220:
-            # # if n != 582:
-            #     print('################')
-            #     print('Prediction runner SKIP')
-            #     print('################')
-            #     continue
-            # ############ RUN ONLY BEGINNING OF DATASET
 
             # Dirty but avoids creating error when running with real detector
             dt_det = 0

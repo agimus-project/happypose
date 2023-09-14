@@ -1,4 +1,4 @@
-name: happypose2
+name: happypose
 channels:
    - conda-forge
    - pytorch
