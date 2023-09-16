@@ -66,6 +66,7 @@ jobs:
 
       - name: Download pre-trained models required for tests
         run: |
+          mkdir local_data
           python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
           python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
           python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090         
