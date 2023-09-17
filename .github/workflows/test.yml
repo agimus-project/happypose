@@ -69,7 +69,10 @@ jobs:
           mkdir local_data
           python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
           python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
-          python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090         
+          python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
+          
+          cd tests/data
+          git clone https://github.com/petrikvladimir/happypose_test_data.git crackers_example
 
       - name: Run tests
         run: |
