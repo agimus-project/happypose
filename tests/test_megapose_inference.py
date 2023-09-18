@@ -13,7 +13,7 @@ from happypose.toolbox.utils.load_model import NAMED_MODELS, load_named_model
 class TestMegaPoseInference(unittest.TestCase):
     """Unit tests for MegaPose inference example."""
 
-    def test_meagpose_pipeline(self):
+    def test_megapose_pipeline(self):
         """Run detector from CosyPose with coarse and refiner from MegaPose"""
         observation = TestCosyPoseInference._load_crackers_example_observation()
 
@@ -30,9 +30,14 @@ class TestMegaPoseInference(unittest.TestCase):
 
         model_info = NAMED_MODELS["megapose-1.0-RGB"]
         pose_estimator = load_named_model("megapose-1.0-RGB", object_dataset).to("cpu")
-        preds, _ = pose_estimator.run_inference_pipeline(
+        # let's limit the grid, 278 is the most promising one, 477 the least one
+        pose_estimator._SO3_grid = pose_estimator._SO3_grid[[278, 477]]
+        preds, data = pose_estimator.run_inference_pipeline(
             observation, detections=detections, **model_info["inference_parameters"]
         )
+
+        scores = data["coarse"]["data"]["logits"]
+        self.assertGreater(scores[0], scores[1])  # 278 is better than 477
 
         self.assertEqual(len(preds), 1)
         self.assertEqual(preds.infos.label[0], "ycbv-obj_000002")
