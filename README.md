@@ -40,7 +40,7 @@ pip install -r requirements.txt -e .
 
 ```
 Create data dir /somewhere/convenient. The dataset to store are quite large.
-export MEGAPOSE_DATA_DIR=/somewhere/convenient
+export HAPPYPOSE_DATA_DIR=/somewhere/convenient
 ```
 
 # Configuration for the evaluation

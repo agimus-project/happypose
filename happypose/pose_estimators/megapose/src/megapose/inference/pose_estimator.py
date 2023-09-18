@@ -582,12 +582,7 @@ class PoseEstimator(PoseEstimationModule):
                     detections, **detection_filter_kwargs
                 )
 
-<<<<<<< HEAD
             # Run the coarse estimator using detections
-=======
-            # Run the coarse estimator using gt_detections
-            print("detections coarse =", detections)
->>>>>>> c6cd60e ( first attempt at bop challenge)
             data_TCO_coarse, coarse_extra_data = self.forward_coarse_model(
                 observation=observation,
                 detections=detections,

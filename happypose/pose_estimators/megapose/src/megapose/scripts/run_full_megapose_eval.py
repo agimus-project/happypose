@@ -206,8 +206,6 @@ if __name__ == "__main__":
     cli_cfg = OmegaConf.from_cli()
     logger.info(f"CLI config: \n {OmegaConf.to_yaml(cli_cfg)}")
 
-    print("full eval config =", FullEvalConfig.ds_names)
-
     cfg: FullEvalConfig = OmegaConf.structured(FullEvalConfig)
     cfg.hardware = HardwareConfig(
         n_cpus=int(os.environ.get("N_CPUS", 10)),

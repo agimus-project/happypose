@@ -60,7 +60,6 @@ logger = get_logger(__name__)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-<<<<<<< HEAD
 
 
 ##################################
@@ -112,8 +111,6 @@ assert( sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()) == len(CNOS_SUBM
 ##################################
 
 
-=======
->>>>>>> c6cd60e ( first attempt at bop challenge)
 
 class PredictionRunner:
     def __init__(
@@ -161,14 +158,10 @@ class PredictionRunner:
 
 
         """
-        print("gt detections =\n", gt_detections)
-        print("sam detections =\n", sam_detections)
-
         # TODO: this check could be done outside of run_inference_pipeline
         # and then only check if detections are None
         if self.inference_cfg.detection_type == "gt":
             detections = gt_detections
-            print("gt detections =", gt_detections.bboxes)
             run_detector = False
         elif self.inference_cfg.detection_type == "sam":
             # print("sam_detections =", sam_detections.bboxes)
@@ -177,14 +170,7 @@ class PredictionRunner:
         elif self.inference_cfg.detection_type == "detector":
             detections = None
             run_detector = True
-<<<<<<< HEAD
 
-=======
-        elif self.inference_cfg.detection_type == "sam":
-            print("sam_detections =", sam_detections.bboxes)
-            detections = sam_detections
-            run_detector = False
->>>>>>> c6cd60e ( first attempt at bop challenge)
         else:
             raise ValueError(f"Unknown detection type {self.inference_cfg.detection_type}")
 
@@ -252,7 +238,6 @@ class PredictionRunner:
 
         predictions_list = defaultdict(list)
 
-<<<<<<< HEAD
         ######
         # This section opens the detections stored in "baseline.json"
         # format it and store it in a dataframe that will be accessed later
@@ -291,24 +276,12 @@ class PredictionRunner:
             df_all_dets = pd.DataFrame.from_records(dets_lst)
 
             df_targets = pd.read_json(self.scene_ds.ds_dir / "test_targets_bop19.json")
-=======
-        # Temporary solution
-        if self.inference_cfg.detection_type == "sam":
-            data_path = Path("/home/emaitre/local_data/bop23/baseline/ycbv/baseline.json")
-            object_data = json.loads(data_path.read_text())
-            for object in object_data:
-                object['bbox'] = [float(i) for i in object['bbox']]
-                object['bbox_modal'] = object['bbox']
-                object['label'] = "ycbv-obj_{}".format(str(object['category_id']).zfill(6))
-            object_data = pd.DataFrame.from_records(object_data)
->>>>>>> c6cd60e ( first attempt at bop challenge)
 
         for n, data in enumerate(tqdm(self.dataloader)):
             # data is a dict
             rgb = data["rgb"]
             depth = data["depth"]
             K = data["cameras"].K
-<<<<<<< HEAD
 
             # Dirty but avoids creating error when running with real detector
             dt_det = 0
@@ -368,20 +341,6 @@ class PredictionRunner:
                 sam_detections = make_detections_from_object_data(list_object_data).to(device)
                 sam_detections.infos['score'] = scores
 
-=======
-            
-            # Temporary solution
-            if self.inference_cfg.detection_type == "sam":
-                list_object_data = []
-                scene_id = data['im_infos'][0]['scene_id']
-                view_id = data['im_infos'][0]['view_id']
-                print("scene and view :", scene_id, view_id)
-                list_object = object_data.loc[(object_data['scene_id'] == scene_id) & (object_data['image_id'] == view_id)].to_dict('records')
-                for object in list_object:
-                    list_object_data.append(ObjectData.from_json(object))
-                sam_detections = make_detections_from_object_data(list_object_data).to(device)
-                print("sam_detections =", sam_detections)
->>>>>>> c6cd60e ( first attempt at bop challenge)
             else:
                 sam_detections = None
             gt_detections = data["gt_detections"].cuda()
@@ -417,7 +376,7 @@ class PredictionRunner:
                 v.infos['view_id'] = view_id
                 predictions_list[k].append(v)
 
-        # Concatenate the lists of PandasTensorCollections
+    # Concatenate the lists of PandasTensorCollections
         predictions = dict()
         for k, v in predictions_list.items():
             predictions[k] = tc.concatenate(v)

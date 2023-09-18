@@ -28,7 +28,7 @@ import happypose.pose_estimators.megapose.src.megapose as megapose
 
 PROJECT_ROOT = Path(megapose.__file__).parent.parent.parent
 PROJECT_DIR = PROJECT_ROOT
-LOCAL_DATA_DIR = Path(os.environ.get("MEGAPOSE_DATA_DIR", Path(PROJECT_DIR) / "local_data"))
+LOCAL_DATA_DIR = Path(os.environ.get("HAPPYPOSE_DATA_DIR", Path(PROJECT_DIR) / "local_data"))
 BOP_DS_DIR = LOCAL_DATA_DIR / "bop_datasets"
 NB_DATA_DIR = LOCAL_DATA_DIR / "notebook_data"
 SHAPENET_DIR = LOCAL_DATA_DIR / "shapenetcorev2"
