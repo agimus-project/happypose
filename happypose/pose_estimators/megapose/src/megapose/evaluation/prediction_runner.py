@@ -43,6 +43,10 @@ from happypose.pose_estimators.megapose.src.megapose.inference.types import (
 from happypose.pose_estimators.megapose.src.megapose.config import (
     BOP_DS_DIR
 )
+from happypose.pose_estimators.megapose.src.megapose.evaluation.bop import (
+    get_sam_detections,
+    load_sam_predictions
+)
 
 from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer
 from happypose.toolbox.datasets.samplers import DistributedSceneSampler
@@ -59,57 +63,6 @@ import json
 logger = get_logger(__name__)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-
-
-##################################
-##################################
-import os
-
-# New CNOS detection from Nguyen drive
-# CNOS_SUBMISSION_FILES = {
-#     "ycbv": 'sam_pbr_ycbv.json', 
-#     "lmo": 'sam_pbr_lmo.json', 
-#     "tless": 'sam_pbr_tless.json', 
-#     "tudl": 'sam_pbr_tudl.json', 
-#     "icbin": 'sam_pbr_icbin.json', 
-#     "itodd": 'sam_pbr_itodd.json', 
-#     "hb": 'sam_pbr_hb.json', 
-# }
-
-# CNOS_SUBMISSION_FILES = {
-#     "ycbv": 'fastSAM_pbr_ycbv.json', 
-#     "lmo": 'fastSAM_pbr_lmo.json', 
-#     "tless": 'fastSAM_pbr_tless.json', 
-#     "tudl": 'fastSAM_pbr_tudl.json', 
-#     "icbin": 'fastSAM_pbr_icbin.json', 
-#     "itodd": 'fastSAM_pbr_itodd.json', 
-#     "hb": 'fastSAM_pbr_hb.json', 
-# }
-
-# New official default detections -> fastSAM method, same as nguyen's drive
-CNOS_SUBMISSION_FILES = {
-    "ycbv": 'cnos-fastsam_ycbv-test_f4f2127c-6f59-447c-95b3-28e1e591f1a1.json', 
-    "lmo": 'cnos-fastsam_lmo-test_3cb298ea-e2eb-4713-ae9e-5a7134c5da0f.json', 
-    "tless": 'cnos-fastsam_tless-test_8ca61cb0-4472-4f11-bce7-1362a12d396f.json', 
-    "tudl": 'cnos-fastsam_tudl-test_c48a2a95-1b41-4a51-9920-a667cb3d7149.json', 
-    "icbin": 'cnos-fastsam_icbin-test_f21a9faf-7ef2-4325-885f-f4b6460f4432.json', 
-    "itodd": 'cnos-fastsam_itodd-test_df32d45b-301c-4fc9-8769-797904dd9325.json', 
-    "hb": 'cnos-fastsam_hb-test_db836947-020a-45bd-8ec5-c95560b68011.json', 
-}
-
-
-
-CNOS_SUBMISSION_DIR = os.environ.get('CNOS_SUBMISSION_DIR')
-assert(CNOS_SUBMISSION_DIR is not None)
-CNOS_SUBMISSION_DIR = Path(CNOS_SUBMISSION_DIR)
-
-CNOS_SUBMISSION_PATHS = {ds_name: CNOS_SUBMISSION_DIR / fname for ds_name, fname in CNOS_SUBMISSION_FILES.items()}
-# Check if all paths exist
-assert( sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()) == len(CNOS_SUBMISSION_FILES))
-##################################
-##################################
-
 
 
 class PredictionRunner:
@@ -244,137 +197,61 @@ class PredictionRunner:
         ######
         # Temporary solution
         if self.inference_cfg.detection_type == "sam":
-            ds_name = self.scene_ds.ds_dir.name
-            detections_path = CNOS_SUBMISSION_PATHS[ds_name]  
-
-            """
-            # dets_lst: list of dictionary, each element = detection of one object in an image
-            $ df_all_dets[0].keys()
-              > ['scene_id', 'image_id', 'category_id', 'bbox', 'score', 'time', 'segmentation']
-            - For the evaluation of Megapose, we only need the 'scene_id', 'image_id', 'category_id', 'score', 'time' and 'bbox'
-            - We also need need to change the format of bounding boxes as explained below 
-            """
-            dets_lst = []
-            for det in json.loads(detections_path.read_text()):
-                # We don't need the segmentation mask
-                del det['segmentation']
-                # Bounding box formats:
-                # - CNOS/SAM baseline.json: [xmin, ymin, width, height]
-                # - Megapose expects: [xmin, ymin, xmax, ymax]
-                x, y, w, h = det['bbox']
-                det['bbox'] = [float(v) for v in [x, y, x+w, y+h]]
-                det['bbox_modal'] = det['bbox']
-
-                # HACK: object models are same in lm and lmo -> obj labels start with 'lm'
-                if ds_name == 'lmo':
-                    ds_name = 'lm'
-
-                det['label'] = '{}-obj_{}'.format(ds_name, str(det["category_id"]).zfill(6))
-                
-                dets_lst.append(det)
-
-            df_all_dets = pd.DataFrame.from_records(dets_lst)
-
-            df_targets = pd.read_json(self.scene_ds.ds_dir / "test_targets_bop19.json")
+            df_all_dets, df_targets = load_sam_predictions(self.scene_ds.ds_dir.name, self.scene_ds.ds_dir)
 
         for n, data in enumerate(tqdm(self.dataloader)):
             # data is a dict
-            rgb = data["rgb"]
-            depth = data["depth"]
-            K = data["cameras"].K
-
-            # Dirty but avoids creating error when running with real detector
-            dt_det = 0
-
-            ######
-            # Filter the dataframe according to scene id and view id
-            # Transform the data in ObjectData and then Detections
-            ######
-            # Temporary solution
-            if self.inference_cfg.detection_type == "sam":
-                # We assume a unique image ("view") associated with a unique scene_id is 
+            if n < 5:
+                rgb = data["rgb"]
+                depth = data["depth"]
+                K = data["cameras"].K
                 im_info = data['im_infos'][0]
                 scene_id, view_id = im_info['scene_id'], im_info['view_id']
+                # Dirty but avoids creating error when running with real detector
+                dt_det = 0
 
-                df_dets_scene_img = df_all_dets.loc[(df_all_dets['scene_id'] == scene_id) & (df_all_dets['image_id'] == view_id)]
-                df_targets_scene_img = df_targets[(df_targets['scene_id'] == scene_id) & (df_targets['im_id'] == view_id)]
-
-                dt_det += df_dets_scene_img.time.iloc[0]
-
-                #################
-                # Filter detections based on 2 criteria
-                # - 1) Localization 6D task: we can assume that we know which object category and how many instances 
-                # are present in the image
-                obj_ids = df_targets_scene_img.obj_id.to_list()
-                df_dets_scene_img_obj_filt = df_dets_scene_img[df_dets_scene_img['category_id'].isin(obj_ids)]
-                # In case none of the detections category ids match the ones present in the scene,
-                # keep only one detection to avoid downstream error
-                if len(df_dets_scene_img_obj_filt) > 0:
-                    df_dets_scene_img = df_dets_scene_img_obj_filt
+                ######
+                # Filter the dataframe according to scene id and view id
+                # Transform the data in ObjectData and then Detections
+                ######
+                # Temporary solution
+                if self.inference_cfg.detection_type == "sam":
+                    # We assume a unique image ("view") associated with a unique scene_id is 
+                    sam_detections = get_sam_detections(data=data, df_all_dets=df_all_dets, df_targets=df_targets, dt_det=dt_det)
                 else:
-                    df_dets_scene_img = df_dets_scene_img[:1]
+                    sam_detections = None
+                gt_detections = data["gt_detections"].cuda()
+                initial_data = None
+                if data["initial_data"]:
+                    initial_data = data["initial_data"].cuda()
 
-                # TODO: retain only corresponding inst_count number for each detection category_id  
+                obs_tensor = ObservationTensor.from_torch_batched(rgb, depth, K)
+                obs_tensor = obs_tensor.cuda()
 
-                # - 2) Retain detections with best cnos scores (kind of redundant with finalized 1) )
-                # based on expected number of objects in the scene (from groundtruth)
-                nb_gt_dets = df_targets_scene_img.inst_count.sum()
-                
-                # TODO: put that as a parameter somewhere?
-                MARGIN = 1  # if 0, some images will have no detections
-                K_MULT = 1
-                nb_det = K_MULT*nb_gt_dets + MARGIN
-                df_dets_scene_img = df_dets_scene_img.sort_values('score', ascending=False).head(nb_det)
-                #################
+                # GPU warmup for timing
+                if n == 0:
+                    with torch.no_grad():
+                        self.run_inference_pipeline(
+                            pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
+                        )
 
-                lst_dets_scene_img = df_dets_scene_img.to_dict('records')
-
-                if len(lst_dets_scene_img) == 0:
-                    raise(ValueError('lst_dets_scene_img empty!: ', f'scene_id: {scene_id}, image_id/view_id: {view_id}'))                
-
-                # Do not forget the scores that are not present in object data
-                scores = []
-                list_object_data = []
-                for det in lst_dets_scene_img:
-                    list_object_data.append(ObjectData.from_json(det))
-                    scores.append(det['score'])
-                sam_detections = make_detections_from_object_data(list_object_data).to(device)
-                sam_detections.infos['score'] = scores
-
-            else:
-                sam_detections = None
-            gt_detections = data["gt_detections"].cuda()
-            initial_data = None
-            if data["initial_data"]:
-                initial_data = data["initial_data"].cuda()
-
-            obs_tensor = ObservationTensor.from_torch_batched(rgb, depth, K)
-            obs_tensor = obs_tensor.cuda()
-
-            # GPU warmup for timing
-            if n == 0:
+                cuda_timer = CudaTimer()
+                cuda_timer.start()
                 with torch.no_grad():
-                    self.run_inference_pipeline(
+                    all_preds = self.run_inference_pipeline(
                         pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
                     )
+                cuda_timer.end()
+                duration = cuda_timer.elapsed()
 
-            cuda_timer = CudaTimer()
-            cuda_timer.start()
-            with torch.no_grad():
-                all_preds = self.run_inference_pipeline(
-                    pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
-                )
-            cuda_timer.end()
-            duration = cuda_timer.elapsed()
+                total_duration = duration + dt_det
 
-            total_duration = duration + dt_det
-
-            # Add metadata to the predictions for later evaluation
-            for k, v in all_preds.items():
-                v.infos['time'] = total_duration
-                v.infos['scene_id'] = scene_id
-                v.infos['view_id'] = view_id
-                predictions_list[k].append(v)
+                # Add metadata to the predictions for later evaluation
+                for k, v in all_preds.items():
+                    v.infos['time'] = total_duration
+                    v.infos['scene_id'] = scene_id
+                    v.infos['view_id'] = view_id
+                    predictions_list[k].append(v)
 
     # Concatenate the lists of PandasTensorCollections
         predictions = dict()
