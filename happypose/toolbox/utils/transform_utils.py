@@ -34,7 +34,8 @@ def load_SO3_grid(resolution):
     Returns:
         rotmats: [N,3,3]
     """
-    data_fname = PROJECT_DIR / f"src/megapose/data/data_{resolution}.qua"
+    meagpose_dir = PROJECT_DIR / "happypose" / "pose_estimators" / "megapose"
+    data_fname = meagpose_dir / f"src/megapose/data/data_{resolution}.qua"
 
     assert data_fname.is_file(), f"File {data_fname} not found"
 
