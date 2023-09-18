@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview-method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../cosypose/overview-repo.html"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../cosypose/download-data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/test-install.html"><strong aria-hidden="true">5.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html" class="active"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview-method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../megapose/overview-repo.html"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../megapose/download-data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/test-install.html"><strong aria-hidden="true">11.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview_method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../cosypose/overview_repo.html"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../cosypose/download_data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/inference.html"><strong aria-hidden="true">5.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html" class="active"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview_method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../megapose/overview_repo.html"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../megapose/download_data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/inference.html"><strong aria-hidden="true">11.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -167,13 +167,16 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="train-cosypose"><a class="header" href="#train-cosypose">Train CosyPose</a></h1>
+<p>Disclaimer : This part of the repository is still under development.</p>
+<p>Training the detector part of the pose estimation part are independant.</p>
 <h2 id="training-pose-estimator"><a class="header" href="#training-pose-estimator">Training Pose Estimator</a></h2>
-<p>Example</p>
+<p>This script can be used to train both the coarse model or the refiner model.</p>
 <pre><code>python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_pose_training --config ycbv-refiner-syntonly
 </code></pre>
 <h2 id="training-detector"><a class="header" href="#training-detector">Training Detector</a></h2>
 <pre><code>python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_detector_training --config bop-ycbv-synt+real
 </code></pre>
+<p>All the models were trained on 32 GPUs.</p>
 
                     </main>
 
@@ -183,7 +186,7 @@
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="../megapose/overview-method.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../megapose/overview_method.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -197,7 +200,7 @@
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="../megapose/overview-method.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../megapose/overview_method.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

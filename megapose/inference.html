@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Testing your installation - HappyPose</title>
+        <title>Inference - HappyPose</title>
 
 
         <!-- Custom HTML head -->
@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview-method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../cosypose/overview-repo.html"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../cosypose/download-data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/test-install.html"><strong aria-hidden="true">5.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview-method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../megapose/overview-repo.html"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../megapose/download-data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/test-install.html" class="active"><strong aria-hidden="true">11.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview_method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../cosypose/overview_repo.html"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../cosypose/download_data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/inference.html"><strong aria-hidden="true">5.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview_method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../megapose/overview_repo.html"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../megapose/download_data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/inference.html" class="active"><strong aria-hidden="true">11.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,17 +166,25 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="testing-your-installation"><a class="header" href="#testing-your-installation">Testing your installation</a></h1>
-<p>Make sur to <a href="(download-data.html">download</a> the data and models before running this script.</p>
-<h2 id="run-examples"><a class="header" href="#run-examples">Run examples</a></h2>
-<pre><code>python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs
+                        <h1 id="inference"><a class="header" href="#inference">Inference</a></h1>
+<p>Here are provided the minimal commands you have to run in order to run the inference of CosyPose. You need to set up the environment variable <code>$HAPPYPOSE_DATA_DIR</code> as explained in the README. </p>
+<h2 id="1-download-pre-trained-pose-estimation-models"><a class="header" href="#1-download-pre-trained-pose-estimation-models">1. Download pre-trained pose estimation models</a></h2>
+<pre><code class="language-sh">python -m happypose.toolbox.utils.download --megapose_models
+</code></pre>
+<h2 id="2-download-the-example"><a class="header" href="#2-download-the-example">2. Download the example</a></h2>
+<pre><code class="language-sh">cd $HAPPYPOSE_DATA_DIR
+wget https://memmo-data.laas.fr/static/examples.tar.xz
+tar xf examples.tar.xz 
+</code></pre>
+<h2 id="3-run-the-script"><a class="header" href="#3-run-the-script">3. Run the script</a></h2>
+<pre><code class="language-sh">python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs
 </code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../megapose/download-data.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../megapose/download_data.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
@@ -190,7 +198,7 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../megapose/download-data.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../megapose/download_data.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 

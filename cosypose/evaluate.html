@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview-method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../cosypose/overview-repo.html"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../cosypose/download-data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/test-install.html"><strong aria-hidden="true">5.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html" class="active"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview-method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../megapose/overview-repo.html"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../megapose/download-data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/test-install.html"><strong aria-hidden="true">11.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview_method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../cosypose/overview_repo.html"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../cosypose/download_data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/inference.html"><strong aria-hidden="true">5.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html" class="active"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview_method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../megapose/overview_repo.html"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../megapose/download_data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/inference.html"><strong aria-hidden="true">11.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -168,15 +168,16 @@
                     <main>
                         <h1 id="evaluating-cosypose"><a class="header" href="#evaluating-cosypose">Evaluating CosyPose</a></h1>
 <p>Please make sure you followed the steps relative to the evaluation in the main readme.</p>
-<p>This needs to be adapted (SO3_grid not used for CosyPose)</p>
+<p>Please run the following command to evaluate on YCBV dataset</p>
 <pre><code>python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_full_cosypose_eval_new detector_run_id=bop_pbr coarse_run_id=coarse-bop-ycbv-pbr--724183 refiner_run_id=refiner-bop-ycbv-pbr--604090 ds_names=[&quot;ycbv.bop19&quot;] result_id=ycbv-debug detection_coarse_types=[[&quot;detector&quot;,&quot;S03_grid&quot;]]
 </code></pre>
+<p>The other BOP datasets are supported as long as you download the correspond models.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../cosypose/test-install.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../cosypose/inference.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
@@ -190,7 +191,7 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../cosypose/test-install.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../cosypose/inference.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
