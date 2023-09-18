@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="cosypose/overview-method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="cosypose/overview-repo.html"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="cosypose/download-data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="cosypose/test-install.html"><strong aria-hidden="true">5.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="cosypose/evaluate.html"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="cosypose/train.html"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="megapose/overview-method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="megapose/overview-repo.html"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="megapose/download-data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="megapose/test-install.html"><strong aria-hidden="true">11.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="cosypose/overview.html"><strong aria-hidden="true">2.</strong> Overview</a></li><li class="chapter-item expanded "><a href="cosypose/download-data.html"><strong aria-hidden="true">3.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="cosypose/test-install.html"><strong aria-hidden="true">4.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="cosypose/evaluate.html"><strong aria-hidden="true">5.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="cosypose/train.html"><strong aria-hidden="true">6.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="megapose/overview.html"><strong aria-hidden="true">7.</strong> Overview</a></li><li class="chapter-item expanded "><a href="megapose/download-data.html"><strong aria-hidden="true">8.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="megapose/test-install.html"><strong aria-hidden="true">9.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="megapose/evaluate.html"><strong aria-hidden="true">10.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -194,7 +194,7 @@ pip install -r requirements.txt -e .
 </code></pre>
 <h1 id="create-data-directory"><a class="header" href="#create-data-directory">Create data directory</a></h1>
 <pre><code>Create data dir /somewhere/convenient. The dataset to store are quite large.
-export HAPPYPOSE_DATA_DIR=/somewhere/convenient
+export MEGAPOSE_DATA_DIR=/somewhere/convenient
 </code></pre>
 <h1 id="configuration-for-the-evaluation"><a class="header" href="#configuration-for-the-evaluation">Configuration for the evaluation</a></h1>
 <p>If you plan on evaluating CosyPose and Megapose, you need to modify the following lines in <code>bop_toolkit_lib/config.py</code>, replace</p>
@@ -276,13 +276,6 @@ We release 2D detection models (MaskRCNN) and 6D pose estimation models (coarse+
 <h2 id="bop-challenge-2020-single-view-2d-detection--6d-pose-estimation-models"><a class="header" href="#bop-challenge-2020-single-view-2d-detection--6d-pose-estimation-models">BOP challenge 2020: single-view 2D detection + 6D pose estimation models</a></h2>
 <p><img src="cosypose/../../../happypose/pose_estimators/cosypose/images/bop_datasets.png" alt="BOP" /></p>
 <p>We used our {coarse+refinement} single-view 6D pose estimation method in the <a href="https://bop.felk.cvut.cz/challenges/bop-challenge-2020/">BOP challenge 2020</a>. In addition, we trained a MaskRCNN detector (torchvision's implementation) on each of the 7 core datasets (LM-O, T-LESS, TUD-L, IC-BIN, ITODD, HB, YCB-V). We provide 2D detectors and 6D pose estimation models for these datasets. All training (including 2D detector), inference and evaluation code are available in this repository. It can be easily used for another dataset in the BOP format.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="main-entry-points"><a class="header" href="#main-entry-points">Main entry points</a></h1>
-<p>This repository is divided into different entry points</p>
-<ul>
-<li><a href="cosypose/./test-install.html">Inference</a>: <code>run_cosypose_on_example.py</code> is used to run the inference pipeline on a single example image. </li>
-<li><a href="cosypose/./evaluate.html">Evaluation</a>: ̀<code>run_full_cosypose_evaluation.py</code> is ued to first run inference on one or several datasets, and then use the results obtained to evaluate the method on these datasets. </li>
-<li><a href="cosypose/./train.html">Training</a>: <code>run_detector_training.py</code> is used to train the detector part of Cosypose.<code>run_pose_training.py</code> can be used to train the <code>coarse</code> model or the <code>refiner</code> model.</li>
-</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="downloading-and-preparing-the-data"><a class="header" href="#downloading-and-preparing-the-data">Downloading and preparing the data</a></h1>
 <p>All data used (datasets, models, results, ...) are stored in a directory <code>$MEGAPOSE_DATA_DIR</code> that you created in the Readsme. We provide the utilities for downloading required data and models. All of the files can also be <a href="https://www.paris.inria.fr/archive_ylabbeprojectsdata/">downloaded manually</a>.</p>
 <h2 id="bop-datasets"><a class="header" href="#bop-datasets">BOP Datasets</a></h2>
@@ -387,8 +380,48 @@ python -m happypose.toolbox.utils.download --detections=tless_pix2pose_retinanet
 <h2 id="training-detector"><a class="header" href="#training-detector">Training Detector</a></h2>
 <pre><code>python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_detector_training --config bop-ycbv-synt+real
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="overview-method"><a class="header" href="#overview-method">Overview Method</a></h1>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="overview-repository"><a class="header" href="#overview-repository">Overview Repository</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="megapose"><a class="header" href="#megapose">MegaPose</a></h1>
+<p>This repository contains code, models and dataset for our MegaPose paper. </p>
+<p>Yann Labbé, Lucas Manuelli, Arsalan Mousavian, Stephen Tyree, Stan Birchfield, Jonathan Tremblay, Justin Carpentier, Mathieu Aubry, Dieter Fox, Josef Sivic. “MegaPose: 6D Pose Estimation of Novel Objects via Render &amp; Compare.” In: CoRL 2022.</p>
+<p><a href="https://arxiv.org/abs/2212.06870">[Paper]</a> <a href="https://megapose6d.github.io/">[Project page]</a></p>
+<h2 id="news-1"><a class="header" href="#news-1">News</a></h2>
+<ul>
+<li><strong>09.01.2023</strong> We release two new variants of our approach (see the <a href="megapose/overview.html#model-zoo">Model Zoo</a>).</li>
+<li><strong>09.01.2023</strong> Code, models and dataset are released in this repository.</li>
+<li><strong>10.09.2022</strong> The paper is accepted at CoRL 2022.</li>
+</ul>
+<h2 id="contributors"><a class="header" href="#contributors">Contributors</a></h2>
+<p>The main contributors to the code are:</p>
+<ul>
+<li><a href="https://ylabbe.github.io/">Yann Labbé</a> (Inria, NVIDIA internship)</li>
+<li><a href="https://lucasmanuelli.com">Lucas Manuelli</a> (NVIDIA Seattle Robotics Lab)</li>
+</ul>
+<h2 id="citation-1"><a class="header" href="#citation-1">Citation</a></h2>
+<p>If you find this source code useful please cite:</p>
+<pre><code>@inproceedings{labbe2022megapose,
+  title = {{{MegaPose}}: {{6D Pose Estimation}} of {{Novel Objects}} via {{Render}} \&amp; {{Compare}}},
+  booktitle = {CoRL},
+  author = {Labb\'e, Yann and Manuelli, Lucas and Mousavian, Arsalan and Tyree, Stephen and Birchfield, Stan and Tremblay, Jonathan and Carpentier, Justin and Aubry, Mathieu and Fox, Dieter and Sivic, Josef},
+  date = {2022}
+}
+</code></pre>
+<h1 id="overview-1"><a class="header" href="#overview-1">Overview</a></h1>
+<p>This repository contains pre-trained models for pose estimation of novel objects, and our synthetic training dataset. Most notable features are listed below.</p>
+<h2 id="pose-estimation-of-novel-objects"><a class="header" href="#pose-estimation-of-novel-objects">Pose estimation of novel objects</a></h2>
+<img src="megapose/../../../happypose/pose_estimators/megapose/images/pose-estimation.png" width="800">
+<p>We provide pre-trained models for 6D pose estimation of novel objects. </p>
+<p>Given as inputs: </p>
+<ul>
+<li>an RGB image (depth can also be used but is optional),</li>
+<li>the intrinsic parameters of the camera,</li>
+<li>a mesh of the object,</li>
+<li>a bounding box of that object in the image,</li>
+</ul>
+<p>our approach estimates the 6D pose of the object (3D rotation + 3D translation) with respect to the camera. </p>
+<p>We provide a script and an example for inference on novel objects. After installation, please see the <a href="megapose/overview.html#inference-tutorial">Inference tutorial</a>.</p>
+<h2 id="large-scale-synthetic-dataset"><a class="header" href="#large-scale-synthetic-dataset">Large-scale synthetic dataset</a></h2>
+<img src="megapose/../../../happypose/pose_estimators/megapose/images/dataset.jpg" width="800">
+<p>We provide the synthetic dataset we used to train MegaPose. The dataset contains 2 million images displaying more than 20,000 objects from the Google Scanned Objects and ShapeNet datasets. After installation, please see the <a href="megapose/overview.html#dataset">Dataset section</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="download-example-data-for-minimal-testing"><a class="header" href="#download-example-data-for-minimal-testing">Download example data for minimal testing</a></h1>
 <pre><code>cd $MEGAPOSE_DATA_DIR
 wget https://memmo-data.laas.fr/static/examples.tar.xz
