@@ -37,7 +37,7 @@ class TestMegaPoseInference(unittest.TestCase):
         )
 
         scores = data["coarse"]["data"]["logits"]
-        self.assertGreater(scores[0], scores[1])  # 278 is better than 477
+        self.assertGreater(scores[0, 0], scores[0, 1])  # 278 is better than 477
 
         self.assertEqual(len(preds), 1)
         self.assertEqual(preds.infos.label[0], "ycbv-obj_000002")
