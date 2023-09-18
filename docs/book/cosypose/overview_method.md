@@ -51,24 +51,24 @@ This repository contains the code for the full CosyPose approach, including:
 
 ## Single-view single-object 6D pose estimator
 
-![Single view predictions](../../../happypose/pose_estimators/cosypose/images/example_predictions.png)
+![Single view predictions](./images/example_predictions.png)
   
   Given an RGB image and a 2D bounding box of an object with known 3D model, the 6D pose estimator predicts the full 6D pose of the object with respect to the camera. Our method is inspired by DeepIM with several simplifications and technical improvements. It is fully implemented in pytorch and achieve single-view state-of-the-art on YCB-Video and T-LESS. We provide pre-trained models used in our experiments on both datasets. We make the training code that we used to train them available. It can be parallelized on multiple GPUs and multiple nodes.
 
 ## Synthetic data generation
 
-![Synthetic images](../../../happypose/pose_estimators/cosypose/images/synthetic_images.png)
+![Synthetic images](./images/synthetic_images.png)
 
 The single-view 6D pose estimation models are trained on a mix of synthetic and real images. We provide the code for generating the additional synthetic images.
 
 ## Multi-view multi-object scene reconstruction
 
-![Multiview](../../../happypose/pose_estimators/cosypose/images/multiview.png)
+![Multiview](./images/multiview.png)
 
 Single-view object-level reconstruction of a scene often fails because of detection mistakes, pose estimation errors and occlusions; which makes it impractical for real applications. Our multi-view approach, CosyPose, addresses these single-view limitations and helps improving 6D pose accuracy by leveraging information from multiple cameras with unknown positions. We provide the full code, including robust object-level multi-view matching and global scene refinement. The method is agnostic to the 6D pose estimator used, and can therefore be combined with many other existing single-view object pose estimation method to solve problems on other datasets, or in real scenarios. We provide a utility for running CosyPose given a set of input 6D object candidates in each image.
 
 ## BOP challenge 2020: single-view 2D detection + 6D pose estimation models
 
-![BOP](../../../happypose/pose_estimators/cosypose/images/bop_datasets.png)
+![BOP](./images/bop_datasets.png)
 
 We used our {coarse+refinement} single-view 6D pose estimation method in the [BOP challenge 2020](https://bop.felk.cvut.cz/challenges/bop-challenge-2020/). In addition, we trained a MaskRCNN detector (torchvision's implementation) on each of the 7 core datasets (LM-O, T-LESS, TUD-L, IC-BIN, ITODD, HB, YCB-V). We provide 2D detectors and 6D pose estimation models for these datasets. All training (including 2D detector), inference and evaluation code are available in this repository. It can be easily used for another dataset in the BOP format.

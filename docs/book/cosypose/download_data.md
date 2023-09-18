@@ -1,11 +1,11 @@
 # Downloading and preparing the data
 
 
-All data used (datasets, models, results, ...) are stored in a directory `$MEGAPOSE_DATA_DIR` that you created in the Readsme. We provide the utilities for downloading required data and models. All of the files can also be [downloaded manually](https://www.paris.inria.fr/archive_ylabbeprojectsdata/).
+All data used (datasets, models, results, ...) are stored in a directory `$HAPPYPOSE_DATA_DIR` that you created in the Readsme. We provide the utilities for downloading required data and models. All of the files can also be [downloaded manually](https://www.paris.inria.fr/archive_ylabbeprojectsdata/).
 
 ## BOP Datasets
 
-For both T-LESS and YCB-Video, we use the datasets in the [BOP format](https://bop.felk.cvut.cz/datasets/). If you already have them on your disk, place them in `$MEGAPOSE_DATA_DIR/bop_datasets`. Alternatively, you can download it using :
+For both T-LESS and YCB-Video, we use the datasets in the [BOP format](https://bop.felk.cvut.cz/datasets/). If you already have them on your disk, place them in `$HAPPYPOSE_DATA_DIR/bop_datasets`. Alternatively, you can download it using :
 
 ```sh
 python -m happypose.toolbox.utils.download --bop_dataset=ycbv

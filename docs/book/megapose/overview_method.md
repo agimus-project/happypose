@@ -31,7 +31,7 @@ If you find this source code useful please cite:
 This repository contains pre-trained models for pose estimation of novel objects, and our synthetic training dataset. Most notable features are listed below.
 
 ## Pose estimation of novel objects
-<img src="../../../happypose/pose_estimators/megapose/images/pose-estimation.png" width="800">
+<img src="./images/pose-estimation.png" width="800">
 
 We provide pre-trained models for 6D pose estimation of novel objects. 
 
@@ -46,6 +46,6 @@ our approach estimates the 6D pose of the object (3D rotation + 3D translation) 
 We provide a script and an example for inference on novel objects. After installation, please see the [Inference tutorial](#inference-tutorial).
 
 ## Large-scale synthetic dataset
-<img src="../../../happypose/pose_estimators/megapose/images/dataset.jpg" width="800">
+<img src="./images/dataset.jpg" width="800">
 
 We provide the synthetic dataset we used to train MegaPose. The dataset contains 2 million images displaying more than 20,000 objects from the Google Scanned Objects and ShapeNet datasets. After installation, please see the [Dataset section](#dataset).
