@@ -1,6 +1,9 @@
 name: Build and Deploy book
 
-on: [push]
+on:
+  push:
+    branches:
+      - dev
 
 permissions:
   contents: write
@@ -11,13 +14,25 @@ jobs:
     container:
       image: nim65s/cargo-binstall:mdbook
     steps:
-      - name: Install deploy tools
-        run: apt update && apt install -qy git rsync
-      - name: Checkout 🛎️
+      - name: Checkout
         uses: actions/checkout@v3
       - name: Build
         run: mdbook build
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+      - uses: actions/upload-pages-artifact@v1
         with:
-          folder: book
+          path: book/
+
+  deploy:
+    name: publish on github pages
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
