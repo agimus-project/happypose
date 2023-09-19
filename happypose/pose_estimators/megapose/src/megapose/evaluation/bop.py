@@ -50,47 +50,37 @@ DUMMY_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_dummy.py"
 ##################################
 import os
 
-# New CNOS detection from Nguyen drive
-# CNOS_SUBMISSION_FILES = {
-#     "ycbv": 'sam_pbr_ycbv.json', 
-#     "lmo": 'sam_pbr_lmo.json', 
-#     "tless": 'sam_pbr_tless.json', 
-#     "tudl": 'sam_pbr_tudl.json', 
-#     "icbin": 'sam_pbr_icbin.json', 
-#     "itodd": 'sam_pbr_itodd.json', 
-#     "hb": 'sam_pbr_hb.json', 
+# # Official Task 4 detections (CNOS fastSAM)
+# EXTERNAL_DETECTIONS_FILES = {
+#     "ycbv": 'cnos-fastsam_ycbv-test_f4f2127c-6f59-447c-95b3-28e1e591f1a1.json', 
+#     "lmo": 'cnos-fastsam_lmo-test_3cb298ea-e2eb-4713-ae9e-5a7134c5da0f.json', 
+#     "tless": 'cnos-fastsam_tless-test_8ca61cb0-4472-4f11-bce7-1362a12d396f.json', 
+#     "tudl": 'cnos-fastsam_tudl-test_c48a2a95-1b41-4a51-9920-a667cb3d7149.json', 
+#     "icbin": 'cnos-fastsam_icbin-test_f21a9faf-7ef2-4325-885f-f4b6460f4432.json', 
+#     "itodd": 'cnos-fastsam_itodd-test_df32d45b-301c-4fc9-8769-797904dd9325.json', 
+#     "hb": 'cnos-fastsam_hb-test_db836947-020a-45bd-8ec5-c95560b68011.json', 
 # }
 
-# CNOS_SUBMISSION_FILES = {
-#     "ycbv": 'fastSAM_pbr_ycbv.json', 
-#     "lmo": 'fastSAM_pbr_lmo.json', 
-#     "tless": 'fastSAM_pbr_tless.json', 
-#     "tudl": 'fastSAM_pbr_tudl.json', 
-#     "icbin": 'fastSAM_pbr_icbin.json', 
-#     "itodd": 'fastSAM_pbr_itodd.json', 
-#     "hb": 'fastSAM_pbr_hb.json', 
-# }
 
-# New official default detections -> fastSAM method, same as nguyen's drive
-CNOS_SUBMISSION_FILES = {
-    "ycbv": 'cnos-fastsam_ycbv-test_f4f2127c-6f59-447c-95b3-28e1e591f1a1.json', 
-    "lmo": 'cnos-fastsam_lmo-test_3cb298ea-e2eb-4713-ae9e-5a7134c5da0f.json', 
-    "tless": 'cnos-fastsam_tless-test_8ca61cb0-4472-4f11-bce7-1362a12d396f.json', 
-    "tudl": 'cnos-fastsam_tudl-test_c48a2a95-1b41-4a51-9920-a667cb3d7149.json', 
-    "icbin": 'cnos-fastsam_icbin-test_f21a9faf-7ef2-4325-885f-f4b6460f4432.json', 
-    "itodd": 'cnos-fastsam_itodd-test_df32d45b-301c-4fc9-8769-797904dd9325.json', 
-    "hb": 'cnos-fastsam_hb-test_db836947-020a-45bd-8ec5-c95560b68011.json', 
+# Official Task 1 detections (gdrnppdet-pbrreal)
+EXTERNAL_DETECTIONS_FILES = {
+    "ycbv": 'gdrnppdet-pbrreal_ycbv-test_abe6c5f1-cb26-4bbd-addc-bb76dd722a96.json', 
+    "lmo": 'gdrnppdet-pbrreal_lmo-test_202a2f15-cbd0-49df-90de-650428c6d157.json', 
+    "tless": 'gdrnppdet-pbrreal_tless-test_e112ecb4-7f56-4107-8a21-945bc7661267.json', 
+    "tudl": 'gdrnppdet-pbrreal_tudl-test_66fd26f1-bebf-493b-a42a-d71e8d10c479.json', 
+    "icbin": 'gdrnppdet-pbrreal_icbin-test_a46668ed-f76b-40ca-9954-708b198c2ab0.json', 
+    "itodd": 'gdrnppdet-pbrreal_itodd-test_9559c160-9507-4d09-94a5-ef0d6e8f22ce.json', 
+    "hb": 'gdrnppdet-pbrreal_hb-test_94485f5a-98ea-48f1-9472-06f4ceecad41.json', 
 }
 
 
+EXTERNAL_DETECTIONS_DIR = os.environ.get('EXTERNAL_DETECTIONS_DIR')
+assert(EXTERNAL_DETECTIONS_DIR is not None)
+EXTERNAL_DETECTIONS_DIR = Path(EXTERNAL_DETECTIONS_DIR)
 
-CNOS_SUBMISSION_DIR = os.environ.get('CNOS_SUBMISSION_DIR')
-assert(CNOS_SUBMISSION_DIR is not None)
-CNOS_SUBMISSION_DIR = Path(CNOS_SUBMISSION_DIR)
-
-CNOS_SUBMISSION_PATHS = {ds_name: CNOS_SUBMISSION_DIR / fname for ds_name, fname in CNOS_SUBMISSION_FILES.items()}
+CNOS_SUBMISSION_PATHS = {ds_name: EXTERNAL_DETECTIONS_DIR / fname for ds_name, fname in EXTERNAL_DETECTIONS_FILES.items()}
 # Check if all paths exist
-assert( sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()) == len(CNOS_SUBMISSION_FILES))
+assert( sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()) == len(EXTERNAL_DETECTIONS_FILES))
 ##################################
 ##################################
 
@@ -284,10 +274,11 @@ def load_sam_predictions(ds_dir_name, scene_ds_dir):
     """
     dets_lst = []
     for det in json.loads(detections_path.read_text()):
-        # We don't need the segmentation mask
-        del det['segmentation']
+        # We don't need the segmentation mask (not always present in the submissions)
+        if 'segmentation' in det:
+            del det['segmentation']
         # Bounding box formats:
-        # - CNOS/SAM baseline.json: [xmin, ymin, width, height]
+        # - BOP format: [xmin, ymin, width, height]
         # - Megapose expects: [xmin, ymin, xmax, ymax]
         x, y, w, h = det['bbox']
         det['bbox'] = [float(v) for v in [x, y, x+w, y+h]]
