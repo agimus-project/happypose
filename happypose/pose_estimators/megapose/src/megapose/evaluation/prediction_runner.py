@@ -201,57 +201,56 @@ class PredictionRunner:
 
         for n, data in enumerate(tqdm(self.dataloader)):
             # data is a dict
-            if n < 5:
-                rgb = data["rgb"]
-                depth = data["depth"]
-                K = data["cameras"].K
-                im_info = data['im_infos'][0]
-                scene_id, view_id = im_info['scene_id'], im_info['view_id']
-                # Dirty but avoids creating error when running with real detector
-                dt_det = 0
+            rgb = data["rgb"]
+            depth = data["depth"]
+            K = data["cameras"].K
+            im_info = data['im_infos'][0]
+            scene_id, view_id = im_info['scene_id'], im_info['view_id']
+            # Dirty but avoids creating error when running with real detector
+            dt_det = 0
 
-                ######
-                # Filter the dataframe according to scene id and view id
-                # Transform the data in ObjectData and then Detections
-                ######
-                # Temporary solution
-                if self.inference_cfg.detection_type == "sam":
-                    # We assume a unique image ("view") associated with a unique scene_id is 
-                    sam_detections = get_sam_detections(data=data, df_all_dets=df_all_dets, df_targets=df_targets, dt_det=dt_det)
-                else:
-                    sam_detections = None
-                gt_detections = data["gt_detections"].cuda()
-                initial_data = None
-                if data["initial_data"]:
-                    initial_data = data["initial_data"].cuda()
+            ######
+            # Filter the dataframe according to scene id and view id
+            # Transform the data in ObjectData and then Detections
+            ######
+            # Temporary solution
+            if self.inference_cfg.detection_type == "sam":
+                # We assume a unique image ("view") associated with a unique scene_id is 
+                sam_detections = get_sam_detections(data=data, df_all_dets=df_all_dets, df_targets=df_targets, dt_det=dt_det)
+            else:
+                sam_detections = None
+            gt_detections = data["gt_detections"].cuda()
+            initial_data = None
+            if data["initial_data"]:
+                initial_data = data["initial_data"].cuda()
 
-                obs_tensor = ObservationTensor.from_torch_batched(rgb, depth, K)
-                obs_tensor = obs_tensor.cuda()
+            obs_tensor = ObservationTensor.from_torch_batched(rgb, depth, K)
+            obs_tensor = obs_tensor.cuda()
 
-                # GPU warmup for timing
-                if n == 0:
-                    with torch.no_grad():
-                        self.run_inference_pipeline(
-                            pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
-                        )
-
-                cuda_timer = CudaTimer()
-                cuda_timer.start()
+            # GPU warmup for timing
+            if n == 0:
                 with torch.no_grad():
-                    all_preds = self.run_inference_pipeline(
+                    self.run_inference_pipeline(
                         pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
                     )
-                cuda_timer.end()
-                duration = cuda_timer.elapsed()
 
-                total_duration = duration + dt_det
+            cuda_timer = CudaTimer()
+            cuda_timer.start()
+            with torch.no_grad():
+                all_preds = self.run_inference_pipeline(
+                    pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
+                )
+            cuda_timer.end()
+            duration = cuda_timer.elapsed()
 
-                # Add metadata to the predictions for later evaluation
-                for k, v in all_preds.items():
-                    v.infos['time'] = total_duration
-                    v.infos['scene_id'] = scene_id
-                    v.infos['view_id'] = view_id
-                    predictions_list[k].append(v)
+            total_duration = duration + dt_det
+
+            # Add metadata to the predictions for later evaluation
+            for k, v in all_preds.items():
+                v.infos['time'] = total_duration
+                v.infos['scene_id'] = scene_id
+                v.infos['view_id'] = view_id
+                predictions_list[k].append(v)
 
     # Concatenate the lists of PandasTensorCollections
         predictions = dict()

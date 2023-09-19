@@ -63,7 +63,6 @@ class App(ShowBase):
         p3d.core.load_prc_file_data(
             __file__,
             "load-display pandagl\n"
-            "gl-version 3 2\n"
             "notify-level-assimp fatal\n"
             "notify-level-egldisplay fatal\n"
             "notify-level-glgsg fatal\n"
