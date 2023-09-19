@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Downloading and preparing the data - HappyPose</title>
+        <title>Overview Repository - HappyPose</title>
 
 
         <!-- Custom HTML head -->
@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview.html"><strong aria-hidden="true">2.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../cosypose/download-data.html" class="active"><strong aria-hidden="true">3.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/test-install.html"><strong aria-hidden="true">4.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">5.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">6.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview.html"><strong aria-hidden="true">7.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../megapose/download-data.html"><strong aria-hidden="true">8.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/test-install.html"><strong aria-hidden="true">9.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">10.</strong> Evaluate MegaPose</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview_method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../cosypose/overview_repo.html" class="active"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../cosypose/download_data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/inference.html"><strong aria-hidden="true">5.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview_method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../megapose/overview_repo.html"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../megapose/download_data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/inference.html"><strong aria-hidden="true">11.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,91 +166,23 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="downloading-and-preparing-the-data"><a class="header" href="#downloading-and-preparing-the-data">Downloading and preparing the data</a></h1>
-<p>All data used (datasets, models, results, ...) are stored in a directory <code>$MEGAPOSE_DATA_DIR</code> that you created in the Readsme. We provide the utilities for downloading required data and models. All of the files can also be <a href="https://www.paris.inria.fr/archive_ylabbeprojectsdata/">downloaded manually</a>.</p>
-<h2 id="bop-datasets"><a class="header" href="#bop-datasets">BOP Datasets</a></h2>
-<p>For both T-LESS and YCB-Video, we use the datasets in the <a href="https://bop.felk.cvut.cz/datasets/">BOP format</a>. If you already have them on your disk, place them in <code>$MEGAPOSE_DATA_DIR/bop_datasets</code>. Alternatively, you can download it using :</p>
-<pre><code class="language-sh">python -m happypose.toolbox.utils.download --bop_dataset=ycbv
-python -m happypose.toolbox.utils.download --bop_dataset=tless
-</code></pre>
-<p>Additional files that contain information about the datasets used to fairly compare with prior works on both datasets.</p>
-<pre><code class="language-sh">python -m happypose.toolbox.utils.download --bop_extra_files=ycbv
-python -m happypose.toolbox.utils.download --bop_extra_files=tless
-</code></pre>
-<p>We use <a href="https://pybullet.org/wordpress/">pybullet</a> for rendering images which requires object models to be provided in the URDF format. We provide converted URDF files, they can be downloaded using:</p>
-<pre><code class="language-sh">python -m happypose.toolbox.utils.download --urdf_models=ycbv
-python -m happypose.toolbox.utils.download --urdf_models=tless.cad
-</code></pre>
-<p>In the BOP format, the YCB objects <code>002_master_chef_can</code> and <code>040_large_marker</code> are considered symmetric, but not by previous works such as PoseCNN, PVNet and DeepIM. To ensure a fair comparison (using ADD instead of ADD-S for ADD-(S) for these objects), these objects must <em>not</em> be considered symmetric in the evaluation. To keep the uniformity of the models format, we generate a set of YCB objects <code>models_bop-compat_eval</code> that can be used to fairly compare our approach against previous works. You can download them directly:</p>
-<pre><code class="language-sh">python -m happypose.toolbox.utils.download --ycbv_compat_models
-</code></pre>
-<p>Notes:</p>
+                        <h1 id="main-entry-points"><a class="header" href="#main-entry-points">Main entry points</a></h1>
+<p>This repository is divided into different entry points</p>
 <ul>
-<li>
-<p>The URDF files were obtained using these commands (requires <code>meshlab</code> to be installed):</p>
-<pre><code class="language-sh">python -m happypose.pose_estimators.cosypose.cosypose.scripts.convert_models_to_urdf --models=ycbv
-python -m happypose.pose_estimators.cosypose.cosypose.scripts.convert_models_to_urdf --models=tless.cad
-</code></pre>
-</li>
-<li>
-<p>Compatibility models were obtained using the following script:</p>
-<pre><code class="language-sh">python -m happypose.pose_estimators.cosypose.cosypose.scripts.make_ycbv_compat_models
-</code></pre>
-</li>
+<li><a href="./test-install.html">Inference</a>: <code>run_cosypose_on_example.py</code> is used to run the inference pipeline on a single example image. </li>
+<li><a href="./evaluate.html">Evaluation</a>: <code>run_full_cosypose_evaluation.py</code> is ued to first run inference on one or several datasets, and then use the results obtained to evaluate the method on these datasets. </li>
+<li><a href="./train.html">Training</a>: <code>run_detector_training.py</code> is used to train the detector part of Cosypose.<code>run_pose_training.py</code> can be used to train the <code>coarse</code> model or the <code>refiner</code> model.</li>
 </ul>
-<h2 id="models-for-minimal-version"><a class="header" href="#models-for-minimal-version">Models for minimal version</a></h2>
-<pre><code class="language-sh"> #ycbv
-  python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
-  python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
-  python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
 
- #tless
-  python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-tless-pbr--873074
-  python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-tless-pbr--506801
-  python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-tless-pbr--233420
-</code></pre>
-<h2 id="pre-trained-models-for-single-view-estimator"><a class="header" href="#pre-trained-models-for-single-view-estimator">Pre-trained models for single-view estimator</a></h2>
-<p>The pre-trained models of the single-view pose estimator can be downloaded using:</p>
-<pre><code class="language-sh"># YCB-V Single-view refiner
-python -m happypose.toolbox.utils.download --cosypose_model=ycbv-refiner-finetune--251020
-
-# YCB-V Single-view refiner trained on synthetic data only
-# Only download this if you are interested in retraining the above model
-python -m happypose.toolbox.utils.download --cosypose_model=ycbv-refiner-syntonly--596719
-
-# T-LESS coarse and refiner models
-python -m happypose.toolbox.utils.download --cosypose_model=tless-coarse--10219
-python -m happypose.toolbox.utils.download --cosypose_model=tless-refiner--585928
-</code></pre>
-<h2 id="2d-detections"><a class="header" href="#2d-detections">2D detections</a></h2>
-<p>To ensure a fair comparison with prior works on both datasets, we use the same detections as DeepIM (from PoseCNN) on YCB-Video and the same as Pix2pose (from a RetinaNet model) on T-LESS. Download the saved 2D detections for both datasets using</p>
-<pre><code class="language-sh">python -m happypose.toolbox.utils.download --detections=ycbv_posecnn
-
-# SiSo detections: 1 detection with highest per score per class per image on all images
-# Available for each image of the T-LESS dataset (primesense sensor)
-# These are the same detections as used in Pix2pose's experiments
-python -m happypose.toolbox.utils.download --detections=tless_pix2pose_retinanet_siso_top1
-
-# ViVo detections: All detections for a subset of 1000 images of T-LESS.
-# Used in our multi-view experiments.
-python -m happypose.toolbox.utils.download --detections=tless_pix2pose_retinanet_vivo_all
-</code></pre>
-<p>If you are interested in re-training a detector, please see the BOP 2020 section.</p>
-<p>Notes:</p>
-<ul>
-<li>The PoseCNN detections (and coarse pose estimates) on YCB-Video were extracted and converted from <a href="https://github.com/yuxng/YCB_Video_toolbox/blob/master/results_PoseCNN_RSS2018.zip">these PoseCNN results</a>.</li>
-<li>The Pix2pose detections were extracted using <a href="https://github.com/kirumang/Pix2Pose">pix2pose's</a> code. We used the detection model from their paper, see <a href="https://github.com/kirumang/Pix2Pose#download-pre-trained-weights">here</a>. For the ViVo detections, their code was slightly modified. The code used to extract detections can be found <a href="https://github.com/ylabbe/pix2pose_cosypose">here</a>.</li>
-</ul>
-</details>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../cosypose/overview.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../cosypose/overview_method.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="../cosypose/test-install.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../cosypose/download_data.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -260,11 +192,11 @@ python -m happypose.toolbox.utils.download --detections=tless_pix2pose_retinanet
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../cosypose/overview.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../cosypose/overview_method.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="../cosypose/test-install.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../cosypose/download_data.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

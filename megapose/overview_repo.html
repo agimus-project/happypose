@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Overview - HappyPose</title>
+        <title>Overview Repository - HappyPose</title>
 
 
         <!-- Custom HTML head -->
@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview.html" class="active"><strong aria-hidden="true">2.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../cosypose/download-data.html"><strong aria-hidden="true">3.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/test-install.html"><strong aria-hidden="true">4.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">5.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">6.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview.html"><strong aria-hidden="true">7.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../megapose/download-data.html"><strong aria-hidden="true">8.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/test-install.html"><strong aria-hidden="true">9.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">10.</strong> Evaluate MegaPose</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="../cosypose/overview_method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../cosypose/overview_repo.html"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../cosypose/download_data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../cosypose/inference.html"><strong aria-hidden="true">5.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../cosypose/evaluate.html"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="../cosypose/train.html"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="../megapose/overview_method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="../megapose/overview_repo.html" class="active"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="../megapose/download_data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="../megapose/inference.html"><strong aria-hidden="true">11.</strong> Inference</a></li><li class="chapter-item expanded "><a href="../megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,71 +166,16 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 align="center">
-CosyPose: Consistent multi-view multi-object 6D pose estimation
-</h1>
-<div align="center">
-<h3>
-<a href="http://ylabbe.github.io">Yann Labbé</a>,
-<a href="https://jcarpent.github.io/">Justin Carpentier</a>,
-<a href="http://imagine.enpc.fr/~aubrym/">Mathieu Aubry</a>,
-<a href="http://www.di.ens.fr/~josef/">Josef Sivic</a>
-<br>
-<br>
-ECCV: European Conference on Computer Vision, 2020
-<br>
-<br>
-<a href="https://arxiv.org/abs/2008.08465">[Paper]</a>
-<a href="https://www.di.ens.fr/willow/research/cosypose/">[Project page]</a>
-<a href="https://youtu.be/4QYyEvnrC_o">[Video (1 min)]</a>
-<a href="https://youtu.be/MNH_Ez7bcP0">[Video (10 min)]</a>
-<a href="https://docs.google.com/presentation/d/1APHpaKKnkIvmquNJUVqERiMN4gEQ10Jt4IY7wTfIVgE/edit?usp=sharing">[Slides]</a>
-<br>
-<br>
-Winner of the <a href="https://bop.felk.cvut.cz/challenges/bop-challenge-2020/">BOP Challenge 2020 </a> at ECCV'20 <a href="https://docs.google.com/presentation/d/1jZDu4mw-uNcwzr5jMFlqEddZsb7SjQozXVG3dT6-1M0/edit?usp=sharing">[slides]</a>  <a href="https://arxiv.org/abs/2009.07378"> [BOP challenge paper] </a>
-</h3>
-</div>
-<h1 id="citation"><a class="header" href="#citation">Citation</a></h1>
-<p>If you use this code in your research, please cite the paper:</p>
-<pre><code class="language-bibtex">@inproceedings{labbe2020,
-title= {CosyPose: Consistent multi-view multi-object 6D pose estimation}
-author={Y. {Labbe} and J. {Carpentier} and M. {Aubry} and J. {Sivic}},
-booktitle={Proceedings of the European Conference on Computer Vision (ECCV)},
-year={2020}}
-</code></pre>
-<h1 id="news"><a class="header" href="#news">News</a></h1>
-<ul>
-<li>CosyPose is the winning method in the <a href="https://bop.felk.cvut.cz/challenges/">BOP challenge 2020</a> (5 awards in total, including best overall method and best RGB-only method) ! All the code and models used for the challenge are available in this repository.</li>
-<li>We participate in the <a href="https://bop.felk.cvut.cz/challenges/bop-challenge-2020/">BOP challenge 2020</a>.
-Results are available on the public <a href="https://bop.felk.cvut.cz/leaderboards/">leaderboard</a> for 7 pose estimation benchmarks.
-We release 2D detection models (MaskRCNN) and 6D pose estimation models (coarse+refiner) used on each dataset.</li>
-<li>The paper is available on arXiv and full code is released.</li>
-<li>Our paper on CosyPose is accepted at ECCV 2020.</li>
-</ul>
-<p>This repository contains the code for the full CosyPose approach, including:</p>
-<h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
-<h2 id="single-view-single-object-6d-pose-estimator"><a class="header" href="#single-view-single-object-6d-pose-estimator">Single-view single-object 6D pose estimator</a></h2>
-<p><img src="../../../happypose/pose_estimators/cosypose/images/example_predictions.png" alt="Single view predictions" /></p>
-<p>Given an RGB image and a 2D bounding box of an object with known 3D model, the 6D pose estimator predicts the full 6D pose of the object with respect to the camera. Our method is inspired by DeepIM with several simplifications and technical improvements. It is fully implemented in pytorch and achieve single-view state-of-the-art on YCB-Video and T-LESS. We provide pre-trained models used in our experiments on both datasets. We make the training code that we used to train them available. It can be parallelized on multiple GPUs and multiple nodes.</p>
-<h2 id="synthetic-data-generation"><a class="header" href="#synthetic-data-generation">Synthetic data generation</a></h2>
-<p><img src="../../../happypose/pose_estimators/cosypose/images/synthetic_images.png" alt="Synthetic images" /></p>
-<p>The single-view 6D pose estimation models are trained on a mix of synthetic and real images. We provide the code for generating the additional synthetic images.</p>
-<h2 id="multi-view-multi-object-scene-reconstruction"><a class="header" href="#multi-view-multi-object-scene-reconstruction">Multi-view multi-object scene reconstruction</a></h2>
-<p><img src="../../../happypose/pose_estimators/cosypose/images/multiview.png" alt="Multiview" /></p>
-<p>Single-view object-level reconstruction of a scene often fails because of detection mistakes, pose estimation errors and occlusions; which makes it impractical for real applications. Our multi-view approach, CosyPose, addresses these single-view limitations and helps improving 6D pose accuracy by leveraging information from multiple cameras with unknown positions. We provide the full code, including robust object-level multi-view matching and global scene refinement. The method is agnostic to the 6D pose estimator used, and can therefore be combined with many other existing single-view object pose estimation method to solve problems on other datasets, or in real scenarios. We provide a utility for running CosyPose given a set of input 6D object candidates in each image.</p>
-<h2 id="bop-challenge-2020-single-view-2d-detection--6d-pose-estimation-models"><a class="header" href="#bop-challenge-2020-single-view-2d-detection--6d-pose-estimation-models">BOP challenge 2020: single-view 2D detection + 6D pose estimation models</a></h2>
-<p><img src="../../../happypose/pose_estimators/cosypose/images/bop_datasets.png" alt="BOP" /></p>
-<p>We used our {coarse+refinement} single-view 6D pose estimation method in the <a href="https://bop.felk.cvut.cz/challenges/bop-challenge-2020/">BOP challenge 2020</a>. In addition, we trained a MaskRCNN detector (torchvision's implementation) on each of the 7 core datasets (LM-O, T-LESS, TUD-L, IC-BIN, ITODD, HB, YCB-V). We provide 2D detectors and 6D pose estimation models for these datasets. All training (including 2D detector), inference and evaluation code are available in this repository. It can be easily used for another dataset in the BOP format.</p>
-
+                        
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../../../index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../megapose/overview_method.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="../cosypose/download-data.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../megapose/download_data.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -240,11 +185,11 @@ We release 2D detection models (MaskRCNN) and 6D pose estimation models (coarse+
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../../../index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../megapose/overview_method.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="../cosypose/download-data.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../megapose/download_data.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
