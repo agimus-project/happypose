@@ -1,6 +1,9 @@
 name: Build and Deploy book
 
-on: [push]
+on:
+  push:
+    branches:
+      - dev
 
 permissions:
   contents: write
