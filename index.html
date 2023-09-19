@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../../index.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="cosypose/overview_method.html"><strong aria-hidden="true">2.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="cosypose/overview_repo.html"><strong aria-hidden="true">3.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="cosypose/download_data.html"><strong aria-hidden="true">4.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="cosypose/inference.html"><strong aria-hidden="true">5.</strong> Inference</a></li><li class="chapter-item expanded "><a href="cosypose/evaluate.html"><strong aria-hidden="true">6.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="cosypose/train.html"><strong aria-hidden="true">7.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="megapose/overview_method.html"><strong aria-hidden="true">8.</strong> Overview Method</a></li><li class="chapter-item expanded "><a href="megapose/overview_repo.html"><strong aria-hidden="true">9.</strong> Overview Repository</a></li><li class="chapter-item expanded "><a href="megapose/download_data.html"><strong aria-hidden="true">10.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="megapose/inference.html"><strong aria-hidden="true">11.</strong> Inference</a></li><li class="chapter-item expanded "><a href="megapose/evaluate.html"><strong aria-hidden="true">12.</strong> Evaluate MegaPose</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../index.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">CosyPose</li><li class="chapter-item expanded "><a href="cosypose/overview.html"><strong aria-hidden="true">2.</strong> Overview</a></li><li class="chapter-item expanded "><a href="cosypose/download-data.html"><strong aria-hidden="true">3.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="cosypose/test-install.html"><strong aria-hidden="true">4.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="cosypose/evaluate.html"><strong aria-hidden="true">5.</strong> Evaluate CosyPose</a></li><li class="chapter-item expanded "><a href="cosypose/train.html"><strong aria-hidden="true">6.</strong> Train CosyPose</a></li><li class="chapter-item expanded affix "><li class="part-title">MegaPose</li><li class="chapter-item expanded "><a href="megapose/overview.html"><strong aria-hidden="true">7.</strong> Overview</a></li><li class="chapter-item expanded "><a href="megapose/download-data.html"><strong aria-hidden="true">8.</strong> Downloading and preparing the data</a></li><li class="chapter-item expanded "><a href="megapose/test-install.html"><strong aria-hidden="true">9.</strong> Testing your installation</a></li><li class="chapter-item expanded "><a href="megapose/evaluate.html"><strong aria-hidden="true">10.</strong> Evaluate MegaPose</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -193,7 +193,7 @@ pip install -r requirements.txt -e .
 </code></pre>
 <h1 id="create-data-directory"><a class="header" href="#create-data-directory">Create data directory</a></h1>
 <pre><code>Create data dir /somewhere/convenient. The dataset to store are quite large.
-export HAPPYPOSE_DATA_DIR=/somewhere/convenient
+export MEGAPOSE_DATA_DIR=/somewhere/convenient
 </code></pre>
 <h1 id="configuration-for-the-evaluation"><a class="header" href="#configuration-for-the-evaluation">Configuration for the evaluation</a></h1>
 <p>If you plan on evaluating CosyPose and Megapose, you need to modify the following lines in <code>bop_toolkit_lib/config.py</code>, replace</p>
@@ -220,24 +220,13 @@ datasets_path = str(os.environ['BOP_DATASETS_PATH'])
 results_path = str(os.environ['BOP_RESULTS_PATH'])
 eval_path = str(os.environ['BOP_EVAL_PATH'])
 </code></pre>
-<p>You will also need to install <a href="https://github.com/MIT-SPARK/TEASER-plusplus">TEASER++</a> if you want to use the depth for MegaPose. To do so, please run the following commands to install it :</p>
-<pre><code># Go to HappyPose root directory
-apt install -y cmake libeigen3-dev libboost-all-dev
-conda activate happypose
-mamba install compilers -c conda-forge
-pip install open3d
-mkdir /build &amp;&amp; cd /build &amp;&amp; git clone https://github.com/MIT-SPARK/TEASER-plusplus.git
-cd TEASER-plusplus &amp;&amp; mkdir build &amp;&amp; cd build 
-cmake -DTEASERPP_PYTHON_VERSION=3.9 .. &amp;&amp; make teaserpp_python
-cd python &amp;&amp; pip install .
-</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
 
-                            <a rel="next" href="cosypose/overview_method.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="cosypose/overview.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -248,7 +237,7 @@ cd python &amp;&amp; pip install .
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
 
-                    <a rel="next" href="cosypose/overview_method.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="cosypose/overview.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
