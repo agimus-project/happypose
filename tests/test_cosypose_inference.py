@@ -97,12 +97,13 @@ class TestCosyPoseInference(unittest.TestCase):
         refiner_model = TestCosyPoseInference._load_pose_model(refiner_run_id, **kwargs)
         return coarse_model, refiner_model
 
-    def _load_crackers_example_observation(self):
+    @staticmethod
+    def _load_crackers_example_observation():
         """Load cracker example observation tensor"""
         data_dir = Path(__file__).parent.joinpath("data").joinpath("crackers_example")
         camera_data = CameraData.from_json((data_dir / "camera_data.json").read_text())
         rgb = np.array(Image.open(data_dir / "image_rgb.png"), dtype=np.uint8)
-        self.assertEqual(rgb.shape[:2], camera_data.resolution)
+        assert rgb.shape[:2] == camera_data.resolution
         return ObservationTensor.from_numpy(rgb=rgb, K=camera_data.K)
 
     def test_detector(self):
