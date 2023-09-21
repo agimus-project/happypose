@@ -8,6 +8,7 @@ Disclaimer : This part of the repository is still under development.
 
 This script can be used to train both the coarse model or the refiner model.
 
+
 ```
 python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_pose_training --config ycbv-refiner-syntonly
 ```
