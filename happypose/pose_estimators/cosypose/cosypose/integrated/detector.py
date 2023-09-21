@@ -6,7 +6,7 @@ import pandas as pd
 import torch
 
 # MegaPose
-import happypose.pose_estimators.megapose.src.megapose
+import happypose.pose_estimators.megapose
 import happypose.toolbox.utils.tensor_collection as tc
 from happypose.toolbox.inference.detector import DetectorModule
 from happypose.toolbox.inference.types import DetectionsType, ObservationTensor

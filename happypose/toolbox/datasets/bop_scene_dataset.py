@@ -28,7 +28,7 @@ from PIL import Image
 from tqdm import tqdm
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.config import (
+from happypose.pose_estimators.megapose.config import (
     BOP_TOOLKIT_DIR,
     MEMORY,
 )

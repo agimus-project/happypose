@@ -33,7 +33,7 @@ cd $HOME && \
   tar -xvf blender-2.93.8-linux-x64.tar.xz && rm blender-2.93.8-linux-x64.tar.xz
 ```
 
-- Download the `cctextures` dataset to `MEGAPOSE_DATA_DIR`.
+- Download the `cctextures` dataset to `HAPPYPOSE_DATA_DIR`.
 
 - Install BlenderProc, currently it has only been tested with this fork
 

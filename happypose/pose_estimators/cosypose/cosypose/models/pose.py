@@ -11,7 +11,7 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import (
     compute_rotation_matrix_from_ortho6d, compute_rotation_matrix_from_quaternions)
 from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import apply_imagespace_predictions
 
-from happypose.pose_estimators.megapose.src.megapose.models.pose_rigid import PosePredictorOutputCosypose
+from happypose.pose_estimators.megapose.models.pose_rigid import PosePredictorOutputCosypose
 
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.renderer import Panda3dLightData

@@ -3,6 +3,6 @@ defaults:
 
 env:
   HP_DATA_DIR: /home/ylabbe/data/happypose
-  MEGAPOSE_DATA_DIR: /home/ylabbe/data/megapose-private
+  HAPPYPOSE_DATA_DIR: /home/ylabbe/data/megapose-private
   BLENDER_INSTALL_DIR: $HOME/blenderproc/blender-2.93.88-linux-x64
   BLENDER_PROC_DIR: /home/ylabbe/projects/blenderproc

@@ -1,8 +1,8 @@
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.megapose.config import LOCAL_DATA_DIR
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
-from happypose.pose_estimators.megapose.src.megapose.inference.icp_refiner import ICPRefiner
-from happypose.pose_estimators.megapose.src.megapose.inference.pose_estimator import PoseEstimator
+from happypose.pose_estimators.megapose.inference.icp_refiner import ICPRefiner
+from happypose.pose_estimators.megapose.inference.pose_estimator import PoseEstimator
 from happypose.toolbox.inference.utils import load_pose_models
 
 NAMED_MODELS = {

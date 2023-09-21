@@ -9,29 +9,29 @@ from omegaconf import OmegaConf
 
 # MegaPose
 import happypose
-import happypose.pose_estimators.megapose.src.megapose as megapose
-import happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation_runner
+import happypose.pose_estimators.megapose as megapose
+import happypose.pose_estimators.megapose.evaluation.evaluation_runner
 import happypose.toolbox.datasets.datasets_cfg
 import happypose.toolbox.inference.utils
-from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config import (
+from happypose.pose_estimators.megapose.evaluation.eval_config import (
     EvalConfig,
 )
-from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation_runner import (
+from happypose.pose_estimators.megapose.evaluation.evaluation_runner import (
     EvaluationRunner,
 )
-from happypose.pose_estimators.megapose.src.megapose.evaluation.meters.modelnet_meters import (
+from happypose.pose_estimators.megapose.evaluation.meters.modelnet_meters import (
     ModelNetErrorMeter,
 )
 from happypose.pose_estimators.cosypose.cosypose.evaluation.prediction_runner import (
     PredictionRunner,
 )
-from happypose.pose_estimators.megapose.src.megapose.evaluation.runner_utils import (
+from happypose.pose_estimators.megapose.evaluation.runner_utils import (
     format_results,
 )
-from happypose.pose_estimators.megapose.src.megapose.inference.depth_refiner import (
+from happypose.pose_estimators.megapose.inference.depth_refiner import (
     DepthRefiner,
 )
-from happypose.pose_estimators.megapose.src.megapose.inference.icp_refiner import (
+from happypose.pose_estimators.megapose.inference.icp_refiner import (
     ICPRefiner,
 )
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
@@ -39,7 +39,7 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator impor
 )
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
-# from happypose.pose_estimators.megapose.src.megapose.inference.teaserpp_refiner import TeaserppRefiner
+# from happypose.pose_estimators.megapose.inference.teaserpp_refiner import TeaserppRefiner
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir
 from happypose.toolbox.utils.logging import get_logger

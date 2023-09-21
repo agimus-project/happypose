@@ -43,7 +43,7 @@ $HAPPYPOSE_DATA_DIR/examples/barbecue-sauce/
 
 You can visualize input detections using :
 ```sh
-python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --vis-detections
+python -m happypose.pose_estimators.megapose.scripts.run_inference_on_example barbecue-sauce --vis-detections
 ```
 
 <img src="images/detections.png" width="500">
@@ -52,7 +52,7 @@ python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_
 ## 3. Run pose estimation and visualize results
 Run inference with the following command:
 ```sh
-python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference
+python -m happypose.pose_estimators.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference
 ```
 by default, the model only uses the RGB input. You can use of our RGB-D megapose models using the `--model` argument. Please see our [Model Zoo](#model-zoo) for all models available.
 
@@ -70,7 +70,7 @@ This file contains a list of objects with their estimated poses . For each objec
 Finally, you can visualize the results using: 
 
 ```sh
-python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs
+python -m happypose.pose_estimators.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs
 ```
 which write several visualization files:
 

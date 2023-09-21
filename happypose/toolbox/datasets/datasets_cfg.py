@@ -29,7 +29,7 @@ from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.datasets.scene_dataset import SceneDataset
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.config import (
+from happypose.pose_estimators.megapose.config import (
     BOP_DS_DIR,
     BOP_PANDA3D_DS_DIR,
     GSO_DIR,

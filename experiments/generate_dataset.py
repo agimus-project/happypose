@@ -43,7 +43,7 @@ cs.store(group="run_dsgen", name="base_run_dsgen", node=Config)
 
 def generate_chunks(ds_cfg: DatasetGenerationConfig):
     submitit.helpers.TorchDistributedEnvironment().export()
-    from happypose.pose_estimators.megapose.src.megapose.scripts.generate_shapenet_pbr import (
+    from happypose.pose_estimators.megapose.scripts.generate_shapenet_pbr import (
         main as main_,
     )
 

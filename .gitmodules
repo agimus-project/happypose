@@ -1,6 +1,3 @@
-[submodule "happypose/pose_estimators/megapose/deps/bop_toolkit"]
-	path = happypose/pose_estimators/megapose/deps/bop_toolkit
-	url = https://github.com/thodan/bop_toolkit
 [submodule "happypose/pose_estimators/cosypose/deps/bop_toolkit_challenge"]
 	path = happypose/pose_estimators/cosypose/deps/bop_toolkit_challenge
 	url = https://github.com/ylabbe/bop_toolkit_challenge20.git
@@ -10,9 +7,9 @@
 [submodule "happypose/pose_estimators/cosypose/deps/job-runner"]
 	path = happypose/pose_estimators/cosypose/deps/job-runner
 	url = https://github.com/ylabbe/job-runner.git
-[submodule "happypose/pose_estimators/megapose/deps/bop_toolkit_challenge"]
-	path = happypose/pose_estimators/megapose/deps/bop_toolkit_challenge
+[submodule "deps/bop_toolkit_challenge"]
+	path = deps/bop_toolkit_challenge
 	url = https://github.com/thodan/bop_toolkit
-[submodule "happypose/pose_estimators/megapose/deps/bop_renderer"]
-	path = happypose/pose_estimators/megapose/deps/bop_renderer
+[submodule "deps/bop_renderer"]
+	path = deps/bop_renderer
 	url = https://github.com/thodan/bop_renderer/

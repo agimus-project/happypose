@@ -27,18 +27,18 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 # MegaPose
-import happypose.pose_estimators.megapose.src.megapose
+import happypose.pose_estimators.megapose
 import happypose.toolbox.utils.tensor_collection as tc
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
     PoseEstimator,
 )
-from happypose.pose_estimators.megapose.src.megapose.inference.types import (
+from happypose.pose_estimators.megapose.inference.types import (
     DetectionsType,
     InferenceConfig,
     ObservationTensor,
     PoseEstimatesType,
 )
-from happypose.pose_estimators.megapose.src.megapose.training.utils import CudaTimer
+from happypose.pose_estimators.megapose.training.utils import CudaTimer
 from happypose.toolbox.datasets.samplers import DistributedSceneSampler
 from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, get_world_size

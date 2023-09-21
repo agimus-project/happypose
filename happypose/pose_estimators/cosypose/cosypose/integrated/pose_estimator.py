@@ -13,7 +13,7 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import (
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.utils.timer import Timer
-from happypose.pose_estimators.megapose.src.megapose.training.utils import (
+from happypose.pose_estimators.megapose.training.utils import (
     CudaTimer,
     SimpleTimer,
 )

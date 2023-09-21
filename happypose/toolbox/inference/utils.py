@@ -31,24 +31,24 @@ from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDa
 from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
 
 # MegaPose
-import happypose.pose_estimators.megapose.src.megapose
+import happypose.pose_estimators.megapose
 import happypose.toolbox.utils.tensor_collection as tc
-from happypose.pose_estimators.megapose.src.megapose.config import EXP_DIR
+from happypose.pose_estimators.megapose.config import EXP_DIR
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
-from happypose.pose_estimators.megapose.src.megapose.inference.detector import Detector
+from happypose.pose_estimators.megapose.inference.detector import Detector
 from happypose.toolbox.inference.types import DetectionsType, PoseEstimatesType
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.pose_estimators.megapose.src.megapose.models.pose_rigid import PosePredictor
+from happypose.pose_estimators.megapose.models.pose_rigid import PosePredictor
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from happypose.pose_estimators.megapose.src.megapose.training.detector_models_cfg import (
+from happypose.pose_estimators.megapose.training.detector_models_cfg import (
     check_update_config as check_update_config_detector,
 )
-from happypose.pose_estimators.megapose.src.megapose.training.detector_models_cfg import create_model_detector
-from happypose.pose_estimators.megapose.src.megapose.training.pose_models_cfg import (
+from happypose.pose_estimators.megapose.training.detector_models_cfg import create_model_detector
+from happypose.pose_estimators.megapose.training.pose_models_cfg import (
     check_update_config as check_update_config_pose,
 )
-from happypose.pose_estimators.megapose.src.megapose.training.pose_models_cfg import create_model_pose
-from happypose.pose_estimators.megapose.src.megapose.training.training_config import TrainingConfig
+from happypose.pose_estimators.megapose.training.pose_models_cfg import create_model_pose
+from happypose.pose_estimators.megapose.training.training_config import TrainingConfig
 from happypose.toolbox.utils.logging import get_logger
 from happypose.toolbox.utils.models_compat import change_keys_of_older_models
 from happypose.toolbox.utils.tensor_collection import PandasTensorCollection

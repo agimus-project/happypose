@@ -20,7 +20,7 @@ import json
 from pathlib import Path
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.config import MEMORY
+from happypose.pose_estimators.megapose.config import MEMORY
 
 # Local Folder
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
