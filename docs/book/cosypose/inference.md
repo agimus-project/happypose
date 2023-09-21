@@ -6,9 +6,9 @@ Here are provided the minimal commands you have to run in order to run the infer
 
 ```sh
  #ycbv
-  python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
-  python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
-  python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
+python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
+python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
+python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
 ```
 
 ## 2. Download YCB-V Dataset
@@ -30,3 +30,9 @@ tar xf examples.tar.xz
 ```sh
 python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example crackers --run-inference
 ```
+
+## 5. Results
+
+The results are stored in the visualization folder created in the crackers example directory.
+
+![Inference results](./images/all_results.png)
