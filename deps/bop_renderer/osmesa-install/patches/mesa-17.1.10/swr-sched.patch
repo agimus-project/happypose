@@ -1,0 +1,11 @@
+--- mesa-17.0.3/src/gallium/drivers/swr/swr_fence.cpp.orig	2017-04-05 12:14:21.000000000 +0200
++++ mesa-17.0.3/src/gallium/drivers/swr/swr_fence.cpp	2017-04-05 12:14:54.000000000 +0200
+@@ -31,6 +31,8 @@
+ 
+ #if defined(PIPE_CC_MSVC) // portable thread yield
+    #define sched_yield SwitchToThread
++#else
++#include <sched.h>
+ #endif
+ 
+ /*

@@ -1,0 +1,25 @@
+--- mesa-13.0.5/src/mesa/SConscript.orig	2017-03-09 12:49:41.000000000 +0100
++++ mesa-13.0.5/src/mesa/SConscript	2017-03-09 12:50:10.000000000 +0100
+@@ -3,7 +3,9 @@
+ 
+ 
+ Import('*')
+-from sys import executable as python_cmd
++
++#from sys import executable as python_cmd
++python_cmd='python2.exe'
+ 
+ env = env.Clone()
+ 
+--- mesa-13.0.5/src/compiler/SConscript.nir.orig	2017-02-20 12:46:54.000000000 +0100
++++ mesa-13.0.5/src/compiler/SConscript.nir	2017-03-09 15:52:19.000000000 +0100
+@@ -2,7 +2,8 @@
+ 
+ Import('*')
+ 
+-from sys import executable as python_cmd
++#from sys import executable as python_cmd
++python_cmd='python2.exe'
+ 
+ env = env.Clone()
+ 

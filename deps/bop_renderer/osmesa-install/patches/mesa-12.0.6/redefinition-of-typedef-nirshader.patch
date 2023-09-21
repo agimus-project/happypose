@@ -1,0 +1,49 @@
+From 3fea592c4eb26f6652bef1e5dc430e2296e14bac Mon Sep 17 00:00:00 2001
+From: Vinson Lee <vlee@freedesktop.org>
+Date: Wed, 29 Jun 2016 20:15:03 -0700
+Subject: mesa/st: Use 'struct nir_shader' instead of 'nir_shader'.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix this build error with GCC 4.4.
+
+  CC     state_tracker/st_nir_lower_builtin.lo
+In file included from state_tracker/st_nir_lower_builtin.c:61:
+state_tracker/st_nir.h:34: error: redefinition of typedef ‘nir_shader’
+../../src/compiler/nir/nir.h:1830: note: previous declaration of ‘nir_shader’ was here
+
+Suggested-by: Rob Clark <robdclark@gmail.com>
+Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=96235
+Signed-off-by: Vinson Lee <vlee@freedesktop.org>
+Reviewed-by: Jason Ekstrand <jason@jlekstrand.net>
+Reviewed-by: Rob Clark <robdclark@gmail.com>
+
+diff --git a/src/mesa/state_tracker/st_nir.h b/src/mesa/state_tracker/st_nir.h
+index 19e2d2d..523a274 100644
+--- a/src/mesa/state_tracker/st_nir.h
++++ b/src/mesa/state_tracker/st_nir.h
+@@ -31,14 +31,14 @@
+ extern "C" {
+ #endif
+ 
+-typedef struct nir_shader nir_shader;
++struct nir_shader;
+ 
+-void st_nir_lower_builtin(nir_shader *shader);
+-nir_shader * st_glsl_to_nir(struct st_context *st, struct gl_program *prog,
+-                            struct gl_shader_program *shader_program,
+-                            gl_shader_stage stage);
++void st_nir_lower_builtin(struct nir_shader *shader);
++struct nir_shader * st_glsl_to_nir(struct st_context *st, struct gl_program *prog,
++                                   struct gl_shader_program *shader_program,
++                                   gl_shader_stage stage);
+ 
+-void st_finalize_nir(struct st_context *st, struct gl_program *prog, nir_shader *nir);
++void st_finalize_nir(struct st_context *st, struct gl_program *prog, struct nir_shader *nir);
+ 
+ struct gl_program *
+ st_nir_get_mesa_program(struct gl_context *ctx,
+-- 
+cgit v0.10.2
+

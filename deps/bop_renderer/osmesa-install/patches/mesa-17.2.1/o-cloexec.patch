@@ -1,0 +1,115 @@
+--- mesa-17.1.1/src/util/disk_cache.c.orig	2017-05-25 09:13:13.000000000 +0200
++++ mesa-17.1.1/src/util/disk_cache.c	2017-05-31 09:47:00.000000000 +0200
+@@ -260,7 +260,21 @@
+    if (path == NULL)
+       goto fail;
+ 
++#ifdef O_CLOEXEC
+    fd = open(path, O_RDWR | O_CREAT | O_CLOEXEC, 0644);
++   if (fd == -1 && errno == EINVAL)
++#endif
++   {
++      fd = open(path, O_RDWR | O_CREAT, 0644);
++      if (fd != -1) {
++         /* Snow Leopard doesn't have O_CLOEXEC */
++         int cloexec = fcntl(fd, F_SETFD, FD_CLOEXEC);
++         if (cloexec == -1) {
++            close(fd);
++            fd = -1;
++         }
++      }
++   }
+    if (fd == -1)
+       goto fail;
+ 
+@@ -795,7 +809,21 @@
+    if (asprintf(&filename_tmp, "%s.tmp", filename) == -1)
+       goto done;
+ 
++#ifdef O_CLOEXEC
+    fd = open(filename_tmp, O_WRONLY | O_CLOEXEC | O_CREAT, 0644);
++   if (fd == -1 && errno == EINVAL)
++#endif
++   {
++      fd = open(filename_tmp, O_WRONLY | O_CREAT, 0644);
++      if (fd != -1) {
++         /* Snow Leopard doesn't have O_CLOEXEC */
++         int cloexec = fcntl(fd, F_SETFD, FD_CLOEXEC);
++         if (cloexec == -1) {
++            close(fd);
++            fd = -1;
++         }
++      }
++   }
+ 
+    /* Make the two-character subdirectory within the cache as needed. */
+    if (fd == -1) {
+@@ -804,7 +832,22 @@
+ 
+       make_cache_file_directory(dc_job->cache, dc_job->key);
+ 
++#ifdef O_CLOEXEC
+       fd = open(filename_tmp, O_WRONLY | O_CLOEXEC | O_CREAT, 0644);
++      if (fd == -1 && errno == EINVAL)
++#endif
++      {
++         fd = open(filename_tmp, O_WRONLY | O_CREAT, 0644);
++         if (fd != -1) {
++            /* Snow Leopard doesn't have O_CLOEXEC */
++            int cloexec = fcntl(fd, F_SETFD, FD_CLOEXEC);
++            if (cloexec == -1) {
++               close(fd);
++               fd = -1;
++            }
++         }
++      }
++
+       if (fd == -1)
+          goto done;
+    }
+@@ -824,7 +867,22 @@
+     * didn't exist and now. In this case, we don't do anything more,
+     * (to ensure the size accounting of the cache doesn't get off).
+     */
++#ifdef O_CLOEXEC
+    fd_final = open(filename, O_RDONLY | O_CLOEXEC);
++   if (fd_final == -1 && errno == EINVAL)
++#endif
++   {
++      fd_final = open(filename, O_RDONLY);
++      if (fd_final != -1) {
++         /* Snow Leopard doesn't have O_CLOEXEC */
++         int cloexec = fcntl(fd_final, F_SETFD, FD_CLOEXEC);
++         if (cloexec == -1) {
++            close(fd_final);
++            fd_final = -1;
++         }
++      }
++   }
++
+    if (fd_final != -1) {
+       unlink(filename_tmp);
+       goto done;
+@@ -968,7 +1026,22 @@
+    if (filename == NULL)
+       goto fail;
+ 
++#ifdef O_CLOEXEC
+    fd = open(filename, O_RDONLY | O_CLOEXEC);
++   if (fd == -1 && errno == EINVAL)
++#endif
++   {
++      fd = open(filename, O_RDONLY);
++      if (fd != -1) {
++         /* Snow Leopard doesn't have O_CLOEXEC */
++         int cloexec = fcntl(fd, F_SETFD, FD_CLOEXEC);
++         if (cloexec == -1) {
++            close(fd);
++            fd = -1;
++         }
++      }
++   }
++
+    if (fd == -1)
+       goto fail;
+ 

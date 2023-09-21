@@ -1,0 +1,58 @@
+avoid the following error when linking with osmesa on linux 32-bit:
+/usr/bin/ld: libMangledOSMesa32.a(glapi_libglapi_la-glapi_x86.o)(.text+0x5): unresolvable R_386_32 relocation against symbol `_gl_DispatchTSD'
+---
+diff -urN mesa-17.1.10.orig/src/mapi/glapi/gen/gl_x86-64_asm.py mesa-17.1.10/src/mapi/glapi/gen/gl_x86-64_asm.py
+--- mesa-17.1.10.orig/src/mapi/glapi/gen/gl_x86-64_asm.py	2017-09-25 18:56:19.000000000 +0200
++++ mesa-17.1.10/src/mapi/glapi/gen/gl_x86-64_asm.py	2018-02-22 17:48:10.000000000 +0100
+@@ -135,6 +135,7 @@
+         print '# if defined(USE_MGL_NAMESPACE)'
+         print '#  define GL_PREFIX(n) GLNAME(CONCAT(mgl,n))'
+         print '#  define _glapi_Dispatch _mglapi_Dispatch'
++        print '#  define _gl_DispatchTSD _mgl_DispatchTSD'
+         print '# else'
+         print '#  define GL_PREFIX(n) GLNAME(CONCAT(gl,n))'
+         print '# endif'
+diff -urN mesa-17.1.10.orig/src/mapi/glapi/gen/gl_x86_asm.py mesa-17.1.10/src/mapi/glapi/gen/gl_x86_asm.py
+--- mesa-17.1.10.orig/src/mapi/glapi/gen/gl_x86_asm.py	2017-09-25 18:56:19.000000000 +0200
++++ mesa-17.1.10/src/mapi/glapi/gen/gl_x86_asm.py	2018-02-22 17:47:34.000000000 +0100
+@@ -65,6 +65,7 @@
+         print '# if defined(USE_MGL_NAMESPACE)'
+         print '#  define GL_PREFIX(n,n2) GLNAME(CONCAT(mgl,n))'
+         print '#  define _glapi_Dispatch _mglapi_Dispatch'
++        print '#  define _gl_DispatchTSD _mgl_DispatchTSD'
+         print '# else'
+         print '#  define GL_PREFIX(n,n2) GLNAME(CONCAT(gl,n))'
+         print '# endif'
+diff -urN mesa-17.1.10.orig/src/mapi/glapi/glapi.h mesa-17.1.10/src/mapi/glapi/glapi.h
+--- mesa-17.1.10.orig/src/mapi/glapi/glapi.h	2017-09-25 18:56:19.000000000 +0200
++++ mesa-17.1.10/src/mapi/glapi/glapi.h	2018-02-22 17:49:09.000000000 +0100
+@@ -77,6 +77,7 @@
+ #define _glapi_get_context _mglapi_get_context
+ #define _glapi_Dispatch _mglapi_Dispatch
+ #define _glapi_Context _mglapi_Context
++#define _gl_DispatchTSD _mgl_DispatchTSD
+ #endif
+ 
+ typedef void (*_glapi_proc)(void);
+diff -urN mesa-17.1.10.orig/src/mapi/glapi/glapi_x86-64.S mesa-17.1.10/src/mapi/glapi/glapi_x86-64.S
+--- mesa-17.1.10.orig/src/mapi/glapi/glapi_x86-64.S	2017-09-25 18:56:47.000000000 +0200
++++ mesa-17.1.10/src/mapi/glapi/glapi_x86-64.S	2018-02-22 17:49:34.000000000 +0100
+@@ -41,6 +41,7 @@
+ # if defined(USE_MGL_NAMESPACE)
+ #  define GL_PREFIX(n) GLNAME(CONCAT(mgl,n))
+ #  define _glapi_Dispatch _mglapi_Dispatch
++#  define _gl_DispatchTSD _mgl_DispatchTSD
+ # else
+ #  define GL_PREFIX(n) GLNAME(CONCAT(gl,n))
+ # endif
+diff -urN mesa-17.1.10.orig/src/mapi/glapi/glapi_x86.S mesa-17.1.10/src/mapi/glapi/glapi_x86.S
+--- mesa-17.1.10.orig/src/mapi/glapi/glapi_x86.S	2017-09-25 18:56:49.000000000 +0200
++++ mesa-17.1.10/src/mapi/glapi/glapi_x86.S	2018-02-22 17:48:38.000000000 +0100
+@@ -38,6 +38,7 @@
+ # if defined(USE_MGL_NAMESPACE)
+ #  define GL_PREFIX(n,n2) GLNAME(CONCAT(mgl,n))
+ #  define _glapi_Dispatch _mglapi_Dispatch
++#  define _gl_DispatchTSD _mgl_DispatchTSD
+ # else
+ #  define GL_PREFIX(n,n2) GLNAME(CONCAT(gl,n))
+ # endif

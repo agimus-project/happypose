@@ -1,0 +1,28 @@
+--- mesa-17.1.1/src/mesa/SConscript.orig	2017-06-11 09:38:56.000000000 +0200
++++ mesa-17.1.1/src/mesa/SConscript	2017-06-11 09:40:50.000000000 +0200
+@@ -3,7 +3,10 @@
+ 
+ 
+ Import('*')
+-from sys import executable as python_cmd
++if env['platform'] == 'windows':
++    python_cmd='python2.exe'
++else:
++    from sys import executable as python_cmd
+ 
+ env = env.Clone()
+ 
+--- mesa-17.1.1/src/compiler/SConscript.nir.orig	2017-06-11 09:41:36.000000000 +0200
++++ mesa-17.1.1/src/compiler/SConscript.nir	2017-06-11 09:41:44.000000000 +0200
+@@ -2,7 +2,10 @@
+ 
+ Import('*')
+ 
+-from sys import executable as python_cmd
++if env['platform'] == 'windows':
++    python_cmd='python2.exe'
++else:
++    from sys import executable as python_cmd
+ 
+ env = env.Clone()
+ 

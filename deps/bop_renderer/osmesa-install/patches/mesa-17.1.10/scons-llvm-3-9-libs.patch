@@ -1,0 +1,11 @@
+--- mesa-13.0.5/scons/llvm.py.orig	2017-03-09 15:07:44.000000000 +0100
++++ mesa-13.0.5/scons/llvm.py	2017-03-09 16:53:27.000000000 +0100
+@@ -156,6 +156,8 @@
+                 'LLVMSupport', 'LLVMRuntimeDyld', 'LLVMObject'
+             ])
+         env.Append(LIBS = [
++            'ole32',
++            'uuid',
+             'imagehlp',
+             'psapi',
+             'shell32',

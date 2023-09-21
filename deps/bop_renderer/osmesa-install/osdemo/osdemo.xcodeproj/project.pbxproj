@@ -1,0 +1,388 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1E3AC21A1CC2424900DBAB99 /* libMangledGLU.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E3AC2181CC2424900DBAB99 /* libMangledGLU.a */; };
+		1E3AC21B1CC2424900DBAB99 /* libMangledOSMesa32.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E3AC2191CC2424900DBAB99 /* libMangledOSMesa32.a */; };
+		1E3AC21D1CC242B300DBAB99 /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E3AC21C1CC242B300DBAB99 /* libstdc++.dylib */; };
+		1ED651FD1CC4F9C500CD1C8A /* osdemo32.c in Sources */ = {isa = PBXBuildFile; fileRef = 1ED651FA1CC4C38E00CD1C8A /* osdemo32.c */; };
+		1ED652001CC5068400CD1C8A /* osdemo32.c in Sources */ = {isa = PBXBuildFile; fileRef = 1ED651FA1CC4C38E00CD1C8A /* osdemo32.c */; };
+		1ED652041CC5068400CD1C8A /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E3AC21C1CC242B300DBAB99 /* libstdc++.dylib */; };
+		1ED6520F1CC507CB00CD1C8A /* libGLU.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ED6520B1CC507C400CD1C8A /* libGLU.a */; };
+		1ED652101CC507CF00CD1C8A /* libOSMesa32.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ED6520C1CC507C400CD1C8A /* libOSMesa32.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1E49E4D01CC2402000E06294 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		1ED652051CC5068400CD1C8A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1E3AC2181CC2424900DBAB99 /* libMangledGLU.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMangledGLU.a; path = lib/libMangledGLU.a; sourceTree = OSMESA_PATH; };
+		1E3AC2191CC2424900DBAB99 /* libMangledOSMesa32.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMangledOSMesa32.a; path = lib/libMangledOSMesa32.a; sourceTree = OSMESA_PATH; };
+		1E3AC21C1CC242B300DBAB99 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "/usr/lib/libstdc++.dylib"; sourceTree = "<absolute>"; };
+		1E49E4D21CC2402000E06294 /* osdemo32-mangled */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "osdemo32-mangled"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1ED651F91CC4C30E00CD1C8A /* glut_wrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glut_wrap.h; sourceTree = "<group>"; };
+		1ED651FA1CC4C38E00CD1C8A /* osdemo32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = osdemo32.c; sourceTree = "<group>"; };
+		1ED652091CC5068400CD1C8A /* osdemo32 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = osdemo32; sourceTree = BUILT_PRODUCTS_DIR; };
+		1ED6520B1CC507C400CD1C8A /* libGLU.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGLU.a; path = lib/libGLU.a; sourceTree = OSMESA_PATH; };
+		1ED6520C1CC507C400CD1C8A /* libOSMesa32.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOSMesa32.a; path = lib/libOSMesa32.a; sourceTree = OSMESA_PATH; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1E49E4CF1CC2402000E06294 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E3AC21B1CC2424900DBAB99 /* libMangledOSMesa32.a in Frameworks */,
+				1E3AC21A1CC2424900DBAB99 /* libMangledGLU.a in Frameworks */,
+				1E3AC21D1CC242B300DBAB99 /* libstdc++.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ED652011CC5068400CD1C8A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1ED6520F1CC507CB00CD1C8A /* libGLU.a in Frameworks */,
+				1ED652041CC5068400CD1C8A /* libstdc++.dylib in Frameworks */,
+				1ED652101CC507CF00CD1C8A /* libOSMesa32.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1E3AC2171CC2422600DBAB99 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				1E3AC21C1CC242B300DBAB99 /* libstdc++.dylib */,
+				1ED6520B1CC507C400CD1C8A /* libGLU.a */,
+				1ED6520C1CC507C400CD1C8A /* libOSMesa32.a */,
+				1E3AC2181CC2424900DBAB99 /* libMangledGLU.a */,
+				1E3AC2191CC2424900DBAB99 /* libMangledOSMesa32.a */,
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+		1E49E4C91CC2402000E06294 = {
+			isa = PBXGroup;
+			children = (
+				1E3AC2171CC2422600DBAB99 /* Libraries */,
+				1E49E4D41CC2402000E06294 /* Sources */,
+				1E49E4D31CC2402000E06294 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1E49E4D31CC2402000E06294 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1E49E4D21CC2402000E06294 /* osdemo32-mangled */,
+				1ED652091CC5068400CD1C8A /* osdemo32 */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1E49E4D41CC2402000E06294 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				1ED651FA1CC4C38E00CD1C8A /* osdemo32.c */,
+				1ED651F91CC4C30E00CD1C8A /* glut_wrap.h */,
+			);
+			name = Sources;
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1E49E4D11CC2402000E06294 /* osdemo32-mangled */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1E49E4D91CC2402000E06294 /* Build configuration list for PBXNativeTarget "osdemo32-mangled" */;
+			buildPhases = (
+				1E49E4CE1CC2402000E06294 /* Sources */,
+				1E49E4CF1CC2402000E06294 /* Frameworks */,
+				1E49E4D01CC2402000E06294 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "osdemo32-mangled";
+			productName = osdemo32;
+			productReference = 1E49E4D21CC2402000E06294 /* osdemo32-mangled */;
+			productType = "com.apple.product-type.tool";
+		};
+		1ED651FE1CC5068400CD1C8A /* osdemo32 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1ED652061CC5068400CD1C8A /* Build configuration list for PBXNativeTarget "osdemo32" */;
+			buildPhases = (
+				1ED651FF1CC5068400CD1C8A /* Sources */,
+				1ED652011CC5068400CD1C8A /* Frameworks */,
+				1ED652051CC5068400CD1C8A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = osdemo32;
+			productName = osdemo32;
+			productReference = 1ED652091CC5068400CD1C8A /* osdemo32 */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1E49E4CA1CC2402000E06294 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = "Frédéric Devernay";
+				TargetAttributes = {
+					1E49E4D11CC2402000E06294 = {
+						CreatedOnToolsVersion = 7.3;
+					};
+				};
+			};
+			buildConfigurationList = 1E49E4CD1CC2402000E06294 /* Build configuration list for PBXProject "osdemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 1E49E4C91CC2402000E06294;
+			productRefGroup = 1E49E4D31CC2402000E06294 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1E49E4D11CC2402000E06294 /* osdemo32-mangled */,
+				1ED651FE1CC5068400CD1C8A /* osdemo32 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1E49E4CE1CC2402000E06294 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1ED651FD1CC4F9C500CD1C8A /* osdemo32.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ED651FF1CC5068400CD1C8A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1ED652001CC5068400CD1C8A /* osdemo32.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1E49E4D71CC2402000E06294 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(OSMESA_PATH)/include";
+				LIBRARY_SEARCH_PATHS = "$(OSMESA_PATH)/lib";
+				LLVM_LIBS = "-L$(LLVM_PATH)/lib -Wl,-search_paths_first -Wl,-headerpad_max_install_names\n-lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMCodeGen -lLLVMScalarOpts -lLLVMInstCombine -lLLVMInstrumentation -lLLVMProfileData -lLLVMTransformUtils -lLLVMBitWriter -lLLVMX86Desc -lLLVMMCDisassembler -lLLVMX86Info -lLLVMX86AsmPrinter -lLLVMX86Utils -lLLVMMCJIT -lLLVMExecutionEngine -lLLVMTarget -lLLVMAnalysis -lLLVMRuntimeDyld -lLLVMObject -lLLVMMCParser -lLLVMBitReader -lLLVMMC -lLLVMCore -lLLVMSupport\n-lcurses -lpthread -lz -lm";
+				LLVM_PATH = /opt/llvm;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OSMESA_PATH = /opt/osmesa;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		1E49E4D81CC2402000E06294 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(OSMESA_PATH)/include";
+				LIBRARY_SEARCH_PATHS = "$(OSMESA_PATH)/lib";
+				LLVM_LIBS = "-L$(LLVM_PATH)/lib -Wl,-search_paths_first -Wl,-headerpad_max_install_names\n-lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMCodeGen -lLLVMScalarOpts -lLLVMInstCombine -lLLVMInstrumentation -lLLVMProfileData -lLLVMTransformUtils -lLLVMBitWriter -lLLVMX86Desc -lLLVMMCDisassembler -lLLVMX86Info -lLLVMX86AsmPrinter -lLLVMX86Utils -lLLVMMCJIT -lLLVMExecutionEngine -lLLVMTarget -lLLVMAnalysis -lLLVMRuntimeDyld -lLLVMObject -lLLVMMCParser -lLLVMBitReader -lLLVMMC -lLLVMCore -lLLVMSupport\n-lcurses -lpthread -lz -lm";
+				LLVM_PATH = /opt/llvm;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		1E49E4DA1CC2402000E06294 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/osmesa.swrast/lib,
+				);
+				OTHER_CFLAGS = (
+					"-include",
+					"$(OSMESA_PATH)/include/GL/gl_mangle.h",
+					"-include",
+					"$(OSMESA_PATH)/include/GL/glu_mangle.h",
+				);
+				OTHER_LDFLAGS = "$(LLVM_LIBS)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1E49E4DB1CC2402000E06294 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/osmesa.swrast/lib,
+				);
+				OTHER_CFLAGS = (
+					"-include",
+					"$(OSMESA_PATH)/include/GL/gl_mangle.h",
+					"-include",
+					"$(OSMESA_PATH)/include/GL/glu_mangle.h",
+				);
+				OTHER_LDFLAGS = "$(LLVM_LIBS)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		1ED652071CC5068400CD1C8A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/osmesa.swrast/lib,
+				);
+				OTHER_LDFLAGS = "$(LLVM_LIBS)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1ED652081CC5068400CD1C8A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/osmesa.swrast/lib,
+				);
+				OTHER_LDFLAGS = "$(LLVM_LIBS)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1E49E4CD1CC2402000E06294 /* Build configuration list for PBXProject "osdemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E49E4D71CC2402000E06294 /* Debug */,
+				1E49E4D81CC2402000E06294 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1E49E4D91CC2402000E06294 /* Build configuration list for PBXNativeTarget "osdemo32-mangled" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E49E4DA1CC2402000E06294 /* Debug */,
+				1E49E4DB1CC2402000E06294 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1ED652061CC5068400CD1C8A /* Build configuration list for PBXNativeTarget "osdemo32" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1ED652071CC5068400CD1C8A /* Debug */,
+				1ED652081CC5068400CD1C8A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1E49E4CA1CC2402000E06294 /* Project object */;
+}
