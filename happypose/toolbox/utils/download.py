@@ -204,7 +204,7 @@ def download(download_path, local_path, flags=None):
 
 class DownloadClient:
     def __init__(self):
-        self.client = httpx.AsyncClient(timeout = None)
+        self.client = httpx.AsyncClient()
         self.task_set = set()
     
     async def __aenter__(self):
@@ -230,7 +230,7 @@ class DownloadClient:
         task.add_done_callback(self.task_set.discard)
 
 
-    async def adownload(self, download_path, local_path,flags):
+    async def adownload(self, download_path, local_path, flags):
 
         Path_download = Path(download_path)
         if Path_download.name != local_path.name:
@@ -240,15 +240,19 @@ class DownloadClient:
             return
 
         if not download_path.endswith("/") and not httpx.head(download_path).is_redirect: #file
-            await self.download_file(download_path,local_path)
+            await self.download_file(download_path, local_path)
         else:
             if not download_path.endswith("/"): 
                 download_path += "/"
-            await self.download_dir(download_path,local_path,flags)
+            await self.download_dir(download_path, local_path, flags)
  
 
-    async def download_dir(self, download_path, local_path,flags):
-        r = await self.client.get(download_path)
+    async def download_dir(self, download_path, local_path, flags):
+        try:
+            r = await self.client.get(download_path)
+        except httpx.PoolTimeout:
+            logger.error(f"Failed {download_path} with timeout")
+            return
         if r.status_code != 200:
             logger.error(f"Failed {download_path} with code {res.status_code}")
             return
@@ -267,7 +271,11 @@ class DownloadClient:
 
 
     async def download_file(self, download_path, local_path):
-        r = await self.client.get(download_path)
+        try:
+            r = await self.client.get(download_path)
+        except httpx.PoolTimeout:
+            logger.error(f"Failed {download_path} with timeout")
+            return
         if r.status_code != 200:
             logger.error(f"Failed {download_path} with code {res.status_code}")
             return
@@ -298,7 +306,7 @@ class Flags:
 
     def flags_managing(flags, href):
         for el in flags.exclude_set:
-            if re.fullmatch(el,href):
+            if re.fullmatch(el, href):
                 return False
         return True
 
