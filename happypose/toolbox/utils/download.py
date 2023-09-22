@@ -7,13 +7,10 @@ from pathlib import Path
 
 import wget
 
-
-#ADDED
 from bs4 import BeautifulSoup
 import re
 import asyncio
 import httpx
-
 
 from happypose.pose_estimators.cosypose.cosypose.config import (
     BOP_DS_DIR,
@@ -24,7 +21,6 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-#ADDED
 DOWNLOAD_URL = 'https://www.paris.inria.fr/archive_ylabbeprojectsdata'
 
 RCLONE_CFG_PATH = (PROJECT_DIR / 'rclone.conf')
@@ -106,11 +102,6 @@ def main():
             download(f'{DOWNLOAD_URL}/cosypose/bop_datasets/tless/all_target_tless.json', BOP_DS_DIR / 'tless')
             os.symlink(BOP_DS_DIR / 'tless/models_eval', BOP_DS_DIR / 'tless/models')
         elif args.bop_extra_files == 'ycbv':
-            #download(f'{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/ycbv_friendly_names.txt', BOP_DS_DIR / 'ycbv')
-            #download(f'{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/offsets.txt', BOP_DS_DIR / 'ycbv')
-            #download(f'{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_original', BOP_DS_DIR / 'ycbv')
-            #download(f'{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/keyframe.txt', BOP_DS_DIR / 'ycbv')
-
                       # Friendly names used with YCB-Video
             downloads((None, f'{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/ycbv_friendly_names.txt', BOP_DS_DIR / 'ycbv'),
                       # Offsets between YCB-Video and BOP (extracted from BOP readme)
@@ -124,8 +115,6 @@ def main():
         download(f'{DOWNLOAD_URL}/cosypose/urdfs/{args.urdf_models}', LOCAL_DATA_DIR / 'urdfs')
 
     if args.ycbv_compat_models:
-        #download(f'{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_bop-compat', BOP_DS_DIR / 'ycbv')
-        #download(f'{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_bop-compat_eval', BOP_DS_DIR / 'ycbv')
         downloads((None, f'{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_bop-compat', BOP_DS_DIR / 'ycbv'),
                   (None, f'{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_bop-compat_eval', BOP_DS_DIR / 'ycbv'))
 
@@ -149,8 +138,6 @@ def main():
 
     if args.bop_result_id:
         csv_name = args.bop_result_id + '.csv'
-        #download(f'{DOWNLOAD_URL}/cosypose/bop_predictions/{csv_name}', LOCAL_DATA_DIR / 'bop_predictions')
-        #download(f'{DOWNLOAD_URL}/cosypose/bop_eval_outputs/{args.bop_result_id}', LOCAL_DATA_DIR / 'bop_predictions')
         downloads((None, f'{DOWNLOAD_URL}/cosypose/bop_predictions/{csv_name}', LOCAL_DATA_DIR / 'bop_predictions'),
                   (None, f'{DOWNLOAD_URL}/cosypose/bop_eval_outputs/{args.bop_result_id}', LOCAL_DATA_DIR / 'bop_predictions'))
 
@@ -166,8 +153,6 @@ def main():
         zipfile.ZipFile(DOWNLOAD_DIR / zip_name).extractall(LOCAL_DATA_DIR / 'synt_datasets')
 
     if args.example_scenario:
-        #download(f'{DOWNLOAD_URL}/cosypose/custom_scenarios/example/candidates.csv', LOCAL_DATA_DIR / 'custom_scenarios/example')
-        #download(f'{DOWNLOAD_URL}/cosypose/custom_scenarios/example/scene_camera.json', LOCAL_DATA_DIR / 'custom_scenarios/example')
         downloads((None, f'{DOWNLOAD_URL}/cosypose/custom_scenarios/example/candidates.csv', LOCAL_DATA_DIR / 'custom_scenarios/example'),
                   (None, f'{DOWNLOAD_URL}/cosypose/custom_scenarios/example/scene_camera.json', LOCAL_DATA_DIR / 'custom_scenarios/example'))
 
@@ -196,29 +181,6 @@ def main():
         for result_id in (PBR_INFERENCE_ID, SYNT_REAL_INFERENCE_ID, SYNT_REAL_ICP_INFERENCE_ID,
                           SYNT_REAL_4VIEWS_INFERENCE_ID, SYNT_REAL_8VIEWS_INFERENCE_ID):
             download(f'{DOWNLOAD_URL}/cosypose/results/{result_id}', LOCAL_DATA_DIR / 'results')
-
-
-#RCLONE
-#def run_rclone(cmd, args, flags):
-#    rclone_cmd = ['rclone', cmd] + args + flags + ['--config', str(RCLONE_CFG_PATH)]
-#    logger.debug(' '.join(rclone_cmd))
-#    print(rclone_cmd)
-#    subprocess.run(rclone_cmd)
-#
-#
-#def download(download_path, local_path, flags=[]):
-#    download_path = Path(download_path)
-#    if download_path.name != local_path.name:
-#        local_path = local_path / download_path.name
-#    if '.' in str(download_path):
-#        rclone_path = RCLONE_ROOT + str(download_path)
-#    else:
-#        rclone_path = RCLONE_ROOT + str(download_path) + "/"
-#    local_path = str(local_path)
-#    logger.info(f"Copying {rclone_path} to {local_path}")
-#    run_rclone("copyto", [rclone_path, local_path], flags=flags + ["-P"])
-
-
 
 
 #manages multiple downloads in async
