@@ -159,6 +159,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
                         eval_dir=eval_out["save_dir"] / "bop_evaluation",
                         method=method,
                         convert_only=False,
+                        use_post_score=False
                     )
                     bop_eval_cfgs.append(bop_eval_cfg)
 

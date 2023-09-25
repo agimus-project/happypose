@@ -241,7 +241,7 @@ def run_evaluation(cfg: BOPEvalConfig) -> None:
         csv_path = eval_dir / f"{method}_{cfg.dataset.split('.')[0]}-{cfg.split}.csv"
 
         # pose scores give better AR scores in general
-        convert_results_to_bop(results_path, csv_path, cfg.method, use_pose_score=True)
+        convert_results_to_bop(results_path, csv_path, cfg.method, use_pose_score=cfg.use_post_score)
 
         if not cfg.convert_only:
             _run_bop_evaluation(csv_path, cfg.eval_dir, eval_detection=False)

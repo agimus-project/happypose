@@ -102,3 +102,4 @@ class BOPEvalConfig:
     method: str  # ['refiner/final', 'depth_refiner', etc.]
     detection_method: Optional[str] = None
     convert_only: bool = False
+    use_post_score: Optional[bool] = True
