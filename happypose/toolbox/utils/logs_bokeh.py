@@ -35,7 +35,7 @@ from IPython.display import display
 from omegaconf import OmegaConf
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.training.pose_models_cfg import (
+from happypose.pose_estimators.megapose.training.pose_models_cfg import (
     check_update_config as check_update_config_pose,
 )
 

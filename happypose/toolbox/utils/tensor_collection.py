@@ -26,7 +26,6 @@ import torch
 # MegaPose
 from happypose.toolbox.utils.distributed import get_rank, get_world_size
 
-
 def concatenate(datas):
     datas = [data for data in datas if len(data) > 0]
     if len(datas) == 0:

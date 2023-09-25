@@ -193,7 +193,7 @@ if __name__ == "__main__":
     #parser.add_argument("--vis-outputs", action="store_true")
     args = parser.parse_args()
 
-    data_dir = os.getenv("MEGAPOSE_DATA_DIR")
+    data_dir = os.getenv("HAPPYPOSE_DATA_DIR")
     assert data_dir
     example_dir = Path(data_dir) / "examples" / args.example_name
     dataset_to_use = args.dataset  # tless or ycbv

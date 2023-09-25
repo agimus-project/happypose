@@ -29,7 +29,7 @@ from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.datasets.scene_dataset import SceneDataset
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.config import (
+from happypose.pose_estimators.megapose.config import (
     BOP_DS_DIR,
     BOP_PANDA3D_DS_DIR,
     GSO_DIR,
@@ -231,6 +231,7 @@ def make_scene_dataset(
 
 def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     # BOP original models
+    
     if ds_name == "tless.cad":
         ds: RigidObjectDataset = BOPObjectDataset(
             BOP_DS_DIR / "tless/models_cad", label_format="tless-{label}"
@@ -424,13 +425,17 @@ def get_obj_ds_info(ds_name: str) -> Tuple[Optional[str], str]:
         urdf_ds_name = "lm"
         obj_ds_name = "lm.panda3d"
     elif ds_name == "tless.bop19":
-        obj_ds_name = "tless.panda3d"
+        obj_ds_name = "tless.cad.panda3d"
     elif ds_name == "hope.bop19":
         obj_ds_name = "hope.panda3d"
     elif ds_name == "hb.bop19":
         obj_ds_name = "hb.panda3d"
     elif ds_name == "tudl.bop19":
         obj_ds_name = "tudl.panda3d"
+    elif ds_name == "icbin.bop19":
+        obj_ds_name = "icbin.panda3d"
+    elif ds_name == "itodd.bop19":
+        obj_ds_name = "itodd.panda3d"
     elif ds_name == "custom":
         obj_ds_name = "custom.panda3d"
     elif "modelnet." in ds_name:

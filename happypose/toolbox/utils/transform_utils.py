@@ -20,8 +20,8 @@ import roma
 import torch
 
 # MegaPose
-import happypose.pose_estimators.megapose.src.megapose as megapose
-from happypose.pose_estimators.megapose.src.megapose.config import PROJECT_DIR
+import happypose.pose_estimators.megapose as megapose
+from happypose.pose_estimators.megapose.config import PROJECT_DIR
 
 
 def load_SO3_grid(resolution):
@@ -35,7 +35,7 @@ def load_SO3_grid(resolution):
         rotmats: [N,3,3]
     """
     megapose_dir = PROJECT_DIR / "happypose" / "pose_estimators" / "megapose"
-    data_fname = megapose_dir / f"src/megapose/data/data_{resolution}.qua"
+    data_fname = megapose_dir / f"data/data_{resolution}.qua"
 
     assert data_fname.is_file(), f"File {data_fname} not found"
 

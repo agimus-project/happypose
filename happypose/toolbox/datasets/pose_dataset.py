@@ -35,7 +35,7 @@ from happypose.toolbox.datasets.scene_dataset import (
 )
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.megapose.config import LOCAL_DATA_DIR
 from happypose.toolbox.datasets.augmentations import (
     CropResizeToAspectTransform,
     DepthBackgroundDropoutTransform,

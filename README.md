@@ -40,7 +40,7 @@ pip install -r requirements.txt -e .
 
 ```
 Create data dir /somewhere/convenient. The dataset to store are quite large.
-export MEGAPOSE_DATA_DIR=/somewhere/convenient
+export HAPPYPOSE_DATA_DIR=/somewhere/convenient
 ```
 
 # Configuration for the evaluation
@@ -73,4 +73,18 @@ with
 datasets_path = str(os.environ['BOP_DATASETS_PATH'])
 results_path = str(os.environ['BOP_RESULTS_PATH'])
 eval_path = str(os.environ['BOP_EVAL_PATH'])
+```
+
+You will also need to install [TEASER++](https://github.com/MIT-SPARK/TEASER-plusplus) if you want to use the depth for MegaPose. To do so, please run the following commands to install it :
+
+```
+# Go to HappyPose root directory
+apt install -y cmake libeigen3-dev libboost-all-dev
+conda activate happypose
+mamba install compilers -c conda-forge
+pip install open3d
+mkdir /build && cd /build && git clone https://github.com/MIT-SPARK/TEASER-plusplus.git
+cd TEASER-plusplus && mkdir build && cd build 
+cmake -DTEASERPP_PYTHON_VERSION=3.9 .. && make teaserpp_python
+cd python && pip install .
 ```

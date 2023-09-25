@@ -6,11 +6,11 @@ from typing import Dict, Optional, Tuple
 
 # Third Party
 from omegaconf import OmegaConf
-from happypose.pose_estimators.megapose.src.megapose.evaluation.bop import run_evaluation
-from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation import get_save_dir
+from happypose.pose_estimators.megapose.evaluation.bop import run_evaluation
+from happypose.pose_estimators.megapose.evaluation.evaluation import get_save_dir
 
 # MegaPose
-from happypose.pose_estimators.megapose.src.megapose.bop_config import (
+from happypose.pose_estimators.megapose.bop_config import (
     PBR_COARSE,
     PBR_DETECTORS,
     PBR_REFINER,
@@ -18,19 +18,19 @@ from happypose.pose_estimators.megapose.src.megapose.bop_config import (
     SYNT_REAL_DETECTORS,
     SYNT_REAL_REFINER,
 )
-from happypose.pose_estimators.megapose.src.megapose.config import (
+from happypose.pose_estimators.megapose.config import (
     DEBUG_RESULTS_DIR,
     EXP_DIR,
     MODELNET_TEST_CATEGORIES,
     RESULTS_DIR,
 )
-from happypose.pose_estimators.megapose.src.megapose.evaluation.eval_config import (
+from happypose.pose_estimators.megapose.evaluation.eval_config import (
     BOPEvalConfig,
     EvalConfig,
     FullEvalConfig,
     HardwareConfig,
 )
-from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation import generate_save_key
+from happypose.pose_estimators.megapose.evaluation.evaluation import generate_save_key
 from happypose.pose_estimators.cosypose.cosypose.evaluation.evaluation import run_eval
 
 from happypose.toolbox.utils.distributed import get_rank, get_world_size, init_distributed_mode

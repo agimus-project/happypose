@@ -26,7 +26,7 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator impor
 from happypose.pose_estimators.cosypose.cosypose.evaluation.prediction_runner import (
     PredictionRunner,
 )
-from happypose.pose_estimators.megapose.src.megapose.evaluation.evaluation_runner import (
+from happypose.pose_estimators.megapose.evaluation.evaluation_runner import (
     EvaluationRunner,
 )
 from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.multiview_predictions import MultiviewPredictionRunner

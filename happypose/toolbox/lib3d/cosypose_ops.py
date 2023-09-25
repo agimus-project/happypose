@@ -262,7 +262,7 @@ def TCO_init_from_boxes_zup_autodepth(boxes_2d, model_points_3d, K):
 def TCO_init_from_boxes_v3(layer, boxes, K):
     # TODO: Clean these 2 functions
     # MegaPose
-    from happypose.pose_estimators.megapose.src.megapose.math_utils.meshes import get_T_offset
+    from happypose.pose_estimators.megapose.math_utils.meshes import get_T_offset
 
     bsz = len(boxes)
     assert len(K) == bsz
