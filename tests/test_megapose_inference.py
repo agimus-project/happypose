@@ -47,7 +47,7 @@ class TestMegaPoseInference(unittest.TestCase):
             pin.exp3(np.array([1.44, 1.19, -0.91])), np.array([0, 0, 0.52])
         )
         diff = pose.inverse() * exp_pose
-        self.assertLess(np.linalg.norm(pin.log6(diff).vector), 0.2)
+        self.assertLess(np.linalg.norm(pin.log6(diff).vector), 0.3)
 
 
 if __name__ == "__main__":

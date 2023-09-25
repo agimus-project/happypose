@@ -63,7 +63,6 @@ class App(ShowBase):
         p3d.core.load_prc_file_data(
             __file__,
             "load-display pandagl\n"
-            "gl-version 3 2\n"
             "notify-level-assimp fatal\n"
             "notify-level-egldisplay fatal\n"
             "notify-level-glgsg fatal\n"
@@ -82,6 +81,9 @@ class App(ShowBase):
             "audio-library-name null\n"
             "model-cache-dir\n",
         )
+        if "GITHUB_ACTIONS" in os.environ:
+            p3d.core.load_prc_file_data(f"{__file__}_2", "gl-version 3 2\n")
+
         if torch.cuda.is_available():
             assert "CUDA_VISIBLE_DEVICES" in os.environ
             devices = os.environ["CUDA_VISIBLE_DEVICES"].split(",")
