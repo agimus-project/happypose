@@ -36,7 +36,7 @@ render = ["panda3d", "pybullet"]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
+black = "^23.9.1"
 coverage = {extras = ["toml"], version = "^7.2.5"}
 ipython = "^8.12.2"
 pre-commit = "^3.2.1"
