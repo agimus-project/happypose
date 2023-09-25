@@ -52,7 +52,7 @@ jobs:
 
       - name: Install bop toolkit (temporal fix)
         run: |
-          cd happypose/pose_estimators/megapose/deps/bop_toolkit_challenge/
+          cd happypose/deps/bop_toolkit_challenge/
           sed 's/==.*$//' requirements.txt > req_nover.txt
           pip install -r req_nover.txt -e .
         if: steps.cache.outputs.cache-hit != 'true'
