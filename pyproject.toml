@@ -25,29 +25,52 @@ version = "0.1.0"
 
 [tool.poetry.dependencies]
 panda3d = {optional = true, version = "=1.10.13"}
-pin = "^2.6.17"
+pin = "^2.6.20"
 pybullet = {optional = true, version = "^3.2.5"}
-python = "^3.9"
+python = "^3.9, <3.11"
+torch = [
+  {markers = "extra!='cuda'", source = "torch_cpu", version = "1.11.0+cpu"},
+  {markers = "extra=='cuda'", source = "torch_cu113", version = "1.11.0+cu113"}
+]
+torchvision = [
+  {markers = "extra!='cuda'", source = "torch_cpu", version = "0.12.0+cpu"},
+  {markers = "extra=='cuda'", source = "torch_cu113", version = "0.12.0+cu113"}
+]
 
 [tool.poetry.extras]
+cuda = []
 render = ["panda3d", "pybullet"]
 
 [tool.poetry.group.dev]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
+black = "^23.9.1"
 coverage = {extras = ["toml"], version = "^7.2.5"}
 ipython = "^8.12.2"
 pre-commit = "^3.2.1"
-ruff = "^0.0.260"
+ruff = "^0.0.290"
 
 [tool.poetry.group.docs]
 optional = true
 
 [tool.poetry.group.docs.dependencies]
-myst-parser = "^1.0.0"
+myst-parser = "^2.0.0"
 sphinx = "^6.2.1"
+
+[[tool.poetry.source]]
+name = "torch_cpu"
+priority = "supplemental"
+url = "https://download.pytorch.org/whl/cpu"
+
+[[tool.poetry.source]]
+name = "torch_cu113"
+priority = "supplemental"
+url = "https://download.pytorch.org/whl/cu113"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
 
 [tool.poetry.urls]
 changelog = "https://github.com/agimus-project/happypose/blob/main/CHANGELOG.md"
