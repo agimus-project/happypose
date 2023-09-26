@@ -1164,7 +1164,7 @@ files = [
 name = "pillow"
 version = "10.0.1"
 description = "Python Imaging Library (Fork)"
-optional = true
+optional = false
 python-versions = ">=3.8"
 files = [
     {file = "Pillow-10.0.1-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:8f06be50669087250f319b706decf69ca71fdecd829091a37cc89398ca4dc17a"},
@@ -1703,7 +1703,7 @@ files = [
 name = "torch"
 version = "1.11.0+cpu"
 description = "Tensors and Dynamic neural networks in Python with strong GPU acceleration"
-optional = true
+optional = false
 python-versions = ">=3.7.0"
 files = [
     {file = "torch-1.11.0+cpu-cp310-cp310-linux_x86_64.whl", hash = "sha256:32fa00d974707c0183bc4dd0c1d69e853d0f15cc60f157b71ac5718847808943"},
@@ -1725,35 +1725,10 @@ url = "https://download.pytorch.org/whl/cpu"
 reference = "torch_cpu"
 
 [[package]]
-name = "torch"
-version = "1.11.0+cu113"
-description = "Tensors and Dynamic neural networks in Python with strong GPU acceleration"
-optional = true
-python-versions = ">=3.7.0"
-files = [
-    {file = "torch-1.11.0+cu113-cp310-cp310-linux_x86_64.whl", hash = "sha256:a68c33657a546131eb9bc44e2a98d2fa704aafae861460b051b82813852ccb44"},
-    {file = "torch-1.11.0+cu113-cp310-cp310-win_amd64.whl", hash = "sha256:ddc57495195aa2456e78bfc7d8d3f45dabbb8b7b268b3b5dbed4f0e4db492f33"},
-    {file = "torch-1.11.0+cu113-cp37-cp37m-linux_x86_64.whl", hash = "sha256:f56333470daea3c97078b37607e0035cccf72fc5c36fd84546e1a4b8d9944f2b"},
-    {file = "torch-1.11.0+cu113-cp37-cp37m-win_amd64.whl", hash = "sha256:e9df65c1fb2d80283b276114878fd38f411b70880e0b406c451d000e6159f451"},
-    {file = "torch-1.11.0+cu113-cp38-cp38-linux_x86_64.whl", hash = "sha256:b6a799bdb6ee3d914e5e62bddb4276d4a10248c1af4f2d217738e5f9ee27485b"},
-    {file = "torch-1.11.0+cu113-cp38-cp38-win_amd64.whl", hash = "sha256:7fd4751bbf39bbb04ec6116c7243ce6528aded4197afcf380537340e1eebd19a"},
-    {file = "torch-1.11.0+cu113-cp39-cp39-linux_x86_64.whl", hash = "sha256:e9126b0a5d95704bee40a9d0ef1cbd82d8dc7863e4638a376bef702dfd659370"},
-    {file = "torch-1.11.0+cu113-cp39-cp39-win_amd64.whl", hash = "sha256:e4bb14d953db9aad5bdb945a328410638721d77e3e622d0a8d77063c01daf40b"},
-]
-
-[package.dependencies]
-typing-extensions = "*"
-
-[package.source]
-type = "legacy"
-url = "https://download.pytorch.org/whl/cu113"
-reference = "torch_cu113"
-
-[[package]]
 name = "torchvision"
 version = "0.12.0+cpu"
 description = "image and video datasets and models for torch deep learning"
-optional = true
+optional = false
 python-versions = ">=3.7"
 files = [
     {file = "torchvision-0.12.0+cpu-cp310-cp310-linux_x86_64.whl", hash = "sha256:1f4da68f79207e7204f77afeb8271b41e7f7b602c7a3f832c8103948c37a8a9a"},
@@ -1780,38 +1755,6 @@ scipy = ["scipy"]
 type = "legacy"
 url = "https://download.pytorch.org/whl/cpu"
 reference = "torch_cpu"
-
-[[package]]
-name = "torchvision"
-version = "0.12.0+cu113"
-description = "image and video datasets and models for torch deep learning"
-optional = true
-python-versions = ">=3.7"
-files = [
-    {file = "torchvision-0.12.0+cu113-cp310-cp310-linux_x86_64.whl", hash = "sha256:a1cb063876bdebb1dc64657ed68983ff1307b9f9a88b5eba620d87afe48485f1"},
-    {file = "torchvision-0.12.0+cu113-cp310-cp310-win_amd64.whl", hash = "sha256:ffc6467294a418a8c0d0c68bc98bfbacf97299360ddc8a461f2ec4e821cf8636"},
-    {file = "torchvision-0.12.0+cu113-cp37-cp37m-linux_x86_64.whl", hash = "sha256:8bfaa4b594fee47418423b531edc4e57be750dcb0ff401ccb1257dfecbec1b30"},
-    {file = "torchvision-0.12.0+cu113-cp37-cp37m-win_amd64.whl", hash = "sha256:b2b5fae217ff0972e6494fa6f32d0a4f757e8c9280d6a3bf55373d42765250f0"},
-    {file = "torchvision-0.12.0+cu113-cp38-cp38-linux_x86_64.whl", hash = "sha256:37133e8c5b0ec2f01999e59116f6d0e36d9afb1c7f8f58bd0c3dc8996f835419"},
-    {file = "torchvision-0.12.0+cu113-cp38-cp38-win_amd64.whl", hash = "sha256:fc4b4f12f50749c12637261e9efa1cced008753b6ecc8d1c2681fde9dd52b675"},
-    {file = "torchvision-0.12.0+cu113-cp39-cp39-linux_x86_64.whl", hash = "sha256:6c63b9abe2849efed27b199b6d459a21bb01708c720db2fca5ebd941b2f00db8"},
-    {file = "torchvision-0.12.0+cu113-cp39-cp39-win_amd64.whl", hash = "sha256:2d7e794a1f8949ef9a280a4d94a6f15053d4e697c12f9678893e0908f34ca733"},
-]
-
-[package.dependencies]
-numpy = "*"
-pillow = ">=5.3.0,<8.3.dev0 || >=8.4.dev0"
-requests = "*"
-torch = "1.11.0"
-typing-extensions = "*"
-
-[package.extras]
-scipy = ["scipy"]
-
-[package.source]
-type = "legacy"
-url = "https://download.pytorch.org/whl/cu113"
-reference = "torch_cu113"
 
 [[package]]
 name = "traitlets"
@@ -1909,4 +1852,4 @@ render = ["panda3d", "pybullet"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9, <3.11"
-content-hash = "b6b487e7ea4f6cbcd8a74bf74edc6be84cf08cc016be2e9288dd9fedb52adfba"
+content-hash = "b055fbbb9c33bc1fc138efa926c50ee60aaafc010f5f232bf75b3acd726ebf88"
