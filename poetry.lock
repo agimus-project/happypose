@@ -1865,5 +1865,5 @@ render = ["panda3d", "pybullet"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.9, <3.11"
-content-hash = "4ccdee27c6ce83ca49167ba8013780e4374522cd408918c115ae5fe9aa273394"
+python-versions = ">=3.9,<3.11"
+content-hash = "5020cb4443dd05055a3795731c796f86e340c5d0b3e3c8b93203cba657db4ed9"
