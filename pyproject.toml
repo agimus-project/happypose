@@ -40,7 +40,7 @@ black = "^23.3.0"
 coverage = {extras = ["toml"], version = "^7.2.5"}
 ipython = "^8.12.2"
 pre-commit = "^3.2.1"
-ruff = "^0.0.260"
+ruff = "^0.0.291"
 
 [tool.poetry.group.docs]
 optional = true
