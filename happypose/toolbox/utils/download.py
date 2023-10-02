@@ -183,17 +183,17 @@ def main():
             download(f'{DOWNLOAD_URL}/cosypose/results/{result_id}', LOCAL_DATA_DIR / 'results')
 
 
-#manages multiple downloads in async
 def downloads(*args):
+    """manages multiple downloads in async"""
     asyncio.run(adownloads(*args))
 
 async def adownloads(*args):
     async with DownloadClient() as dl_client:
-        for (download_path, local_path,new_flags) in args:
-            if flags is None:
-                flags = []
-            flags = Flags(new_flags)
-            dl_client.create_task(dl_client.adownload(download_path, local_path,flags))
+        for (new_flags, download_path, local_path) in args:
+            if new_flags is None:
+                new_flags = []
+            new_flags = Flags(new_flags)
+            dl_client.create_task(dl_client.adownload(download_path, local_path,new_flags))
 
 
 def download(download_path, local_path, flags=None):
@@ -215,8 +215,9 @@ class DownloadClient:
     
     async def aclose(self):
         while len(self.task_set) > 0:
-            for task in list(self.task_set):
-                await task
+           # for task in list(self.task_set):
+            #    await task
+            await asyncio.gather(*list(self.task_set))
         await self.client.aclose()
 
     @classmethod
@@ -256,7 +257,7 @@ class DownloadClient:
         if r.status_code != 200:
             logger.error(f"Failed {download_path} with code {res.status_code}")
             return
-        create_dir(local_path)
+        Path(local_path).mkdir(parents=True,exist_ok=True)
         soup = BeautifulSoup(r.content, "html.parser")
         logger.info(f"Copying {download_path} to {local_path}")
 
@@ -280,14 +281,10 @@ class DownloadClient:
             logger.error(f"Failed {download_path} with code {res.status_code}")
             return
         logger.info(f"Copying {download_path} to {local_path}")
-        create_dir(local_path.parent)
+        Path(local_path.parent).mkdir(parents=True,exist_ok=True)
         with open(str(local_path),'wb') as f:
             f.write(r.content)
 
-
-def create_dir(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
 
 class Flags:
     def __init__(self, flags: [str]):
@@ -295,14 +292,12 @@ class Flags:
         #if you need to use other flags, feel free to implement them here
         self.exclude_set: set[str] = set()
 
-        skip = False
+        parser = argparse.ArgumentParser('Flags parsing')
+        parser.add_argument('--exclude', default='', type=str)
+        args = parser.parse_args(flags)
 
-        for (arg, nxt) in zip(flags, flags[1:]):
-            if skip:
-                skip = False
-            elif arg == "--exclude":
-                self.exclude_set.add(nxt)
-                skip = True
+        if args.exclude:
+            self.exclude_set.add(args.exclude)
 
     def flags_managing(flags, href):
         for el in flags.exclude_set:
