@@ -1,0 +1,45 @@
+name: Tests & Coverage
+
+on: [ push, pull_request ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Install EGL mesa - required for Panda3D renderer
+        run: sudo apt-get update && sudo apt-get install -qqy libegl1-mesa libegl1-mesa-dev
+
+      - name: Setup poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: matrix.python-version
+          cache: poetry
+
+      - name: Install happypose
+        run: poetry install --with dev --all-extras
+
+      - name: Download pre-trained models required for tests
+        run: |
+          mkdir local_data
+          python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
+          python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
+          python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
+
+          python -m happypose.toolbox.utils.download --megapose_models
+
+          cd tests/data
+          git clone https://github.com/petrikvladimir/happypose_test_data.git crackers_example
+
+      - name: Run tests
+        run: |
+          coverage run --source=happypose -m unittest
+          coverage xml

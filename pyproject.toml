@@ -24,6 +24,8 @@ readme = "README.md"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
+cosypose = { path = "happypose/pose_estimators/cosypose" }
+bop_toolkit_lib = { path = "deps/bop_toolkit_challenge" }
 ipython = "^8.12.2"
 panda3d = {optional = true, version = "=1.10.13"}
 pin = "^2.6.20"
