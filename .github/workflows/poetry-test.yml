@@ -14,7 +14,7 @@ jobs:
           submodules: 'recursive'
 
       - name: Install EGL mesa - required for Panda3D renderer
-        run: sudo apt-get update && sudo apt-get install -qqy libegl1-mesa libegl1-mesa-dev
+        run: sudo apt-get update && sudo apt-get install -qqy libegl1-mesa libegl1-mesa-dev rclone
 
       - name: Setup poetry
         run: pipx install poetry
