@@ -25,6 +25,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import yaml
 from bokeh.io import output_notebook, show
 from bokeh.layouts import gridplot
 from bokeh.models import HoverTool
@@ -67,7 +68,7 @@ class Plotter:
             cfg_path = run_dir / "config.yaml"
             try:
                 config = OmegaConf.load(cfg_path)
-            except:
+            except Exception:
                 config = yaml.load(cfg_path.read_text(), Loader=yaml.UnsafeLoader)
                 config = vars(config)
             configs[run_id] = self.fill_config_fn(config)

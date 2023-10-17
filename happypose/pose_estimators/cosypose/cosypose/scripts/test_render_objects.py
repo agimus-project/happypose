@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import (
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import (  # noqa: E501
     BulletSceneRenderer,
 )
 

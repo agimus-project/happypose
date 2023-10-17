@@ -30,9 +30,9 @@ under Apache license
 def isRotationMatrix(M, tol=1e-4):
     """Checks if something is a valid rotation matrix."""
     tag = False
-    I = np.identity(M.shape[0])
+    img = np.identity(M.shape[0])
 
-    if (np.linalg.norm(np.matmul(M, M.T) - I) < tol) and (
+    if (np.linalg.norm(np.matmul(M, M.T) - img) < tol) and (
         np.abs(np.linalg.det(M) - 1) < tol
     ):
         tag = True
@@ -134,8 +134,8 @@ def visualize_scene(vis, object_dict, randomize_color=True):
 
 def create_visualizer(clear=True, zmq_url="tcp://127.0.0.1:6000"):
     print(
-        "Waiting for meshcat server... have you started a server? Run `meshcat-server` to start a"
-        f" server. Communicating on zmq_url={zmq_url}",
+        "Waiting for meshcat server... have you started a server? Run `meshcat-server`"
+        f" to start a server. Communicating on zmq_url={zmq_url}",
     )
     vis = meshcat.Visualizer(zmq_url=zmq_url)
     if clear:

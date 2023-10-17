@@ -53,7 +53,8 @@ def group_by_keys(data, keys=base_plus_ext, lcase=True, suffixes=None, handler=N
             current_sample = {"__key__": prefix, "__url__": filesample["__url__"]}
         if suffix in current_sample:
             print(
-                f"{fname}: duplicate file name in tar file {suffix} {current_sample.keys()}",
+                f"{fname}: duplicate file name in tar file {suffix} "
+                f"{current_sample.keys()}",
             )
             current_sample["__bad__"] = True
         if suffixes is None or suffix in suffixes:

@@ -50,7 +50,6 @@ DUMMY_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_dummy.py"
 
 ##################################
 ##################################
-import os
 
 # Official Task 4 detections (CNOS fastSAM)
 EXTERNAL_DETECTIONS_FILES = {
@@ -285,8 +284,10 @@ def load_sam_predictions(ds_dir_name, scene_ds_dir):
     """
     # dets_lst: list of dictionary, each element = detection of one object in an image
     $ df_all_dets[0].keys()
-        > ['scene_id', 'image_id', 'category_id', 'bbox', 'score', 'time', 'segmentation']
-    - For the evaluation of Megapose, we only need the 'scene_id', 'image_id', 'category_id', 'score', 'time' and 'bbox'
+        > ['scene_id', 'image_id', 'category_id', 'bbox', 'score', 'time',
+        'segmentation']
+    - For the evaluation of Megapose, we only need the 'scene_id', 'image_id',
+      'category_id', 'score', 'time' and 'bbox'
     - We also need need to change the format of bounding boxes as explained below
     """
     dets_lst = []
@@ -332,8 +333,8 @@ def get_sam_detections(data, df_all_dets, df_targets, dt_det):
 
     #################
     # Filter detections based on 2 criteria
-    # - 1) Localization 6D task: we can assume that we know which object category and how many instances
-    # are present in the image
+    # - 1) Localization 6D task: we can assume that we know which object category and
+    # how many instances are present in the image
     obj_ids = df_targets_scene_img.obj_id.to_list()
     df_dets_scene_img_obj_filt = df_dets_scene_img[
         df_dets_scene_img["category_id"].isin(obj_ids)
@@ -347,8 +348,8 @@ def get_sam_detections(data, df_all_dets, df_targets, dt_det):
 
     # TODO: retain only corresponding inst_count number for each detection category_id
 
-    # - 2) Retain detections with best cnos scores (kind of redundant with finalized 1) )
-    # based on expected number of objects in the scene (from groundtruth)
+    # - 2) Retain detections with best cnos scores (kind of redundant with finalized 1)
+    # ) based on expected number of objects in the scene (from groundtruth)
     nb_gt_dets = df_targets_scene_img.inst_count.sum()
 
     # TODO: put that as a parameter somewhere?

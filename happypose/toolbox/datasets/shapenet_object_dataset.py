@@ -94,7 +94,7 @@ def make_shapenet_infos(shapenet_dir, model_name):
         if len(synset.children) == 0:
             return synset.models
         else:
-            return sum([get_descendants(child) for child in children])
+            return sum([get_descendants(child) for child in synset.children])
 
     for synset in synset_id_to_synset.values():
         synset.models_descendants = get_descendants(synset)

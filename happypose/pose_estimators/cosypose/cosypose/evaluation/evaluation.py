@@ -44,10 +44,12 @@ from happypose.pose_estimators.megapose.evaluation.meters.modelnet_meters import
 )
 from happypose.pose_estimators.megapose.evaluation.runner_utils import format_results
 from happypose.pose_estimators.megapose.inference.icp_refiner import ICPRefiner
-from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
 # Pose estimator
-# from happypose.pose_estimators.megapose.inference.teaserpp_refiner import TeaserppRefiner
+from happypose.pose_estimators.megapose.inference.teaserpp_refiner import (
+    TeaserppRefiner,
+)
+from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir
@@ -86,7 +88,9 @@ def load_pose_models(coarse_run_id, refiner_run_id, n_workers):
     # object_ds = BOPObjectDataset(BOP_DS_DIR / 'tless/models_cad')
     # object_ds = make_object_dataset(cfg.object_ds_name)
     # mesh_db = MeshDataBase.from_object_ds(object_ds)
-    # renderer = BulletBatchRenderer(object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer)
+    # renderer = BulletBatchRenderer(
+    # object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer
+    # )
     #
 
     object_dataset = make_object_dataset("ycbv")
@@ -210,9 +214,14 @@ def run_eval(
     # See https://stackoverflow.com/a/53287330
     assert cfg.coarse_run_id is not None
     assert cfg.refiner_run_id is not None
-    # TODO (emaitre): This fuction seems to take the wrong parameters. Trying to fix this
+    # TODO (emaitre): This fuction seems to take the wrong parameters. Trying to fix
+    # this.
     """
-    coarse_model, refiner_model, mesh_db = happypose.toolbox.inference.utils.load_pose_models(
+    (
+        coarse_model,
+        refiner_model,
+        mesh_db,
+    ) = happypose.toolbox.inference.utils.load_pose_models(
         coarse_run_id=cfg.coarse_run_id,
         refiner_run_id=cfg.refiner_run_id,
         n_workers=cfg.n_rendering_workers,

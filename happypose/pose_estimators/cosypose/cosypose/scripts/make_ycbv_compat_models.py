@@ -13,7 +13,8 @@ if __name__ == "__main__":
 
     orig_names = (ds_dir / "ycbv_friendly_names.txt").read_text()
     orig_names = {
-        str(int(l.split(" ")[0])): l.split(" ")[1] for l in orig_names.split("\n")[:-1]
+        str(int(line.split(" ")[0])): line.split(" ")[1]
+        for line in orig_names.split("\n")[:-1]
     }
 
     infos = json.loads((models_dir / "models_info.json").read_text())

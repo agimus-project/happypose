@@ -47,7 +47,8 @@ class EvalConfig:
     2. If `run_id` is None, then use `config_id`, `run_comment`and
     `run_postfix` to create a `run_id`
 
-    In 2., the parameters of the config are set-up using the function `update_cfg_with_config_id`.
+    In 2., the parameters of the config are set-up using the function
+    `update_cfg_with_config_id`.
     """
 
     # Network

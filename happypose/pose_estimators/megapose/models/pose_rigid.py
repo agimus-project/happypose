@@ -206,7 +206,8 @@ class PosePredictor(nn.Module):
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """Crop input images.
 
-        The image is cropped using the reprojection of the object points in the input pose (TCO).
+        The image is cropped using the reprojection of the object points in the input
+        pose (TCO).
         The reference point reprojects to the center of the cropped image.
         Please note that the unlike DeepIm, we do not explicitly use the input bounding
         box for cropping.
@@ -223,8 +224,8 @@ class PosePredictor(nn.Module):
         -------
             images_cropped: Images cropped and resized to self.render_size
             K_crop: Intrinsics of the fictive cropped camera.
-            boxes_rend: smallest bounding box defined by the reprojection of object points in
-                pose TCO.
+            boxes_rend: smallest bounding box defined by the reprojection of object
+                        points in pose TCO.
             boxes_crop: bounding box used to crop the input image.
         """
         bsz = images.shape[0]

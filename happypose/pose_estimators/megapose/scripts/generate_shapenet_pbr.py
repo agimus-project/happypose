@@ -37,7 +37,6 @@ from happypose.pose_estimators.megapose.config import (
     BLENDERPROC_DIR,
     GSO_DIR,
     GSO_NORMALIZED_DIR,
-    GSO_ORIG_DIR,
     LOCAL_DATA_DIR,
     MEMORY,
     PROJECT_DIR,
@@ -65,7 +64,6 @@ VERBOSE_KWARGS = {
 }
 SHAPENET_ORIG_DIR = SHAPENET_DIR / "models_orig"
 SHAPENET_SCALED_DIR = SHAPENET_DIR / "models_bop-renderer_scale=0.1"
-GSO_ORIG_DIR = GSO_DIR / "models_orig"
 GSO_SCALED_DIR = GSO_DIR / "models_bop-renderer_scale=0.1"
 
 
@@ -230,7 +228,8 @@ def make_shapenet_loader(synset_id, category_id, source_id=None, scale=None):
         {
             "module": "manipulators.EntityManipulator",
             "config": {
-                # get all shape net objects, as we have only loaded one, this returns only one entity
+                # get all shape net objects, as we have only loaded one, this returns
+                # only one entity
                 "selector": {
                     "provider": "getter.Entity",
                     "conditions": {
@@ -269,7 +268,8 @@ def make_gso_loader(obj_id, category_id, scale=None):
         {
             "module": "manipulators.EntityManipulator",
             "config": {
-                # get all shape net objects, as we have only loaded one, this returns only one entity
+                # get all shape net objects, as we have only loaded one, this returns
+                # only one entity
                 "selector": {
                     "provider": "getter.Entity",
                     "conditions": {
@@ -341,8 +341,10 @@ def make_light_sampler(radius_min=1, radius_max=1.5, energy=100):
                     "location": {
                         "provider": "sampler.Shell",
                         "center": [0, 0, 0],
-                        "radius_min": radius_min,  # now depends on the bottom area of the box
-                        "radius_max": radius_max,  # this one too
+                        # now depends on the bottom area of the box
+                        "radius_min": radius_min,
+                        # this one too
+                        "radius_max": radius_max,
                         "elevation_min": 5,
                         "elevation_max": 89,
                         "uniform_elevation": True,
@@ -759,54 +761,62 @@ def record_chunk(cfg, ds_dir, chunk_id):
         shutil.rmtree(output_dir)
     return
 
-    # # HDF5 dataset generation
-    # if cfg.save_hdf5:
-    #     shutil.copy(
-    #         ds_dir / "shapenet_labels.json", output_dir / "bop_data" / "shapenet_labels.json"
-    #     )
-    #     scene_ds = BOPDataset(
-    #         output_dir / "bop_data",
-    #         split="train_pbr",
-    #         load_depth=True,
-    #         allow_cache=False,
-    #         per_view_annotations=False,
-    #     )
-    #     write_scene_ds_as_hdf5(
-    #         scene_ds, output_dir / f"bop_data/train_pbr/{0:06d}/data.hdf5", n_reading_workers=4
-    #     )
 
-    # if cfg.save_webdataset:
-    #     shutil.copy(
-    #         ds_dir / "shapenet_labels.json", output_dir / "bop_data" / "shapenet_labels.json"
-    #     )
-    #     scene_ds = BOPDataset(
-    #         output_dir / "bop_data",
-    #         split="train_pbr",
-    #         load_depth=True,
-    #         allow_cache=False,
-    #         per_view_annotations=False,
-    #     )
-    #     write_scene_ds_as_wds(
-    #         scene_ds, output_dir / f"bop_data/train_pbr/{0:06d}/", n_reading_workers=4
-    #     )
+"""
+    # HDF5 dataset generation
+    if cfg.save_hdf5:
+        shutil.copy(
+            ds_dir / "shapenet_labels.json",
+            output_dir / "bop_data" / "shapenet_labels.json",
+        )
+        scene_ds = BOPDataset(
+            output_dir / "bop_data",
+            split="train_pbr",
+            load_depth=True,
+            allow_cache=False,
+            per_view_annotations=False,
+        )
+        write_scene_ds_as_hdf5(
+            scene_ds,
+            output_dir / f"bop_data/train_pbr/{0:06d}/data.hdf5",
+            n_reading_workers=4,
+        )
+    if cfg.save_webdataset:
+        shutil.copy(
+            ds_dir / "shapenet_labels.json",
+            output_dir / "bop_data" / "shapenet_labels.json",
+        )
+        scene_ds = BOPDataset(
+            output_dir / "bop_data",
+            split="train_pbr",
+            load_depth=True,
+            allow_cache=False,
+            per_view_annotations=False,
+        )
+        write_scene_ds_as_wds(
+            scene_ds, output_dir / f"bop_data/train_pbr/{0:06d}/", n_reading_workers=4
+        )
 
-    # # Move everything to base directory
-    # chunk_scene_dir = output_dir / f"bop_data/train_pbr/{0:06d}"
-    # train_pbr_dir = ds_dir / "train_pbr"
-    # target_dir = train_pbr_dir / f"{chunk_id:06d}"
-    # if target_dir.exists():
-    #     shutil.rmtree(target_dir)
-    # if cfg.save_files and success:
-    #     shutil.copytree(chunk_scene_dir, target_dir)
-    # if cfg.save_hdf5 and success:
-    #     target_dir.mkdir(exist_ok=True)
-    #     shutil.copy(chunk_scene_dir / "data.hdf5", target_dir / "data.hdf5")
-    # if cfg.save_webdataset and success:
-    #     target_dir.mkdir(exist_ok=True)
-    #     shutil.copy(chunk_scene_dir / "shard-00000000.tar", target_dir / "shard-00000000.tar")
-    #     shutil.copy(chunk_scene_dir / "ds_infos.json", target_dir / "ds_infos.json")
-    # shutil.rmtree(output_dir)
-    # return
+    # Move everything to base directory
+    chunk_scene_dir = output_dir / f"bop_data/train_pbr/{0:06d}"
+    train_pbr_dir = ds_dir / "train_pbr"
+    target_dir = train_pbr_dir / f"{chunk_id:06d}"
+    if target_dir.exists():
+        shutil.rmtree(target_dir)
+    if cfg.save_files and success:
+        shutil.copytree(chunk_scene_dir, target_dir)
+    if cfg.save_hdf5 and success:
+        target_dir.mkdir(exist_ok=True)
+        shutil.copy(chunk_scene_dir / "data.hdf5", target_dir / "data.hdf5")
+    if cfg.save_webdataset and success:
+        target_dir.mkdir(exist_ok=True)
+        shutil.copy(
+            chunk_scene_dir / "shard-00000000.tar", target_dir / "shard-00000000.tar"
+        )
+        shutil.copy(chunk_scene_dir / "ds_infos.json", target_dir / "ds_infos.json")
+    shutil.rmtree(output_dir)
+    return
+"""
 
 
 def find_chunks_to_record(cfg, chunk_ids):

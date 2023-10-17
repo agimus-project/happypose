@@ -22,10 +22,10 @@ from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
     make_object_dataset,
     make_scene_dataset,
 )
-from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (  # noqa: E501
     MultiViewWrapper,
 )
-from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.bop_predictions import (
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.bop_predictions import (  # noqa: E501
     BopPredictionRunner,
 )
 from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import (
@@ -46,7 +46,7 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor impor
 from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import (
     MeshDataBase,
 )
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import (
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import (  # noqa: E501
     BulletBatchRenderer,
 )
 

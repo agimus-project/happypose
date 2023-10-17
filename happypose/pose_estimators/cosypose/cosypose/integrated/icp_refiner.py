@@ -173,8 +173,12 @@ def icp_refinement(
 
     # import trimesh
     # print(points_src.shape, points_tgt.shape)
-    # trimesh.Trimesh(vertices=points_src[:, :3], normals=points_src[:, 3:]).export(DEBUG_DATA_DIR / 'src.ply')
-    # trimesh.Trimesh(vertices=points_tgt[:, :3], normals=points_tgt[:, 3:]).export(DEBUG_DATA_DIR / 'tgt.ply')
+    # trimesh.Trimesh(vertices=points_src[:, :3], normals=points_src[:, 3:]).export(
+    # DEBUG_DATA_DIR / "src.ply"
+    # )
+    # trimesh.Trimesh(vertices=points_tgt[:, :3], normals=points_tgt[:, 3:]).export(
+    # DEBUG_DATA_DIR / "tgt.ply"
+    # )
     # raise ValueError
 
     tolerence = 0.05

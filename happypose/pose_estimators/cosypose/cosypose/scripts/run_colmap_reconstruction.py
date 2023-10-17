@@ -9,7 +9,7 @@ from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
     make_scene_dataset,
 )
-from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (  # noqa: E501
     MultiViewWrapper,
 )
 

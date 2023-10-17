@@ -42,20 +42,20 @@ def measure_memory(gltf_path):
     s = f.getvalue()
     s = s.splitlines()
     mems = []
-    for l in s:
-        if "GeomVertexData arrays occupy" in l:
-            print(l)
-            l_ = l.split(" ")
+    for line in s:
+        if "GeomVertexData arrays occupy" in line:
+            print(line)
+            l_ = line.split(" ")
             idx = [n for n, w in enumerate(l_) if w == "occupy"][0]
             mems.append(float(l_[idx + 1]))
-        elif "GeomPrimitive arrays occupy" in l:
-            print(l)
-            l_ = l.split(" ")
+        elif "GeomPrimitive arrays occupy" in line:
+            print(line)
+            l_ = line.split(" ")
             idx = [n for n, w in enumerate(l_) if w == "occupy"][0]
             mems.append(float(l_[idx + 1]))
-        elif "texture memory required" in l:
-            print(l)
-            l_ = l.split(" ")
+        elif "texture memory required" in line:
+            print(line)
+            l_ = line.split(" ")
             idx = [n for n, w in enumerate(l_) if w == "minimum"][0]
             mems.append(float(l_[idx + 1]))
     tot_mem_kb = sum(mems)

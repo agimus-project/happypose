@@ -144,12 +144,16 @@ class MBConvBlock(nn.Module):
         return x
 
     def set_swish(self, memory_efficient=True):
-        """Sets swish function as memory efficient (for training) or standard (for export)."""
+        """
+        Sets swish function as memory efficient (for training) or standard (for export).
+        """
         self._swish = MemoryEfficientSwish() if memory_efficient else Swish()
 
 
 class EfficientNet(nn.Module):
-    """An EfficientNet model. Most easily loaded with the .from_name or .from_pretrained methods.
+    """
+    An EfficientNet model. Most easily loaded with the .from_name or .from_pretrained
+    methods.
 
     Args:
     ----
@@ -238,7 +242,9 @@ class EfficientNet(nn.Module):
         self._swish = MemoryEfficientSwish()
 
     def set_swish(self, memory_efficient=True):
-        """Sets swish function as memory efficient (for training) or standard (for export)."""
+        """
+        Sets swish function as memory efficient (for training) or standard (for export).
+        """
         self._swish = MemoryEfficientSwish() if memory_efficient else Swish()
         for block in self._blocks:
             block.set_swish(memory_efficient)
@@ -261,7 +267,10 @@ class EfficientNet(nn.Module):
         return x
 
     def forward(self, inputs):
-        """Calls extract_features to extract features, applies final linear layer, and returns logits."""
+        """
+        Calls extract_features to extract features, applies final linear layer, and
+        returns logits.
+        """
         inputs.size(0)
         # Convolution layers
         x = self.extract_features(inputs)

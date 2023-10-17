@@ -142,7 +142,8 @@ def main():
         "--ransac_dist_threshold",
         default=0.02,
         type=float,
-        help="Threshold (in meters) on symmetric distance to consider a tentative match an inlier",
+        help="Threshold (in meters) on symmetric distance to consider "
+        "a tentative match an inlier",
     )
     parser.add_argument(
         "--ba_n_iter",
@@ -217,7 +218,8 @@ def main():
         view_group_dir.mkdir(exist_ok=True, parents=True)
 
         logger.info(
-            f"Subscene {view_group} has {len(objects_)} objects and {len(cameras_)} cameras.",
+            f"Subscene {view_group} has {len(objects_)} objects and "
+            f"{len(cameras_)} cameras.",
         )
 
         predicted_scene_path = view_group_dir / "predicted_scene.json"
@@ -227,7 +229,8 @@ def main():
 
         logger.info(f"Wrote predicted scene (objects+cameras): {predicted_scene_path}")
         logger.info(
-            f"Wrote predicted objects with pose expressed in camera frame: {scene_reprojected_path}",
+            f"Wrote predicted objects with pose expressed in camera frame: "
+            f"{scene_reprojected_path}",
         )
 
         # if args.no_visualization:

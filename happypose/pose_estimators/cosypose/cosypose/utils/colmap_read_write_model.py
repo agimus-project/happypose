@@ -297,10 +297,13 @@ def write_images_text(images, path):
         mean_observations = sum(
             (len(img.point3D_ids) for _, img in images.items()),
         ) / len(images)
-    HEADER = "# Image list with two lines of data per image:\n"
-    "#   IMAGE_ID, QW, QX, QY, QZ, TX, TY, TZ, CAMERA_ID, NAME\n"
-    "#   POINTS2D[] as (X, Y, POINT3D_ID)\n"
-    f"# Number of images: {len(images)}, mean observations per image: {mean_observations}\n"
+    HEADER = (
+        "# Image list with two lines of data per image:\n"
+        "#   IMAGE_ID, QW, QX, QY, QZ, TX, TY, TZ, CAMERA_ID, NAME\n"
+        "#   POINTS2D[] as (X, Y, POINT3D_ID)\n"
+        f"# Number of images: {len(images)}, mean observations per image: "
+        f"{mean_observations}\n"
+    )
 
     with open(path, "w") as fid:
         fid.write(HEADER)

@@ -56,38 +56,31 @@ class DeepImModelNetDataset(SceneDataset):
         n_images_per_object: int = 50,
         load_depth: bool = False,
     ):
+        data_dir = modelnet_dir / "modelnet_render_v1" / "data"
         self.test_template_im = (
-            modelnet_dir
-            / "modelnet_render_v1/data/real/{category}/{split}/{obj_id}_{im_id:04d}-color.png"
+            data_dir / "real/{category}/{split}/{obj_id}_{im_id:04d}-color.png"
         )
         self.test_template_depth = (
-            modelnet_dir
-            / "modelnet_render_v1/data/real/{category}/{split}/{obj_id}_{im_id:04d}-depth.png"
+            data_dir / "real/{category}/{split}/{obj_id}_{im_id:04d}-depth.png"
         )
         self.test_template_label = (
-            modelnet_dir
-            / "modelnet_render_v1/data/real/{category}/{split}/{obj_id}_{im_id:04d}-label.png"
+            data_dir / "real/{category}/{split}/{obj_id}_{im_id:04d}-label.png"
         )
         self.test_template_pose = (
-            modelnet_dir
-            / "modelnet_render_v1/data/real/{category}/{split}/{obj_id}_{im_id:04d}-pose.txt"
+            data_dir / "real/{category}/{split}/{obj_id}_{im_id:04d}-pose.txt"
         )
 
         self.init_template_im = (
-            modelnet_dir
-            / "modelnet_render_v1/data/rendered/{category}/{split}/{obj_id}_{im_id:04d}_0-color.png"
+            data_dir / "rendered/{category}/{split}/{obj_id}_{im_id:04d}_0-color.png"
         )
         self.init_template_depth = (
-            modelnet_dir
-            / "modelnet_render_v1/data/rendered/{category}/{split}/{obj_id}_{im_id:04d}_0-depth.png"
+            data_dir / "rendered/{category}/{split}/{obj_id}_{im_id:04d}_0-depth.png"
         )
         self.init_template_label = (
-            modelnet_dir
-            / "modelnet_render_v1/data/rendered/{category}/{split}/{obj_id}_{im_id:04d}_0-label.png"
+            data_dir / "rendered/{category}/{split}/{obj_id}_{im_id:04d}_0-label.png"
         )
         self.init_template_pose = (
-            modelnet_dir
-            / "modelnet_render_v1/data/rendered/{category}/{split}/{obj_id}_{im_id:04d}_0-pose.txt"
+            data_dir / "rendered/{category}/{split}/{obj_id}_{im_id:04d}_0-pose.txt"
         )
 
         object_ids = (

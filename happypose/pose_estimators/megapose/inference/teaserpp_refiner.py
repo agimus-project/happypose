@@ -205,8 +205,8 @@ class TeaserppRefiner(DepthRefiner):
         To generate correspondences for Teaser++ we use the following approach.
         1. Render depth image depth_rendered at the estimated pose from predictions.
         2. Generate 3D --> 3D correspondences across rendered and observed depth images.
-            by assuming that pose is correctly aligned in rgb space. So depth_rendered[u,v]
-            corresponds to depth_observed[u,v].
+            by assuming that pose is correctly aligned in rgb space.
+            So depth_rendered[u,v] corresponds to depth_observed[u,v].
         3. Estimate a mask to filter out some outliers in our generated correspondences.
 
         Args:

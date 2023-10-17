@@ -248,7 +248,8 @@ class PoseDataset(torch.utils.data.IterableDataset):
         The object satisfies the constraints:
             1. The visible 2D area is superior or equal to min_area
             2. if `keep_objects_set` isn't None, the object must belong to this set
-        If there are no objects that satisfy this condition in the observation, returns None.
+        If there are no objects that satisfy this condition in the observation,
+        returns None.
         """
         obs = remove_invisible_objects(obs)
 

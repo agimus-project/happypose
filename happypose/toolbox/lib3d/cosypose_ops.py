@@ -18,6 +18,7 @@ limitations under the License.
 import torch
 
 # Local Folder
+from .camera_geometry import project_points
 from .rotations import compute_rotation_matrix_from_ortho6d
 from .transform_ops import invert_transform_matrices, transform_pts
 
@@ -284,6 +285,7 @@ def TCO_init_from_boxes_zup_autodepth(boxes_2d, model_points_3d, K):
 
 def TCO_init_from_boxes_v3(layer, boxes, K):
     # TODO: Clean these 2 functions
+    # TODO: F821 Undefined name `_TCO_init_from_boxes_v2`
     # MegaPose
     from happypose.pose_estimators.megapose.math_utils.meshes import get_T_offset
 
@@ -301,7 +303,7 @@ def TCO_init_from_boxes_v3(layer, boxes, K):
         .to(boxes.device)
         .to(boxes.dtype)
     )
-    TCO = _TCO_init_from_boxes_v2(z, boxes, K)
+    TCO = _TCO_init_from_boxes_v2(z, boxes, K)  # noqa: F821
     pts2d = project_points(pts, K, TCO)
     deltax = pts2d[..., 0].max() - pts2d[..., 0].min()
     deltay = pts2d[..., 1].max() - pts2d[..., 1].min()
@@ -313,7 +315,7 @@ def TCO_init_from_boxes_v3(layer, boxes, K):
     ratio_y = deltay / bb_deltay
 
     z2 = z * (ratio_y.unsqueeze(1) + ratio_x.unsqueeze(1)) / 2
-    TCO = _TCO_init_from_boxes_v2(z2, boxes, K)
+    TCO = _TCO_init_from_boxes_v2(z2, boxes, K)  # noqa: F821
     return TCO
 
 

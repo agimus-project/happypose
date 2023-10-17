@@ -10,7 +10,7 @@ import transforms3d
 from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import euler2quat
 from happypose.pose_estimators.cosypose.cosypose.lib3d.transform import Transform
 from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import (
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import (  # noqa: E501
     BulletSceneRenderer,
 )
 

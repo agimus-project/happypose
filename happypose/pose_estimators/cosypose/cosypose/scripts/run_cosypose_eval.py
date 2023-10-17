@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 from happypose.pose_estimators.cosypose.cosypose.utils.tqdm import patch_tqdm
 
 patch_tqdm()
@@ -27,16 +28,16 @@ from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
     make_scene_dataset,
 )
 from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import ListSampler
-from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (  # noqa: E501
     MultiViewWrapper,
 )
-from happypose.pose_estimators.cosypose.cosypose.evaluation.eval_runner.pose_eval import (
+from happypose.pose_estimators.cosypose.cosypose.evaluation.eval_runner.pose_eval import (  # noqa: E501
     PoseEvaluation,
 )
 from happypose.pose_estimators.cosypose.cosypose.evaluation.meters.pose_meters import (
     PoseErrorMeter,
 )
-from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.multiview_predictions import (
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.multiview_predictions import (  # noqa: E501
     MultiviewPredictionRunner,
 )
 from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import (
@@ -53,7 +54,7 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d import Transform
 from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import (
     MeshDataBase,
 )
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import (
+from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import (  # noqa: E501
     BulletBatchRenderer,
 )
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
@@ -208,7 +209,8 @@ def get_pose_meters(scene_ds, ds_name):
     if "tless" in ds_name:
         object_ds_name = "tless.eval"
     elif "ycbv" in ds_name:
-        object_ds_name = "ycbv.bop-compat.eval"  # This is important for definition of symmetric objects
+        # This is important for definition of symmetric objects
+        object_ds_name = "ycbv.bop-compat.eval"
     else:
         raise ValueError
 
@@ -262,12 +264,14 @@ def get_pose_meters(scene_ds, ds_name):
         if "tless" in ds_name:
             meters.update(
                 {
-                    f"{error_type}_ntop=BOP_matching=BOP": PoseErrorMeter(  # For ADD-S<0.1d
+                    # For ADD-S<0.1d
+                    f"{error_type}_ntop=BOP_matching=BOP": PoseErrorMeter(
                         error_type=error_type,
                         match_threshold=0.1,
                         **base_kwargs,
                     ),
-                    f"{error_type}_ntop=ALL_matching=BOP": PoseErrorMeter(  # For mAP
+                    # For mAP
+                    f"{error_type}_ntop=ALL_matching=BOP": PoseErrorMeter(
                         error_type=error_type,
                         match_threshold=0.1,
                         consider_all_predictions=True,
@@ -530,33 +534,70 @@ def main():
 
     metrics_to_print = {}
     if "ycbv" in ds_name:
+        k_0 = "posecnn/ADD(-S)_ntop=1_matching=CLASS/AUC/objects/mean"
+        k_1 = (
+            f"{det_key}/refiner/iteration={n_refiner_iterations}/"
+            f"ADD(-S)_ntop=1_matching=CLASS/AUC/objects/mean"
+        )
+        k_2 = (
+            f"{det_key}/refiner/iteration={n_refiner_iterations}/"
+            f"ADD-S_ntop=1_matching=CLASS/AUC/objects/mean"
+        )
+        k_3 = (
+            f"{det_key}/ba_output+all_cand/ADD(-S)_ntop=1_matching="
+            f"CLASS/AUC/objects/mean"
+        )
+        k_4 = (
+            f"{det_key}/ba_output+all_cand/ADD-S_ntop=1_matching="
+            f"CLASS/AUC/objects/mean"
+        )
         metrics_to_print.update(
             {
-                "posecnn/ADD(-S)_ntop=1_matching=CLASS/AUC/objects/mean": "PoseCNN/AUC of ADD(-S)",
-                f"{det_key}/refiner/iteration={n_refiner_iterations}/ADD(-S)_ntop=1_matching=CLASS/AUC/objects/mean": "Singleview/AUC of ADD(-S)",
-                f"{det_key}/refiner/iteration={n_refiner_iterations}/ADD-S_ntop=1_matching=CLASS/AUC/objects/mean": "Singleview/AUC of ADD-S",
-                f"{det_key}/ba_output+all_cand/ADD(-S)_ntop=1_matching=CLASS/AUC/objects/mean": f"Multiview (n={args.n_views})/AUC of ADD(-S)",
-                f"{det_key}/ba_output+all_cand/ADD-S_ntop=1_matching=CLASS/AUC/objects/mean": f"Multiview (n={args.n_views})/AUC of ADD-S",
+                k_0: "PoseCNN/AUC of ADD(-S)",
+                k_1: "Singleview/AUC of ADD(-S)",
+                k_2: "Singleview/AUC of ADD-S",
+                k_3: f"Multiview (n={args.n_views})/AUC of ADD(-S)",
+                k_4: f"Multiview (n={args.n_views})/AUC of ADD-S",
             },
         )
     elif "tless" in ds_name:
+        k_0 = (
+            f"{det_key}/refiner/iteration={n_refiner_iterations}/ADD-S_ntop="
+            f"BOP_matching=OVERLAP/AUC/objects/mean"
+        )
+        k_1 = (
+            f"{det_key}/refiner/iteration={n_refiner_iterations}/ADD-S_ntop="
+            f"BOP_matching=BOP/0.1d"
+        )
+        k_2 = (
+            f"{det_key}/refiner/iteration={n_refiner_iterations}/ADD-S_ntop="
+            f"ALL_matching=BOP/mAP"
+        )
+        k_3 = (
+            f"{det_key}/ba_output+all_cand/ADD-S_ntop=BOP_matching="
+            f"OVERLAP/AUC/objects/mean"
+        )
+        k_4 = f"{det_key}/ba_output+all_cand/ADD-S_ntop=BOP_matching=BOP/0.1d"
+        k_5 = f"{det_key}/ba_output+all_cand/ADD-S_ntop=ALL_matching=BOP/mAP"
         metrics_to_print.update(
             {
-                f"{det_key}/refiner/iteration={n_refiner_iterations}/ADD-S_ntop=BOP_matching=OVERLAP/AUC/objects/mean": "Singleview/AUC of ADD-S",
-                # f'{det_key}/refiner/iteration={n_refiner_iterations}/ADD-S_ntop=BOP_matching=BOP/0.1d': f'Singleview/ADD-S<0.1d',
-                f"{det_key}/refiner/iteration={n_refiner_iterations}/ADD-S_ntop=ALL_matching=BOP/mAP": "Singleview/mAP@ADD-S<0.1d",
-                f"{det_key}/ba_output+all_cand/ADD-S_ntop=BOP_matching=OVERLAP/AUC/objects/mean": f"Multiview (n={args.n_views})/AUC of ADD-S",
-                # f'{det_key}/ba_output+all_cand/ADD-S_ntop=BOP_matching=BOP/0.1d': f'Multiview (n={args.n_views})/ADD-S<0.1d',
-                f"{det_key}/ba_output+all_cand/ADD-S_ntop=ALL_matching=BOP/mAP": f"Multiview (n={args.n_views}/mAP@ADD-S<0.1d)",
+                k_0: "Singleview/AUC of ADD-S",
+                # k_1: f'Singleview/ADD-S<0.1d',
+                k_2: "Singleview/mAP@ADD-S<0.1d",
+                k_3: f"Multiview (n={args.n_views})/AUC of ADD-S",
+                # k_4: f'Multiview (n={args.n_views})/ADD-S<0.1d',
+                k_5: f"Multiview (n={args.n_views}/mAP@ADD-S<0.1d)",
             },
         )
     else:
         raise ValueError
 
+    k_0 = f"{det_key}/ba_input/ADD-S_ntop=BOP_matching=OVERLAP/norm"
+    k_1 = f"{det_key}/ba_output/ADD-S_ntop=BOP_matching=OVERLAP/norm"
     metrics_to_print.update(
         {
-            f"{det_key}/ba_input/ADD-S_ntop=BOP_matching=OVERLAP/norm": "Multiview before BA/ADD-S (m)",
-            f"{det_key}/ba_output/ADD-S_ntop=BOP_matching=OVERLAP/norm": "Multiview after BA/ADD-S (m)",
+            k_0: "Multiview before BA/ADD-S (m)",
+            k_1: "Multiview after BA/ADD-S (m)",
         },
     )
 

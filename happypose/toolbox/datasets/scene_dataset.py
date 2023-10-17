@@ -52,7 +52,8 @@ infos: pd.DataFrame with fields
 tensors:
     K: [B,3,3] camera intrinsics
     poses: [B,4,4] object to camera transform
-    poses_init [Optional]: [B,4,4] object to camera transform. Used if the dataset has initial estimates (ModelNet)
+    poses_init [Optional]: [B,4,4] object to camera transform. Used if the dataset has
+                           initial estimates (ModelNet)
     TCO: same as poses
     bboxes: [B,4] bounding boxes for objects
     masks: (optional)
@@ -70,14 +71,16 @@ def transform_to_list(T: Transform) -> ListPose:
 
 @dataclass
 class ObjectData:
-    # NOTE (Yann): bbox_amodal, bbox_modal, visib_fract should be moved to SceneObservation
+    # NOTE (Yann): bbox_amodal, bbox_modal, visib_fract should be moved to
+    # SceneObservation
     label: str
     TWO: Transform | None = None
     unique_id: int | None = None
     bbox_amodal: np.ndarray | None = None  # (4, ) array [xmin, ymin, xmax, ymax]
     bbox_modal: np.ndarray | None = None  # (4, ) array [xmin, ymin, xmax, ymax]
     visib_fract: float | None = None
-    TWO_init: Transform | None = None  # Some pose estimation datasets (ModelNet) provide an initial pose estimate
+    TWO_init: Transform | None = None
+    # Some pose estimation datasets (ModelNet) provide an initial pose estimate
     #  NOTE: This should be loaded externally
 
     def to_json(self) -> dict[str, SingleDataJsonType]:
@@ -124,7 +127,8 @@ class CameraData:
     resolution: Resolution | None = None
     TWC: Transform | None = None
     camera_id: str | None = None
-    TWC_init: Transform | None = None  # Some pose estimation datasets (ModelNet) provide an initial pose estimate
+    TWC_init: Transform | None = None
+    # Some pose estimation datasets (ModelNet) provide an initial pose estimate
     #  NOTE: This should be loaded externally
 
     def to_json(self) -> str:
@@ -191,7 +195,8 @@ class SceneObservation:
     rgb: np.ndarray | None = None  # (h,w,3) uint8 numpy array
     depth: np.ndarray | None = None  # (h, w), np.float32
     segmentation: np.ndarray | None = None  # (h, w), np.uint32 (important);
-    # contains objects unique ids. int64 are not handled and can be dangerous when used with PIL
+    # contains objects unique ids. int64 are not handled and can be dangerous when used
+    # with PIL
     infos: ObservationInfos | None = None
     object_datas: list[ObjectData] | None = None
     camera_data: CameraData | None = None
@@ -400,8 +405,10 @@ class SceneDataset(torch.utils.data.Dataset):
 
         Args:
         ----
-            frame_index (pd.DataFrame): Must contain the following columns: scene_id, view_id
-            load_depth (bool, optional): Whether to load depth images. Defaults to False.
+            frame_index (pd.DataFrame): Must contain the following columns:
+                                        scene_id, view_id
+            load_depth (bool, optional): Whether to load depth images.
+                                         Defaults to False.
             load_segmentation (bool, optional): Whether to load image segmentation.
             Defaults to True.
             Defaults to f'{label}'.

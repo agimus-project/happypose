@@ -48,27 +48,32 @@ class RigidObject:
         ----
             label (str): A unique label to identify an object.
             mesh_path (Path): Path to a mesh. Multiple object types are supported.
-                Please refer to downstream usage of this class for the supported formats.
-                For example, when a `RigidObjectDataset`is passed to a `Panda3dSceneRenderer`,
-                the user must ensure that the mesh can be loaded correctly.
+                Please refer to downstream usage of this class for the supported
+                formats.
+                For example, when a `RigidObjectDataset`is passed to a
+                `Panda3dSceneRenderer`, the user must ensure that the mesh can be loaded
+                correctly.
             category (Optional[str], optional): Can be used to identify the object
-                as one of a known category,  e.g. mug or shoes.  In the general case, an
-                object does not need to belong to a category. The notion of category can also
-                ambiguous. In this codebase, this is only used to parse the categories of the
-                ShapeNet dataset in order to remove the instances that overlap with the test
-                categories of the ModelNet dataset.
+                as one of a known category, e.g. mug or shoes. In the general case, an
+                object does not need to belong to a category. The notion of category can
+                also ambiguous. In this codebase, this is only used to parse the
+                categories of the ShapeNet dataset in order to remove the instances that
+                overlap with the test categories of the ModelNet dataset.
             mesh_diameter (Optional[float], optional): Diameter of the object, expressed
                 the in unit of the meshes.
-                This is useful for computing error some metrics like ADD<0.1d or ADD-S<0.1d.
-            mesh_units (str, optional): Units in which the vertex positions are expressed.
-                Can be `m`or `mm`, defaults to `m`. In the operations of this codebase,
-                all mesh coordinates and poses must be expressed in meters.
-                When an object is loaded, a scaling will be applied to the mesh
+                This is useful for computing error some metrics like ADD<0.1d or
+                ADD-S<0.1d.
+            mesh_units (str, optional): Units in which the vertex positions are
+                expressed. Can be `m`or `mm`, defaults to `m`. In the operations of
+                this codebase, all mesh coordinates and poses must be expressed in
+                meters. When an object is loaded, a scaling will be applied to the mesh
                 to ensure its coordinates are in meters when in memory.
             symmetries_discrete (List[ContinuousSymmetry], optional):
-                See https://github.com/thodan/bop_toolkit/blob/master/bop_toolkit_lib/misc.py
+                See https://github.com/thodan/bop_toolkit/blob/master/
+                    bop_toolkit_lib/misc.py
             symmetries_continuous (List[DiscreteSymmetry], optional):
-                See https://github.com/thodan/bop_toolkit/blob/master/bop_toolkit_lib/misc.py
+                See https://github.com/thodan/bop_toolkit/blob/master/
+                    bop_toolkit_lib/misc.py
             ypr_offset_deg (np.ndarray, optional): A rotation offset applied to the mesh
                 **only when loaded in Panda3D**. This can be useful to correct
                 some mesh conventions where axes are flipped.
@@ -80,7 +85,8 @@ class RigidObject:
                 For example, if you have a mesh with coordinates expressed in `mm`
                 which you want to resize to 10% of its size,
                 you should pass `mesh_units=mm`and `scaling_factor=0.1`.
-                Note that `mesh_units=m` and `scaling_factor=100` would be strictly equivalent.
+                Note that `mesh_units=m` and `scaling_factor=100` would be strictly
+                equivalent.
             scaling_factor_mesh_units_to_meters (float, optional): Can be used
                 instead of the mesh_units argument. This is the scale that converts
                 mesh units to meters.

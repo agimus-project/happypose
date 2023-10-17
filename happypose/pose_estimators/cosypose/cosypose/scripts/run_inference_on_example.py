@@ -32,7 +32,8 @@ from happypose.toolbox.utils.logging import get_logger, set_logging_level
 from happypose.toolbox.visualization.bokeh_plotter import BokehPlotter
 from happypose.toolbox.visualization.utils import make_contour_overlay
 
-# from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
+# from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer
+# import BulletSceneRenderer
 
 
 ########################
@@ -131,8 +132,10 @@ def rendering(predictions, example_dir):
 def save_predictions(example_dir, renderings):
     rgb_render = renderings.rgb
     rgb, _, _ = load_observation(example_dir, load_depth=False)
-    # render_prediction_wrt_camera calls BulletSceneRenderer.render_scene using only one camera at pose Identity and return only rgb values
-    # BulletSceneRenderer.render_scene: gets a "object list" (prediction like object), a list of camera infos (with Km pose, res) and renders
+    # render_prediction_wrt_camera calls BulletSceneRenderer.render_scene using only one
+    # camera at pose Identity and return only rgb values
+    # BulletSceneRenderer.render_scene: gets a "object list" (prediction like object), a
+    # list of camera infos (with Km pose, res) and renders
     # a "camera observation" for each camera/viewpoint
     # Actually, renders: rgb, mask, depth, near, far
     # rgb_render = render_prediction_wrt_camera(renderer, preds, cam)
@@ -184,7 +187,9 @@ if __name__ == "__main__":
     set_logging_level("info")
     parser = argparse.ArgumentParser()
     parser.add_argument("example_name")
-    # parser.add_argument("--model", type=str, default="megapose-1.0-RGB-multi-hypothesis")
+    # parser.add_argument(
+    # "--model", type=str, default="megapose-1.0-RGB-multi-hypothesis"
+    # )
     parser.add_argument("--dataset", type=str, default="ycbv")
     # parser.add_argument("--vis-detections", action="store_true")
     parser.add_argument("--run-inference", action="store_true", default=True)

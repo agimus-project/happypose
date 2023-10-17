@@ -61,7 +61,8 @@ class Camera:
         self.mask_link_index(True)
         self.casts_shadow(True)
 
-        # Transform between standard camera coordinate (z forward) and OPENGL camera coordinate system
+        # Transform between standard camera coordinate (z forward) and OPENGL camera
+        # coordinate system
         wxyz = transforms3d.euler.euler2quat(np.pi / 2, 0, 0, axes="rxyz")
         xyzw = [*wxyz[1:], wxyz[0]]
         self.TCCGL = Transform(xyzw, (0, 0, 0))

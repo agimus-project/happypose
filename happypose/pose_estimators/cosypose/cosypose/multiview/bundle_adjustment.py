@@ -221,7 +221,8 @@ class MultiviewRefinement:
     def forward_jacobian(self, TWO_9d, TCW_9d, residuals_threshold):
         _, TCO_cand_aligned = self.align_TCO_cand(TWO_9d, TCW_9d)
 
-        # NOTE: This could be *much* faster by computing gradients manually, reducing number of operations.
+        # NOTE: This could be *much* faster by computing gradients manually, reducing
+        # number of operations.
         cand_ids, view_ids, obj_ids, point_ids, xy_ids = (
             self.residuals_ids[k]
             for k in ("cand_id", "view_id", "obj_id", "point_id", "xy_id")

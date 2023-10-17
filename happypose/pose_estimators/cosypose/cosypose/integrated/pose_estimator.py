@@ -113,7 +113,8 @@ class PoseEstimator(PoseEstimationModule):
                 preds[f"iteration={n}"].append(batch_preds)
 
         logger.debug(
-            f"Pose prediction on {len(obj_data)} detections (n_iterations={n_iterations}): {timer.stop()}",
+            f"Pose prediction on {len(obj_data)} detections "
+            f"(n_iterations={n_iterations}): {timer.stop()}",
         )
         preds = dict(preds)
         for k, v in preds.items():

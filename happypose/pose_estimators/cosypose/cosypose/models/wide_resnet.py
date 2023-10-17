@@ -17,7 +17,8 @@ def conv3x3(in_planes, out_planes, stride=1):
 
 class BasicBlockV2(nn.Module):
     r"""BasicBlock V2 from
-    `"Identity Mappings in Deep Residual Networks"<https://arxiv.org/abs/1603.05027>`_ paper.
+    `"Identity Mappings in Deep Residual Networks"
+    <https://arxiv.org/abs/1603.05027>`_ paper.
     This is used for ResNet V2 for 18, 34 layers.
 
     Args:

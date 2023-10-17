@@ -257,7 +257,8 @@ def train_megapose(cfg: TrainingConfig) -> None:
             ckpt = torch.load(ckpt_path)
         except EOFError:
             print(
-                "Unable to load checkpoint.pth.tar. Falling back to checkpoint_epoch=last.pth.tar",
+                "Unable to load checkpoint.pth.tar. "
+                "Falling back to checkpoint_epoch=last.pth.tar",
             )
             ckpt_path = resume_run_dir / "checkpoint_epoch=last.pth.tar"
             ckpt = torch.load(ckpt_path)

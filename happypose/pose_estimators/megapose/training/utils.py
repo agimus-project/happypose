@@ -93,15 +93,19 @@ def cast_raw_numpy_images_to_tensor(images):
 
     """
     B, H, W, C = images.shape
-    assert C in [
-        3,
-        4,
-    ], f"images must have shape [B,H,W,C] with C=3 (rgb) or C=4 (rgbd), encountered C={C}"
+    msg = (
+        f"images must have shape [B,H,W,C] with C=3 (rgb) or C=4 (rgbd), "
+        f"encountered C={C}"
+    )
+    assert C in [3, 4], msg
     images = torch.as_tensor(images)
 
     max_rgb = torch.max(images[:, RGB_DIMS])
     if max_rgb < 1.5:
-        msg = "You are about to divide by 255 but the max rgb pixel value is less than 1.5"
+        msg = (
+            "You are about to divide by 255 "
+            "but the max rgb pixel value is less than 1.5"
+        )
         raise Warning(msg)
 
     # [B,C,H,W]

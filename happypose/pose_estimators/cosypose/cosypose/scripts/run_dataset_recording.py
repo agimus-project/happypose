@@ -111,7 +111,7 @@ def main():
         print(f"RESUMING {Fore.RED} {cfg.ds_name} {Style.RESET_ALL} \n ")
     else:
         print(
-            f"STARTING DATASET RECORDING {Fore.GREEN} {cfg.ds_name} {Style.RESET_ALL} \n ",
+            f"STARTING DATASET RECORDING {Fore.GREEN} {cfg.ds_name} {Style.RESET_ALL}"
         )
 
     record_dataset(cfg)

@@ -152,7 +152,8 @@ class BopPredictionRunner:
                 n_dets = len(this_batch_detections)
 
                 logger.debug(
-                    f"Full predictions: {n_dets} detections + pose estimation in {duration:.3f} s",
+                    f"Full predictions: {n_dets} detections + pose estimation "
+                    f"in {duration:.3f} s",
                 )
                 logger.debug(f"{'-'*80}")
                 return this_batch_detections, all_preds, duration

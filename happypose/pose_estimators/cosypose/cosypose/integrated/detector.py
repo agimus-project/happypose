@@ -4,8 +4,6 @@ import numpy as np
 import pandas as pd
 import torch
 
-import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
-
 # MegaPose
 import happypose.toolbox.utils.tensor_collection as tc
 from happypose.toolbox.inference.detector import DetectorModule

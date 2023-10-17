@@ -95,7 +95,8 @@ class PredictionRunner:
 
         Returns: A dict with keys
             - 'final': final preds
-            - 'refiner/final': preds at final refiner iteration (before depth refinement)
+            - 'refiner/final': preds at final refiner iteration (before depth
+              refinement)
             - 'depth_refinement': preds after depth refinement.
 
 
@@ -146,14 +147,16 @@ class PredictionRunner:
         # - 'refiner/iteration=5`
         # - `depth_refiner`
         # Note: Since we support multi-hypotheses we need to potentially
-        # go back and extract out the 'refiner/iteration=1`, `refiner/iteration=5` things for the ones that were actually the highest scoring at the end.
+        # go back and extract out the 'refiner/iteration=1`, `refiner/iteration=5`
+        # things for the ones that were actually the highest scoring at the end.
 
         all_preds = {}
         data_TCO_refiner = extra_data["refiner"]["preds"]
 
+        ref_str = f"refiner/iteration={self.inference_cfg.n_refiner_iterations}"
         all_preds = {
             "final": preds,
-            f"refiner/iteration={self.inference_cfg.n_refiner_iterations}": data_TCO_refiner,
+            ref_str: data_TCO_refiner,
             "refiner/final": data_TCO_refiner,
             "coarse": extra_data["coarse"]["preds"],
         }

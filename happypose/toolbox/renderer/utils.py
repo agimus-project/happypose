@@ -20,6 +20,7 @@ limitations under the License.
 import numpy as np
 import numpy.typing as npt
 import panda3d as p3d
+from panda3d.core import AntialiasAttrib, GeomNode, Material, NodePath
 
 # MegaPose
 from happypose.toolbox.lib3d.transform import Transform
@@ -90,7 +91,7 @@ def make_cube_node(scale, color=(1, 0, 0, 1)):
     node.set_color(color)
     node.set_render_mode_thickness(4)
     node.set_antialias(AntialiasAttrib.MLine)
-    node.set_material(Material(), 1)
+    node.setMaterial(Material(), 1)
     return node
 
 
@@ -129,7 +130,7 @@ def show_node_center(node, radius=None):
     else:
         radius = bounds.get_radius()
     sphere_node.set_scale(radius * 0.1)
-    set_material(sphere_node, (1, 1, 1, 1))
+    sphere_node.set_material(sphere_node, (1, 1, 1, 1))
 
     sphere_node.reparentTo(node)
     sphere_node.setPos(0, 0, 0)

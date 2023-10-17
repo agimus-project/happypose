@@ -140,8 +140,12 @@ def make_eval_bundle(args, model_training):
         # scene_ds_pred = MultiViewWrapper(scene_ds, n_views=1)
 
         # Predictions
-        # pred_runner = MultiviewPredictionRunner(scene_ds_pred, batch_size=1,
-        #                                        n_workers=args.n_dataloader_workers, cache_data=False)
+        # pred_runner = MultiviewPredictionRunner(
+        # scene_ds_pred,
+        # batch_size=1,
+        # n_workers=args.n_dataloader_workers,
+        # cache_data=False,
+        # )
 
         inference = {
             "detection_type": "gt",
@@ -217,7 +221,9 @@ def make_eval_bundle(args, model_training):
         meters = {k.split("_")[0]: v for k, v in meters.items()}
         list(iter(pred_runner.sampler))
         print(scene_ds.frame_index)
-        # scene_ds_ids = np.concatenate(scene_ds.frame_index.loc[mv_group_ids, 'scene_ds_ids'].values)
+        # scene_ds_ids = np.concatenate(
+        # scene_ds.frame_index.loc[mv_group_ids, "scene_ds_ids"].values
+        # )
         # sampler = ListSampler(scene_ds_ids)
         eval_runner = EvaluationRunner(
             scene_ds,

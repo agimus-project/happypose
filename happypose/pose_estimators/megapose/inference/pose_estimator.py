@@ -302,7 +302,10 @@ class PoseEstimator(PoseEstimationModule):
 
         elapsed = time.time() - start_time
 
-        timing_str = f"time: {elapsed:.2f}, model_time: {model_time:.2f}, render_time: {render_time:.2f}"
+        timing_str = (
+            f"time: {elapsed:.2f}, model_time: {model_time:.2f}, "
+            f"render_time: {render_time:.2f}"
+        )
 
         extra_data = {
             "render_time": render_time,
@@ -458,7 +461,10 @@ class PoseEstimator(PoseEstimationModule):
 
         elapsed = time.time() - start_time
 
-        timing_str = f"time: {elapsed:.2f}, model_time: {model_time:.2f}, render_time: {render_time:.2f}"
+        timing_str = (
+            f"time: {elapsed:.2f}, model_time: {model_time:.2f}, "
+            f"render_time: {render_time:.2f}"
+        )
 
         extra_data = {
             "render_time": render_time,

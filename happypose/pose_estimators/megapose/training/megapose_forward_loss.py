@@ -344,7 +344,10 @@ def megapose_forward_loss(
                     if cfg.predict_rendered_views_logits:
                         assert is_hypothesis_positive is not None
                         is_positive = is_hypothesis_positive[batch_idx, init_idx]
-                        f.title.text = f"idx={batch_idx},view={view_idx},init={init_idx},target={is_positive}"
+                        f.title.text = (
+                            f"idx={batch_idx},view={view_idx},init={init_idx},"
+                            f"target={is_positive}"
+                        )
                     row.append(f)
 
                     if n_channels == 6:

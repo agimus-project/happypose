@@ -224,7 +224,7 @@ def make_scene_dataset(
 
     # Synthetic datasets
     elif "synthetic." in ds_name:
-        from happypose.pose_estimators.cosypose.cosypose.datasets.synthetic_dataset import (
+        from happypose.pose_estimators.cosypose.cosypose.datasets.synthetic_dataset import (  # noqa: E501
             SyntheticSceneDataset,
         )
 

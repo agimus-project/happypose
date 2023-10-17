@@ -21,6 +21,7 @@ from typing import Any, Callable, Optional, Union
 import torch
 import torch.nn as nn
 from torch import Tensor
+from torch.hub import load_state_dict_from_url
 
 __all__ = [
     "ResNet",
@@ -97,7 +98,8 @@ class BasicBlock(nn.Module):
         if dilation > 1:
             msg = "Dilation > 1 not supported in BasicBlock"
             raise NotImplementedError(msg)
-        # Both self.conv1 and self.downsample layers downsample the input when stride != 1
+        # Both self.conv1 and self.downsample layers downsample the input
+        # when stride != 1
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = norm_layer(planes)
         self.relu = nn.ReLU(inplace=True)
@@ -126,11 +128,14 @@ class BasicBlock(nn.Module):
 
 
 class Bottleneck(nn.Module):
-    # Bottleneck in torchvision places the stride for downsampling at 3x3 convolution(self.conv2)
-    # while original implementation places the stride at the first 1x1 convolution(self.conv1)
-    # according to "Deep residual learning for image recognition"https://arxiv.org/abs/1512.03385.
-    # This variant is also known as ResNet V1.5 and improves accuracy according to
-    # https://ngc.nvidia.com/catalog/model-scripts/nvidia:resnet_50_v1_5_for_pytorch.
+    """
+    Bottleneck in torchvision places the stride for downsampling at 3x3
+    convolution(self.conv2) while original implementation places the stride at the first
+    1x1 convolution(self.conv1) according to "Deep residual learning for image
+    recognition"https://arxiv.org/abs/1512.03385.  This variant is also known as ResNet
+    V1.5 and improves accuracy according to
+    https://ngc.nvidia.com/catalog/model-scripts/nvidia:resnet_50_v1_5_for_pytorch.
+    """
 
     expansion: int = 4
 
@@ -149,7 +154,8 @@ class Bottleneck(nn.Module):
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         width = int(planes * (base_width / 64.0)) * groups
-        # Both self.conv2 and self.downsample layers downsample the input when stride != 1
+        # Both self.conv2 and self.downsample layers downsample the input
+        # when stride != 1
         self.conv1 = conv1x1(inplanes, width)
         self.bn1 = norm_layer(width)
         self.conv2 = conv3x3(width, width, stride, groups, dilation)
@@ -208,10 +214,11 @@ class ResNet(nn.Module):
             # the 2x2 stride with a dilated convolution instead
             replace_stride_with_dilation = [False, False, False]
         if len(replace_stride_with_dilation) != 3:
-            msg = f"replace_stride_with_dilation should be None or a 3-element tuple, got {replace_stride_with_dilation}"
-            raise ValueError(
-                msg,
+            msg = (
+                f"replace_stride_with_dilation should be None or a 3-element tuple, "
+                f"got {replace_stride_with_dilation}"
             )
+            raise ValueError(msg)
         self.groups = groups
         self.base_width = width_per_group
         self.conv1 = nn.Conv2d(
@@ -258,7 +265,8 @@ class ResNet(nn.Module):
                 nn.init.constant_(m.bias, 0)
 
         # Zero-initialize the last BN in each residual branch,
-        # so that the residual branch starts with zeros, and each residual block behaves like an identity.
+        # so that the residual branch starts with zeros, and each residual block behaves
+        # like an identity.
         # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
         if zero_init_residual:
             for m in self.modules():

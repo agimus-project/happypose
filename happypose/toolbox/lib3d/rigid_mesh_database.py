@@ -55,7 +55,7 @@ class MeshDataBase:
         self.obj_list = obj_list
         self.infos = {obj.label: {} for obj in obj_list}
         self.meshes = {
-            l: as_mesh(
+            label: as_mesh(
                 trimesh.load(
                     obj.mesh_path,
                     group_material=False,
@@ -64,7 +64,7 @@ class MeshDataBase:
                     maintain_order=True,
                 ),
             )
-            for l, obj in self.obj_dict.items()
+            for label, obj in self.obj_dict.items()
         }
 
         for label, obj in self.obj_dict.items():
@@ -145,9 +145,9 @@ class BatchedMeshes(TensorCollection):
         return {label: obj["n_sym"] for label, obj in self.infos.items()}
 
     def select(self, labels):
-        ids = [self.label_to_id[l] for l in labels]
+        ids = [self.label_to_id[label] for label in labels]
         return Meshes(
-            infos=[self.infos[l] for l in labels],
+            infos=[self.infos[label] for label in labels],
             labels=self.labels[ids],
             points=self.points[ids],
             symmetries=self.symmetries[ids],

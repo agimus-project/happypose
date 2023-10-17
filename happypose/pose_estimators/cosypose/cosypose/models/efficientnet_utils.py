@@ -1,6 +1,8 @@
 """Copied from https://github.com/lukemelas/EfficientNet-PyTorch
-This file contains helper functions for building the model and for loading model parameters.
-These helper functions are built to mirror those in the official TensorFlow implementation.
+This file contains helper functions for building the model and for loading model
+parameters.
+These helper functions are built to mirror those in the official TensorFlow
+implementation.
 """
 
 import collections
@@ -120,7 +122,8 @@ def drop_connect(inputs, p, training):
 
 
 def get_same_padding_conv2d(image_size=None):
-    """Chooses static padding if you have specified an image size, and dynamic padding otherwise.
+    """Chooses static padding if you have specified an image size, and dynamic padding
+    otherwise.
     Static padding is necessary for ONNX exporting of models.
     """
     if image_size is None:
@@ -193,7 +196,9 @@ class Conv2dStaticSamePadding(nn.Conv2d):
 
         # Calculate padding based on image size and save it
         assert image_size is not None
-        ih, iw = image_size if type(image_size) == list else [image_size, image_size]
+        ih, iw = (
+            image_size if isinstance(image_size, list) else [image_size, image_size]
+        )
         kh, kw = self.weight.size()[-2:]
         sh, sw = self.stride
         oh, ow = math.ceil(ih / sh), math.ceil(iw / sw)
@@ -252,7 +257,9 @@ def efficientnet_params(model_name):
 
 
 class BlockDecoder:
-    """Block Decoder for readability, straight from the official TensorFlow repository."""
+    """
+    Block Decoder for readability, straight from the official TensorFlow repository.
+    """
 
     @staticmethod
     def _decode_block_string(block_string):
@@ -377,7 +384,8 @@ def get_model_params(model_name, override_params):
     else:
         raise NotImplementedError("model name is not pre-defined: %s" % model_name)
     if override_params:
-        # ValueError will be raised here if override_params has fields not included in global_params.
+        # ValueError will be raised here if override_params has fields not included in
+        # global_params.
         global_params = global_params._replace(**override_params)
     return blocks_args, global_params
 

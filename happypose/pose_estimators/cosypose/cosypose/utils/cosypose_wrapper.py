@@ -39,7 +39,8 @@ from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import
     create_model_refiner,
 )
 
-# from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_scene_dataset, make_object_dataset
+# from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg
+# import make_scene_dataset, make_object_dataset
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
 # Pose estimator
@@ -64,7 +65,9 @@ def make_object_dataset(example_dir: Path) -> RigidObjectDataset:
                 assert not mesh_path, f"there multiple meshes in the {label} directory"
                 mesh_path = fn
         assert mesh_path, f"couldnt find a obj or ply mesh for {label}"
-        rigid_objects.append(RigidObject(label=label, mesh_path=mesh_path, mesh_units=mesh_units))
+        rigid_objects.append(
+                RigidObject(label=label, mesh_path=mesh_path, mesh_units=mesh_units)
+                )
         # TODO: fix mesh units
     rigid_object_dataset = RigidObjectDataset(rigid_objects)
     return rigid_object_dataset
@@ -107,7 +110,9 @@ class CosyPoseWrapper:
         # object_ds = BOPObjectDataset(BOP_DS_DIR / 'tless/models_cad')
         # object_ds = make_object_dataset(cfg.object_ds_name)
         # mesh_db = MeshDataBase.from_object_ds(object_ds)
-        # renderer = BulletBatchRenderer(object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer)
+        # renderer = BulletBatchRenderer(
+        # object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer
+        # )
         #
 
         object_dataset = make_object_dataset("ycbv")
@@ -122,7 +127,9 @@ class CosyPoseWrapper:
         def load_model(run_id):
             run_dir = EXP_DIR / run_id
 
-            # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
+            # cfg = yaml.load(
+            # (run_dir / "config.yaml").read_text(), Loader=yaml.FullLoader
+            # )
             cfg = yaml.load(
                 (run_dir / "config.yaml").read_text(),
                 Loader=yaml.UnsafeLoader,

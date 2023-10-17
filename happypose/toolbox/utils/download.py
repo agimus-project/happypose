@@ -346,7 +346,7 @@ class DownloadClient:
             logger.error(f"Failed {download_path} with timeout")
             return
         if r.status_code != 200:
-            logger.error(f"Failed {download_path} with code {res.status_code}")
+            logger.error(f"Failed {download_path} with code {r.status_code}")
             return
         Path(local_path).mkdir(parents=True, exist_ok=True)
         soup = BeautifulSoup(r.content, "html.parser")
@@ -372,7 +372,7 @@ class DownloadClient:
             logger.error(f"Failed {download_path} with timeout")
             return
         if r.status_code != 200:
-            logger.error(f"Failed {download_path} with code {res.status_code}")
+            logger.error(f"Failed {download_path} with code {r.status_code}")
             return
         logger.info(f"Copying {download_path} to {local_path}")
         Path(local_path.parent).mkdir(parents=True, exist_ok=True)
