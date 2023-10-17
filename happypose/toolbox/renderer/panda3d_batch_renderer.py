@@ -139,11 +139,11 @@ def worker_loop(
 
         output = RenderOutput(
             data_id=render_args.data_id,
-            rgb=torch.tensor(renderings_.rgb).share_memory_(),
-            normals=torch.tensor(renderings_.normals).share_memory_()
+            rgb=renderings_.rgb,
+            normals=renderings_.normals
             if render_args.render_normals
             else None,
-            depth=torch.tensor(renderings_.depth).share_memory_()
+            depth=renderings_.depth
             if render_args.render_depth
             else None,
         )
@@ -253,11 +253,11 @@ class Panda3dBatchRenderer:
         for n in np.arange(bsz):
             renders = self._out_queue.get()
             data_id = renders.data_id
-            list_rgbs[data_id] = renders.rgb
+            list_rgbs[data_id] = torch.tensor(renders.rgb)
             if render_depth:
-                list_depths[data_id] = renders.depth
+                list_depths[data_id] = torch.tensor(renders.depth)
             if render_normals:
-                list_normals[data_id] = renders.normals
+                list_normals[data_id] = torch.tensor(renders.normals)
             del renders
 
         assert list_rgbs[0] is not None
