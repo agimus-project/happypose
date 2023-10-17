@@ -60,6 +60,8 @@ transforms3d = "^0.4.1"
 trimesh = "^3.23.5"
 webdataset = "^0.2.57"
 wget = "^3.2"
+beautifulsoup4 = "^4.12.2"
+httpx = "^0.25.0"
 
 [tool.poetry.extras]
 cpu = ["torch", "torchvision"]
