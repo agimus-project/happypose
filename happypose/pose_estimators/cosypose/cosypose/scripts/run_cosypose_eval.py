@@ -29,7 +29,7 @@ from happypose.pose_estimators.cosypose.cosypose.evaluation.meters.pose_meters i
 from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.multiview_predictions import MultiviewPredictionRunner
 from happypose.pose_estimators.cosypose.cosypose.evaluation.eval_runner.pose_eval import PoseEvaluation
 
-import cosypose.utils.tensor_collection as tc
+import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import format_results, gather_predictions
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_rank
 

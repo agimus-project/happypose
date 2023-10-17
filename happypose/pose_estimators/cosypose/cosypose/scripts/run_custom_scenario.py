@@ -10,7 +10,7 @@ import logging
 from happypose.pose_estimators.cosypose.cosypose.datasets.bop_object_datasets import BOPObjectDataset
 from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.pose_estimators.cosypose.cosypose.integrated.multiview_predictor import MultiviewScenePredictor
-import cosypose.utils.tensor_collection as tc
+import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import BulletSceneRenderer
 from happypose.pose_estimators.cosypose.cosypose.visualization.multiview import make_cosypose_plots
 from happypose.pose_estimators.cosypose.cosypose.visualization.multiview import make_scene_renderings, nms3d

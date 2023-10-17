@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
-import cosypose.utils.tensor_collection as tc
+import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 
 from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T, compute_transform_from_pose9d
 from happypose.pose_estimators.cosypose.cosypose.lib3d.camera_geometry import project_points

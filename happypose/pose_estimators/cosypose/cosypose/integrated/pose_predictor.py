@@ -5,7 +5,7 @@ from collections import defaultdict
 from torch.utils.data import TensorDataset, DataLoader
 from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import TCO_init_from_boxes, TCO_init_from_boxes_zup_autodepth
 
-import cosypose.utils.tensor_collection as tc
+import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.utils.timer import Timer

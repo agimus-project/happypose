@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-import cosypose.utils.tensor_collection as tc
+import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 
 from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 from happypose.pose_estimators.cosypose.cosypose.multiview.ransac import multiview_candidate_matching

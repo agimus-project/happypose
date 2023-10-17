@@ -1,7 +1,7 @@
 import pandas as pd
 import torch
 from collections import defaultdict
-import cosypose.utils.tensor_collection as tc
+import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 
 

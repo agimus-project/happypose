@@ -2,7 +2,7 @@ import time
 from collections import defaultdict
 from typing import Any, Optional, Tuple
 
-import cosypose.utils.tensor_collection as tc
+import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
