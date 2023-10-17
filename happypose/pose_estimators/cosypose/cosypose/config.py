@@ -1,4 +1,3 @@
-import cosypose
 import happypose
 import os
 import yaml
