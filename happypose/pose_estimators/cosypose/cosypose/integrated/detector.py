@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-import cosypose.utils.tensor_collection as tc
+import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 import numpy as np
 import pandas as pd
 import torch
