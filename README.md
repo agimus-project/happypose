@@ -26,15 +26,6 @@ cd ../../..
 pip install -e .
 ```
 
-Installation of bop_toolkit :
-
-```
-conda activate happypose
-cd happypose/pose_estimators/megapose/deps/bop_toolkit_challenge/
-# Remove all versions enforcing on requirements.txt
-pip install -r requirements.txt -e .
-```
-
 
 # Create data directory
 
@@ -45,11 +36,21 @@ export HAPPYPOSE_DATA_DIR=/somewhere/convenient
 
 # Configuration for the evaluation
 
-If you plan on evaluating CosyPose and Megapose, you need to modify the following lines in `bop_toolkit_lib/config.py`, replace
+Installation of bop_toolkit :
+
+```
+conda activate happypose
+cd happypose/deps/bop_toolkit_challenge/
+# Remove all versions enforcing on requirements.txt
+pip install -r requirements.txt -e .
+```
+
+If you plan on evaluating CosyPose and Megapose, you need to modify the paths to data directories used by the bop_toolkit.
+A simple solution is to create subfolders in `HAPPYPOSE_DATA_DIR`.
+This is done by modifying following lines in `deps/bop_toolkit_challenge/bop_toolkit_lib/config.py`, replace
 
 ```
 ######## Basic ########
-
 
 # Folder with the BOP datasets.
 if 'BOP_PATH' in os.environ:
@@ -69,10 +70,16 @@ with
 ```
 ######## Basic ########
 
+HAPPYPOSE_DATA_DIR = os.environ['HAPPYPOSE_DATA_DIR']
+
 # Folder with the BOP datasets.
-datasets_path = str(os.environ['BOP_DATASETS_PATH'])
-results_path = str(os.environ['BOP_RESULTS_PATH'])
-eval_path = str(os.environ['BOP_EVAL_PATH'])
+datasets_path = os.path.join(HAPPYPOSE_DATA_DIR, 'bop_datasets')
+
+# Folder with pose results to be evaluated.
+results_path = os.path.join(HAPPYPOSE_DATA_DIR, 'results')
+
+# Folder for the calculated pose errors and performance scores.
+eval_path = os.path.join(HAPPYPOSE_DATA_DIR, 'bop_eval_outputs')
 ```
 
 You will also need to install [TEASER++](https://github.com/MIT-SPARK/TEASER-plusplus) if you want to use the depth for MegaPose. To do so, please run the following commands to install it :
