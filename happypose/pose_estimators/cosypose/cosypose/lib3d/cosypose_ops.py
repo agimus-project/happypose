@@ -1,10 +1,18 @@
 import torch
 
-from .rotations import compute_rotation_matrix_from_ortho6d, compute_rotation_matrix_from_quaternions
+from .rotations import (
+    compute_rotation_matrix_from_ortho6d,
+    compute_rotation_matrix_from_quaternions,
+)
 from .transform_ops import transform_pts
 
-l1 = lambda diff: diff.abs()
-l2 = lambda diff: diff ** 2
+
+def l1(diff):
+    return diff.abs()
+
+
+def l2(diff):
+    return diff**2
 
 
 def apply_imagespace_predictions(TCO, K, vxvyvz, dRCO):
@@ -23,7 +31,10 @@ def apply_imagespace_predictions(TCO, K, vxvyvz, dRCO):
     fxfy = K[:, [0, 1], [0, 1]]
     xsrcysrc = TCO[:, :2, 3]
     TCO_out[:, 2, 3] = ztgt.flatten()
-    TCO_out[:, :2, 3] = ((vxvy / fxfy) + (xsrcysrc / zsrc.repeat(1, 2))) * ztgt.repeat(1, 2)
+    TCO_out[:, :2, 3] = ((vxvy / fxfy) + (xsrcysrc / zsrc.repeat(1, 2))) * ztgt.repeat(
+        1,
+        2,
+    )
 
     # Rotation in camera frame
     # TC1' = TC2' @  T2'1' where TC2' = T22' = dCRO is predicted and T2'1'=T21=TC1
@@ -40,15 +51,21 @@ def loss_CO_symmetric(TCO_possible_gt, TCO_pred, points, l1_or_l2=l1):
 
     TCO_points_possible_gt = transform_pts(TCO_possible_gt, points)
     TCO_pred_points = transform_pts(TCO_pred, points)
-    losses_possible = l1_or_l2((TCO_pred_points.unsqueeze(1) - TCO_points_possible_gt).flatten(-2, -1)).mean(-1)
+    losses_possible = l1_or_l2(
+        (TCO_pred_points.unsqueeze(1) - TCO_points_possible_gt).flatten(-2, -1),
+    ).mean(-1)
     loss, min_id = losses_possible.min(dim=1)
     TCO_assign = TCO_possible_gt[torch.arange(bsz), min_id]
     return loss, TCO_assign
 
 
-def loss_refiner_CO_disentangled(TCO_possible_gt,
-                                 TCO_input, refiner_outputs,
-                                 K_crop, points):
+def loss_refiner_CO_disentangled(
+    TCO_possible_gt,
+    TCO_input,
+    refiner_outputs,
+    K_crop,
+    points,
+):
     bsz = TCO_possible_gt.shape[0]
     assert TCO_possible_gt.shape[0] == bsz
     assert TCO_input.shape[0] == bsz
@@ -70,7 +87,9 @@ def loss_refiner_CO_disentangled(TCO_possible_gt,
     vxvy = vxvyvz[:, :2]
     fxfy = K_crop[:, [0, 1], [0, 1]]
     xsrcysrc = TCO_input[:, :2, 3]
-    TCO_pred_xy[:, :2, 3] = ((vxvy / fxfy) + (xsrcysrc / z_input.repeat(1, 2))) * z_gt.repeat(1, 2)
+    TCO_pred_xy[:, :2, 3] = (
+        (vxvy / fxfy) + (xsrcysrc / z_input.repeat(1, 2))
+    ) * z_gt.repeat(1, 2)
 
     TCO_pred_z = TCO_gt.clone()
     vz = vxvyvz[:, [2]]
@@ -82,9 +101,13 @@ def loss_refiner_CO_disentangled(TCO_possible_gt,
     return loss_orn + loss_xy + loss_z
 
 
-def loss_refiner_CO_disentangled_quaternions(TCO_possible_gt,
-                                             TCO_input, refiner_outputs,
-                                             K_crop, points):
+def loss_refiner_CO_disentangled_quaternions(
+    TCO_possible_gt,
+    TCO_input,
+    refiner_outputs,
+    K_crop,
+    points,
+):
     bsz = TCO_possible_gt.shape[0]
     assert TCO_possible_gt.shape[0] == bsz
     assert TCO_input.shape[0] == bsz
@@ -106,7 +129,9 @@ def loss_refiner_CO_disentangled_quaternions(TCO_possible_gt,
     vxvy = vxvyvz[:, :2]
     fxfy = K_crop[:, [0, 1], [0, 1]]
     xsrcysrc = TCO_input[:, :2, 3]
-    TCO_pred_xy[:, :2, 3] = ((vxvy / fxfy) + (xsrcysrc / z_input.repeat(1, 2))) * z_gt.repeat(1, 2)
+    TCO_pred_xy[:, :2, 3] = (
+        (vxvy / fxfy) + (xsrcysrc / z_input.repeat(1, 2))
+    ) * z_gt.repeat(1, 2)
 
     TCO_pred_z = TCO_gt.clone()
     vz = vxvyvz[:, [2]]
@@ -125,7 +150,15 @@ def TCO_init_from_boxes(z_range, boxes, K):
     assert boxes.dim() == 2
     bsz = boxes.shape[0]
     uv_centers = (boxes[:, [0, 1]] + boxes[:, [2, 3]]) / 2
-    z = torch.as_tensor(z_range).mean().unsqueeze(0).unsqueeze(0).repeat(bsz, 1).to(boxes.device).to(boxes.dtype)
+    z = (
+        torch.as_tensor(z_range)
+        .mean()
+        .unsqueeze(0)
+        .unsqueeze(0)
+        .repeat(bsz, 1)
+        .to(boxes.device)
+        .to(boxes.dtype)
+    )
     fxfy = K[:, [0, 1], [0, 1]]
     cxcy = K[:, [0, 1], [2, 2]]
     xy_init = ((uv_centers - cxcy) * z) / fxfy
@@ -143,19 +176,30 @@ def TCO_init_from_boxes_zup_autodepth(boxes_2d, model_points_3d, K):
     z_guess = 1.0
     fxfy = K[:, [0, 1], [0, 1]]
     cxcy = K[:, [0, 1], [2, 2]]
-    TCO = torch.tensor([
-        [0, 1, 0, 0],
-        [0, 0, -1, 0],
-        [-1, 0, 0, z_guess],
-        [0, 0, 0, 1]
-    ]).to(torch.float).to(boxes_2d.device).repeat(bsz, 1, 1)
+    TCO = (
+        torch.tensor(
+            [
+                [0, 1, 0, 0],
+                [0, 0, -1, 0],
+                [-1, 0, 0, z_guess],
+                [0, 0, 0, 1],
+            ],
+        )
+        .to(torch.float)
+        .to(boxes_2d.device)
+        .repeat(bsz, 1, 1)
+    )
     bb_xy_centers = (boxes_2d[:, [0, 1]] + boxes_2d[:, [2, 3]]) / 2
     xy_init = ((bb_xy_centers - cxcy) * z_guess) / fxfy
     TCO[:, :2, 3] = xy_init
 
     C_pts_3d = transform_pts(TCO, model_points_3d)
-    deltax_3d = C_pts_3d[:, :, 0].max(dim=1).values - C_pts_3d[:, :, 0].min(dim=1).values
-    deltay_3d = C_pts_3d[:, :, 1].max(dim=1).values - C_pts_3d[:, :, 1].min(dim=1).values
+    deltax_3d = (
+        C_pts_3d[:, :, 0].max(dim=1).values - C_pts_3d[:, :, 0].min(dim=1).values
+    )
+    deltay_3d = (
+        C_pts_3d[:, :, 1].max(dim=1).values - C_pts_3d[:, :, 1].min(dim=1).values
+    )
 
     bb_deltax = (boxes_2d[:, 2] - boxes_2d[:, 0]) + 1
     bb_deltay = (boxes_2d[:, 3] - boxes_2d[:, 1]) + 1

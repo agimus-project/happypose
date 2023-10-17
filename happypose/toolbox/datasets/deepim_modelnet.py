@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 from pathlib import Path
 
@@ -25,10 +23,6 @@ import pandas as pd
 import torch
 from PIL import Image
 
-# MegaPose
-from happypose.toolbox.datasets.utils import make_detections_from_segmentation
-from happypose.toolbox.lib3d.transform import Transform
-
 # Local Folder
 from happypose.toolbox.datasets.scene_dataset import (
     CameraData,
@@ -37,6 +31,10 @@ from happypose.toolbox.datasets.scene_dataset import (
     SceneDataset,
     SceneObservation,
 )
+
+# MegaPose
+from happypose.toolbox.datasets.utils import make_detections_from_segmentation
+from happypose.toolbox.lib3d.transform import Transform
 
 
 def parse_pose(pose_str: str) -> np.ndarray:
@@ -58,7 +56,6 @@ class DeepImModelNetDataset(SceneDataset):
         n_images_per_object: int = 50,
         load_depth: bool = False,
     ):
-
         self.test_template_im = (
             modelnet_dir
             / "modelnet_render_v1/data/real/{category}/{split}/{obj_id}_{im_id:04d}-color.png"
@@ -116,29 +113,37 @@ class DeepImModelNetDataset(SceneDataset):
             load_depth=load_depth,
         )
 
-    def _load_scene_observation(self, image_infos: ObservationInfos) -> SceneObservation:
-        infos_dict = dict(
-            category=self.category,
-            split=self.split,
-            obj_id=image_infos.scene_id,
-            im_id=image_infos.view_id,
-        )
+    def _load_scene_observation(
+        self,
+        image_infos: ObservationInfos,
+    ) -> SceneObservation:
+        infos_dict = {
+            "category": self.category,
+            "split": self.split,
+            "obj_id": image_infos.scene_id,
+            "im_id": image_infos.view_id,
+        }
         obj_label = image_infos.scene_id
 
         rgb = np.array(Image.open(str(self.test_template_im).format(**infos_dict)))
 
         if self.load_depth:
-            depth = np.array(Image.open(str(self.test_template_depth).format(**infos_dict)))
+            depth = np.array(
+                Image.open(str(self.test_template_depth).format(**infos_dict)),
+            )
             depth = torch.as_tensor(depth) / self.depth_im_scale
         else:
             depth = None
 
         segmentation = np.array(
-            Image.open(str(self.test_template_label).format(**infos_dict)), dtype=np.int_
+            Image.open(str(self.test_template_label).format(**infos_dict)),
+            dtype=np.int_,
         )
         pose_str = Path(str(self.test_template_pose).format(**infos_dict)).read_text()
         pose = Transform(parse_pose(pose_str))
-        init_pose_str = Path(str(self.init_template_pose).format(**infos_dict)).read_text()
+        init_pose_str = Path(
+            str(self.init_template_pose).format(**infos_dict),
+        ).read_text()
         init_pose = Transform(parse_pose(init_pose_str))
 
         obj_label = self.label_format.format(label=obj_label)
@@ -154,7 +159,7 @@ class DeepImModelNetDataset(SceneDataset):
                 visib_fract=1.0,
                 unique_id=1,
                 bbox_modal=dets[1],
-            )
+            ),
         ]
 
         K = np.array([[572.4114, 0, 325.2611], [0, 573.57043, 242.04899], [0, 0, 1]])

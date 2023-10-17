@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 
 
 # Third Party
@@ -37,7 +35,10 @@ def _get_views_TCO_pos_sphere(TCO, tCR, cam_positions_wrt_cam0):
     obj.reparentTo(root)
     obj.setPos(0, 0, 0)
 
-    TCCGL = np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float)
+    TCCGL = np.array(
+        [[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]],
+        dtype=float,
+    )
 
     tCR = np.array(tCR.tolist())
     TOC = Transform(np.array(TCO.tolist())).inverse().toHomogeneousMatrix()
@@ -96,7 +97,7 @@ def get_1_view_TCO_pos_front(TCO, tCR):
     cam_positions_wrt_cam0 = np.array(
         [
             [0, 0, 0],
-        ]
+        ],
     )
     return _get_views_TCO_pos_sphere(TCO, tCR, cam_positions_wrt_cam0)
 
@@ -107,7 +108,7 @@ def get_3_views_TCO_pos_front(TCO, tCR):
             [0, 0, 0],
             [1, 0, 0],
             [-1, 0, 0],
-        ]
+        ],
     )
     return _get_views_TCO_pos_sphere(TCO, tCR, cam_positions_wrt_cam0)
 
@@ -120,7 +121,7 @@ def get_5_views_TCO_pos_front(TCO, tCR):
             [-1, 0, 0],
             [0, 0, 1],
             [0, 0, -1],
-        ]
+        ],
     )
     return _get_views_TCO_pos_sphere(TCO, tCR, cam_positions_wrt_cam0)
 
@@ -131,7 +132,7 @@ def get_3_views_TCO_pos_sphere(TCO, tCR):
             [0, 0, 0],
             [1, 0, 0],
             [-1, 0, 0],
-        ]
+        ],
     )
     return _get_views_TCO_pos_sphere(TCO, tCR, cam_positions_wrt_cam0)
 
@@ -145,7 +146,7 @@ def get_6_views_TCO_pos_sphere(TCO, tCR):
             [0, 1, 1],
             [-1, 1, 0],
             [0, 1, -1],
-        ]
+        ],
     )
     return _get_views_TCO_pos_sphere(TCO, tCR, cam_positions_wrt_cam0)
 
@@ -162,6 +163,7 @@ def get_26_views_TCO_pos_sphere(TCO, tCR):
     cam_positions_wrt_cam0 = np.array(cam_positions_wrt_cam0, dtype=float)
     return _get_views_TCO_pos_sphere(TCO, tCR, cam_positions_wrt_cam0)
 
+
 def make_TCO_multiview(
     TCO: torch.Tensor,
     tCR: torch.Tensor,
@@ -170,14 +172,16 @@ def make_TCO_multiview(
     remove_TCO_rendering: bool = False,
     views_inplane_rotations: bool = False,
 ):
-    """_summary_
+    """_summary_.
 
     Args:
+    ----
         TCO (torch.Tensor): (bsz, 4, 4)
         tCR (torch.Tensor): (bsz, 3)
 
 
     Returns:
+    -------
         _type_: _description_
     """
     bsz = TCO.shape[0]
@@ -188,7 +192,7 @@ def make_TCO_multiview(
 
     if n_views == 1:
         TC0_CV = []
-        for b in range(bsz):
+        for _b in range(bsz):
             TC0_CV_ = [np.eye(4)]
             TC0_CV.append(TC0_CV_)
         TC0_CV = torch.as_tensor(np.stack(TC0_CV), device=device, dtype=dtype)
@@ -239,7 +243,9 @@ def make_TCO_multiview(
         for idx, angle in enumerate([np.pi / 2, np.pi, 3 * np.pi / 2]):
             idx = idx + 1
             dR = torch.as_tensor(
-                transforms3d.euler.euler2mat(0, 0, angle), device=device, dtype=dtype
+                transforms3d.euler.euler2mat(0, 0, angle),
+                device=device,
+                dtype=dtype,
             )
             TCV_O[:, :, idx, :3, :3] = dR @ TCV_O[:, :, idx, :3, :3]
         TCV_O = TCV_O.flatten(1, 2)

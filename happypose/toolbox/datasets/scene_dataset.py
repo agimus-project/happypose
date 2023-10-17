@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,8 +22,9 @@ import json
 import os
 import random
 import time
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Union
 
 # Third Party
 import numpy as np
@@ -39,8 +39,8 @@ from happypose.toolbox.utils.random import make_seed
 from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 from happypose.toolbox.utils.types import Resolution
 
-ListBbox = List[int]
-ListPose = List[List[float]]
+ListBbox = list[int]
+ListPose = list[list[float]]
 
 """
 infos: pd.DataFrame with fields
@@ -61,7 +61,7 @@ tensors:
 SceneObservationTensorCollection = PandasTensorCollection
 
 SingleDataJsonType = Union[str, float, ListPose, int, ListBbox, Any]
-DataJsonType = Union[Dict[str, SingleDataJsonType], List[SingleDataJsonType]]
+DataJsonType = Union[dict[str, SingleDataJsonType], list[SingleDataJsonType]]
 
 
 def transform_to_list(T: Transform) -> ListPose:
@@ -72,18 +72,16 @@ def transform_to_list(T: Transform) -> ListPose:
 class ObjectData:
     # NOTE (Yann): bbox_amodal, bbox_modal, visib_fract should be moved to SceneObservation
     label: str
-    TWO: Optional[Transform] = None
-    unique_id: Optional[int] = None
-    bbox_amodal: Optional[np.ndarray] = None  # (4, ) array [xmin, ymin, xmax, ymax]
-    bbox_modal: Optional[np.ndarray] = None  # (4, ) array [xmin, ymin, xmax, ymax]
-    visib_fract: Optional[float] = None
-    TWO_init: Optional[
-        Transform
-    ] = None  # Some pose estimation datasets (ModelNet) provide an initial pose estimate
+    TWO: Transform | None = None
+    unique_id: int | None = None
+    bbox_amodal: np.ndarray | None = None  # (4, ) array [xmin, ymin, xmax, ymax]
+    bbox_modal: np.ndarray | None = None  # (4, ) array [xmin, ymin, xmax, ymax]
+    visib_fract: float | None = None
+    TWO_init: Transform | None = None  # Some pose estimation datasets (ModelNet) provide an initial pose estimate
     #  NOTE: This should be loaded externally
 
-    def to_json(self) -> Dict[str, SingleDataJsonType]:
-        d: Dict[str, SingleDataJsonType] = dict(label=self.label)
+    def to_json(self) -> dict[str, SingleDataJsonType]:
+        d: dict[str, SingleDataJsonType] = {"label": self.label}
         for k in ("TWO", "TWO_init"):
             if getattr(self, k) is not None:
                 d[k] = transform_to_list(getattr(self, k))
@@ -96,7 +94,7 @@ class ObjectData:
         return d
 
     @staticmethod
-    def from_json(d: DataJsonType) -> "ObjectData":
+    def from_json(d: DataJsonType) -> ObjectData:
         assert isinstance(d, dict)
         label = d["label"]
         assert isinstance(label, str)
@@ -122,17 +120,15 @@ class ObjectData:
 
 @dataclass
 class CameraData:
-    K: Optional[np.ndarray] = None
-    resolution: Optional[Resolution] = None
-    TWC: Optional[Transform] = None
-    camera_id: Optional[str] = None
-    TWC_init: Optional[
-        Transform
-    ] = None  # Some pose estimation datasets (ModelNet) provide an initial pose estimate
+    K: np.ndarray | None = None
+    resolution: Resolution | None = None
+    TWC: Transform | None = None
+    camera_id: str | None = None
+    TWC_init: Transform | None = None  # Some pose estimation datasets (ModelNet) provide an initial pose estimate
     #  NOTE: This should be loaded externally
 
     def to_json(self) -> str:
-        d: Dict[str, SingleDataJsonType] = dict()
+        d: dict[str, SingleDataJsonType] = {}
         for k in ("TWC", "TWC_init"):
             if getattr(self, k) is not None:
                 d[k] = transform_to_list(getattr(self, k))
@@ -145,7 +141,7 @@ class CameraData:
         return json.dumps(d)
 
     @staticmethod
-    def from_json(data_str: str) -> "CameraData":
+    def from_json(data_str: str) -> CameraData:
         d: DataJsonType = json.loads(data_str)
         assert isinstance(d, dict)
         data = CameraData()
@@ -183,7 +179,7 @@ class ObservationInfos:
         return json.dumps(self.__dict__)
 
     @staticmethod
-    def from_json(data_str: str) -> "ObservationInfos":
+    def from_json(data_str: str) -> ObservationInfos:
         d = json.loads(data_str)
         assert "scene_id" in d
         assert "view_id" in d
@@ -192,27 +188,31 @@ class ObservationInfos:
 
 @dataclass
 class SceneObservation:
-    rgb: Optional[np.ndarray] = None  # (h,w,3) uint8 numpy array
-    depth: Optional[np.ndarray] = None  # (h, w), np.float32
-    segmentation: Optional[np.ndarray] = None  # (h, w), np.uint32 (important);
+    rgb: np.ndarray | None = None  # (h,w,3) uint8 numpy array
+    depth: np.ndarray | None = None  # (h, w), np.float32
+    segmentation: np.ndarray | None = None  # (h, w), np.uint32 (important);
     # contains objects unique ids. int64 are not handled and can be dangerous when used with PIL
-    infos: Optional[ObservationInfos] = None
-    object_datas: Optional[List[ObjectData]] = None
-    camera_data: Optional[CameraData] = None
-    binary_masks: Optional[
-        Dict[int, np.ndarray]
-    ] = None  # dict mapping unique id to (h, w) np.bool_
+    infos: ObservationInfos | None = None
+    object_datas: list[ObjectData] | None = None
+    camera_data: CameraData | None = None
+    binary_masks: dict[
+        int,
+        np.ndarray,
+    ] | None = None  # dict mapping unique id to (h, w) np.bool_
 
     @staticmethod
     def collate_fn(
-        batch: List[SceneObservation], object_labels: Optional[List[str]] = None
-    ) -> Dict[Any, Any]:
+        batch: list[SceneObservation],
+        object_labels: list[str] | None = None,
+    ) -> dict[Any, Any]:
         """Collate a batch of SceneObservation objects.
 
         Args:
+        ----
             object_labels: If passed in parse only those object labels.
 
         Returns:
+        -------
             A dict with fields
                 cameras: PandasTensorCollection
                 rgb: torch.tensor [B,3,H,W] torch.uint8
@@ -235,21 +235,21 @@ class SceneObservation:
         rgb_images = []
         depth_images = []
 
-        for n, data in enumerate(batch):
+        for _n, data in enumerate(batch):
             # data is of type SceneObservation
             batch_im_id += 1
-            im_info = dict(
-                scene_id=data.infos.scene_id,
-                view_id=data.infos.view_id,
-                batch_im_id=batch_im_id,
-            )
+            im_info = {
+                "scene_id": data.infos.scene_id,
+                "view_id": data.infos.view_id,
+                "batch_im_id": batch_im_id,
+            }
             im_infos.append(im_info)
 
             K.append(data.camera_data.K)
-            cam_info = dict(
-                TWC=data.camera_data.TWC,
-                resolution=data.camera_data.resolution,
-            )
+            cam_info = {
+                "TWC": data.camera_data.TWC,
+                "resolution": data.camera_data.resolution,
+            }
             cam_infos.append(cam_info)
 
             # [3,H,W]
@@ -288,19 +288,19 @@ class SceneObservation:
             infos=pd.DataFrame(cam_infos),
             K=torch.as_tensor(np.stack(K)),
         )
-        return dict(
-            cameras=cameras,
-            rgb=torch.stack(rgb_images),  # [B,3,H,W]
-            depth=torch.as_tensor(np.stack(depth_images)),  # [B,1,H,W] or [B,0]
-            im_infos=im_infos,
-            gt_detections=gt_detections,
-            gt_data=gt_data,
-            initial_data=initial_data,
-        )
+        return {
+            "cameras": cameras,
+            "rgb": torch.stack(rgb_images),  # [B,3,H,W]
+            "depth": torch.as_tensor(np.stack(depth_images)),  # [B,1,H,W] or [B,0]
+            "im_infos": im_infos,
+            "gt_detections": gt_detections,
+            "gt_data": gt_data,
+            "initial_data": initial_data,
+        }
 
     def as_pandas_tensor_collection(
         self,
-        object_labels: Optional[List[str]] = None,
+        object_labels: list[str] | None = None,
     ) -> SceneObservationTensorCollection:
         """Convert SceneData to a PandasTensorCollection representation."""
         obs = self
@@ -319,15 +319,15 @@ class SceneObservation:
         if obs.camera_data.TWC_init is not None:
             TWC_init = torch.as_tensor(obs.camera_data.TWC_init.matrix).float()
 
-        for n, obj_data in enumerate(obs.object_datas):
+        for _n, obj_data in enumerate(obs.object_datas):
             if object_labels is not None and obj_data.label not in object_labels:
                 continue
-            info = dict(
-                label=obj_data.label,
-                scene_id=obs.infos.scene_id,
-                view_id=obs.infos.view_id,
-                visib_fract=getattr(obj_data, "visib_fract", 1),
-            )
+            info = {
+                "label": obj_data.label,
+                "scene_id": obs.infos.scene_id,
+                "view_id": obs.infos.view_id,
+                "visib_fract": getattr(obj_data, "visib_fract", 1),
+            }
             infos.append(info)
             TWO.append(torch.tensor(obj_data.TWO.matrix).float())
             bboxes.append(torch.tensor(obj_data.bbox_modal).float())
@@ -391,7 +391,7 @@ class SceneObservation:
 class SceneDataset(torch.utils.data.Dataset):
     def __init__(
         self,
-        frame_index: Optional[pd.DataFrame],
+        frame_index: pd.DataFrame | None,
         load_depth: bool = False,
         load_segmentation: bool = True,
     ):
@@ -399,18 +399,21 @@ class SceneDataset(torch.utils.data.Dataset):
         Can be an IterableDataset or a map-style Dataset.
 
         Args:
+        ----
             frame_index (pd.DataFrame): Must contain the following columns: scene_id, view_id
             load_depth (bool, optional): Whether to load depth images. Defaults to False.
             load_segmentation (bool, optional): Whether to load image segmentation.
             Defaults to True.
             Defaults to f'{label}'.
         """
-
         self.frame_index = frame_index
         self.load_depth = load_depth
         self.load_segmentation = load_segmentation
 
-    def _load_scene_observation(self, image_infos: ObservationInfos) -> SceneObservation:
+    def _load_scene_observation(
+        self,
+        image_infos: ObservationInfos,
+    ) -> SceneObservation:
         raise NotImplementedError
 
     def __getitem__(self, idx: int) -> SceneObservation:
@@ -468,7 +471,7 @@ class RandomIterableSceneDataset(IterableSceneDataset):
 class IterableMultiSceneDataset(IterableSceneDataset):
     def __init__(
         self,
-        list_iterable_scene_ds: List[IterableSceneDataset],
+        list_iterable_scene_ds: list[IterableSceneDataset],
         deterministic: bool = False,
     ):
         self.list_iterable_scene_ds = list_iterable_scene_ds
@@ -490,4 +493,3 @@ class IterableMultiSceneDataset(IterableSceneDataset):
         while True:
             idx = self.rng.randint(0, len(self.iterators) - 1)
             yield next(self.iterators[idx])
-

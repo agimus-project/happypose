@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,14 +14,10 @@ limitations under the License.
 """
 
 
-
 # Standard Library
-import contextlib
 import logging
 import time
 from datetime import timedelta
-from io import StringIO
-from typing import Optional
 
 
 class ElapsedFormatter:
@@ -32,7 +27,7 @@ class ElapsedFormatter:
     def format(self, record):
         elapsed_seconds = record.created - self.start_time
         elapsed = timedelta(seconds=elapsed_seconds)
-        return "{} - {}".format(elapsed, record.getMessage())
+        return f"{elapsed} - {record.getMessage()}"
 
 
 def get_logger(name: str):

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 
 
 # Standard Library
@@ -35,7 +33,11 @@ from happypose.pose_estimators.megapose.bop_config import (
     SYNT_REAL_DETECTORS,
     SYNT_REAL_REFINER,
 )
-from happypose.pose_estimators.megapose.config import BOP_DS_DIR, LOCAL_DATA_DIR, PROJECT_DIR
+from happypose.pose_estimators.megapose.config import (
+    BOP_DS_DIR,
+    LOCAL_DATA_DIR,
+    PROJECT_DIR,
+)
 from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -87,12 +89,12 @@ BOP_DATASETS = {
     "ruapc": {
         "test_splits": [
             "test_all",
-        ]
+        ],
     },
     "tyol": {
         "test_splits": [
             "test_all",
-        ]
+        ],
     },
 }
 
@@ -103,7 +105,12 @@ def main():
     parser = argparse.ArgumentParser("Megapose download utility")
     parser.add_argument("--bop_dataset", default="", type=str, choices=BOP_DS_NAMES)
     parser.add_argument("--bop_src", default="bop", type=str, choices=["bop", "gdrive"])
-    parser.add_argument("--bop_extra_files", default="", type=str, choices=["ycbv", "tless"])
+    parser.add_argument(
+        "--bop_extra_files",
+        default="",
+        type=str,
+        choices=["ycbv", "tless"],
+    )
     parser.add_argument("--model", default="", type=str)
     parser.add_argument("--urdf_models", default="", type=str)
     parser.add_argument("--ycbv_compat_models", action="store_true")
@@ -126,7 +133,8 @@ def main():
         if args.bop_src == "bop":
             download_bop_original(
                 args.bop_dataset,
-                args.pbr_training_images and BOP_DATASETS[args.bop_dataset].get("has_pbr", True),
+                args.pbr_training_images
+                and BOP_DATASETS[args.bop_dataset].get("has_pbr", True),
                 args.train_splits,
             )
         elif args.bop_src == "gdrive":
@@ -135,30 +143,37 @@ def main():
     if args.bop_extra_files:
         if args.bop_extra_files == "tless":
             # https://github.com/kirumang/Pix2Pose#download-pre-trained-weights
-            gdrive_download(f"bop_datasets/tless/all_target_tless.json", BOP_DS_DIR / "tless")
+            gdrive_download(
+                "bop_datasets/tless/all_target_tless.json",
+                BOP_DS_DIR / "tless",
+            )
         elif args.bop_extra_files == "ycbv":
             # Friendly names used with YCB-Video
-            gdrive_download(f"bop_datasets/ycbv/ycbv_friendly_names.txt", BOP_DS_DIR / "ycbv")
+            gdrive_download(
+                "bop_datasets/ycbv/ycbv_friendly_names.txt",
+                BOP_DS_DIR / "ycbv",
+            )
             # Offsets between YCB-Video and BOP (extracted from BOP readme)
-            gdrive_download(f"bop_datasets/ycbv/offsets.txt", BOP_DS_DIR / "ycbv")
+            gdrive_download("bop_datasets/ycbv/offsets.txt", BOP_DS_DIR / "ycbv")
             # Evaluation models for YCB-Video (used by other works)
-            gdrive_download(f"bop_datasets/ycbv/models_original", BOP_DS_DIR / "ycbv")
+            gdrive_download("bop_datasets/ycbv/models_original", BOP_DS_DIR / "ycbv")
             # Keyframe definition
-            gdrive_download(f"bop_datasets/ycbv/keyframe.txt", BOP_DS_DIR / "ycbv")
+            gdrive_download("bop_datasets/ycbv/keyframe.txt", BOP_DS_DIR / "ycbv")
 
     if args.urdf_models:
         gdrive_download(f"urdfs/{args.urdf_models}", LOCAL_DATA_DIR / "urdfs")
 
     if args.ycbv_compat_models:
-        gdrive_download(f"bop_datasets/ycbv/models_bop-compat", BOP_DS_DIR / "ycbv")
-        gdrive_download(f"bop_datasets/ycbv/models_bop-compat_eval", BOP_DS_DIR / "ycbv")
+        gdrive_download("bop_datasets/ycbv/models_bop-compat", BOP_DS_DIR / "ycbv")
+        gdrive_download("bop_datasets/ycbv/models_bop-compat_eval", BOP_DS_DIR / "ycbv")
 
     if args.model:
         gdrive_download(f"experiments/{args.model}", LOCAL_DATA_DIR / "experiments")
 
     if args.detections:
         gdrive_download(
-            f"saved_detections/{args.detections}.pkl", LOCAL_DATA_DIR / "saved_detections"
+            f"saved_detections/{args.detections}.pkl",
+            LOCAL_DATA_DIR / "saved_detections",
         )
 
     if args.result_id:
@@ -166,23 +181,29 @@ def main():
 
     if args.bop_result_id:
         csv_name = args.bop_result_id + ".csv"
-        gdrive_download(f"bop_predictions/{csv_name}", LOCAL_DATA_DIR / "bop_predictions")
         gdrive_download(
-            f"bop_eval_outputs/{args.bop_result_id}", LOCAL_DATA_DIR / "bop_predictions"
+            f"bop_predictions/{csv_name}",
+            LOCAL_DATA_DIR / "bop_predictions",
+        )
+        gdrive_download(
+            f"bop_eval_outputs/{args.bop_result_id}",
+            LOCAL_DATA_DIR / "bop_predictions",
         )
 
     if args.texture_dataset:
         gdrive_download("zip_files/textures.zip", DOWNLOAD_DIR)
         logger.info("Extracting textures ...")
         zipfile.ZipFile(DOWNLOAD_DIR / "textures.zip").extractall(
-            LOCAL_DATA_DIR / "texture_datasets"
+            LOCAL_DATA_DIR / "texture_datasets",
         )
 
     if args.synt_dataset:
         zip_name = f"{args.synt_dataset}.zip"
         gdrive_download(f"zip_files/{zip_name}", DOWNLOAD_DIR)
         logger.info("Extracting textures ...")
-        zipfile.ZipFile(DOWNLOAD_DIR / zip_name).extractall(LOCAL_DATA_DIR / "synt_datasets")
+        zipfile.ZipFile(DOWNLOAD_DIR / zip_name).extractall(
+            LOCAL_DATA_DIR / "synt_datasets",
+        )
 
     if args.all_bop20_models:
         for model_dict in (
@@ -218,7 +239,7 @@ def main():
 
 
 def run_rclone(cmd, args, flags):
-    rclone_cmd = ["rclone", cmd] + args + flags + ["--config", str(RCLONE_CFG_PATH)]
+    rclone_cmd = ["rclone", cmd, *args, *flags] + ["--config", str(RCLONE_CFG_PATH)]
     logger.debug(" ".join(rclone_cmd))
     subprocess.run(rclone_cmd)
 
@@ -243,7 +264,10 @@ def download_bop_original(ds_name, download_pbr, download_train):
     if download_train:
         suffixes += BOP_DATASETS[ds_name].get("train_splits", [])
     for suffix in suffixes:
-        wget_download_and_extract(BOP_SRC + f"{ds_name}_{suffix}.zip", BOP_DS_DIR / ds_name)
+        wget_download_and_extract(
+            BOP_SRC + f"{ds_name}_{suffix}.zip",
+            BOP_DS_DIR / ds_name,
+        )
 
 
 def download_bop_gdrive(ds_name):

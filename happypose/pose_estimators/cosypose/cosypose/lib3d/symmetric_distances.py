@@ -1,8 +1,8 @@
-import torch
 import cosypose_cext
+import torch
 
-from .transform_ops import transform_pts
 from .camera_geometry import project_points
+from .transform_ops import transform_pts
 
 
 def expand_ids_for_symmetry(labels, n_symmetries):
@@ -26,9 +26,7 @@ def symmetric_distance_batched(T1, T2, labels, mesh_db):
     ids_expand, sym_ids = expand_ids_for_symmetry(labels, mesh_db.n_sym_mapping)
     points_expand = meshes.points[ids_expand]
     sym_expand = meshes.symmetries[ids_expand, sym_ids]
-    dists = mesh_points_dist(T1[ids_expand] @ sym_expand,
-                             T2[ids_expand],
-                             points_expand)
+    dists = mesh_points_dist(T1[ids_expand] @ sym_expand, T2[ids_expand], points_expand)
     min_ids = scatter_argmin(dists, ids_expand)
     min_dists = dists[min_ids]
     S12 = meshes.symmetries[torch.arange(len(min_ids)), sym_ids[min_ids]]
@@ -112,9 +110,12 @@ def symmetric_distance_reprojected(T1, T2, K, labels, mesh_db):
     ids_expand, sym_ids = expand_ids_for_symmetry(labels, mesh_db.n_sym_mapping)
     points_expand = meshes.points[ids_expand]
     sym_expand = meshes.symmetries[ids_expand, sym_ids]
-    dists = reprojected_dist(T1[ids_expand] @ sym_expand,
-                             T2[ids_expand], K[ids_expand],
-                             points_expand)
+    dists = reprojected_dist(
+        T1[ids_expand] @ sym_expand,
+        T2[ids_expand],
+        K[ids_expand],
+        points_expand,
+    )
     min_ids = scatter_argmin(dists, ids_expand)
     min_dists = dists[min_ids]
     S12 = meshes.symmetries[torch.arange(len(min_ids)), sym_ids[min_ids]]

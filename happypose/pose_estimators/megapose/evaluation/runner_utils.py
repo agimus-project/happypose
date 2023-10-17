@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 
 
 # Standard Library
@@ -30,7 +28,7 @@ logger = get_logger(__name__)
 
 
 def run_pred_eval(pred_runner, pred_kwargs, eval_runner, eval_preds=None):
-    all_predictions = dict()
+    all_predictions = {}
     for pred_prefix, pred_kwargs_n in pred_kwargs.items():
         print("Prediction :", pred_prefix)
         preds = pred_runner.get_predictions(**pred_kwargs_n)
@@ -38,9 +36,9 @@ def run_pred_eval(pred_runner, pred_kwargs, eval_runner, eval_preds=None):
             all_predictions[f"{pred_prefix}/{preds_name}"] = preds_n
 
     all_predictions = OrderedDict(
-        {k: v for k, v in sorted(all_predictions.items(), key=lambda item: item[0])}
+        dict(sorted(all_predictions.items(), key=lambda item: item[0])),
     )
-    eval_metrics, eval_dfs = dict(), dict()
+    eval_metrics, eval_dfs = {}, {}
 
     for preds_k, preds in all_predictions.items():
         print("Evaluation :", preds_k)
@@ -63,7 +61,7 @@ def gather_predictions(all_predictions):
 
 
 def format_results(predictions, eval_metrics, eval_dfs, print_metrics=True):
-    summary = dict()
+    summary = {}
     df = defaultdict(list)
     summary_txt = ""
     for k, v in eval_metrics.items():
@@ -79,12 +77,12 @@ def format_results(predictions, eval_metrics, eval_dfs, print_metrics=True):
         logger.info(summary_txt)
 
     df = pd.DataFrame(df)
-    results = dict(
-        summary=summary,
-        summary_txt=summary_txt,
-        predictions=predictions,
-        metrics=eval_metrics,
-        summary_df=df,
-        dfs=eval_dfs,
-    )
+    results = {
+        "summary": summary,
+        "summary_txt": summary_txt,
+        "predictions": predictions,
+        "metrics": eval_metrics,
+        "summary_df": df,
+        "dfs": eval_dfs,
+    }
     return results

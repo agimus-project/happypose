@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,18 +14,13 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import json
-from typing import List, Optional, Tuple
+from typing import Optional
 
 # Third Party
 import numpy as np
 import pandas as pd
-
-# HappyPose
-from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
-from happypose.toolbox.datasets.scene_dataset import SceneDataset
 
 # MegaPose
 from happypose.pose_estimators.megapose.config import (
@@ -44,6 +38,10 @@ from happypose.toolbox.datasets.bop_scene_dataset import BOPDataset, remap_bop_t
 from happypose.toolbox.datasets.deepim_modelnet import DeepImModelNetDataset
 from happypose.toolbox.datasets.gso_dataset import GoogleScannedObjectDataset
 from happypose.toolbox.datasets.modelnet_object_dataset import ModelNetObjectDataset
+
+# HappyPose
+from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
+from happypose.toolbox.datasets.scene_dataset import SceneDataset
 from happypose.toolbox.datasets.shapenet_object_dataset import ShapeNetObjectDataset
 from happypose.toolbox.datasets.urdf_dataset import UrdfDataset
 from happypose.toolbox.datasets.web_scene_dataset import WebSceneDataset
@@ -58,7 +56,9 @@ def keep_bop19(ds: SceneDataset) -> SceneDataset:
     targets = pd.read_json(ds.ds_dir / "test_targets_bop19.json")
     targets = remap_bop_targets(targets)
     targets = targets.loc[:, ["scene_id", "view_id"]].drop_duplicates()
-    index = ds.frame_index.merge(targets, on=["scene_id", "view_id"]).reset_index(drop=True)
+    index = ds.frame_index.merge(targets, on=["scene_id", "view_id"]).reset_index(
+        drop=True,
+    )
     assert len(index) == len(targets)
     ds.frame_index = index
     return ds
@@ -69,11 +69,14 @@ def make_scene_dataset(
     load_depth: bool = False,
     n_frames: Optional[int] = None,
 ) -> SceneDataset:
-
     # BOP challenge splits
     if ds_name == "hb.bop19":
         ds_dir = BOP_DS_DIR / "hb"
-        ds: SceneDataset = BOPDataset(ds_dir, split="test_primesense", label_format="hb-{label}")
+        ds: SceneDataset = BOPDataset(
+            ds_dir,
+            split="test_primesense",
+            label_format="hb-{label}",
+        )
         ds = keep_bop19(ds)
     elif ds_name == "icbin.bop19":
         ds_dir = BOP_DS_DIR / "icbin"
@@ -126,29 +129,31 @@ def make_scene_dataset(
     elif ds_name == "ycbv.train.real":
         ds_dir = BOP_DS_DIR / "ycbv"
         ds = BOPDataset(ds_dir, split="train_real", label_format="ycbv-{label}")
-    elif ds_name == 'ycbv.train.synt':
-        ds_dir = BOP_DS_DIR / 'ycbv'
-        ds = BOPDataset(ds_dir, split='train_synt', label_format="ycbv-{label}")
+    elif ds_name == "ycbv.train.synt":
+        ds_dir = BOP_DS_DIR / "ycbv"
+        ds = BOPDataset(ds_dir, split="train_synt", label_format="ycbv-{label}")
     elif ds_name == "ycbv.real.train":
         ds_dir = BOP_DS_DIR / "ycbv"
         ds = BOPDataset(ds_dir, split="train_real", label_format="ycbv-{label}")
-    elif ds_name == 'ycbv.synt.train':
-        ds_dir = BOP_DS_DIR / 'ycbv'
+    elif ds_name == "ycbv.synt.train":
+        ds_dir = BOP_DS_DIR / "ycbv"
         ds = BOPDataset(ds_dir, split="train_synt", label_format="ycbv-{label}")
     elif ds_name == "ycbv.test":
         ds_dir = BOP_DS_DIR / "ycbv"
         ds = BOPDataset(ds_dir, split="test", label_format="ycbv-{label}")
-    elif ds_name == 'ycbv.test.keyframes':
-        ds_dir = BOP_DS_DIR / 'ycbv'
-        ds = BOPDataset(ds_dir, split='test', label_format="ycbv-{label}")
-        keyframes_path = ds_dir / 'keyframe.txt'
-        ls = keyframes_path.read_text().split('\n')[:-1]
+    elif ds_name == "ycbv.test.keyframes":
+        ds_dir = BOP_DS_DIR / "ycbv"
+        ds = BOPDataset(ds_dir, split="test", label_format="ycbv-{label}")
+        keyframes_path = ds_dir / "keyframe.txt"
+        ls = keyframes_path.read_text().split("\n")[:-1]
         frame_index = ds.frame_index
         ids = []
         for l_n in ls:
-            scene_id, view_id = l_n.split('/')
+            scene_id, view_id = l_n.split("/")
             scene_id, view_id = int(scene_id), int(view_id)
-            mask = (frame_index['scene_id'] == scene_id) & (frame_index['view_id'] == view_id)
+            mask = (frame_index["scene_id"] == scene_id) & (
+                frame_index["view_id"] == view_id
+            )
             ids.append(np.where(mask)[0].item())
         ds.frame_index = frame_index.iloc[ids].reset_index(drop=True)
     elif ds_name == "lmo.test":
@@ -193,7 +198,15 @@ def make_scene_dataset(
         n_objects = (
             30
             if category
-            in {"bathtub", "bookshelf", "guitar", "range_hood", "sofa", "wardrobe", "tv_stand"}
+            in {
+                "bathtub",
+                "bookshelf",
+                "guitar",
+                "range_hood",
+                "sofa",
+                "wardrobe",
+                "tv_stand",
+            }
             else 50
         )
         ds = DeepImModelNetDataset(
@@ -210,14 +223,19 @@ def make_scene_dataset(
         ds = WebSceneDataset(WDS_DS_DIR / ds_name)
 
     # Synthetic datasets
-    elif 'synthetic.' in ds_name:
-        from happypose.pose_estimators.cosypose.cosypose.datasets.synthetic_dataset import SyntheticSceneDataset
-        assert '.train' in ds_name or '.val' in ds_name
-        is_train = 'train' in ds_name.split('.')[-1]
-        ds_name = ds_name.split('.')[1]
-        print("ds_name synthetic =", ds_name)
-        ds = SyntheticSceneDataset(ds_dir=LOCAL_DATA_DIR / 'synt_datasets' / ds_name, train=is_train)
+    elif "synthetic." in ds_name:
+        from happypose.pose_estimators.cosypose.cosypose.datasets.synthetic_dataset import (
+            SyntheticSceneDataset,
+        )
 
+        assert ".train" in ds_name or ".val" in ds_name
+        is_train = "train" in ds_name.split(".")[-1]
+        ds_name = ds_name.split(".")[1]
+        print("ds_name synthetic =", ds_name)
+        ds = SyntheticSceneDataset(
+            ds_dir=LOCAL_DATA_DIR / "synt_datasets" / ds_name,
+            train=is_train,
+        )
 
     else:
         raise ValueError(ds_name)
@@ -231,15 +249,22 @@ def make_scene_dataset(
 
 def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     # BOP original models
-    
+
     if ds_name == "tless.cad":
         ds: RigidObjectDataset = BOPObjectDataset(
-            BOP_DS_DIR / "tless/models_cad", label_format="tless-{label}"
+            BOP_DS_DIR / "tless/models_cad",
+            label_format="tless-{label}",
         )
     elif ds_name == "tless.eval":
-        ds = BOPObjectDataset(BOP_DS_DIR / "tless/models_eval", label_format="tless-{label}")
+        ds = BOPObjectDataset(
+            BOP_DS_DIR / "tless/models_eval",
+            label_format="tless-{label}",
+        )
     elif ds_name == "tless.reconst":
-        ds = BOPObjectDataset(BOP_DS_DIR / "tless/models_reconst", label_format="tless-{label}")
+        ds = BOPObjectDataset(
+            BOP_DS_DIR / "tless/models_reconst",
+            label_format="tless-{label}",
+        )
     elif ds_name == "ycbv":
         ds = BOPObjectDataset(BOP_DS_DIR / "ycbv/models", label_format="ycbv-{label}")
     elif ds_name == "hb":
@@ -262,25 +287,55 @@ def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     # BOP models converted for Panda3D
     # TODO: Is this necessary ?
     elif ds_name == "hb.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "hb/models", label_format="hb-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "hb/models",
+            label_format="hb-{label}",
+        )
     elif ds_name == "icbin.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "icbin/models", label_format="icbin-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "icbin/models",
+            label_format="icbin-{label}",
+        )
     elif ds_name == "itodd.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "itodd/models", label_format="itodd-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "itodd/models",
+            label_format="itodd-{label}",
+        )
     elif ds_name == "lm.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "lm/models", label_format="lm-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "lm/models",
+            label_format="lm-{label}",
+        )
     elif ds_name == "tless.cad.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "tless/models_cad", label_format="tless-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "tless/models_cad",
+            label_format="tless-{label}",
+        )
     elif ds_name == "ycbv.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "ycbv/models", label_format="ycbv-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "ycbv/models",
+            label_format="ycbv-{label}",
+        )
     elif ds_name == "tudl.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "tudl/models", label_format="tudl-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "tudl/models",
+            label_format="tudl-{label}",
+        )
     elif ds_name == "tyol.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "tyol/models", label_format="tyol-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "tyol/models",
+            label_format="tyol-{label}",
+        )
     elif ds_name == "ruapc.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "ruapc/models", label_format="ruapc-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "ruapc/models",
+            label_format="ruapc-{label}",
+        )
     elif ds_name == "hope.panda3d":
-        ds = BOPObjectDataset(BOP_PANDA3D_DS_DIR / "hope/models", label_format="hope-{label}")
+        ds = BOPObjectDataset(
+            BOP_PANDA3D_DS_DIR / "hope/models",
+            label_format="hope-{label}",
+        )
 
     # GSO
     elif ds_name == "gso.orig":
@@ -297,7 +352,15 @@ def make_object_dataset(ds_name: str) -> RigidObjectDataset:
         n_objects = (
             30
             if category
-            in {"bathtub", "bookshelf", "guitar", "range_hood", "sofa", "wardrobe", "tv_stand"}
+            in {
+                "bathtub",
+                "bookshelf",
+                "guitar",
+                "range_hood",
+                "sofa",
+                "wardrobe",
+                "tv_stand",
+            }
             else 50
         )
         ds = ModelNetObjectDataset(
@@ -313,7 +376,7 @@ def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     elif ds_name.startswith("shapenet."):
         ds_name = ds_name[len("shapenet.") :]
 
-        filters_list: List[str] = []
+        filters_list: list[str] = []
         if ds_name.startswith("filters="):
             filter_str = ds_name.split(".")[0]
             filters_list = filter_str.split("filters=")[1].split(",")
@@ -324,20 +387,18 @@ def make_object_dataset(ds_name: str) -> RigidObjectDataset:
 
         for filter_str in filters_list:
             if filter_str == "remove_modelnet":
-                keep_labels = set(
-                    [
-                        obj.label
-                        for obj in ds.objects
-                        if obj.category not in SHAPENET_MODELNET_CATEGORIES
-                    ]
-                )
+                keep_labels = {
+                    obj.label
+                    for obj in ds.objects
+                    if obj.category not in SHAPENET_MODELNET_CATEGORIES
+                }
             else:
                 keep_labels = set(
                     json.loads(
                         (SHAPENET_DIR / "stats" / ("shapenet_" + filter_str))
                         .with_suffix(".json")
-                        .read_text()
-                    )
+                        .read_text(),
+                    ),
                 )
             ds = ds.filter_objects(keep_labels)
 
@@ -358,8 +419,10 @@ def make_object_dataset(ds_name: str) -> RigidObjectDataset:
             np_random = np.random.RandomState(0)
             keep_labels = set(
                 np_random.choice(
-                    [obj.label for obj in ds.objects], n_objects_, replace=False
-                ).tolist()
+                    [obj.label for obj in ds.objects],
+                    n_objects_,
+                    replace=False,
+                ).tolist(),
             )
             ds = ds.filter_objects(keep_labels)
 
@@ -372,7 +435,9 @@ def make_urdf_dataset(ds_name: str) -> RigidObjectDataset:
     # BOP
     if ds_name == "tless.cad":
         ds = UrdfDataset(
-            LOCAL_DATA_DIR / "urdfs" / "tless.cad", mesh_units="mm", label_format="tless-{label}"
+            LOCAL_DATA_DIR / "urdfs" / "tless.cad",
+            mesh_units="mm",
+            label_format="tless-{label}",
         )
     elif ds_name == "tless.reconst":
         ds = UrdfDataset(
@@ -383,31 +448,45 @@ def make_urdf_dataset(ds_name: str) -> RigidObjectDataset:
 
     elif ds_name == "tless":
         ds = UrdfDataset(
-            LOCAL_DATA_DIR / "urdfs" / "tless.cad", mesh_units="mm", label_format="tless-{label}"
+            LOCAL_DATA_DIR / "urdfs" / "tless.cad",
+            mesh_units="mm",
+            label_format="tless-{label}",
         )
     elif ds_name == "ycbv":
         ds = UrdfDataset(
-            LOCAL_DATA_DIR / "urdfs" / "ycbv", mesh_units="mm", label_format="ycbv-{label}"
+            LOCAL_DATA_DIR / "urdfs" / "ycbv",
+            mesh_units="mm",
+            label_format="ycbv-{label}",
         )
     elif ds_name == "hb":
         ds = UrdfDataset(
-            LOCAL_DATA_DIR / "urdfs" / "hb", mesh_units="mm", label_format="hb-{label}"
+            LOCAL_DATA_DIR / "urdfs" / "hb",
+            mesh_units="mm",
+            label_format="hb-{label}",
         )
     elif ds_name == "icbin":
         ds = UrdfDataset(
-            LOCAL_DATA_DIR / "urdfs" / "icbin", mesh_units="mm", label_format="icbin-{label}"
+            LOCAL_DATA_DIR / "urdfs" / "icbin",
+            mesh_units="mm",
+            label_format="icbin-{label}",
         )
     elif ds_name == "itodd":
         ds = UrdfDataset(
-            LOCAL_DATA_DIR / "urdfs" / "itodd", mesh_units="mm", label_format="itodd-{label}"
+            LOCAL_DATA_DIR / "urdfs" / "itodd",
+            mesh_units="mm",
+            label_format="itodd-{label}",
         )
     elif ds_name == "lm":
         ds = UrdfDataset(
-            LOCAL_DATA_DIR / "urdfs" / "lm", mesh_units="mm", label_format="lm-{label}"
+            LOCAL_DATA_DIR / "urdfs" / "lm",
+            mesh_units="mm",
+            label_format="lm-{label}",
         )
     elif ds_name == "tudl":
         ds = UrdfDataset(
-            LOCAL_DATA_DIR / "urdfs" / "tudl", mesh_units="mm", label_format="tudl-{label}"
+            LOCAL_DATA_DIR / "urdfs" / "tudl",
+            mesh_units="mm",
+            label_format="tudl-{label}",
         )
 
     else:
@@ -415,8 +494,8 @@ def make_urdf_dataset(ds_name: str) -> RigidObjectDataset:
     return ds
 
 
-def get_obj_ds_info(ds_name: str) -> Tuple[Optional[str], str]:
-    urdf_ds_name = None # Only used for bullet compatibility
+def get_obj_ds_info(ds_name: str) -> tuple[Optional[str], str]:
+    urdf_ds_name = None  # Only used for bullet compatibility
     if ds_name == "ycbv.bop19":
         ds_name = "ycbv"
         urdf_ds_name = "ycbv"
@@ -442,7 +521,8 @@ def get_obj_ds_info(ds_name: str) -> Tuple[Optional[str], str]:
         category = ds_name.split(".")[1]
         obj_ds_name = f"modelnet.{category}.test.rescaled"
     else:
-        raise ValueError("Unknown dataset")
+        msg = "Unknown dataset"
+        raise ValueError(msg)
 
     return urdf_ds_name, obj_ds_name
 
@@ -452,10 +532,12 @@ def get_object_label(ds_name, description):
     if ds_name == "ycbv":
         df = YCBV_OBJECT_NAMES
     else:
-        raise ValueError(f"Unknown dataset {ds_name}")
+        msg = f"Unknown dataset {ds_name}"
+        raise ValueError(msg)
 
     x = df[df.description == description]
     if len(x) == 0:
-        raise ValueError(f"Couldn't find object '{description}' in ds {ds_name}")
+        msg = f"Couldn't find object '{description}' in ds {ds_name}"
+        raise ValueError(msg)
 
     return x.iloc[0].label

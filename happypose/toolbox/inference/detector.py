@@ -1,4 +1,3 @@
-
 # Standard Library
 from abc import ABCMeta, abstractmethod
 
@@ -10,9 +9,8 @@ from happypose.toolbox.inference.types import DetectionsType
 
 
 class DetectorModule(torch.nn.Module, metaclass=ABCMeta):
-
     @abstractmethod
     def get_detections(
-        self
+        self,
     ) -> DetectionsType:
         pass

@@ -1,16 +1,16 @@
-import bokeh
-import numpy as np
-from PIL import Image
 from itertools import cycle
-import torch
-import seaborn as sns
-from .bokeh_utils import plot_image, to_rgba, make_image_figure, image_figure
 
+import numpy as np
+import seaborn as sns
+import torch
 from bokeh.models import ColumnDataSource, LabelSet
+from PIL import Image
+
+from .bokeh_utils import make_image_figure, to_rgba
 
 
 class Plotter:
-    source_map = dict()
+    source_map = {}
 
     @property
     def hex_colors(self):
@@ -30,13 +30,24 @@ class Plotter:
         overlay[~mask] = rgb_input[~mask] * 0.6 + 255 * 0.4
         overlay[mask] = rgb_rendered[mask] * 0.8 + 255 * 0.2
         # overlay[mask] = rgb_rendered[mask] * 0.3 + rgb_input[mask] * 0.7
-        f = self.plot_image(overlay, name='image')
+        f = self.plot_image(overlay, name="image")
         return f
 
-    def plot_maskrcnn_bboxes(self, f, detections, colors='red', text=None, text_auto=True, line_width=2, source_id=''):
+    def plot_maskrcnn_bboxes(
+        self,
+        f,
+        detections,
+        colors="red",
+        text=None,
+        text_auto=True,
+        line_width=2,
+        source_id="",
+    ):
         boxes = detections.bboxes
         if text_auto:
-            text = [f'{row.label} {row.score:.2f}' for _, row in detections.infos.iterrows()]
+            text = [
+                f"{row.label} {row.score:.2f}" for _, row in detections.infos.iterrows()
+            ]
 
         boxes = self.numpy(boxes)
         xs = []
@@ -62,20 +73,32 @@ class Plotter:
             if text is not None:
                 text_x.append(x1)
                 text_y.append(y1)
-        source, new = self.get_source(f'{f.id}/{source_id}/bboxes')
+        source, new = self.get_source(f"{f.id}/{source_id}/bboxes")
 
         if new:
-            f.patches(xs='xs', ys='ys', source=source,
-                      line_width=line_width, color='colors', fill_alpha=0.0)
+            f.patches(
+                xs="xs",
+                ys="ys",
+                source=source,
+                line_width=line_width,
+                color="colors",
+                fill_alpha=0.0,
+            )
 
             if text is not None:
-                labelset = LabelSet(x='text_x', y='text_y', text='text',
-                                    text_align='left', text_baseline='bottom',
-                                    text_color='white',
-                                    source=source, background_fill_color='colors',
-                                    text_font_size="5pt")
+                labelset = LabelSet(
+                    x="text_x",
+                    y="text_y",
+                    text="text",
+                    text_align="left",
+                    text_baseline="bottom",
+                    text_color="white",
+                    source=source,
+                    background_fill_color="colors",
+                    text_font_size="5pt",
+                )
                 f.add_layout(labelset)
-        data = dict(xs=xs, ys=ys, colors=patch_colors)
+        data = {"xs": xs, "ys": ys, "colors": patch_colors}
         if text is not None:
             data.update(text_x=text_x, text_y=text_y, text=text)
         source.data = data
@@ -96,25 +119,29 @@ class Plotter:
         new_fig = figure is None
         mask = self.numpy(mask)
         h, w = mask.shape
-        mask_rgba = self._make_rgba_instance_segm(mask > 0.9, colors=self.colors, alpha=alpha)
+        mask_rgba = self._make_rgba_instance_segm(
+            mask > 0.9,
+            colors=self.colors,
+            alpha=alpha,
+        )
 
         if new_fig:
             figure = make_image_figure(im_size=(w, h), axes=False)
 
-        source, new = self.get_source(f'{figure.id}/mask')
+        source, new = self.get_source(f"{figure.id}/mask")
 
         if new:
-            figure.image_rgba('rgb', x=0, y=0, dw=w, dh=h, source=source)
-            figure.image_rgba('mask', x=0, y=0, dw=w, dh=h, source=source)
+            figure.image_rgba("rgb", x=0, y=0, dw=w, dh=h, source=source)
+            figure.image_rgba("mask", x=0, y=0, dw=w, dh=h, source=source)
 
-        source.data = dict(rgb=[to_rgba(im)], mask=[to_rgba(mask_rgba)])
+        source.data = {"rgb": [to_rgba(im)], "mask": [to_rgba(mask_rgba)]}
         return figure
 
     def masks_to_instance_segm(self, masks, thresh=0.9):
         masks = torch.as_tensor(masks).cpu().float()
         segm = torch.zeros(masks.shape[-2:], dtype=torch.uint8)
         for n, mask_n in enumerate(masks):
-            m = torch.as_tensor(mask_n > thresh)
+            torch.as_tensor(mask_n > thresh)
             segm[mask_n > thresh] = n + 1
         return segm
 
@@ -126,10 +153,10 @@ class Plotter:
         rgba[..., -1] = alpha * 255
         rgba[..., :3] = im
         rgba[im.sum(axis=-1) == 255 * 3, -1] = 120
-        source, new = self.get_source(f'{figure.id}/segm')
+        source, new = self.get_source(f"{figure.id}/segm")
         if new:
-            figure.image_rgba('image', x=0, y=0, dw=w, dh=h, source=source)
-        source.data = dict(image=[to_rgba(rgba)])
+            figure.image_rgba("image", x=0, y=0, dw=w, dh=h, source=source)
+        source.data = {"image": [to_rgba(rgba)]}
         return figure
 
     def plot_segm_overlay(self, im, segm, alpha=0.8, figure=None):
@@ -149,16 +176,16 @@ class Plotter:
         if new_fig:
             figure = make_image_figure(im_size=(w, h), axes=False)
 
-        source, new = self.get_source(f'{figure.id}/segm')
+        source, new = self.get_source(f"{figure.id}/segm")
 
         if new:
-            figure.image_rgba('rgb', x=0, y=0, dw=w, dh=h, source=source)
-            figure.image_rgba('segm', x=0, y=0, dw=w, dh=h, source=source)
+            figure.image_rgba("rgb", x=0, y=0, dw=w, dh=h, source=source)
+            figure.image_rgba("segm", x=0, y=0, dw=w, dh=h, source=source)
 
-        source.data = dict(rgb=[to_rgba(im)], segm=[to_rgba(segm_rgba)])
+        source.data = {"rgb": [to_rgba(im)], "segm": [to_rgba(segm_rgba)]}
         return figure
 
-    def plot_image(self, im, figure=None, name='image'):
+    def plot_image(self, im, figure=None, name="image"):
         im = self.numpy(im)
         if im.shape[0] == 3:
             im = im.transpose((1, 2, 0))
@@ -171,12 +198,12 @@ class Plotter:
         if new_fig:
             figure = make_image_figure(im_size=(w, h), axes=False)
 
-        source, new = self.get_source(f'{figure.id}/{name}')
+        source, new = self.get_source(f"{figure.id}/{name}")
 
         if new:
-            figure.image_rgba('image', x=0, y=0, dw=w, dh=h, source=source)
+            figure.image_rgba("image", x=0, y=0, dw=w, dh=h, source=source)
 
-        source.data = dict(image=[to_rgba(im)])
+        source.data = {"image": [to_rgba(im)]}
         return figure
 
     def numpy(self, x):

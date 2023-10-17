@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +19,7 @@ import functools
 import os
 import time
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any
 
 # Third Party
 import numpy as np
@@ -34,8 +33,34 @@ from tqdm import tqdm
 
 # MegaPose
 from happypose.pose_estimators.megapose.config import EXP_DIR
-from happypose.toolbox.datasets.datasets_cfg import make_object_dataset, make_scene_dataset
-from happypose.toolbox.datasets.object_dataset import RigidObjectDataset, concat_object_datasets
+from happypose.pose_estimators.megapose.panda3d_renderer.panda3d_batch_renderer import (
+    Panda3dBatchRenderer,
+)
+from happypose.pose_estimators.megapose.training.megapose_forward_loss import (
+    megapose_forward_loss,
+)
+from happypose.pose_estimators.megapose.training.pose_models_cfg import (
+    check_update_config,
+    create_model_pose,
+)
+from happypose.pose_estimators.megapose.training.training_config import (
+    DatasetConfig,
+    TrainingConfig,
+)
+from happypose.pose_estimators.megapose.training.utils import (
+    CudaTimer,
+    make_lr_ratio_function,
+    make_optimizer,
+    write_logs,
+)
+from happypose.toolbox.datasets.datasets_cfg import (
+    make_object_dataset,
+    make_scene_dataset,
+)
+from happypose.toolbox.datasets.object_dataset import (
+    RigidObjectDataset,
+    concat_object_datasets,
+)
 from happypose.toolbox.datasets.pose_dataset import PoseDataset
 from happypose.toolbox.datasets.scene_dataset import (
     IterableMultiSceneDataset,
@@ -43,18 +68,11 @@ from happypose.toolbox.datasets.scene_dataset import (
     RandomIterableSceneDataset,
     SceneDataset,
 )
-from happypose.toolbox.datasets.web_scene_dataset import IterableWebSceneDataset, WebSceneDataset
-from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.pose_estimators.megapose.panda3d_renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from happypose.pose_estimators.megapose.training.megapose_forward_loss import megapose_forward_loss
-from happypose.pose_estimators.megapose.training.pose_models_cfg import check_update_config, create_model_pose
-from happypose.pose_estimators.megapose.training.training_config import DatasetConfig, TrainingConfig
-from happypose.pose_estimators.megapose.training.utils import (
-    CudaTimer,
-    make_lr_ratio_function,
-    make_optimizer,
-    write_logs,
+from happypose.toolbox.datasets.web_scene_dataset import (
+    IterableWebSceneDataset,
+    WebSceneDataset,
 )
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.toolbox.utils.distributed import (
     get_rank,
     get_world_size,
@@ -65,7 +83,11 @@ from happypose.toolbox.utils.distributed import (
 )
 from happypose.toolbox.utils.logging import get_logger
 from happypose.toolbox.utils.random import get_unique_seed, set_seed, temp_numpy_seed
-from happypose.toolbox.utils.resources import get_cuda_memory, get_gpu_memory, get_total_memory
+from happypose.toolbox.utils.resources import (
+    get_cuda_memory,
+    get_gpu_memory,
+    get_total_memory,
+)
 
 
 def worker_init_fn(worker_id: int) -> None:
@@ -91,23 +113,27 @@ def train_megapose(cfg: TrainingConfig) -> None:
     cfg.global_batch_size = world_size * cfg.batch_size
     assert cfg.hardware.n_gpus == world_size
 
-    def split_objects_across_gpus(obj_dataset: RigidObjectDataset) -> RigidObjectDataset:
+    def split_objects_across_gpus(
+        obj_dataset: RigidObjectDataset,
+    ) -> RigidObjectDataset:
         rank, world_size = get_rank(), get_world_size()
         if cfg.split_objects_across_gpus:
             with temp_numpy_seed(0):
                 this_rank_labels = set(
                     np.array_split(
-                        np.random.permutation(np.array([obj.label for obj in obj_dataset.objects])),
+                        np.random.permutation(
+                            np.array([obj.label for obj in obj_dataset.objects]),
+                        ),
                         world_size,
-                    )[rank].tolist()
+                    )[rank].tolist(),
                 )
         else:
-            this_rank_labels = set([obj.label for obj in renderer_obj_dataset.objects])
+            this_rank_labels = {obj.label for obj in renderer_obj_dataset.objects}
         if cfg.n_max_objects is not None:
             this_rank_labels = set(list(this_rank_labels)[: cfg.n_max_objects])
 
         obj_dataset = RigidObjectDataset(
-            [obj for obj in obj_dataset.objects if obj.label in this_rank_labels]
+            [obj for obj in obj_dataset.objects if obj.label in this_rank_labels],
         )
         return obj_dataset
 
@@ -116,21 +142,21 @@ def train_megapose(cfg: TrainingConfig) -> None:
         [
             split_objects_across_gpus(make_object_dataset(ds_cfg.renderer_obj_ds_name))
             for ds_cfg in cfg.train_datasets + cfg.val_datasets
-        ]
+        ],
     )
     mesh_obj_dataset = concat_object_datasets(
         [
             split_objects_across_gpus(make_object_dataset(ds_cfg.mesh_obj_ds_name))
             for ds_cfg in cfg.train_datasets + cfg.val_datasets
-        ]
+        ],
     )
-    this_rank_labels = set([obj.label for obj in renderer_obj_dataset.objects])
+    this_rank_labels = {obj.label for obj in renderer_obj_dataset.objects}
     assert len(renderer_obj_dataset) == len(mesh_obj_dataset)
     logger.info(f"Number of objects to train on (this rank):  {len(mesh_obj_dataset)})")
 
     # Scene dataset
     def make_iterable_scene_dataset(
-        dataset_configs: List[DatasetConfig],
+        dataset_configs: list[DatasetConfig],
         deterministic: bool = False,
     ) -> IterableMultiSceneDataset:
         scene_dataset_iterators = []
@@ -142,7 +168,8 @@ def train_megapose(cfg: TrainingConfig) -> None:
             if isinstance(ds, WebSceneDataset):
                 assert not deterministic
                 iterator: IterableSceneDataset = IterableWebSceneDataset(
-                    ds, buffer_size=cfg.sample_buffer_size
+                    ds,
+                    buffer_size=cfg.sample_buffer_size,
                 )
             else:
                 assert isinstance(ds, SceneDataset)
@@ -230,7 +257,7 @@ def train_megapose(cfg: TrainingConfig) -> None:
             ckpt = torch.load(ckpt_path)
         except EOFError:
             print(
-                "Unable to load checkpoint.pth.tar. Falling back to checkpoint_epoch=last.pth.tar"
+                "Unable to load checkpoint.pth.tar. Falling back to checkpoint_epoch=last.pth.tar",
             )
             ckpt_path = resume_run_dir / "checkpoint_epoch=last.pth.tar"
             ckpt = torch.load(ckpt_path)
@@ -244,7 +271,9 @@ def train_megapose(cfg: TrainingConfig) -> None:
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
     model = sync_model(model)
     model = torch.nn.parallel.DistributedDataParallel(
-        model, device_ids=[torch.cuda.current_device()], output_device=torch.cuda.current_device()
+        model,
+        device_ids=[torch.cuda.current_device()],
+        output_device=torch.cuda.current_device(),
     )
 
     optimizer = make_optimizer(model.parameters(), cfg)
@@ -252,7 +281,10 @@ def train_megapose(cfg: TrainingConfig) -> None:
     this_rank_epoch_size = cfg.epoch_size // get_world_size()
     this_rank_n_batch_per_epoch = this_rank_epoch_size // cfg.batch_size
     # NOTE: LR schedulers "epoch" actually correspond to "batch"
-    lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, make_lr_ratio_function(cfg))
+    lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
+        optimizer,
+        make_lr_ratio_function(cfg),
+    )
     lr_scheduler.last_epoch = (  # type: ignore
         start_epoch * this_rank_epoch_size // cfg.batch_size - 1
     )
@@ -266,16 +298,27 @@ def train_megapose(cfg: TrainingConfig) -> None:
     scaler = torch.cuda.amp.GradScaler()
 
     for epoch in range(start_epoch, cfg.n_epochs + 1):
-        meters_train: Dict[str, AverageValueMeter] = defaultdict(lambda: AverageValueMeter())
-        meters_val: Dict[str, AverageValueMeter] = defaultdict(lambda: AverageValueMeter())
+        meters_train: dict[str, AverageValueMeter] = defaultdict(
+            lambda: AverageValueMeter(),
+        )
+        meters_val: dict[str, AverageValueMeter] = defaultdict(
+            lambda: AverageValueMeter(),
+        )
 
         if cfg.add_iteration_epoch_interval is None:
             n_iterations = cfg.n_iterations
         else:
-            n_iterations = min(epoch // cfg.add_iteration_epoch_interval + 1, cfg.n_iterations)
+            n_iterations = min(
+                epoch // cfg.add_iteration_epoch_interval + 1,
+                cfg.n_iterations,
+            )
 
         forward_loss_fn = functools.partial(
-            megapose_forward_loss, model=model, cfg=cfg, n_iterations=n_iterations, mesh_db=mesh_db
+            megapose_forward_loss,
+            model=model,
+            cfg=cfg,
+            n_iterations=n_iterations,
+            mesh_db=mesh_db,
         )
 
         def train() -> None:
@@ -283,7 +326,9 @@ def train_megapose(cfg: TrainingConfig) -> None:
             set_seed(epoch * get_rank() + get_rank())
             model.train()
             pbar = tqdm(
-                range(this_rank_n_batch_per_epoch), ncols=120, disable=cfg.logging_style != "tqdm"
+                range(this_rank_n_batch_per_epoch),
+                ncols=120,
+                disable=cfg.logging_style != "tqdm",
             )
             for n in pbar:
                 start_iter = time.time()
@@ -293,7 +338,7 @@ def train_megapose(cfg: TrainingConfig) -> None:
 
                 optimizer.zero_grad()
 
-                debug_dict: Dict[str, Any] = dict()
+                debug_dict: dict[str, Any] = {}
                 timer_forward = CudaTimer(enabled=cfg.cuda_timing)
                 timer_forward.start()
                 with torch.cuda.amp.autocast():
@@ -313,7 +358,9 @@ def train_megapose(cfg: TrainingConfig) -> None:
                 scaler.scale(loss).backward()
                 scaler.unscale_(optimizer)
                 total_grad_norm = torch.nn.utils.clip_grad_norm_(
-                    model.parameters(), max_norm=cfg.clip_grad_norm, norm_type=2
+                    model.parameters(),
+                    max_norm=cfg.clip_grad_norm,
+                    norm_type=2,
                 )
                 meters["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
 
@@ -327,14 +374,14 @@ def train_megapose(cfg: TrainingConfig) -> None:
                 if n > 0:
                     meters["time_iter"].add(time_iter)
 
-                infos = dict(
-                    loss=f"{loss.item():.2e}",
-                    tf=f"{timer_forward.elapsed():.3f}",
-                    tb=f"{timer_backward.elapsed():.3f}",
-                    tr=f"{time_render:.3f}",
-                    td=f"{time_data:.3f}",
-                    tt=f"{time_iter:.3f}",
-                )
+                infos = {
+                    "loss": f"{loss.item():.2e}",
+                    "tf": f"{timer_forward.elapsed():.3f}",
+                    "tb": f"{timer_backward.elapsed():.3f}",
+                    "tr": f"{time_render:.3f}",
+                    "td": f"{time_data:.3f}",
+                    "tt": f"{time_iter:.3f}",
+                }
                 infos["it/s"] = f"{1. / time_iter:.2f}"
                 if not pbar.disable:
                     pbar.set_postfix(**infos)
@@ -360,7 +407,7 @@ def train_megapose(cfg: TrainingConfig) -> None:
             iter_val = iter(ds_iter_val)
             n_batch = (cfg.val_size // get_world_size()) // cfg.batch_size
             pbar = tqdm(range(n_batch), ncols=120)
-            for n in pbar:
+            for _n in pbar:
                 data = next(iter_val)
                 loss = forward_loss_fn(
                     data=data,
@@ -375,7 +422,7 @@ def train_megapose(cfg: TrainingConfig) -> None:
         if do_eval and ds_iter_val is not None:
             validation()
 
-        log_dict = dict()
+        log_dict = {}
         log_dict.update(
             {
                 "grad_norm": meters_train["grad_norm"].mean,
@@ -390,7 +437,7 @@ def train_megapose(cfg: TrainingConfig) -> None:
                 "time": time.time(),
                 "n_iterations": epoch * cfg.epoch_size // cfg.batch_size,
                 "n_datas": epoch * this_rank_n_batch_per_epoch * cfg.batch_size,
-            }
+            },
         )
 
         for string, meters in zip(("train", "val"), (meters_train, meters_val)):

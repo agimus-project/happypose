@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +18,6 @@ from __future__ import annotations
 
 # Standard Library
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -95,23 +93,21 @@ class InferenceConfig:
     n_refiner_iterations: int = 5
     n_pose_hypotheses: int = 5
     run_depth_refiner: bool = False
-    depth_refiner: Optional[str] = None  # ['icp', 'teaserpp']
+    depth_refiner: str | None = None  # ['icp', 'teaserpp']
     bsz_objects: int = 16  # How many parallel refiners to run
     bsz_images: int = 576  # How many images to push through coarse model
 
 
 @dataclass
 class ObservationTensor:
-    """
-
-    images: [B,C,H,W] with C=3 (rgb) or C=4 (rgbd). RGB dimensions should already
-        be normalized to be in [0,1] by diving the uint8 values by 255
+    """images: [B,C,H,W] with C=3 (rgb) or C=4 (rgbd). RGB dimensions should already
+        be normalized to be in [0,1] by diving the uint8 values by 255.
 
     K: [B,3,3] camera intrinsics
     """
 
     images: torch.Tensor  # [B,C,H,W]
-    K: Optional[torch.Tensor] = None  # [B,3,3]
+    K: torch.Tensor | None = None  # [B,3,3]
 
     def cuda(self) -> ObservationTensor:
         self.images = self.images.cuda()
@@ -122,14 +118,14 @@ class ObservationTensor:
     @property
     def batch_size(self) -> int:
         """Returns the batch size."""
-
         return self.images.shape[0]
 
     @property
     def depth(self) -> torch.tensor:
         """Returns depth tensor.
 
-        Returns:
+        Returns
+        -------
             torch.tensor with shape [B,H,W]
         """
         assert self.channel_dim == 4
@@ -141,7 +137,6 @@ class ObservationTensor:
         return self.images.shape[1]
 
     def is_valid(self) -> bool:
-
         if not self.images.ndim == 4:
             return False
 
@@ -169,18 +164,18 @@ class ObservationTensor:
     @staticmethod
     def from_numpy(
         rgb: np.ndarray,
-        depth: Optional[np.ndarray] = None,
-        K: Optional[np.ndarray] = None,
+        depth: np.ndarray | None = None,
+        K: np.ndarray | None = None,
     ) -> ObservationTensor:
         """Create an ObservationData type from numpy data.
 
         Args:
+        ----
             rgb: [H,W,3] np.uint8
             depth: [H,W] np.float
             K: [3,3] np.float
 
         """
-
         assert rgb.dtype == np.uint8
         rgb_tensor = torch.as_tensor(rgb).float() / 255
 
@@ -201,17 +196,17 @@ class ObservationTensor:
 
     @staticmethod
     def from_torch_batched(
-        rgb: torch.Tensor, depth: torch.Tensor, K: torch.Tensor
+        rgb: torch.Tensor,
+        depth: torch.Tensor,
+        K: torch.Tensor,
     ) -> ObservationTensor:
-        """
-
-        Args:
+        """Args:
+        ----
             rgb: [B,3,H,W] torch.uint8
             depth: [B,1,H,W] torch.float
-            K: [B,3,3] torch.float
+            K: [B,3,3] torch.float.
 
         """
-
         assert rgb.dtype == torch.uint8
 
         # [B,3,H,W]
@@ -221,7 +216,6 @@ class ObservationTensor:
 
         # [C,H,W]
         if depth is not None:
-
             if depth.ndim == 3:
                 depth.unsqueeze(1)
 

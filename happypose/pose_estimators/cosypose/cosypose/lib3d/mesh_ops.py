@@ -1,5 +1,5 @@
-import torch
 import numpy as np
+import torch
 
 
 def get_meshes_center(pts):
@@ -13,9 +13,18 @@ def get_meshes_center(pts):
 
 
 def get_meshes_bounding_boxes(pts):
-    xmin, xmax = pts[..., 0].min(dim=-1, keepdim=True).values, pts[..., 0].max(dim=-1, keepdim=True).values
-    ymin, ymax = pts[..., 1].min(dim=-1, keepdim=True).values, pts[..., 1].max(dim=-1, keepdim=True).values
-    zmin, zmax = pts[..., 2].min(dim=-1, keepdim=True).values, pts[..., 2].max(dim=-1, keepdim=True).values
+    xmin, xmax = (
+        pts[..., 0].min(dim=-1, keepdim=True).values,
+        pts[..., 0].max(dim=-1, keepdim=True).values,
+    )
+    ymin, ymax = (
+        pts[..., 1].min(dim=-1, keepdim=True).values,
+        pts[..., 1].max(dim=-1, keepdim=True).values,
+    )
+    zmin, zmax = (
+        pts[..., 2].min(dim=-1, keepdim=True).values,
+        pts[..., 2].max(dim=-1, keepdim=True).values,
+    )
     v0 = torch.cat((xmin, ymax, zmax), dim=-1).unsqueeze(1)
     v1 = torch.cat((xmax, ymax, zmax), dim=-1).unsqueeze(1)
     v2 = torch.cat((xmax, ymin, zmax), dim=-1).unsqueeze(1)

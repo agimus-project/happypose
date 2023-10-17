@@ -1,5 +1,7 @@
 import contextlib
+
 import numpy as np
+
 
 @contextlib.contextmanager
 def temp_numpy_seed(seed):

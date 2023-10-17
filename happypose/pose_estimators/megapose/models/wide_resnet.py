@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,20 +21,30 @@ from torch import nn
 
 
 def conv3x3(in_planes, out_planes, stride=1):
-    """3x3 convolution with padding"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
+    """3x3 convolution with padding."""
+    return nn.Conv2d(
+        in_planes,
+        out_planes,
+        kernel_size=3,
+        stride=stride,
+        padding=1,
+        bias=False,
+    )
 
 
 class BasicBlockV2(nn.Module):
     r"""BasicBlock V2 from
     `"Identity Mappings in Deep Residual Networks"<https://arxiv.org/abs/1603.05027>`_ paper.
     This is used for ResNet V2 for 18, 34 layers.
+
     Args:
+    ----
         inplanes (int): number of input channels.
         planes (int): number of output channels.
         stride (int): stride size.
         downsample (Module) optional downsample module to downsample the input.
     """
+
     expansion = 1
 
     def __init__(self, inplanes, planes, stride=1, downsample=None):
@@ -63,7 +72,12 @@ class WideResNet(nn.Module):
         config = [int(v * width) for v in (64, 128, 256, 512)]
         self.inplanes = config[0]
         self.conv1 = nn.Conv2d(
-            num_inputs, self.inplanes, kernel_size=5, stride=2, padding=2, bias=False
+            num_inputs,
+            self.inplanes,
+            kernel_size=5,
+            stride=2,
+            padding=2,
+            bias=False,
         )
         self.bn1 = nn.BatchNorm2d(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
@@ -87,14 +101,18 @@ class WideResNet(nn.Module):
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Conv2d(
-                self.inplanes, planes * block.expansion, kernel_size=1, stride=stride, bias=False
+                self.inplanes,
+                planes * block.expansion,
+                kernel_size=1,
+                stride=stride,
+                bias=False,
             )
 
         layers = [
             block(self.inplanes, planes, stride, downsample),
         ]
         self.inplanes = planes * block.expansion
-        for i in range(1, blocks):
+        for _i in range(1, blocks):
             layers.append(block(self.inplanes, planes))
 
         return nn.Sequential(*layers)
@@ -116,13 +134,23 @@ CONFIG = {18: [2, 2, 2, 2], 34: [3, 4, 6, 3]}
 
 class WideResNet18(WideResNet):
     def __init__(self, n_inputs=3, width=1.0):
-        super().__init__(block=BasicBlockV2, layers=CONFIG[18], width=width, num_inputs=n_inputs)
+        super().__init__(
+            block=BasicBlockV2,
+            layers=CONFIG[18],
+            width=width,
+            num_inputs=n_inputs,
+        )
         self.n_features = int(512 * width)
 
 
 class WideResNet34(WideResNet):
     def __init__(self, n_inputs=3, width=1.0):
-        super().__init__(block=BasicBlockV2, layers=CONFIG[34], width=width, num_inputs=n_inputs)
+        super().__init__(
+            block=BasicBlockV2,
+            layers=CONFIG[34],
+            width=width,
+            num_inputs=n_inputs,
+        )
         self.n_features = int(512 * width)
 
 

@@ -37,4 +37,3 @@ repos:
   rev: 23.3.0
   hooks:
   - id: black
-exclude: cosypose|megapose6d|happypose|experiments

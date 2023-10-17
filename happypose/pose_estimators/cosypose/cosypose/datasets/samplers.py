@@ -1,6 +1,7 @@
-import torch
 import numpy as np
+import torch
 from torch.utils.data import Sampler
+
 from happypose.pose_estimators.cosypose.cosypose.utils.random import temp_numpy_seed
 
 
@@ -14,7 +15,7 @@ class PartialSampler(Sampler):
         return self.epoch_size
 
     def __iter__(self):
-        return (i.item() for i in torch.randperm(self.n_items)[:len(self)])
+        return (i.item() for i in torch.randperm(self.n_items)[: len(self)])
 
 
 class DistributedSceneSampler(Sampler):

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,13 +14,10 @@ limitations under the License.
 """
 
 
-
 # Standard Library
-import io
 from pathlib import Path
 
 # Third Party
-import meshcat
 import numpy as np
 import trimesh
 from meshcat.geometry import (
@@ -35,12 +31,17 @@ from meshcat.geometry import (
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
 # Local Folder
-from .meshcat_utils import create_visualizer, trimesh_to_meshcat_geometry
+from .meshcat_utils import create_visualizer
 
 
 class MeshcatSceneViewer:
-    def __init__(self, obj_ds_name, use_textures=True, zmq_url="tcp://127.0.0.1:6000", clear=True):
-
+    def __init__(
+        self,
+        obj_ds_name,
+        use_textures=True,
+        zmq_url="tcp://127.0.0.1:6000",
+        clear=True,
+    ):
         self.obj_ds = make_object_dataset(obj_ds_name)
         self.label_to_object = {}
         self.visualizer = create_visualizer(zmq_url=zmq_url, clear=clear)
@@ -67,11 +68,14 @@ class MeshcatSceneViewer:
             # Needed to deal with the fact that some objects might
             # be saved as trimesh.Scene instead of trimesh.Trimesh
             if hasattr(mesh, "visual"):
-                if isinstance(mesh.visual, trimesh.visual.TextureVisuals) and self.use_textures:
+                if (
+                    isinstance(mesh.visual, trimesh.visual.TextureVisuals)
+                    and self.use_textures
+                ):
                     texture_path = f"/dev/shm/{label}_texture.png"
                     mesh.visual.material.image.save(texture_path)
                     material = MeshLambertMaterial(
-                        map=ImageTexture(image=PngImage.from_file(texture_path))
+                        map=ImageTexture(image=PngImage.from_file(texture_path)),
                     )
             self.label_to_object[label] = (geometry, material)
         return self.label_to_object[label]

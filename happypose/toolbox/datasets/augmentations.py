@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,13 +14,12 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import dataclasses
 import random
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import Union
 
 # Third Party
 import cv2
@@ -47,7 +45,10 @@ class SceneObservationTransform:
 class SceneObservationAugmentation(SceneObservationTransform):
     def __init__(
         self,
-        transform: Union[SceneObservationTransform, List["SceneObservationAugmentation"]],
+        transform: Union[
+            SceneObservationTransform,
+            list["SceneObservationAugmentation"],
+        ],
         p: float = 1.0,
     ):
         self.p = p
@@ -65,39 +66,54 @@ class SceneObservationAugmentation(SceneObservationTransform):
 
 
 class PillowRGBTransform(SceneObservationTransform):
-    def __init__(self, pillow_fn: PIL.ImageEnhance._Enhance, factor_interval: Tuple[float, float]):
+    def __init__(
+        self,
+        pillow_fn: PIL.ImageEnhance._Enhance,
+        factor_interval: tuple[float, float],
+    ):
         self.pillow_fn = pillow_fn
         self.factor_interval = factor_interval
 
     def __call__(self, obs: SceneObservation) -> SceneObservation:
         rgb_pil = PIL.Image.fromarray(obs.rgb)
-        rgb_pil = self.pillow_fn(rgb_pil).enhance(factor=random.uniform(*self.factor_interval))
+        rgb_pil = self.pillow_fn(rgb_pil).enhance(
+            factor=random.uniform(*self.factor_interval),
+        )
         obs = dataclasses.replace(obs, rgb=np.array(rgb_pil))
         return obs
 
 
 class PillowSharpness(PillowRGBTransform):
-    def __init__(self, factor_interval: Tuple[float, float] = (0.0, 50.0)):
-        super().__init__(pillow_fn=ImageEnhance.Sharpness, factor_interval=factor_interval)
+    def __init__(self, factor_interval: tuple[float, float] = (0.0, 50.0)):
+        super().__init__(
+            pillow_fn=ImageEnhance.Sharpness,
+            factor_interval=factor_interval,
+        )
 
 
 class PillowContrast(PillowRGBTransform):
-    def __init__(self, factor_interval: Tuple[float, float] = (0.2, 50.0)):
-        super().__init__(pillow_fn=ImageEnhance.Contrast, factor_interval=factor_interval)
+    def __init__(self, factor_interval: tuple[float, float] = (0.2, 50.0)):
+        super().__init__(
+            pillow_fn=ImageEnhance.Contrast,
+            factor_interval=factor_interval,
+        )
 
 
 class PillowBrightness(PillowRGBTransform):
-    def __init__(self, factor_interval: Tuple[float, float] = (0.1, 6.0)):
-        super().__init__(pillow_fn=ImageEnhance.Brightness, factor_interval=factor_interval)
+    def __init__(self, factor_interval: tuple[float, float] = (0.1, 6.0)):
+        super().__init__(
+            pillow_fn=ImageEnhance.Brightness,
+            factor_interval=factor_interval,
+        )
 
 
 class PillowColor(PillowRGBTransform):
-    def __init__(self, factor_interval: Tuple[float, float] = (0, 20.0)):
+    def __init__(self, factor_interval: tuple[float, float] = (0, 20.0)):
         super().__init__(pillow_fn=ImageEnhance.Color, factor_interval=factor_interval)
 
 
 class PillowBlur(SceneObservationTransform):
-    def __init__(self, factor_interval: Tuple[int, int] = (1, 3)):
+    def __init__(self, factor_interval: tuple[int, int] = (1, 3)):
         self.factor_interval = factor_interval
 
     def __call__(self, obs: SceneObservation) -> SceneObservation:
@@ -156,8 +172,16 @@ class DepthCorrelatedGaussianNoiseTransform(DepthTransform):
         )
 
         small_H, small_W = (np.array([H, W]) / rescale_factor).astype(int)
-        additive_noise = np.random.normal(loc=0.0, scale=self.std_dev, size=(small_H, small_W))
-        additive_noise = cv2.resize(additive_noise, (W, H), interpolation=cv2.INTER_CUBIC)
+        additive_noise = np.random.normal(
+            loc=0.0,
+            scale=self.std_dev,
+            size=(small_H, small_W),
+        )
+        additive_noise = cv2.resize(
+            additive_noise,
+            (W, H),
+            interpolation=cv2.INTER_CUBIC,
+        )
         depth[depth > 0] += additive_noise[depth > 0]
         depth = np.clip(depth, 0, np.finfo(np.float32).max)
         return depth
@@ -178,7 +202,9 @@ class DepthMissingTransform(DepthTransform):
         else:
             missing_fraction = self.max_missing_fraction
         dropout_ids = np.random.choice(
-            np.arange(len(u_idx)), int(missing_fraction * len(u_idx)), replace=False
+            np.arange(len(u_idx)),
+            int(missing_fraction * len(u_idx)),
+            replace=False,
         )
         depth[v_idx[dropout_ids], u_idx[dropout_ids]] = 0
         return depth
@@ -207,15 +233,21 @@ class DepthEllipseDropoutTransform(DepthTransform):
 
     @staticmethod
     def generate_random_ellipses(
-        depth_img: np.ndarray, noise_params: Dict[str, float]
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        depth_img: np.ndarray,
+        noise_params: dict[str, float],
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         # Sample number of ellipses to dropout
-        num_ellipses_to_dropout = np.random.poisson(noise_params["ellipse_dropout_mean"])
+        num_ellipses_to_dropout = np.random.poisson(
+            noise_params["ellipse_dropout_mean"],
+        )
 
         # Sample ellipse centers
-        nonzero_pixel_indices = np.array(np.where(depth_img > 0)).T  # Shape: [#nonzero_pixels x 2]
+        nonzero_pixel_indices = np.array(
+            np.where(depth_img > 0),
+        ).T  # Shape: [#nonzero_pixels x 2]
         dropout_centers_indices = np.random.choice(
-            nonzero_pixel_indices.shape[0], size=num_ellipses_to_dropout
+            nonzero_pixel_indices.shape[0],
+            size=num_ellipses_to_dropout,
         )
         # Shape: [num_ellipses_to_dropout x 2]
         dropout_centers = nonzero_pixel_indices[dropout_centers_indices, :]
@@ -237,7 +269,8 @@ class DepthEllipseDropoutTransform(DepthTransform):
 
     @staticmethod
     def dropout_random_ellipses(
-        depth_img: np.ndarray, noise_params: Dict[str, float]
+        depth_img: np.ndarray,
+        noise_params: dict[str, float],
     ) -> np.ndarray:
         """Randomly drop a few ellipses in the image for robustness.
 
@@ -250,7 +283,6 @@ class DepthEllipseDropoutTransform(DepthTransform):
 
         @param depth_img: a [H x W] set of depth z values
         """
-
         depth_img = depth_img.copy()
 
         (
@@ -259,7 +291,8 @@ class DepthEllipseDropoutTransform(DepthTransform):
             angles,
             dropout_centers,
         ) = DepthEllipseDropoutTransform.generate_random_ellipses(
-            depth_img, noise_params=noise_params
+            depth_img,
+            noise_params=noise_params,
         )
 
         num_ellipses_to_dropout = x_radii.shape[0]
@@ -314,12 +347,17 @@ class DepthEllipseNoiseTransform(DepthTransform):
             angles,
             dropout_centers,
         ) = DepthEllipseDropoutTransform.generate_random_ellipses(
-            depth_img, noise_params=self._noise_params
+            depth_img,
+            noise_params=self._noise_params,
         )
 
         num_ellipses_to_dropout = x_radii.shape[0]
 
-        additive_noise = np.random.normal(loc=0.0, scale=self.std_dev, size=x_radii.shape)
+        additive_noise = np.random.normal(
+            loc=0.0,
+            scale=self.std_dev,
+            size=x_radii.shape,
+        )
 
         # Dropout ellipses
         noise = np.zeros_like(depth)
@@ -347,7 +385,7 @@ class DepthEllipseNoiseTransform(DepthTransform):
 
 
 class DepthBlurTransform(DepthTransform):
-    def __init__(self, factor_interval: Tuple[int, int] = (3, 7)):
+    def __init__(self, factor_interval: tuple[int, int] = (3, 7)):
         self.factor_interval = factor_interval
 
     def _transform_depth(self, depth: np.ndarray) -> np.ndarray:
@@ -444,7 +482,12 @@ class CropResizeToAspectTransform(SceneObservationTransform):
             x0, y0 = w / 2, h / 2
             crop_box_size = (crop_h, w)
             crop_h, crop_w = min(crop_box_size), max(crop_box_size)
-            x1, y1, x2, y2 = x0 - crop_w / 2, y0 - crop_h / 2, x0 + crop_w / 2, y0 + crop_h / 2
+            x1, y1, x2, y2 = (
+                x0 - crop_w / 2,
+                y0 - crop_h / 2,
+                x0 + crop_w / 2,
+                y0 + crop_h / 2,
+            )
             box = (x1, y1, x2, y2)
             rgb_pil = rgb_pil.crop(box)
             segmentation_pil = segmentation_pil.crop(box)
@@ -463,9 +506,15 @@ class CropResizeToAspectTransform(SceneObservationTransform):
         w, h = rgb_pil.size
         w_resize, h_resize = max(self.resize), min(self.resize)
         rgb_pil = rgb_pil.resize((w_resize, h_resize), resample=PIL.Image.BILINEAR)
-        segmentation_pil = segmentation_pil.resize((w_resize, h_resize), resample=PIL.Image.NEAREST)
+        segmentation_pil = segmentation_pil.resize(
+            (w_resize, h_resize),
+            resample=PIL.Image.NEAREST,
+        )
         if depth_pil is not None:
-            depth_pil = depth_pil.resize((w_resize, h_resize), resample=PIL.Image.NEAREST)
+            depth_pil = depth_pil.resize(
+                (w_resize, h_resize),
+                resample=PIL.Image.NEAREST,
+            )
         box = (0, 0, w, h)
         new_K = get_K_crop_resize(
             torch.tensor(new_K).unsqueeze(0),
@@ -488,7 +537,10 @@ class CropResizeToAspectTransform(SceneObservationTransform):
         for obj in obs.object_datas:
             if obj.unique_id in dets_gt:
                 new_obj = dataclasses.replace(
-                    obj, bbox_modal=dets_gt[obj.unique_id], bbox_amodal=None, visib_fract=None
+                    obj,
+                    bbox_modal=dets_gt[obj.unique_id],
+                    bbox_amodal=None,
+                    visib_fract=None,
                 )
                 new_object_datas.append(new_obj)
         new_obs.object_datas = new_object_datas

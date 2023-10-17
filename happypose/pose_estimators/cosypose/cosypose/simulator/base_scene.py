@@ -1,8 +1,10 @@
 import os
+import pkgutil
 import subprocess
 import xml.etree.ElementTree as ET
-import pkgutil
+
 import pybullet as pb
+
 from .client import BulletClient
 
 
@@ -10,33 +12,52 @@ class BaseScene:
     _client_id = -1
     _client = None
     _connected = False
-    _simulation_step = 1/240.
+    _simulation_step = 1 / 240.0
 
     def connect(self, gpu_renderer=True, gui=False):
-        assert not self._connected, 'Already connected'
+        assert not self._connected, "Already connected"
         if gui:
-            self._client_id = pb.connect(pb.GUI, '--width=640 --height=480')
-            pb.configureDebugVisualizer(pb.COV_ENABLE_GUI, 1, physicsClientId=self._client_id)
-            pb.configureDebugVisualizer(pb.COV_ENABLE_RENDERING, 1, physicsClientId=self._client_id)
-            pb.configureDebugVisualizer(pb.COV_ENABLE_TINY_RENDERER, 0, physicsClientId=self._client_id)
+            self._client_id = pb.connect(pb.GUI, "--width=640 --height=480")
+            pb.configureDebugVisualizer(
+                pb.COV_ENABLE_GUI,
+                1,
+                physicsClientId=self._client_id,
+            )
+            pb.configureDebugVisualizer(
+                pb.COV_ENABLE_RENDERING,
+                1,
+                physicsClientId=self._client_id,
+            )
+            pb.configureDebugVisualizer(
+                pb.COV_ENABLE_TINY_RENDERER,
+                0,
+                physicsClientId=self._client_id,
+            )
         else:
             self._client_id = pb.connect(pb.DIRECT)
         if self._client_id < 0:
-            raise Exception('Cannot connect to pybullet')
+            msg = "Cannot connect to pybullet"
+            raise Exception(msg)
         if gpu_renderer and not gui:
-            os.environ['MESA_GL_VERSION_OVERRIDE'] = '3.3'
-            os.environ['MESA_GLSL_VERSION_OVERRIDE'] = '330'
+            os.environ["MESA_GL_VERSION_OVERRIDE"] = "3.3"
+            os.environ["MESA_GLSL_VERSION_OVERRIDE"] = "330"
             # Get EGL device
-            assert 'CUDA_VISIBLE_DEVICES' in os.environ
-            devices = os.environ.get('CUDA_VISIBLE_DEVICES', ).split(',')
+            assert "CUDA_VISIBLE_DEVICES" in os.environ
+            devices = os.environ.get("CUDA_VISIBLE_DEVICES").split(",")
             assert len(devices) == 1
-            out = subprocess.check_output(['nvidia-smi', '--id='+str(devices[0]), '-q', '--xml-format'])
+            out = subprocess.check_output(
+                ["nvidia-smi", "--id=" + str(devices[0]), "-q", "--xml-format"],
+            )
             tree = ET.fromstring(out)
-            gpu = tree.findall('gpu')[0]
-            dev_id = gpu.find('minor_number').text
-            os.environ['EGL_VISIBLE_DEVICES'] = str(dev_id)
-            egl = pkgutil.get_loader('eglRenderer')
-            pb.loadPlugin(egl.get_filename(), "_eglRendererPlugin", physicsClientId=self._client_id)
+            gpu = tree.findall("gpu")[0]
+            dev_id = gpu.find("minor_number").text
+            os.environ["EGL_VISIBLE_DEVICES"] = str(dev_id)
+            egl = pkgutil.get_loader("eglRenderer")
+            pb.loadPlugin(
+                egl.get_filename(),
+                "_eglRendererPlugin",
+                physicsClientId=self._client_id,
+            )
         pb.resetSimulation(physicsClientId=self._client_id)
         self._connected = True
         self._client = BulletClient(self._client_id)

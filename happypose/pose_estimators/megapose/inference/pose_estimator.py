@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,8 +19,7 @@ from __future__ import annotations
 # Standard Library
 import time
 from collections import defaultdict
-from dataclasses import dataclass
-from typing import Any, Optional, Tuple
+from typing import Any
 
 # Third Party
 import numpy as np
@@ -30,16 +28,10 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 
 # MegaPose
-import happypose.pose_estimators.megapose as megapose
 import happypose.toolbox.inference.utils
 import happypose.toolbox.utils.tensor_collection as tc
-from happypose.pose_estimators.megapose.inference.depth_refiner import (
-    DepthRefiner,
-)
-from happypose.pose_estimators.megapose.training.utils import (
-    CudaTimer,
-    SimpleTimer,
-)
+from happypose.pose_estimators.megapose.inference.depth_refiner import DepthRefiner
+from happypose.pose_estimators.megapose.training.utils import CudaTimer, SimpleTimer
 from happypose.toolbox.inference.pose_estimator import PoseEstimationModule
 from happypose.toolbox.inference.types import (
     DetectionsType,
@@ -54,22 +46,22 @@ from happypose.toolbox.utils.timer import Timer
 
 logger = get_logger(__name__)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class PoseEstimator(PoseEstimationModule):
     """Performs inference for pose estimation."""
 
     def __init__(
         self,
-        refiner_model: Optional[torch.nn.Module] = None,
-        coarse_model: Optional[torch.nn.Module] = None,
-        detector_model: Optional[torch.nn.Module] = None,
-        depth_refiner: Optional[DepthRefiner] = None,
+        refiner_model: torch.nn.Module | None = None,
+        coarse_model: torch.nn.Module | None = None,
+        detector_model: torch.nn.Module | None = None,
+        depth_refiner: DepthRefiner | None = None,
         bsz_objects: int = 8,
         bsz_images: int = 256,
         SO3_grid_size: int = 576,
     ) -> None:
-
         super().__init__()
         self.coarse_model = coarse_model
         self.refiner_model = refiner_model
@@ -90,7 +82,8 @@ class PoseEstimator(PoseEstimationModule):
             self.cfg = self.coarse_model.cfg
             self.mesh_db = self.coarse_model.mesh_db
         else:
-            raise ValueError("At least one of refiner_model or " " coarse_model must be specified.")
+            msg = "At least one of refiner_model or  coarse_model must be specified."
+            raise ValueError(msg)
 
         self.eval()
 
@@ -98,7 +91,7 @@ class PoseEstimator(PoseEstimationModule):
         self.keep_all_coarse_outputs = False
         self.refiner_outputs = None
         self.coarse_outputs = None
-        self.debug_dict: dict = dict()
+        self.debug_dict: dict = {}
 
     def load_SO3_grid(self, grid_size: int) -> None:
         """Loads the SO(3) grid."""
@@ -114,14 +107,14 @@ class PoseEstimator(PoseEstimationModule):
         keep_all_outputs: bool = False,
         cuda_timer: bool = False,
         **refiner_kwargs,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
         """Runs the refiner model for the specified number of iterations.
-
 
         Will actually use the batched_model_predictions to stay within
         batch size limit.
 
-        Returns:
+        Returns
+        -------
             (preds, extra_data)
 
             preds:
@@ -134,7 +127,6 @@ class PoseEstimator(PoseEstimationModule):
                 A dict containing additional information such as timing
 
         """
-
         timer = Timer()
         timer.start()
 
@@ -153,7 +145,7 @@ class PoseEstimator(PoseEstimationModule):
 
         model_time = 0.0
 
-        for (batch_idx, (batch_ids,)) in enumerate(dl):
+        for batch_idx, (batch_ids,) in enumerate(dl):
             data_TCO_input_ = data_TCO_input[batch_ids]
             df_ = data_TCO_input_.infos
             TCO_input_ = data_TCO_input_.poses
@@ -218,7 +210,8 @@ class PoseEstimator(PoseEstimationModule):
         }
 
         logger.debug(
-            f"Pose prediction on {B} poses (n_iterations={n_iterations}):" f" {timer.stop()}"
+            f"Pose prediction on {B} poses (n_iterations={n_iterations}):"
+            f" {timer.stop()}",
         )
 
         return preds, extra_data
@@ -230,16 +223,13 @@ class PoseEstimator(PoseEstimationModule):
         data_TCO: PoseEstimatesType,
         cuda_timer: bool = False,
         return_debug_data: bool = False,
-    ) -> Tuple[PoseEstimatesType, dict]:
-
+    ) -> tuple[PoseEstimatesType, dict]:
         """Score the estimates using the coarse model.
-
 
         Adds the 'pose_score' field to data_TCO.infos
 
         Modifies PandasTensorCollection in-place.
         """
-
         start_time = time.time()
 
         assert self.coarse_model is not None
@@ -290,7 +280,7 @@ class PoseEstimator(PoseEstimationModule):
                 images_crop_list.append(out_["images_crop"])
                 renders_list.append(out_["renders"])
 
-        debug_data = dict()
+        debug_data = {}
 
         # Combine together the data from the different batches
         logits = torch.cat(logits_list)
@@ -299,8 +289,8 @@ class PoseEstimator(PoseEstimationModule):
             images_crop: torch.tensor = torch.cat(images_crop_list)
             renders: torch.tensor = torch.cat(renders_list)
 
-            H = images_crop.shape[2]
-            W = images_crop.shape[3]
+            images_crop.shape[2]
+            images_crop.shape[3]
 
             debug_data = {
                 "images_crop": images_crop,
@@ -312,9 +302,7 @@ class PoseEstimator(PoseEstimationModule):
 
         elapsed = time.time() - start_time
 
-        timing_str = (
-            f"time: {elapsed:.2f}, model_time: {model_time:.2f}, render_time: {render_time:.2f}"
-        )
+        timing_str = f"time: {elapsed:.2f}, model_time: {model_time:.2f}, render_time: {render_time:.2f}"
 
         extra_data = {
             "render_time": render_time,
@@ -337,13 +325,12 @@ class PoseEstimator(PoseEstimationModule):
         detections: DetectionsType,
         cuda_timer: bool = False,
         return_debug_data: bool = False,
-    ) -> Tuple[PoseEstimatesType, dict]:
+    ) -> tuple[PoseEstimatesType, dict]:
         """Generates pose hypotheses and scores them with the coarse model.
 
         - Generates coarse hypotheses using the SO(3) grid.
         - Scores them using the coarse model.
         """
-
         start_time = time.time()
 
         happypose.toolbox.inference.types.assert_detections_valid(detections)
@@ -384,7 +371,6 @@ class PoseEstimator(PoseEstimationModule):
         TCO_init = []
 
         for (batch_ids,) in dl:
-
             # b = bsz_images
             df_ = df_hypotheses.iloc[batch_ids.cpu().numpy()]
 
@@ -418,7 +404,7 @@ class PoseEstimator(PoseEstimationModule):
             )
 
             del points_
-            
+
             out_ = coarse_model.forward_coarse(
                 images=images_,
                 K=K_,
@@ -453,7 +439,7 @@ class PoseEstimator(PoseEstimationModule):
         TCO = torch.cat(TCO_init)
         TCO_reshape = TCO.reshape([B, M, 4, 4])
 
-        debug_data = dict()
+        debug_data = {}
 
         if return_debug_data:
             images_crop = torch.cat(images_crop_list)
@@ -472,9 +458,7 @@ class PoseEstimator(PoseEstimationModule):
 
         elapsed = time.time() - start_time
 
-        timing_str = (
-            f"time: {elapsed:.2f}, model_time: {model_time:.2f}, render_time: {render_time:.2f}"
-        )
+        timing_str = f"time: {elapsed:.2f}, model_time: {model_time:.2f}, render_time: {render_time:.2f}"
 
         extra_data = {
             "render_time": render_time,
@@ -499,20 +483,23 @@ class PoseEstimator(PoseEstimationModule):
         **kwargs: Any,
     ) -> DetectionsType:
         """Runs the detector."""
-
         return self.detector_model.get_detections(observation, *args, **kwargs)
 
     def run_depth_refiner(
         self,
         observation: ObservationTensor,
         predictions: PoseEstimatesType,
-    ) -> Tuple[PoseEstimatesType, dict]:
+    ) -> tuple[PoseEstimatesType, dict]:
         """Runs the depth refiner."""
         assert self.depth_refiner is not None, "You must specify a depth refiner"
         depth = observation.depth
         K = observation.K
 
-        refined_preds, extra_data = self.depth_refiner.refine_poses(predictions, depth=depth, K=K)
+        refined_preds, extra_data = self.depth_refiner.refine_poses(
+            predictions,
+            depth=depth,
+            K=K,
+        )
 
         return refined_preds, extra_data
 
@@ -520,18 +507,18 @@ class PoseEstimator(PoseEstimationModule):
     def run_inference_pipeline(
         self,
         observation: ObservationTensor,
-        detections: Optional[DetectionsType] = None,
-        run_detector: Optional[bool] = None,
+        detections: DetectionsType | None = None,
+        run_detector: bool | None = None,
         n_refiner_iterations: int = 5,
         n_pose_hypotheses: int = 1,
         keep_all_refiner_outputs: bool = False,
-        detection_filter_kwargs: Optional[dict] = None,
+        detection_filter_kwargs: dict | None = None,
         run_depth_refiner: bool = False,
-        bsz_images: Optional[int] = None,
-        bsz_objects: Optional[int] = None,
+        bsz_images: int | None = None,
+        bsz_objects: int | None = None,
         cuda_timer: bool = False,
-        coarse_estimates: Optional[PoseEstimatesType] = None,
-    ) -> Tuple[PoseEstimatesType, dict]:
+        coarse_estimates: PoseEstimatesType | None = None,
+    ) -> tuple[PoseEstimatesType, dict]:
         """Runs the entire pose estimation pipeline.
 
         Performs the following steps
@@ -543,13 +530,13 @@ class PoseEstimator(PoseEstimationModule):
         5. Score refined hypotheses
         6. Select highest scoring refined hypotheses.
 
-        Returns:
+        Returns
+        -------
             data_TCO_final: final predictions
             data: Dict containing additional data about the different
                 steps in the pipeline.
 
         """
-
         timing_str = ""
         timer = SimpleTimer()
         timer.start()
@@ -579,7 +566,8 @@ class PoseEstimator(PoseEstimationModule):
             # Filter detections
             if detection_filter_kwargs is not None:
                 detections = happypose.toolbox.inference.utils.filter_detections(
-                    detections, **detection_filter_kwargs
+                    detections,
+                    **detection_filter_kwargs,
                 )
 
             # Run the coarse estimator using detections
@@ -592,7 +580,9 @@ class PoseEstimator(PoseEstimationModule):
 
             # Extract top-K coarse hypotheses
             data_TCO_filtered = self.filter_pose_estimates(
-                data_TCO_coarse, top_K=n_pose_hypotheses, filter_field="coarse_logit"
+                data_TCO_coarse,
+                top_K=n_pose_hypotheses,
+                filter_field="coarse_logit",
             )
         else:
             data_TCO_coarse = coarse_estimates
@@ -619,13 +609,18 @@ class PoseEstimator(PoseEstimationModule):
 
         # Extract the highest scoring pose estimate for each instance_id
         data_TCO_final_scored = self.filter_pose_estimates(
-            data_TCO_scored, top_K=1, filter_field="pose_logit"
+            data_TCO_scored,
+            top_K=1,
+            filter_field="pose_logit",
         )
 
         # Optionally run ICP or TEASER++
         if run_depth_refiner:
             depth_refiner_start = time.time()
-            data_TCO_depth_refiner, _ = self.run_depth_refiner(observation, data_TCO_final_scored)
+            data_TCO_depth_refiner, _ = self.run_depth_refiner(
+                observation,
+                data_TCO_final_scored,
+            )
             data_TCO_final = data_TCO_depth_refiner
             depth_refiner_time = time.time() - depth_refiner_start
             timing_str += f"depth refiner={depth_refiner_time:.2f}"
@@ -636,12 +631,18 @@ class PoseEstimator(PoseEstimationModule):
         timer.stop()
         timing_str = f"total={timer.elapsed():.2f}, {timing_str}"
 
-        extra_data: dict = dict()
+        extra_data: dict = {}
         extra_data["coarse"] = {"preds": data_TCO_coarse, "data": coarse_extra_data}
         extra_data["coarse_filter"] = {"preds": data_TCO_filtered}
-        extra_data["refiner_all_hypotheses"] = {"preds": preds, "data": refiner_extra_data}
+        extra_data["refiner_all_hypotheses"] = {
+            "preds": preds,
+            "data": refiner_extra_data,
+        }
         extra_data["scoring"] = {"preds": data_TCO_scored, "data": scoring_extra_data}
-        extra_data["refiner"] = {"preds": data_TCO_final_scored, "data": refiner_extra_data}
+        extra_data["refiner"] = {
+            "preds": data_TCO_final_scored,
+            "data": refiner_extra_data,
+        }
         extra_data["timing_str"] = timing_str
         extra_data["time"] = timer.elapsed()
 
@@ -662,15 +663,19 @@ class PoseEstimator(PoseEstimationModule):
         Retain only the top_K estimates corresponding to each hypothesis_id
 
         Args:
+        ----
             top_K: how many estimates to retain
             filter_field: The field to filter estimates by
         """
-
         df = data_TCO.infos
 
         group_cols = ["batch_im_id", "label", "instance_id"]
         # Logic from https://stackoverflow.com/a/40629420
-        df = df.sort_values(filter_field, ascending=ascending).groupby(group_cols).head(top_K)
+        df = (
+            df.sort_values(filter_field, ascending=ascending)
+            .groupby(group_cols)
+            .head(top_K)
+        )
 
         data_TCO_filtered = data_TCO[df.index.tolist()]
 

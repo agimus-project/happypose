@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,15 +16,15 @@ limitations under the License.
 
 # Standard Library
 import time
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Callable, Iterator, Optional
+from typing import Callable, Optional
 
 # Third Party
 import simplejson as json
 import torch
 from bokeh import document
-from bokeh.io import export_png, save
-from bokeh.io.export import get_screenshot_as_png
+from bokeh.io import save
 from omegaconf import OmegaConf
 
 # MegaPose
@@ -56,10 +55,12 @@ def cast_images(rgb: torch.Tensor, depth: Optional[torch.Tensor]) -> torch.Tenso
     """Convert rgb and depth to a single to cuda FloatTensor.
 
     Arguments:
+    ---------
         rgb: (bsz, 3, h, w) uint8 tensor, with values in [0, 1]
         depth: (bsz, h, w) float tensor, or None
 
     Returns:
+    -------
         images: (bsz, 3, h, w) RGB or (bsz, 4, h, w) RGB-D images.
     """
     rgb_tensor = cast(rgb).float() / 255
@@ -71,9 +72,10 @@ def cast_images(rgb: torch.Tensor, depth: Optional[torch.Tensor]) -> torch.Tenso
 
 
 def cast_tensor_image_to_numpy(images):
-    """Convert images to
+    """Convert images to.
 
     Args:
+    ----
         images: [B,C,H,W]
     """
     images = (images[:, :3] * 255).to(torch.uint8)
@@ -83,10 +85,10 @@ def cast_tensor_image_to_numpy(images):
 
 
 def cast_raw_numpy_images_to_tensor(images):
-    """
-    Casts numpy images to tensor.
+    """Casts numpy images to tensor.
 
     Args:
+    ----
         images: [B,H,W,C] numpy array, RGB values in [0,255], depth in meters
 
     """
@@ -99,7 +101,8 @@ def cast_raw_numpy_images_to_tensor(images):
 
     max_rgb = torch.max(images[:, RGB_DIMS])
     if max_rgb < 1.5:
-        raise Warning("You are about to divide by 255 but the max rgb pixel value is less than 1.5")
+        msg = "You are about to divide by 255 but the max rgb pixel value is less than 1.5"
+        raise Warning(msg)
 
     # [B,C,H,W]
     images = images.permute(0, 3, 1, 2).cuda().float()
@@ -109,16 +112,21 @@ def cast_raw_numpy_images_to_tensor(images):
 
 def make_optimizer(
     parameters: Iterator[torch.nn.Parameter],
-    cfg: TrainingConfig
+    cfg: TrainingConfig,
 ) -> torch.optim.Optimizer:
-
     optimizer: Optional[torch.optim.Optimizer] = None
     if cfg.optimizer == "adam":
         optimizer = torch.optim.Adam(
-            parameters, lr=cfg.lr, weight_decay=cfg.weight_decay)
+            parameters,
+            lr=cfg.lr,
+            weight_decay=cfg.weight_decay,
+        )
     elif cfg.optimizer == "sgd":
         optimizer = torch.optim.SGD(
-            parameters, lr=cfg.lr, momentum=cfg.sgd_momentum, weight_decay=cfg.weight_decay
+            parameters,
+            lr=cfg.lr,
+            momentum=cfg.sgd_momentum,
+            weight_decay=cfg.weight_decay,
         )
     else:
         raise ValueError(cfg.optimizer)
@@ -126,7 +134,6 @@ def make_optimizer(
 
 
 def make_lr_ratio_function(cfg: TrainingConfig) -> Callable:
-
     def lr_ratio(batch: int) -> float:
         this_rank_epoch_size = cfg.epoch_size // get_world_size()
         n_batch_per_epoch = this_rank_epoch_size // cfg.batch_size
@@ -179,7 +186,9 @@ def write_logs(cfg, model, epoch, log_dict=None, test_dict=None, bokeh_docs=None
             if cfg.vis_save_only_last:
                 bokeh_doc_path = bokeh_doc_dir / f"epoch=last_{bokeh_doc_postfix}.html"
             else:
-                bokeh_doc_path = bokeh_doc_dir / f"epoch={epoch}_{bokeh_doc_postfix}.html"
+                bokeh_doc_path = (
+                    bokeh_doc_dir / f"epoch={epoch}_{bokeh_doc_postfix}.html"
+                )
             if bokeh_doc_path.exists():
                 bokeh_doc_path.unlink()
             bokeh_doc = document.Document.from_json(bokeh_doc_json)
@@ -256,9 +265,11 @@ class CudaTimer:
             return 0.0
 
         if not self.start_called:
-            raise ValueError("You must call CudaTimer.start() before querying the elapsed time")
+            msg = "You must call CudaTimer.start() before querying the elapsed time"
+            raise ValueError(msg)
 
         if not self.end_called:
-            raise ValueError("You must call CudaTimer.end() before querying the elapsed time")
+            msg = "You must call CudaTimer.end() before querying the elapsed time"
+            raise ValueError(msg)
 
         return self.elapsed_sec

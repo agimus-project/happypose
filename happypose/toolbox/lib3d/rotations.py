@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@ limitations under the License.
 """
 
 
-
 # Third Party
 import numpy as np
 import torch
@@ -23,11 +21,10 @@ import transforms3d
 
 
 def compute_rotation_matrix_from_ortho6d(poses):
-    """
-    Code from https://github.com/papagina/RotationContinuity
+    """Code from https://github.com/papagina/RotationContinuity
     On the Continuity of Rotation Representations in Neural Networks
     Zhou et al. CVPR19
-    https://zhouyisjtu.github.io/project_rotation/rotation.html
+    https://zhouyisjtu.github.io/project_rotation/rotation.html.
     """
     assert poses.shape[-1] == 6
     x_raw = poses[..., 0:3]
@@ -41,9 +38,8 @@ def compute_rotation_matrix_from_ortho6d(poses):
 
 
 def euler2quat(xyz, axes="sxyz"):
-    """
-    euler: sxyz
-    quaternion: xyzw
+    """euler: sxyz
+    quaternion: xyzw.
     """
     wxyz = transforms3d.euler.euler2quat(*xyz, axes=axes)
     xyzw = [*wxyz[1:], wxyz[0]]
@@ -51,12 +47,14 @@ def euler2quat(xyz, axes="sxyz"):
 
 
 def angle_axis_to_rotation_matrix(angle_axis):
-    """Convert 3d vector of axis-angle rotation to 4x4 rotation matrix
+    """Convert 3d vector of axis-angle rotation to 4x4 rotation matrix.
 
     Args:
+    ----
         angle_axis (Tensor): tensor of 3d vector of axis-angle rotations.
 
     Returns:
+    -------
         Tensor: tensor of 4x4 rotation matrices.
 
     Shape:
@@ -64,6 +62,7 @@ def angle_axis_to_rotation_matrix(angle_axis):
         - Output: :math:`(N, 4, 4)`
 
     Example:
+    -------
         >>> input = torch.rand(1, 3)  # Nx3
         >>> output = tgm.angle_axis_to_rotation_matrix(input)  # Nx4x4
     """
@@ -88,13 +87,19 @@ def angle_axis_to_rotation_matrix(angle_axis):
         r02 = wy * sin_theta + wx * wz * (k_one - cos_theta)
         r12 = -wx * sin_theta + wy * wz * (k_one - cos_theta)
         r22 = cos_theta + wz * wz * (k_one - cos_theta)
-        rotation_matrix = torch.cat([r00, r01, r02, r10, r11, r12, r20, r21, r22], dim=1)
+        rotation_matrix = torch.cat(
+            [r00, r01, r02, r10, r11, r12, r20, r21, r22],
+            dim=1,
+        )
         return rotation_matrix.view(-1, 3, 3)
 
     def _compute_rotation_matrix_taylor(angle_axis):
         rx, ry, rz = torch.chunk(angle_axis, 3, dim=1)
         k_one = torch.ones_like(rx)
-        rotation_matrix = torch.cat([k_one, -rz, ry, rz, k_one, -rx, -ry, rx, k_one], dim=1)
+        rotation_matrix = torch.cat(
+            [k_one, -rz, ry, rz, k_one, -rx, -ry, rx, k_one],
+            dim=1,
+        )
         return rotation_matrix.view(-1, 3, 3)
 
     # stolen from ceres/rotation.h
@@ -130,9 +135,11 @@ def quaternion_to_angle_axis(quaternion: torch.Tensor) -> torch.Tensor:
     Adapted from ceres C++ library: ceres-solver/include/ceres/rotation.h
 
     Args:
+    ----
         quaternion (torch.Tensor): tensor with quaternions.
 
     Return:
+    ------
         torch.Tensor: tensor with angle axis of rotation.
 
     Shape:
@@ -140,15 +147,18 @@ def quaternion_to_angle_axis(quaternion: torch.Tensor) -> torch.Tensor:
         - Output: :math:`(*, 3)`
 
     Example:
+    -------
         >>> quaternion = torch.rand(2, 4)  # Nx4
         >>> angle_axis = tgm.quaternion_to_angle_axis(quaternion)  # Nx3
     """
     if not torch.is_tensor(quaternion):
-        raise TypeError("Input type is not a torch.Tensor. Got {}".format(type(quaternion)))
+        msg = f"Input type is not a torch.Tensor. Got {type(quaternion)}"
+        raise TypeError(msg)
 
     if not quaternion.shape[-1] == 4:
+        msg = f"Input must be a tensor of shape Nx4 or 4. Got {quaternion.shape}"
         raise ValueError(
-            "Input must be a tensor of shape Nx4 or 4. Got {}".format(quaternion.shape)
+            msg,
         )
     # unpack input and compute conversion
     q1: torch.Tensor = quaternion[..., 1]
@@ -159,7 +169,9 @@ def quaternion_to_angle_axis(quaternion: torch.Tensor) -> torch.Tensor:
     sin_theta: torch.Tensor = torch.sqrt(sin_squared_theta)
     cos_theta: torch.Tensor = quaternion[..., 0]
     two_theta: torch.Tensor = 2.0 * torch.where(
-        cos_theta < 0.0, torch.atan2(-sin_theta, -cos_theta), torch.atan2(sin_theta, cos_theta)
+        cos_theta < 0.0,
+        torch.atan2(-sin_theta, -cos_theta),
+        torch.atan2(sin_theta, cos_theta),
     )
 
     k_pos: torch.Tensor = two_theta / sin_theta

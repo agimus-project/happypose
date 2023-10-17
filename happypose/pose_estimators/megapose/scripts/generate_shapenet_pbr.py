@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,14 +19,14 @@ import json
 import os
 import shutil
 import subprocess
-from copy import deepcopy
 from pathlib import Path
-from re import I
 
 # Third Party
 import numpy as np
 import torch.distributed as dist
-import yaml
+from bop_toolkit_lib.dataset.convert_scenewise_to_imagewise import (
+    convert_scene_to_imagewise,
+)
 from colorama import Fore, Style
 from omegaconf import OmegaConf
 from tqdm import tqdm
@@ -36,7 +35,6 @@ from tqdm import tqdm
 from happypose.pose_estimators.megapose.config import (
     BLENDER_INSTALL_DIR,
     BLENDERPROC_DIR,
-    BOP_TOOLKIT_DIR,
     GSO_DIR,
     GSO_NORMALIZED_DIR,
     GSO_ORIG_DIR,
@@ -48,31 +46,22 @@ from happypose.pose_estimators.megapose.config import (
 )
 
 # from happypose.toolbox.datasets.bop import BOPDataset
-from happypose.toolbox.datasets.gso_dataset import (
-    GoogleScannedObjectDataset,
-    make_gso_infos,
-)
+from happypose.toolbox.datasets.gso_dataset import make_gso_infos
 
 # from happypose.toolbox.datasets.hdf5_scene_dataset import write_scene_ds_as_hdf5
 from happypose.toolbox.datasets.shapenet_object_dataset import (
     ShapeNetObjectDataset,
     make_shapenet_infos,
 )
-from happypose.toolbox.datasets.web_scene_dataset import write_scene_ds_as_wds
-from happypose.toolbox.utils.distributed import (
-    get_rank,
-    get_tmp_dir,
-    init_distributed_mode,
-)
+from happypose.toolbox.utils.distributed import get_rank, init_distributed_mode
 from happypose.toolbox.utils.logging import get_logger
-from bop_toolkit_lib.dataset.convert_scenewise_to_imagewise import convert_scene_to_imagewise
 
 logger = get_logger(__name__)
 
 CC_TEXTURE_FOLDER = str(LOCAL_DATA_DIR / "cctextures")
 VERBOSE_KWARGS = {
-    True: dict(stdout=None, stderr=None),
-    False: dict(stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL),
+    True: {"stdout": None, "stderr": None},
+    False: {"stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL},
 }
 SHAPENET_ORIG_DIR = SHAPENET_DIR / "models_orig"
 SHAPENET_SCALED_DIR = SHAPENET_DIR / "models_bop-renderer_scale=0.1"
@@ -105,7 +94,7 @@ def make_initializer(output_dir):
         "config": {
             "global": {
                 "output_dir": str(output_dir),
-            }
+            },
         },
     }
 
@@ -155,7 +144,7 @@ def make_box_scene(used_assets=[]):
                         "location": [0, 0, 10],
                         "scale": [3, 3, 1],
                     },
-                ]
+                ],
             },
         },
         {
@@ -171,7 +160,12 @@ def make_box_scene(used_assets=[]):
                         "min": [0.5, 0.5, 0.5, 1.0],
                         "max": [1.0, 1.0, 1.0, 1.0],
                     },
-                    "strength": {"provider": "sampler.Value", "type": "float", "min": 3, "max": 6},
+                    "strength": {
+                        "provider": "sampler.Value",
+                        "type": "float",
+                        "min": 3,
+                        "max": 6,
+                    },
                 },
             },
         },
@@ -185,7 +179,10 @@ def make_box_scene(used_assets=[]):
         {
             "module": "manipulators.EntityManipulator",
             "config": {
-                "selector": {"provider": "getter.Entity", "conditions": {"name": "ground_plane.*"}},
+                "selector": {
+                    "provider": "getter.Entity",
+                    "conditions": {"name": "ground_plane.*"},
+                },
                 "mode": "once_for_all",
                 "cf_randomize_materials": {
                     "randomization_level": 1,
@@ -200,7 +197,10 @@ def make_box_scene(used_assets=[]):
         {
             "module": "manipulators.EntityManipulator",
             "config": {
-                "selector": {"provider": "getter.Entity", "conditions": {"name": ".*plane.*"}},
+                "selector": {
+                    "provider": "getter.Entity",
+                    "conditions": {"name": ".*plane.*"},
+                },
                 "cp_physics": False,
                 "cp_physics_collision_shape": "BOX",
                 "cp_category_id": 333,
@@ -309,7 +309,10 @@ def make_object_pose_sampler():
     object_pose_sampler = {
         "module": "object.ObjectPoseSampler",
         "config": {
-            "objects_to_sample": {"provider": "getter.Entity", "conditions": {"cp_physics": True}},
+            "objects_to_sample": {
+                "provider": "getter.Entity",
+                "conditions": {"cp_physics": True},
+            },
             "pos_sampler": {
                 "provider": "sampler.Uniform3d",
                 "min": {
@@ -351,8 +354,8 @@ def make_light_sampler(radius_min=1, radius_max=1.5, energy=100):
                     },
                     "type": "POINT",
                     "energy": 100,
-                }
-            ]
+                },
+            ],
         },
     }
     return light_sampler
@@ -430,7 +433,7 @@ def make_camera_sampler(cam_intrinsics, num_samples=25, radius_min=0.4, radius_m
                             "max": 3.14159,
                         },
                     },
-                }
+                },
             ],
         },
     }
@@ -452,7 +455,9 @@ def make_writer(depth_scale=0.1, ignore_dist_thresh=5.0):
             "append_to_existing_output": False,
             "depth_scale": depth_scale,
             "ignore_dist_thres": ignore_dist_thresh,
-            "postprocessing_modules": {"distance": [{"module": "postprocessing.Dist2Depth"}]},
+            "postprocessing_modules": {
+                "distance": [{"module": "postprocessing.Dist2Depth"}],
+            },
         },
     }
 
@@ -470,9 +475,9 @@ def make_script(output_dir, objects, textures, cfg, seed):
             [fx, 0, cx],
             [0, fy, cy],
             [0, 0, 1],
-        ]
+        ],
     ).tolist()
-    intrinsics = dict(cam_K=K, resolution_x=w, resolution_y=h)
+    intrinsics = {"cam_K": K, "resolution_x": w, "resolution_y": h}
 
     modules = [
         make_initializer(output_dir),
@@ -489,7 +494,9 @@ def make_script(output_dir, objects, textures, cfg, seed):
             )
         elif obj["category_id"].startswith("gso"):
             modules += make_gso_loader(
-                obj_id=obj["obj_id"], scale=obj["scale"], category_id=obj["category_id"]
+                obj_id=obj["obj_id"],
+                scale=obj["scale"],
+                category_id=obj["category_id"],
             )
         else:
             raise ValueError(obj)
@@ -498,7 +505,10 @@ def make_script(output_dir, objects, textures, cfg, seed):
         make_material_randomization(),
         make_object_pose_sampler(),
         make_physics_positioning(),
-        make_light_sampler(radius_min=cfg.light_radius_min, radius_max=cfg.light_radius_max),
+        make_light_sampler(
+            radius_min=cfg.light_radius_min,
+            radius_max=cfg.light_radius_max,
+        ),
         make_camera_sampler(
             cam_intrinsics=intrinsics,
             num_samples=cfg.camera_num_samples_per_chunk,
@@ -523,7 +533,9 @@ def run_script(script, script_path, verbose=True):
     env["BLENDER_PROC_RANDOM_SEED"] = str(seed)
     run_path = BLENDERPROC_DIR / "run.py"
     subprocess.run(
-        [str(PYTHON_BIN_PATH), str(run_path), str(script_path)], env=env, **VERBOSE_KWARGS[verbose]
+        [str(PYTHON_BIN_PATH), str(run_path), str(script_path)],
+        env=env,
+        **VERBOSE_KWARGS[verbose],
     )
     return
 
@@ -531,7 +543,9 @@ def run_script(script, script_path, verbose=True):
 @MEMORY.cache
 def load_textures_names():
     texture_names = [
-        p.name for p in Path(CC_TEXTURE_FOLDER).iterdir() if len(list(p.glob("*2K_Color.jpg"))) > 0
+        p.name
+        for p in Path(CC_TEXTURE_FOLDER).iterdir()
+        if len(list(p.glob("*2K_Color.jpg"))) > 0
     ]
     return texture_names
 
@@ -546,26 +560,26 @@ def make_one_scene_script(cfg, output_dir, seed):
             if len(synset.parents) == 0 and len(synset.models_descendants) > 0
         ]
         objects = []
-        for n in range(cfg.n_objects):
+        for _n in range(cfg.n_objects):
             synset = np_random.choice(main_synsets)
             source_id = np_random.choice(synset.models_descendants)
-            obj = dict(
-                synset_id=synset.synset_id,
-                source_id=source_id,
-                category_id=f"shapenet_{synset.synset_id}_{source_id}",
-                scale=[cfg.scale, cfg.scale, cfg.scale],
-            )
+            obj = {
+                "synset_id": synset.synset_id,
+                "source_id": source_id,
+                "category_id": f"shapenet_{synset.synset_id}_{source_id}",
+                "scale": [cfg.scale, cfg.scale, cfg.scale],
+            }
             objects.append(obj)
     elif cfg.model_type == "gso":
         object_ids = make_gso_infos(GSO_NORMALIZED_DIR)
         objects = []
-        for n in range(cfg.n_objects):
+        for _n in range(cfg.n_objects):
             obj_id = np_random.choice(object_ids)
-            obj = dict(
-                obj_id=obj_id,
-                category_id=f"gso_{obj_id}",
-                scale=[cfg.scale, cfg.scale, cfg.scale],
-            )
+            obj = {
+                "obj_id": obj_id,
+                "category_id": f"gso_{obj_id}",
+                "scale": [cfg.scale, cfg.scale, cfg.scale],
+            }
             objects.append(obj)
     else:
         raise ValueError(cfg.model_type)
@@ -574,12 +588,15 @@ def make_one_scene_script(cfg, output_dir, seed):
     this_scene_floor_textures = [np_random.choice(textures)]
     script = make_script(output_dir, objects, this_scene_floor_textures, cfg, seed)
     script["seed"] = seed
-    scene_infos = dict(objects=objects, floor_textures=this_scene_floor_textures, seed=seed)
+    scene_infos = {
+        "objects": objects,
+        "floor_textures": this_scene_floor_textures,
+        "seed": seed,
+    }
     return scene_infos, script
 
 
 def make_masks_and_gt_infos(chunk_dir, is_shapenet=True, verbose=True):
-    bop_toolkit_dir = BOP_TOOLKIT_DIR
     env = os.environ.copy()
     # env["PYTHONPATH"] = env.get("PYTHONPATH", "") + ":" + str(bop_toolkit_dir)
     # env["COSYPOSE_DIR"] = str(PROJECT_DIR)
@@ -630,7 +647,7 @@ def make_dataset_cfg(cfg):
 
     cfg.n_scenes = 2
 
-    cfg.hardware = dict()
+    cfg.hardware = {}
     cfg.hardware.world_size = int(os.environ.get("WORLD_SIZE", 1))
     cfg.hardware.rank = int(os.environ.get("RANK", 0))
     cfg.hardware.n_proc_per_gpu = 3
@@ -667,14 +684,20 @@ def make_dataset_cfg(cfg):
     if cfg.resume_dataset is not None:
         logger.info(f"{Fore.RED}Resuming {cfg.resume_dataset} {Style.RESET_ALL}")
         resume_cfg = OmegaConf.load(
-            LOCAL_DATA_DIR / "blender_pbr_datasets" / cfg.resume_dataset / "config.yaml"
+            LOCAL_DATA_DIR
+            / "blender_pbr_datasets"
+            / cfg.resume_dataset
+            / "config.yaml",
         )
         resume_cfg = OmegaConf.merge(
-            resume_cfg, OmegaConf.masked_copy(cfg, ["resume_dataset", "hardware", "verbose"])
+            resume_cfg,
+            OmegaConf.masked_copy(cfg, ["resume_dataset", "hardware", "verbose"]),
         )
         cfg = resume_cfg
     else:
-        logger.info(f"{Fore.GREEN}Recording dataset: {cfg.dataset_id} {Style.RESET_ALL}")
+        logger.info(
+            f"{Fore.GREEN}Recording dataset: {cfg.dataset_id} {Style.RESET_ALL}",
+        )
 
     if cfg.debug:
         cfg.camera_num_samples_per_chunk = 5
@@ -703,13 +726,13 @@ def record_chunk(cfg, ds_dir, chunk_id):
 
     # Generate data with Blender
     run_script(script, script_path, verbose=cfg.verbose)
-    chunk_info = dict(
-        chunk_id=chunk_id,
-        script_path=str(script_path),
-        output_dir=str(output_dir),
-        scene_infos=scene_infos,
-        scale=cfg["scale"],
-    )
+    chunk_info = {
+        "chunk_id": chunk_id,
+        "script_path": str(script_path),
+        "output_dir": str(output_dir),
+        "scene_infos": scene_infos,
+        "scale": cfg["scale"],
+    }
     gt_path = output_dir / f"bop_data/train_pbr/{0:06d}/scene_gt.json"
     gt = json.loads(gt_path.read_text())
     for im_id, im_gt in gt.items():
@@ -721,13 +744,17 @@ def record_chunk(cfg, ds_dir, chunk_id):
 
     # Generate masks and gt infos
     success = make_masks_and_gt_infos(
-        output_dir, verbose=cfg.verbose, is_shapenet=cfg.model_type == "shapenet"
+        output_dir,
+        verbose=cfg.verbose,
+        is_shapenet=cfg.model_type == "shapenet",
     )
     # Third Party
     if success:
         chunk_scene_dir = output_dir / f"bop_data/train_pbr/{0:06d}"
         convert_scene_to_imagewise(
-            chunk_scene_dir, ds_dir / "train_pbr_v2format", f"{chunk_id:06d}_" + "{image_id:06d}"
+            chunk_scene_dir,
+            ds_dir / "train_pbr_v2format",
+            f"{chunk_id:06d}_" + "{image_id:06d}",
         )
         shutil.rmtree(output_dir)
     return
@@ -783,7 +810,9 @@ def record_chunk(cfg, ds_dir, chunk_id):
 
 
 def find_chunks_to_record(cfg, chunk_ids):
-    this_chunk_ids = np.array_split(chunk_ids, cfg.hardware.world_size)[cfg.hardware.rank].tolist()
+    this_chunk_ids = np.array_split(chunk_ids, cfg.hardware.world_size)[
+        cfg.hardware.rank
+    ].tolist()
     chunk_ids = []
     for chunk_id in this_chunk_ids:
         if not (Path(cfg.ds_dir) / f"train_pbr/{chunk_id:06d}").exists():
@@ -793,15 +822,15 @@ def find_chunks_to_record(cfg, chunk_ids):
 
 def main(cli_cfg):
     cfg = OmegaConf.create(
-        dict(
-            dataset_id="test",
-            resume_dataset=None,
-            debug=False,
-            verbose=False,
-            overwrite=False,
-            few=False,
-            chunk_ids=None,
-        )
+        {
+            "dataset_id": "test",
+            "resume_dataset": None,
+            "debug": False,
+            "verbose": False,
+            "overwrite": False,
+            "few": False,
+            "chunk_ids": None,
+        },
     )
     if cli_cfg is not None:
         cfg = OmegaConf.merge(
@@ -824,7 +853,8 @@ def main(cli_cfg):
             elif cfg.overwrite:
                 shutil.rmtree(cfg.ds_dir)
             else:
-                raise ValueError("There is already a dataset with this name")
+                msg = "There is already a dataset with this name"
+                raise ValueError(msg)
 
         if cfg.resume_dataset is None:
             ds_dir.mkdir(exist_ok=cfg.chunk_ids is not None)

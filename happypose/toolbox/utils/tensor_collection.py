@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 from pathlib import Path
 
@@ -26,16 +24,19 @@ import torch
 # MegaPose
 from happypose.toolbox.utils.distributed import get_rank, get_world_size
 
+
 def concatenate(datas):
     datas = [data for data in datas if len(data) > 0]
     if len(datas) == 0:
         return PandasTensorCollection(infos=pd.DataFrame())
     classes = [data.__class__ for data in datas]
-    assert all([class_n == classes[0] for class_n in classes])
+    assert all(class_n == classes[0] for class_n in classes)
 
-    infos = pd.concat([data.infos for data in datas], axis=0, sort=False).reset_index(drop=True)
+    infos = pd.concat([data.infos for data in datas], axis=0, sort=False).reset_index(
+        drop=True,
+    )
     tensor_keys = datas[0].tensors.keys()
-    tensors = dict()
+    tensors = {}
     for k in tensor_keys:
         tensors[k] = torch.cat([getattr(data, k) for data in datas], dim=0)
     return PandasTensorCollection(infos=infos, **tensors)
@@ -43,7 +44,7 @@ def concatenate(datas):
 
 class TensorCollection:
     def __init__(self, **kwargs):
-        self.__dict__["_tensors"] = dict()
+        self.__dict__["_tensors"] = {}
         for k, v in kwargs.items():
             self.register_tensor(k, v)
 
@@ -61,8 +62,8 @@ class TensorCollection:
         return s
 
     def __getitem__(self, ids):
-        tensors = dict()
-        for k, v in self._tensors.items():
+        tensors = {}
+        for k, _v in self._tensors.items():
             tensors[k] = getattr(self, k)[ids]
         return TensorCollection(**tensors)
 
@@ -91,7 +92,8 @@ class TensorCollection:
 
     def __setattr__(self, name, value):
         if "_tensors" not in self.__dict__:
-            raise ValueError("Please call __init__")
+            msg = "Please call __init__"
+            raise ValueError(msg)
         if name in self._tensors:
             self._tensors[name] = value
         else:
@@ -118,8 +120,8 @@ class TensorCollection:
         return self.to(torch.half)
 
     def clone(self):
-        tensors = dict()
-        for k, v in self.tensors.items():
+        tensors = {}
+        for k, _v in self.tensors.items():
             tensors[k] = getattr(self, k).clone()
         return TensorCollection(**tensors)
 
@@ -128,7 +130,7 @@ class PandasTensorCollection(TensorCollection):
     def __init__(self, infos, **tensors):
         super().__init__(**tensors)
         self.infos = infos.reset_index(drop=True)
-        self.meta = dict()
+        self.meta = {}
 
     def register_buffer(self, k, v):
         assert len(v) == len(self)

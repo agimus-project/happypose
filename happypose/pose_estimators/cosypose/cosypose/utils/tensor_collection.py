@@ -1,7 +1,12 @@
-import torch
 from pathlib import Path
+
 import pandas as pd
-from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_rank, get_world_size
+import torch
+
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
+    get_rank,
+    get_world_size,
+)
 
 
 def concatenate(datas):
@@ -9,11 +14,13 @@ def concatenate(datas):
     if len(datas) == 0:
         return PandasTensorCollection(infos=pd.DataFrame())
     classes = [data.__class__ for data in datas]
-    assert all([class_n == classes[0] for class_n in classes])
+    assert all(class_n == classes[0] for class_n in classes)
 
-    infos = pd.concat([data.infos for data in datas], axis=0, sort=False).reset_index(drop=True)
+    infos = pd.concat([data.infos for data in datas], axis=0, sort=False).reset_index(
+        drop=True,
+    )
     tensor_keys = datas[0].tensors.keys()
-    tensors = dict()
+    tensors = {}
     for k in tensor_keys:
         tensors[k] = torch.cat([getattr(data, k) for data in datas], dim=0)
     return PandasTensorCollection(infos=infos, **tensors)
@@ -21,7 +28,7 @@ def concatenate(datas):
 
 class TensorCollection:
     def __init__(self, **kwargs):
-        self.__dict__['_tensors'] = dict()
+        self.__dict__["_tensors"] = {}
         for k, v in kwargs.items():
             self.register_tensor(k, v)
 
@@ -32,15 +39,15 @@ class TensorCollection:
         del self._tensors[name]
 
     def __repr__(self):
-        s = self.__class__.__name__ + '(' '\n'
+        s = self.__class__.__name__ + "(" "\n"
         for k, t in self._tensors.items():
-            s += f'    {k}: {t.shape} {t.dtype} {t.device},\n'
-        s += ')'
+            s += f"    {k}: {t.shape} {t.dtype} {t.device},\n"
+        s += ")"
         return s
 
     def __getitem__(self, ids):
-        tensors = dict()
-        for k, v in self._tensors.items():
+        tensors = {}
+        for k, _v in self._tensors.items():
             tensors[k] = getattr(self, k)[ids]
         return TensorCollection(**tensors)
 
@@ -61,15 +68,16 @@ class TensorCollection:
         return list(self.tensors.values())[0].device
 
     def __getstate__(self):
-        return {'tensors': self.tensors}
+        return {"tensors": self.tensors}
 
     def __setstate__(self, state):
-        self.__init__(**state['tensors'])
+        self.__init__(**state["tensors"])
         return
 
     def __setattr__(self, name, value):
-        if '_tensors' not in self.__dict__:
-            raise ValueError('Please call __init__')
+        if "_tensors" not in self.__dict__:
+            msg = "Please call __init__"
+            raise ValueError(msg)
         if name in self._tensors:
             self._tensors[name] = value
         else:
@@ -81,10 +89,10 @@ class TensorCollection:
         return self
 
     def cuda(self):
-        return self.to('cuda')
+        return self.to("cuda")
 
     def cpu(self):
-        return self.to('cpu')
+        return self.to("cpu")
 
     def float(self):
         return self.to(torch.float)
@@ -96,8 +104,8 @@ class TensorCollection:
         return self.to(torch.half)
 
     def clone(self):
-        tensors = dict()
-        for k, v in self.tensors.items():
+        tensors = {}
+        for k, _v in self.tensors.items():
             tensors[k] = getattr(self, k).clone()
         return TensorCollection(**tensors)
 
@@ -106,14 +114,14 @@ class PandasTensorCollection(TensorCollection):
     def __init__(self, infos, **tensors):
         super().__init__(**tensors)
         self.infos = infos.reset_index(drop=True)
-        self.meta = dict()
+        self.meta = {}
 
     def register_buffer(self, k, v):
         assert len(v) == len(self)
         super().register_buffer()
 
     def merge_df(self, df, *args, **kwargs):
-        infos = self.infos.merge(df, how='left', *args, **kwargs)
+        infos = self.infos.merge(df, how="left", *args, **kwargs)
         assert len(infos) == len(self.infos)
         assert (infos.index == self.infos.index).all()
         return PandasTensorCollection(infos=infos, **self.tensors)
@@ -123,12 +131,12 @@ class PandasTensorCollection(TensorCollection):
         return PandasTensorCollection(self.infos.copy(), **tensors)
 
     def __repr__(self):
-        s = self.__class__.__name__ + '(' '\n'
+        s = self.__class__.__name__ + "(" "\n"
         for k, t in self._tensors.items():
-            s += f'    {k}: {t.shape} {t.dtype} {t.device},\n'
+            s += f"    {k}: {t.shape} {t.dtype} {t.device},\n"
         s += f"{'-'*40}\n"
-        s += '    infos:\n' + self.infos.__repr__() + '\n'
-        s += ')'
+        s += "    infos:\n" + self.infos.__repr__() + "\n"
+        s += ")"
         return s
 
     def __getitem__(self, ids):
@@ -141,7 +149,7 @@ class PandasTensorCollection(TensorCollection):
 
     def gather_distributed(self, tmp_dir=None):
         rank, world_size = get_rank(), get_world_size()
-        tmp_file_template = (tmp_dir / 'rank={rank}.pth.tar').as_posix()
+        tmp_file_template = (tmp_dir / "rank={rank}.pth.tar").as_posix()
 
         if rank > 0:
             tmp_file = tmp_file_template.format(rank=rank)
@@ -164,11 +172,11 @@ class PandasTensorCollection(TensorCollection):
 
     def __getstate__(self):
         state = super().__getstate__()
-        state['infos'] = self.infos
-        state['meta'] = self.meta
+        state["infos"] = self.infos
+        state["meta"] = self.meta
         return state
 
     def __setstate__(self, state):
-        self.__init__(state['infos'], **state['tensors'])
-        self.meta = state['meta']
+        self.__init__(state["infos"], **state["tensors"])
+        self.meta = state["meta"]
         return

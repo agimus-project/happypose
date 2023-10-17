@@ -1,84 +1,75 @@
-
 # Standard Library
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 # Third Party
 import torch
+import yaml
 from omegaconf import OmegaConf
 
 # MegaPose
 import happypose
-import happypose.pose_estimators.megapose as megapose
 import happypose.pose_estimators.megapose.evaluation.evaluation_runner
 import happypose.toolbox.datasets.datasets_cfg
 import happypose.toolbox.inference.utils
-from happypose.pose_estimators.megapose.evaluation.eval_config import (
-    EvalConfig,
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
+from happypose.pose_estimators.cosypose.cosypose.evaluation.prediction_runner import (
+    PredictionRunner,
 )
+from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
+from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
+    PoseEstimator,
+)
+
+# Detection
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
+    check_update_config as check_update_config_detector,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
+    create_model_detector,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
+    check_update_config as check_update_config_pose,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
+    create_model_coarse,
+    create_model_refiner,
+)
+from happypose.pose_estimators.megapose.evaluation.eval_config import EvalConfig
 from happypose.pose_estimators.megapose.evaluation.evaluation_runner import (
     EvaluationRunner,
 )
 from happypose.pose_estimators.megapose.evaluation.meters.modelnet_meters import (
     ModelNetErrorMeter,
 )
-from happypose.pose_estimators.cosypose.cosypose.evaluation.prediction_runner import (
-    PredictionRunner,
-)
-from happypose.pose_estimators.megapose.evaluation.runner_utils import (
-    format_results,
-)
-from happypose.pose_estimators.megapose.inference.depth_refiner import (
-    DepthRefiner,
-)
-from happypose.pose_estimators.megapose.inference.icp_refiner import (
-    ICPRefiner,
-)
-from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
-    PoseEstimator,
-)
+from happypose.pose_estimators.megapose.evaluation.runner_utils import format_results
+from happypose.pose_estimators.megapose.inference.icp_refiner import ICPRefiner
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 
+# Pose estimator
 # from happypose.pose_estimators.megapose.inference.teaserpp_refiner import TeaserppRefiner
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir
 from happypose.toolbox.utils.logging import get_logger
 
 # """" Temporary imports
 
-from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, RESULTS_DIR
 
-# Pose estimator
-from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import create_model_refiner, create_model_coarse
-from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import check_update_config as check_update_config_pose
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import BulletBatchRenderer
-from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor import CoarseRefinePosePredictor
-from happypose.pose_estimators.cosypose.cosypose.integrated.multiview_predictor import MultiviewScenePredictor
-from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import MultiViewWrapper
-import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
-# Detection
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import create_model_detector
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import check_update_config as check_update_config_detector
-from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
-
-from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-
-import yaml
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 logger = get_logger(__name__)
+
 
 def load_detector(run_id, ds_name):
     run_dir = EXP_DIR / run_id
     # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
-    cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.UnsafeLoader)
+    cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config_detector(cfg)
     label_to_category_id = cfg.label_to_category_id
     model = create_model_detector(cfg, len(label_to_category_id))
-    ckpt = torch.load(run_dir / 'checkpoint.pth.tar', map_location=device)
-    ckpt = ckpt['state_dict']
+    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)
+    ckpt = ckpt["state_dict"]
     model.load_state_dict(ckpt)
     model = model.to(device).eval()
     model.cfg = cfg
@@ -86,43 +77,51 @@ def load_detector(run_id, ds_name):
     model = Detector(model, ds_name)
     return model
 
+
 def load_pose_models(coarse_run_id, refiner_run_id, n_workers):
     run_dir = EXP_DIR / coarse_run_id
     # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
-    cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.UnsafeLoader)
+    cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config_pose(cfg)
     # object_ds = BOPObjectDataset(BOP_DS_DIR / 'tless/models_cad')
-    #object_ds = make_object_dataset(cfg.object_ds_name)
-    #mesh_db = MeshDataBase.from_object_ds(object_ds)
-    #renderer = BulletBatchRenderer(object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer)
+    # object_ds = make_object_dataset(cfg.object_ds_name)
+    # mesh_db = MeshDataBase.from_object_ds(object_ds)
+    # renderer = BulletBatchRenderer(object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer)
     #
-    
+
     object_dataset = make_object_dataset("ycbv")
     mesh_db = MeshDataBase.from_object_ds(object_dataset)
-    renderer = Panda3dBatchRenderer(object_dataset, n_workers=n_workers, preload_cache=False)
+    renderer = Panda3dBatchRenderer(
+        object_dataset,
+        n_workers=n_workers,
+        preload_cache=False,
+    )
     mesh_db_batched = mesh_db.batched().to(device)
 
     def load_model(run_id):
         run_dir = EXP_DIR / run_id
         # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
-        cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.UnsafeLoader)
+        cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
         cfg = check_update_config_pose(cfg)
         if cfg.train_refiner:
-            model = create_model_refiner(cfg, renderer=renderer, mesh_db=mesh_db_batched)
+            model = create_model_refiner(
+                cfg,
+                renderer=renderer,
+                mesh_db=mesh_db_batched,
+            )
         else:
             model = create_model_coarse(cfg, renderer=renderer, mesh_db=mesh_db_batched)
-        ckpt = torch.load(run_dir / 'checkpoint.pth.tar', map_location=device)
-        ckpt = ckpt['state_dict']
+        ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)
+        ckpt = ckpt["state_dict"]
         model.load_state_dict(ckpt)
         model = model.to(device).eval()
         model.cfg = cfg
         model.config = cfg
         return model
-    
+
     coarse_model = load_model(coarse_run_id)
     refiner_model = load_model(refiner_run_id)
     return coarse_model, refiner_model, mesh_db
-
 
 
 def generate_save_key(detection_type: str, coarse_estimation_type: str) -> str:
@@ -132,15 +131,18 @@ def generate_save_key(detection_type: str, coarse_estimation_type: str) -> str:
 def get_save_dir(cfg: EvalConfig) -> Path:
     """Returns a save dir.
 
-    Example
-
+    Example:
+    -------
     .../ycbv.bop19/gt+SO3_grid
 
     You must remove the '.bop19' from the name in order for the
     bop_toolkit_lib to process it correctly.
 
     """
-    save_key = generate_save_key(cfg.inference.detection_type, cfg.inference.coarse_estimation_type)
+    save_key = generate_save_key(
+        cfg.inference.detection_type,
+        cfg.inference.coarse_estimation_type,
+    )
 
     assert cfg.save_dir is not None
     assert cfg.ds_name is not None
@@ -151,7 +153,7 @@ def get_save_dir(cfg: EvalConfig) -> Path:
 def run_eval(
     cfg: EvalConfig,
     save_dir: Optional[Path] = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run eval for a single setting on a single dataset.
 
     A single setting is a (detection_type, coarse_estimation_type) such
@@ -161,12 +163,15 @@ def run_eval(
 
     cfg.save_dir / ds_name / eval_key / results.pth.tar
 
-    Returns:
+    Returns
+    -------
         dict: If you are rank_0 process, otherwise returns None
 
     """
-
-    save_key = generate_save_key(cfg.inference.detection_type, cfg.inference.coarse_estimation_type)
+    save_key = generate_save_key(
+        cfg.inference.detection_type,
+        cfg.inference.coarse_estimation_type,
+    )
     if save_dir is None:
         save_dir = get_save_dir(cfg)
 
@@ -175,13 +180,20 @@ def run_eval(
     logger.info(f"Running eval on ds_name={cfg.ds_name} with setting={save_key}")
 
     # Load the dataset
-    ds_kwargs = dict(load_depth=False)
-    scene_ds = happypose.toolbox.datasets.datasets_cfg.make_scene_dataset(cfg.ds_name, **ds_kwargs)
-    urdf_ds_name, obj_ds_name = happypose.toolbox.datasets.datasets_cfg.get_obj_ds_info(cfg.ds_name)
+    ds_kwargs = {"load_depth": False}
+    scene_ds = happypose.toolbox.datasets.datasets_cfg.make_scene_dataset(
+        cfg.ds_name,
+        **ds_kwargs,
+    )
+    urdf_ds_name, obj_ds_name = happypose.toolbox.datasets.datasets_cfg.get_obj_ds_info(
+        cfg.ds_name,
+    )
 
     # drop frames if this was specified
     if cfg.n_frames is not None:
-        scene_ds.frame_index = scene_ds.frame_index[: cfg.n_frames].reset_index(drop=True)
+        scene_ds.frame_index = scene_ds.frame_index[: cfg.n_frames].reset_index(
+            drop=True,
+        )
 
     # Load detector model
     if cfg.inference.detection_type == "detector":
@@ -190,7 +202,8 @@ def run_eval(
     elif cfg.inference.detection_type == "gt":
         detector_model = None
     else:
-        raise ValueError(f"Unknown detection_type={cfg.inference.detection_type}")
+        msg = f"Unknown detection_type={cfg.inference.detection_type}"
+        raise ValueError(msg)
 
     # Load the coarse and mrefiner models
     # Needed to deal with the fact that str and Optional[str] are incompatible types.
@@ -210,25 +223,23 @@ def run_eval(
     """
     object_ds = make_object_dataset(obj_ds_name)
 
-
     coarse_model, refiner_model, mesh_db = load_pose_models(
         coarse_run_id=cfg.coarse_run_id,
         refiner_run_id=cfg.refiner_run_id,
         n_workers=8,
     )
 
-
     renderer = refiner_model.renderer
 
     if cfg.inference.run_depth_refiner:
         if cfg.inference.depth_refiner == "icp":
-            depth_refiner: Optional[DepthRefiner] = ICPRefiner(mesh_db, renderer)
+            ICPRefiner(mesh_db, renderer)
         elif cfg.inference.depth_refiner == "teaserpp":
-            depth_refiner = TeaserppRefiner(mesh_db, renderer)
+            TeaserppRefiner(mesh_db, renderer)
         else:
-            depth_refiner = None
+            pass
     else:
-        depth_refiner = None
+        pass
 
     pose_estimator = PoseEstimator(
         refiner_model=refiner_model,
@@ -260,7 +271,7 @@ def run_eval(
     # Compute eval metrics
     # TODO (lmanuelli): Fix this up.
     # TODO (ylabbe): Clean this.
-    eval_metrics, eval_dfs = dict(), dict()
+    eval_metrics, eval_dfs = {}, {}
     if not cfg.skip_evaluation:
         assert "modelnet" in cfg.ds_name
         object_ds = make_object_dataset(obj_ds_name)

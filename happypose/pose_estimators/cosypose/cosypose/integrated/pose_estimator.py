@@ -1,22 +1,19 @@
 import time
 from collections import defaultdict
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
-import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
+import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import (
     TCO_init_from_boxes,
     TCO_init_from_boxes_zup_autodepth,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.utils.timer import Timer
-from happypose.pose_estimators.megapose.training.utils import (
-    CudaTimer,
-    SimpleTimer,
-)
+from happypose.pose_estimators.megapose.training.utils import CudaTimer, SimpleTimer
 from happypose.toolbox.inference.pose_estimator import PoseEstimationModule
 from happypose.toolbox.inference.types import (
     DetectionsType,
@@ -27,7 +24,8 @@ from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 
 logger = get_logger(__name__)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class PoseEstimator(PoseEstimationModule):
     """Performs inference for pose estimation."""
@@ -37,22 +35,21 @@ class PoseEstimator(PoseEstimationModule):
         refiner_model: Optional[torch.nn.Module] = None,
         coarse_model: Optional[torch.nn.Module] = None,
         detector_model: Optional[torch.nn.Module] = None,
-        #depth_refiner: Optional[DepthRefiner] = None,
+        # depth_refiner: Optional[DepthRefiner] = None,
         bsz_objects: int = 8,
         bsz_images: int = 256,
-        #SO3_grid_size: int = 576,
+        # SO3_grid_size: int = 576,
     ) -> None:
-
         super().__init__()
         self.coarse_model = coarse_model
         self.refiner_model = refiner_model
         self.detector_model = detector_model
-        #self.depth_refiner = depth_refiner
+        # self.depth_refiner = depth_refiner
         self.bsz_objects = bsz_objects
         self.bsz_images = bsz_images
 
         # Load the SO3 grid if was passed in
-        #if SO3_grid_size is not None:
+        # if SO3_grid_size is not None:
         #    self.load_SO3_grid(SO3_grid_size)
 
         # load cfg and mesh_db from refiner model
@@ -63,7 +60,8 @@ class PoseEstimator(PoseEstimationModule):
             self.cfg = self.coarse_model.cfg
             self.mesh_db = self.coarse_model.mesh_db
         else:
-            raise ValueError("At least one of refiner_model or " " coarse_model must be specified.")
+            msg = "At least one of refiner_model or  coarse_model must be specified."
+            raise ValueError(msg)
 
         self.eval()
 
@@ -71,7 +69,7 @@ class PoseEstimator(PoseEstimationModule):
         self.keep_all_coarse_outputs = False
         self.refiner_outputs = None
         self.coarse_outputs = None
-        self.debug_dict: dict = dict()
+        self.debug_dict: dict = {}
 
     @torch.no_grad()
     def batched_model_predictions(self, model, images, K, obj_data, n_iterations=1):
@@ -84,40 +82,49 @@ class PoseEstimator(PoseEstimationModule):
         dl = DataLoader(ds, batch_size=self.bsz_objects)
 
         preds = defaultdict(list)
-        for (batch_ids, ) in dl:
+        for (batch_ids,) in dl:
             timer.resume()
             obj_inputs = obj_data[batch_ids.numpy()]
-            labels = obj_inputs.infos['label'].values
-            im_ids = obj_inputs.infos['batch_im_id'].values
+            labels = obj_inputs.infos["label"].values
+            im_ids = obj_inputs.infos["batch_im_id"].values
             images_ = images[im_ids]
             K_ = K[im_ids]
             TCO_input = obj_inputs.poses
-            outputs = model(images=images_, K=K_, TCO=TCO_input,
-                            n_iterations=n_iterations, labels=labels)
+            outputs = model(
+                images=images_,
+                K=K_,
+                TCO=TCO_input,
+                n_iterations=n_iterations,
+                labels=labels,
+            )
             timer.pause()
-            for n in range(1, n_iterations+1):
-                iter_outputs = outputs[f'iteration={n}']
+            for n in range(1, n_iterations + 1):
+                iter_outputs = outputs[f"iteration={n}"]
 
                 infos = obj_inputs.infos
-                batch_preds = tc.PandasTensorCollection(infos,
-                                                        poses=iter_outputs['TCO_output'],
-                                                        poses_input=iter_outputs['TCO_input'],
-                                                        K_crop=iter_outputs['K_crop'],
-                                                        boxes_rend=iter_outputs['boxes_rend'],
-                                                        boxes_crop=iter_outputs['boxes_crop'])
-                preds[f'iteration={n}'].append(batch_preds)
+                batch_preds = tc.PandasTensorCollection(
+                    infos,
+                    poses=iter_outputs["TCO_output"],
+                    poses_input=iter_outputs["TCO_input"],
+                    K_crop=iter_outputs["K_crop"],
+                    boxes_rend=iter_outputs["boxes_rend"],
+                    boxes_crop=iter_outputs["boxes_crop"],
+                )
+                preds[f"iteration={n}"].append(batch_preds)
 
-        logger.debug(f'Pose prediction on {len(obj_data)} detections (n_iterations={n_iterations}): {timer.stop()}')
+        logger.debug(
+            f"Pose prediction on {len(obj_data)} detections (n_iterations={n_iterations}): {timer.stop()}",
+        )
         preds = dict(preds)
         for k, v in preds.items():
             preds[k] = tc.concatenate(v)
         return preds
 
     def make_TCO_init(self, detections, K):
-        K = K[detections.infos['batch_im_id'].values]
+        K = K[detections.infos["batch_im_id"].values]
         boxes = detections.bboxes
-        if self.coarse_model.cfg.init_method == 'z-up+auto-depth':
-            meshes = self.coarse_model.mesh_db.select(detections.infos['label'])
+        if self.coarse_model.cfg.init_method == "z-up+auto-depth":
+            meshes = self.coarse_model.mesh_db.select(detections.infos["label"])
             points_3d = meshes.sample_points(2000, deterministic=True)
             TCO_init = TCO_init_from_boxes_zup_autodepth(boxes, points_3d, K)
         else:
@@ -138,8 +145,7 @@ class PoseEstimator(PoseEstimationModule):
         coarse_estimates: Optional[PoseEstimatesType] = None,
         detection_th: float = 0.7,
         mask_th: float = 0.8,
-    ) -> Tuple[PoseEstimatesType, dict]:
-        
+    ) -> tuple[PoseEstimatesType, dict]:
         timing_str = ""
         timer = SimpleTimer()
         timer.start()
@@ -156,52 +162,65 @@ class PoseEstimator(PoseEstimationModule):
             )
             if detections is None and run_detector:
                 start_time = time.time()
-                detections = self.forward_detection_model(observation, detection_th, mask_th)
+                detections = self.forward_detection_model(
+                    observation,
+                    detection_th,
+                    mask_th,
+                )
                 if torch.cuda.is_available():
                     detections = detections.cuda()
                 else:
                     detections = detections
                 elapsed = time.time() - start_time
                 timing_str += f"detection={elapsed:.2f}, "
-        
-        preds = dict()
+
+        preds = {}
         if data_TCO_init is None:
             assert detections is not None
             assert self.coarse_model is not None
             assert n_coarse_iterations > 0
             K = observation.K
             data_TCO_init = self.make_TCO_init(detections, K)
-            coarse_preds, coarse_extra_data = self.forward_coarse_model(observation, data_TCO_init,
-                                                          n_iterations=n_coarse_iterations)
+            coarse_preds, coarse_extra_data = self.forward_coarse_model(
+                observation,
+                data_TCO_init,
+                n_iterations=n_coarse_iterations,
+            )
             for n in range(1, n_coarse_iterations + 1):
-                preds[f'coarse/iteration={n}'] = coarse_preds[f'iteration={n}']
-            data_TCO_coarse = coarse_preds[f'iteration={n_coarse_iterations}']
+                preds[f"coarse/iteration={n}"] = coarse_preds[f"iteration={n}"]
+            data_TCO_coarse = coarse_preds[f"iteration={n_coarse_iterations}"]
         else:
             assert n_coarse_iterations == 0
             data_TCO = data_TCO_init
-            preds[f'external_coarse'] = data_TCO
+            preds["external_coarse"] = data_TCO
             data_TCO_coarse = data_TCO
 
         if n_refiner_iterations >= 1:
             assert self.refiner_model is not None
-            refiner_preds, refiner_extra_data = self.forward_refiner(observation, data_TCO_coarse,
-                                                           n_iterations=n_refiner_iterations)
+            refiner_preds, refiner_extra_data = self.forward_refiner(
+                observation,
+                data_TCO_coarse,
+                n_iterations=n_refiner_iterations,
+            )
             for n in range(1, n_refiner_iterations + 1):
-                preds[f'refiner/iteration={n}'] = refiner_preds[f'iteration={n}']
-            data_TCO = refiner_preds[f'iteration={n_refiner_iterations}']
-        
+                preds[f"refiner/iteration={n}"] = refiner_preds[f"iteration={n}"]
+            data_TCO = refiner_preds[f"iteration={n_refiner_iterations}"]
+
         timer.stop()
         timing_str = f"total={timer.elapsed():.2f}, {timing_str}"
 
-        extra_data: dict = dict()
+        extra_data: dict = {}
         extra_data["coarse"] = {"preds": data_TCO_coarse, "data": coarse_extra_data}
-        extra_data["refiner_all_hypotheses"] = {"preds": preds, "data": refiner_extra_data}
+        extra_data["refiner_all_hypotheses"] = {
+            "preds": preds,
+            "data": refiner_extra_data,
+        }
         extra_data["refiner"] = {"preds": data_TCO, "data": refiner_extra_data}
         extra_data["timing_str"] = timing_str
         extra_data["time"] = timer.elapsed()
 
         return data_TCO, extra_data
-    
+
     def forward_detection_model(
         self,
         observation: ObservationTensor,
@@ -210,18 +229,15 @@ class PoseEstimator(PoseEstimationModule):
         *args: Any,
         **kwargs: Any,
     ) -> DetectionsType:
-        
         """Runs the detector."""
-        
         detections = self.detector_model.get_detections(
             observation=observation,
             one_instance_per_class=False,
-            detection_th=detection_th, 
+            detection_th=detection_th,
             output_masks=False,
-            mask_th=mask_th
+            mask_th=mask_th,
         )
         return detections
-
 
     @torch.no_grad()
     def forward_coarse_model(
@@ -231,14 +247,14 @@ class PoseEstimator(PoseEstimationModule):
         n_iterations: int = 5,
         keep_all_outputs: bool = False,
         cuda_timer: bool = False,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
         """Runs the refiner model for the specified number of iterations.
-
 
         Will actually use the batched_model_predictions to stay within
         batch size limit.
 
-        Returns:
+        Returns
+        -------
             (preds, extra_data)
 
             preds:
@@ -251,7 +267,6 @@ class PoseEstimator(PoseEstimationModule):
                 A dict containing additional information such as timing
 
         """
-
         timer = Timer()
         timer.start()
 
@@ -268,7 +283,7 @@ class PoseEstimator(PoseEstimationModule):
 
         model_time = 0.0
 
-        for (batch_idx, (batch_ids,)) in enumerate(dl):
+        for batch_idx, (batch_ids,) in enumerate(dl):
             data_TCO_input_ = data_TCO_input[batch_ids]
             df_ = data_TCO_input_.infos
             TCO_input_ = data_TCO_input_.poses
@@ -284,7 +299,7 @@ class PoseEstimator(PoseEstimationModule):
             K_ = observation.K[batch_im_ids_]
             if torch.cuda.is_available():
                 timer_ = CudaTimer(enabled=cuda_timer)
-            else: 
+            else:
                 timer_ = SimpleTimer()
             timer_.start()
             outputs_ = self.coarse_model(
@@ -341,14 +356,14 @@ class PoseEstimator(PoseEstimationModule):
         n_iterations: int = 5,
         keep_all_outputs: bool = False,
         cuda_timer: bool = False,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
         """Runs the refiner model for the specified number of iterations.
-
 
         Will actually use the batched_model_predictions to stay within
         batch size limit.
 
-        Returns:
+        Returns
+        -------
             (preds, extra_data)
 
             preds:
@@ -361,7 +376,6 @@ class PoseEstimator(PoseEstimationModule):
                 A dict containing additional information such as timing
 
         """
-
         timer = Timer()
         timer.start()
 
@@ -378,7 +392,7 @@ class PoseEstimator(PoseEstimationModule):
 
         model_time = 0.0
 
-        for (batch_idx, (batch_ids,)) in enumerate(dl):
+        for batch_idx, (batch_ids,) in enumerate(dl):
             data_TCO_input_ = data_TCO_input[batch_ids]
             df_ = data_TCO_input_.infos
             TCO_input_ = data_TCO_input_.poses
@@ -394,7 +408,7 @@ class PoseEstimator(PoseEstimationModule):
             K_ = observation.K[batch_im_ids_]
             if torch.cuda.is_available():
                 timer_ = CudaTimer(enabled=cuda_timer)
-            else: 
+            else:
                 timer_ = SimpleTimer()
             timer_.start()
             outputs_ = self.refiner_model(
@@ -442,7 +456,8 @@ class PoseEstimator(PoseEstimationModule):
         }
 
         logger.debug(
-            f"Pose prediction on {B} poses (n_iterations={n_iterations}):" f" {timer.stop()}"
+            f"Pose prediction on {B} poses (n_iterations={n_iterations}):"
+            f" {timer.stop()}",
         )
 
         return preds, extra_data

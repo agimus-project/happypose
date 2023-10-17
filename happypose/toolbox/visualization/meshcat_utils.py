@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,14 +14,12 @@ limitations under the License.
 """
 
 
-
 # Third Party
 import meshcat
 import meshcat.geometry as g
 import meshcat.transformations as mtf
 import numpy as np
 import trimesh
-import trimesh.transformations as tra
 
 """
 Some code borrowed from https://github.com/google-research/ravens
@@ -35,7 +32,9 @@ def isRotationMatrix(M, tol=1e-4):
     tag = False
     I = np.identity(M.shape[0])
 
-    if (np.linalg.norm((np.matmul(M, M.T) - I)) < tol) and (np.abs(np.linalg.det(M) - 1) < tol):
+    if (np.linalg.norm(np.matmul(M, M.T) - I) < tol) and (
+        np.abs(np.linalg.det(M) - 1) < tol
+    ):
         tag = True
 
     if tag is False:
@@ -52,7 +51,6 @@ def trimesh_to_meshcat_geometry(mesh, use_vertex_colors=False):
     Args:
         mesh: trimesh.TriMesh object
     """
-
     if use_vertex_colors:
         visual = mesh.visual
         if isinstance(visual, trimesh.visual.TextureVisuals):
@@ -62,17 +60,21 @@ def trimesh_to_meshcat_geometry(mesh, use_vertex_colors=False):
         vertex_colors = vertex_colors / 255.0
     else:
         vertex_colors = None
-    return meshcat.geometry.TriangularMeshGeometry(mesh.vertices, mesh.faces, vertex_colors)
+    return meshcat.geometry.TriangularMeshGeometry(
+        mesh.vertices,
+        mesh.faces,
+        vertex_colors,
+    )
 
 
 def rgb2hex(rgb):
-    """
-    Converts rgb color to hex
+    """Converts rgb color to hex.
 
     Args:
+    ----
         rgb: color in rgb, e.g. (255,0,0)
     """
-    return "0x%02x%02x%02x" % (rgb)
+    return "0x{:02x}{:02x}{:02x}".format(*rgb)
 
 
 def visualize_mesh(vis, mesh, transform=None, color=None, texture_png=None):
@@ -93,7 +95,7 @@ def visualize_mesh(vis, mesh, transform=None, color=None, texture_png=None):
 
     if texture_png is not None:
         material = g.MeshLambertMaterial(
-            map=g.ImageTexture(image=g.PngImage.from_file(texture_png))
+            map=g.ImageTexture(image=g.PngImage.from_file(texture_png)),
         )
         print("material")
 
@@ -103,9 +105,7 @@ def visualize_mesh(vis, mesh, transform=None, color=None, texture_png=None):
 
 
 def visualize_scene(vis, object_dict, randomize_color=True):
-
     for name, data in object_dict.items():
-
         # try assigning a random color
         if randomize_color:
             if "color" in data:
@@ -135,7 +135,7 @@ def visualize_scene(vis, object_dict, randomize_color=True):
 def create_visualizer(clear=True, zmq_url="tcp://127.0.0.1:6000"):
     print(
         "Waiting for meshcat server... have you started a server? Run `meshcat-server` to start a"
-        f" server. Communicating on zmq_url={zmq_url}"
+        f" server. Communicating on zmq_url={zmq_url}",
     )
     vis = meshcat.Visualizer(zmq_url=zmq_url)
     if clear:
@@ -146,7 +146,14 @@ def create_visualizer(clear=True, zmq_url="tcp://127.0.0.1:6000"):
 
 
 def make_frame(
-    vis, name, h=0.15, radius=0.001, o=1.0, T=None, transform=None, ignore_invalid_transform=False
+    vis,
+    name,
+    h=0.15,
+    radius=0.001,
+    o=1.0,
+    T=None,
+    transform=None,
+    ignore_invalid_transform=False,
 ):
     """Add a red-green-blue triad to the Meschat visualizer.
 
@@ -186,18 +193,28 @@ def make_frame(
         transform = T
 
     if transform is not None:
-
         if not ignore_invalid_transform:
             is_valid = isRotationMatrix(transform[:3, :3])
             if not is_valid:
-                raise ValueError("meshcat_utils:attempted to visualize invalid transform T")
+                msg = "meshcat_utils:attempted to visualize invalid transform T"
+                raise ValueError(msg)
 
         vis[name].set_transform(transform)
 
 
-def draw_grasp(vis, line_name, transform, h=0.15, radius=0.001, o=1.0, color=[255, 0, 0]):
+def draw_grasp(
+    vis,
+    line_name,
+    transform,
+    h=0.15,
+    radius=0.001,
+    o=1.0,
+    color=[255, 0, 0],
+):
     """Draws line to the Meshcat visualizer.
+
     Args:
+    ----
       vis (Meshcat Visualizer): the visualizer
       line_name (string): name for the line associated with the grasp.
       transform (numpy array): 4x4 specifying transformation of grasps.
@@ -215,13 +232,13 @@ def draw_grasp(vis, line_name, transform, h=0.15, radius=0.001, o=1.0, color=[25
 
 
 def visualize_pointcloud(vis, name, pc, color=None, transform=None, **kwargs):
-    """
-    Args:
+    """Args:
+    ----
         vis: meshcat visualizer object
         name: str
         pc: Nx3 or HxWx3
         color: (optional) same shape as pc[0 - 255] scale or just rgb tuple
-        transform: (optional) 4x4 homogeneous transform
+        transform: (optional) 4x4 homogeneous transform.
     """
     if pc.ndim == 3:
         pc = pc.reshape(-1, pc.shape[-1])
@@ -241,7 +258,9 @@ def visualize_pointcloud(vis, name, pc, color=None, transform=None, **kwargs):
     else:
         color = np.ones_like(pc)
 
-    vis[name].set_object(meshcat.geometry.PointCloud(position=pc.T, color=color.T, **kwargs))
+    vis[name].set_object(
+        meshcat.geometry.PointCloud(position=pc.T, color=color.T, **kwargs),
+    )
 
     if transform is not None:
         vis[name].set_transform(transform)
@@ -251,6 +270,7 @@ def visualize_bbox(vis, name, dims, transform=None, T=None):
     """Visualize a bounding box using a wireframe.
 
     Args:
+    ----
         vis (MeshCat Visualizer): the visualizer
         name (string): name for this frame (should be unique)
         dims (array-like): shape (3,), dimensions of the bounding box
@@ -276,17 +296,18 @@ def visualize_transform_manager(vis, tm, frame, **kwargs):
 
 
 def get_pointcloud(depth, intrinsics, flatten=False, remove_zero_depth_points=True):
-    """Projects depth image to pointcloud
+    """Projects depth image to pointcloud.
 
     Args:
+    ----
         depth: HxW float array of perspective depth in meters.
         intrinsics: 3x3 float array of camera intrinsics matrix.
         flatten: whether to flatten pointcloud
 
     Returns:
+    -------
         points: HxWx3 float array of 3D points in camera coordinates.
     """
-
     height, width = depth.shape
     xlin = np.linspace(0, width - 1, width)
     ylin = np.linspace(0, height - 1, height)

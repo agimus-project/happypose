@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,12 +17,12 @@ limitations under the License.
 # Standard Library
 import io
 import json
-import tarfile
 from collections import defaultdict
+from collections.abc import Iterator
 from functools import partial
 from hashlib import sha1
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Set, Union
+from typing import Any, Optional, Union
 
 # Third Party
 import imageio
@@ -60,18 +59,19 @@ def write_scene_ds_as_wds(
     n_reading_workers: int = 8,
     maxcount: int = 1000,
     shard_format: str = "shard-%08d.tar",
-    keep_labels_set: Optional[Set] = None,
+    keep_labels_set: Optional[set] = None,
     n_max_frames: Optional[int] = None,
-    frame_ids: Optional[List[int]] = None,
+    frame_ids: Optional[list[int]] = None,
     depth_scale: int = 1000,
 ) -> None:
-
     assert scene_ds.frame_index is not None
 
     wds_dir.mkdir(exist_ok=True, parents=True)
     frame_index = scene_ds.frame_index.copy()
     shard_writer = wds.ShardWriter(
-        str(wds_dir / shard_format), maxcount=maxcount, start_shard=0
+        str(wds_dir / shard_format),
+        maxcount=maxcount,
+        start_shard=0,
     )
 
     sampler = None
@@ -96,13 +96,13 @@ def write_scene_ds_as_wds(
 
         if keep_labels_set is not None:
             assert obs.object_datas is not None
-            object_labels = set([obj.label for obj in obs.object_datas])
+            object_labels = {obj.label for obj in obs.object_datas}
             n_objects_valid = len(object_labels.intersection(keep_labels_set))
             if n_objects_valid == 0:
                 continue
 
         key = sha1(obs.rgb.data).hexdigest()
-        sample: Dict[str, Any] = {
+        sample: dict[str, Any] = {
             "__key__": key,
         }
         if obs.rgb is not None:
@@ -127,20 +127,19 @@ def write_scene_ds_as_wds(
     frame_index = frame_index.loc[:, ["scene_id", "view_id", "key", "shard_fname"]]
     shard_writer.close()
     frame_index.to_feather(wds_dir / "frame_index.feather")
-    ds_infos = dict(
-        depth_scale=depth_scale,
-    )
+    ds_infos = {
+        "depth_scale": depth_scale,
+    }
     (wds_dir / "infos.json").write_text(json.dumps(ds_infos))
     return
 
 
 def load_scene_ds_obs(
-    sample: Dict[str, Union[bytes, str]],
+    sample: dict[str, Union[bytes, str]],
     depth_scale: float = 1000.0,
     load_depth: bool = False,
     label_format: str = "{label}",
 ) -> SceneObservation:
-
     assert isinstance(sample["rgb.png"], bytes)
     assert isinstance(sample["segmentation.png"], bytes)
     assert isinstance(sample["depth.png"], bytes)
@@ -156,7 +155,7 @@ def load_scene_ds_obs(
         depth = np.asarray(depth, dtype=np.float32)
         depth /= depth_scale
 
-    object_datas_json: List[DataJsonType] = json.loads(sample["object_datas.json"])
+    object_datas_json: list[DataJsonType] = json.loads(sample["object_datas.json"])
     object_datas = [ObjectData.from_json(d) for d in object_datas_json]
     for obj in object_datas:
         obj.label = label_format.format(label=obj.label)
@@ -204,7 +203,7 @@ class WebSceneDataset(SceneDataset):
             load_segmentation=load_segmentation,
         )
 
-    def get_tar_list(self) -> List[str]:
+    def get_tar_list(self) -> list[str]:
         tar_files = [str(x) for x in self.wds_dir.iterdir() if x.suffix == ".tar"]
         tar_files.sort()
         return tar_files

@@ -1,6 +1,5 @@
 # Standard Library
 from abc import ABCMeta, abstractmethod
-from typing import Tuple
 
 # Third Party
 import torch
@@ -10,21 +9,20 @@ from happypose.toolbox.inference.types import PoseEstimatesType
 
 
 class PoseEstimationModule(torch.nn.Module, metaclass=ABCMeta):
-
     @abstractmethod
     def forward_coarse_model(
-        self
-    ) -> Tuple[PoseEstimatesType, dict]:
+        self,
+    ) -> tuple[PoseEstimatesType, dict]:
         pass
 
     @abstractmethod
     def forward_refiner(
-        self
-    ) -> Tuple[dict, dict]:
+        self,
+    ) -> tuple[dict, dict]:
         pass
 
     @abstractmethod
     def run_inference_pipeline(
-        self
-    ) -> Tuple[PoseEstimatesType, dict]:
+        self,
+    ) -> tuple[PoseEstimatesType, dict]:
         pass

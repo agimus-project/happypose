@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,7 +28,9 @@ import happypose
 
 PROJECT_ROOT = Path(happypose.__file__).parent.parent
 PROJECT_DIR = PROJECT_ROOT
-LOCAL_DATA_DIR = Path(os.environ.get("HAPPYPOSE_DATA_DIR", Path(PROJECT_DIR) / "local_data"))
+LOCAL_DATA_DIR = Path(
+    os.environ.get("HAPPYPOSE_DATA_DIR", Path(PROJECT_DIR) / "local_data"),
+)
 BOP_DS_DIR = LOCAL_DATA_DIR / "bop_datasets"
 NB_DATA_DIR = LOCAL_DATA_DIR / "notebook_data"
 SHAPENET_DIR = LOCAL_DATA_DIR / "shapenetcorev2"
@@ -53,10 +54,10 @@ else:
         BLENDER_INSTALL_DIR = Path(os.environ["HOME"]) / BLENDER_VERSION
 
 PYTHON_BIN_PATH = (
-        Path(os.environ["CONDA_PREFIX"]) / "bin/python"
-        if "CONDA_PREFIX" in os.environ
-        else Path(sys.executable)
-        )
+    Path(os.environ["CONDA_PREFIX"]) / "bin/python"
+    if "CONDA_PREFIX" in os.environ
+    else Path(sys.executable)
+)
 
 BOP_PANDA3D_DS_DIR = LOCAL_DATA_DIR / "bop_datasets"
 
@@ -106,14 +107,12 @@ MODELNET_TEST_CATEGORIES = [
     "tv_stand",
 ]
 
-SHAPENET_MODELNET_CATEGORIES = set(
-    [
-        "guitar",
-        "bathtub,bathing tub,bath,tub",
-        "bookshelf",
-        "sofa,couch,lounge",
-    ]
-)
+SHAPENET_MODELNET_CATEGORIES = {
+    "guitar",
+    "bathtub,bathing tub,bath,tub",
+    "bookshelf",
+    "sofa,couch,lounge",
+}
 
 YCBV_OBJECT_NAMES = [
     ["obj_000001", "01_master_chef_can"],

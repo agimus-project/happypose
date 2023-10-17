@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,10 +14,9 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 from dataclasses import dataclass
-from typing import List, Optional, Set, Union
+from typing import Optional, Union
 
 # Third Party
 import numpy as np
@@ -27,7 +25,6 @@ import torch.multiprocessing
 
 # HappyPose
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
-
 
 # MegaPose
 from happypose.toolbox.lib3d.transform import Transform
@@ -49,10 +46,9 @@ logger = get_logger(__name__)
 
 @dataclass
 class RenderOutput:
-    """
-    rgb: (h, w, 3) uint8
+    """rgb: (h, w, 3) uint8
     normals: (h, w, 3) uint8
-    depth: (h, w, 1) float32
+    depth: (h, w, 1) float32.
     """
 
     data_id: int
@@ -63,8 +59,7 @@ class RenderOutput:
 
 @dataclass
 class BatchRenderOutput:
-    """
-    rgb: (bsz, 3, h, w) float, values in [0, 1]
+    """rgb: (bsz, 3, h, w) float, values in [0, 1]
     normals: (bsz, 3, h, w) float, values in [0, 1]
     depth: (bsz, 1, h, w) float, in meters.
     """
@@ -77,8 +72,8 @@ class BatchRenderOutput:
 @dataclass
 class SceneData:
     camera_data: Panda3dCameraData
-    light_datas: List[Panda3dLightData]
-    object_datas: List[Panda3dObjectData]
+    light_datas: list[Panda3dLightData]
+    object_datas: list[Panda3dObjectData]
 
 
 @dataclass
@@ -94,9 +89,8 @@ def worker_loop(
     in_queue: torch.multiprocessing.Queue,
     out_queue: torch.multiprocessing.Queue,
     object_dataset: RigidObjectDataset,
-    preload_labels: Set[str] = set(),
+    preload_labels: set[str] = set(),
 ) -> None:
-
     logger.debug(f"Init worker: {worker_id}")
     renderer = Panda3dSceneRenderer(
         asset_dataset=object_dataset,
@@ -140,12 +134,8 @@ def worker_loop(
         output = RenderOutput(
             data_id=render_args.data_id,
             rgb=renderings_.rgb,
-            normals=renderings_.normals
-            if render_args.render_normals
-            else None,
-            depth=renderings_.depth
-            if render_args.render_depth
-            else None,
+            normals=renderings_.normals if render_args.render_normals else None,
+            depth=renderings_.depth if render_args.render_depth else None,
         )
         del render_args
         out_queue.put(output)
@@ -161,7 +151,6 @@ class Panda3dBatchRenderer:
         preload_cache: bool = True,
         split_objects: bool = False,
     ):
-
         assert n_workers >= 1
         self._object_dataset = object_dataset
         self._n_workers = n_workers
@@ -172,15 +161,16 @@ class Panda3dBatchRenderer:
 
     def make_scene_data(
         self,
-        labels: List[str],
+        labels: list[str],
         TCO: torch.Tensor,
         K: torch.Tensor,
-        light_datas: List[List[Panda3dLightData]],
+        light_datas: list[list[Panda3dLightData]],
         resolution: Resolution,
-    ) -> List[SceneData]:
-        """_summary_
+    ) -> list[SceneData]:
+        """_summary_.
 
         Args:
+        ----
             labels (List[str]): _description_
             TCO (torch.Tensor): (bsz, 4, 4) float
             K (torch.Tensor): (bsz, 3, 3) float
@@ -188,6 +178,7 @@ class Panda3dBatchRenderer:
             resolution (Resolution): _description_
 
         Returns:
+        -------
             List[SceneData]: _description_
         """
         bsz = TCO.shape[0]
@@ -210,7 +201,7 @@ class Panda3dBatchRenderer:
                     Panda3dObjectData(
                         label=label_n,
                         TWO=TWO,
-                    )
+                    ),
                 ],
                 light_datas=lights_n,
             )
@@ -219,16 +210,15 @@ class Panda3dBatchRenderer:
 
     def render(
         self,
-        labels: List[str],
+        labels: list[str],
         TCO: torch.Tensor,
         K: torch.Tensor,
-        light_datas: List[List[Panda3dLightData]],
+        light_datas: list[list[Panda3dLightData]],
         resolution: Resolution,
         render_depth: bool = False,
         render_mask: bool = False,
         render_normals: bool = False,
     ) -> BatchRenderOutput:
-
         if render_mask:
             raise NotImplementedError
 
@@ -265,7 +255,7 @@ class Panda3dBatchRenderer:
             rgbs = torch.stack(list_rgbs).pin_memory().cuda(non_blocking=True)
         else:
             rgbs = torch.stack(list_rgbs)
-        
+
         rgbs = rgbs.float().permute(0, 3, 1, 2) / 255
 
         if render_depth:
@@ -294,18 +284,20 @@ class Panda3dBatchRenderer:
             depths=depths,
             normals=normals,
         )
-    
+
     def _init_renderers(self, preload_cache: bool) -> None:
         object_labels = [obj.label for obj in self._object_dataset.list_objects]
 
-        self._renderers: List[torch.multiprocessing.Process] = []
+        self._renderers: list[torch.multiprocessing.Process] = []
         if self._split_objects:
-            self._in_queues: List[torch.multiprocessing.Queue] = [
+            self._in_queues: list[torch.multiprocessing.Queue] = [
                 torch.multiprocessing.Queue() for _ in range(self._n_workers)
             ]
-            self._worker_id_to_queue = {n: self._in_queues[n] for n in range(self._n_workers)}
+            self._worker_id_to_queue = {
+                n: self._in_queues[n] for n in range(self._n_workers)
+            }
             object_labels_split = np.array_split(object_labels, self._n_workers)
-            self._object_label_to_queue = dict()
+            self._object_label_to_queue = {}
             for n, split in enumerate(object_labels_split):
                 for label in split:
                     self._object_label_to_queue[label] = self._in_queues[n]
@@ -313,7 +305,9 @@ class Panda3dBatchRenderer:
             object_labels_split = [object_labels for _ in range(self._n_workers)]
             self._in_queues = [torch.multiprocessing.Queue()]
             self._object_label_to_queue = {k: self._in_queues[0] for k in object_labels}
-            self._worker_id_to_queue = {n: self._in_queues[0] for n in range(self._n_workers)}
+            self._worker_id_to_queue = {
+                n: self._in_queues[0] for n in range(self._n_workers)
+            }
 
         self._out_queue: torch.multiprocessing.Queue = torch.multiprocessing.Queue()
 
@@ -324,13 +318,13 @@ class Panda3dBatchRenderer:
                 preload_labels = set()
             renderer_process = torch.multiprocessing.Process(
                 target=worker_loop,
-                kwargs=dict(
-                    worker_id=n,
-                    in_queue=self._worker_id_to_queue[n],
-                    out_queue=self._out_queue,
-                    object_dataset=self._object_dataset,
-                    preload_labels=preload_labels,
-                ),
+                kwargs={
+                    "worker_id": n,
+                    "in_queue": self._worker_id_to_queue[n],
+                    "out_queue": self._out_queue,
+                    "object_dataset": self._object_dataset,
+                    "preload_labels": preload_labels,
+                },
             )
             renderer_process.start()
             self._renderers.append(renderer_process)

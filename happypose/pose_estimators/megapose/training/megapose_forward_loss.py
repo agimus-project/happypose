@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import Any, Dict
+from typing import Any
 
 # Third Party
 import numpy as np
@@ -25,6 +24,10 @@ import torchnet
 from bokeh.io import curdoc
 from bokeh.layouts import gridplot
 from torch import nn
+
+from happypose.pose_estimators.megapose.models.pose_rigid import PosePredictor
+from happypose.pose_estimators.megapose.training.training_config import TrainingConfig
+from happypose.pose_estimators.megapose.training.utils import cast, cast_images
 
 # MegaPose
 from happypose.toolbox.datasets.pose_dataset import BatchPoseData
@@ -38,9 +41,6 @@ from happypose.toolbox.lib3d.cosypose_ops import (
 from happypose.toolbox.lib3d.multiview import make_TCO_multiview
 from happypose.toolbox.lib3d.rigid_mesh_database import BatchedMeshes
 from happypose.toolbox.lib3d.transform_ops import add_noise, invert_transform_matrices
-from happypose.pose_estimators.megapose.models.pose_rigid import PosePredictor
-from happypose.pose_estimators.megapose.training.training_config import TrainingConfig
-from happypose.pose_estimators.megapose.training.utils import cast, cast_images
 from happypose.toolbox.visualization.bokeh_plotter import BokehPlotter
 
 
@@ -48,15 +48,14 @@ def megapose_forward_loss(
     model: PosePredictor,
     cfg: TrainingConfig,
     data: BatchPoseData,
-    meters: Dict[str, torchnet.meter.AverageValueMeter],
+    meters: dict[str, torchnet.meter.AverageValueMeter],
     mesh_db: BatchedMeshes,
     n_iterations: int,
-    debug_dict: Dict[str, Any],
+    debug_dict: dict[str, Any],
     make_visualization: bool = False,
     train: bool = True,
     is_notebook: bool = False,
 ) -> torch.Tensor:
-
     # Normalize RGB dims to be in [0,1] from [0,255]
     # Don't tamper with depth
     images = cast_images(rgb=data.rgbs, depth=data.depths)
@@ -75,15 +74,21 @@ def megapose_forward_loss(
         torch.arange(batch_size, device=device).unsqueeze(1).repeat(1, cfg.n_hypotheses)
     )
     hypotheses_labels = np.repeat(
-        np.expand_dims(np.array(labels_gt, dtype=object), axis=1), cfg.n_hypotheses, axis=1
+        np.expand_dims(np.array(labels_gt, dtype=object), axis=1),
+        cfg.n_hypotheses,
+        axis=1,
     ).copy()
 
     if cfg.hypotheses_init_method == "coarse_z_up+auto-depth":
         assert cfg.n_hypotheses == 1
-        points_3d = mesh_db.select(np.ravel(hypotheses_labels).tolist()).sample_points(200)
+        points_3d = mesh_db.select(np.ravel(hypotheses_labels).tolist()).sample_points(
+            200,
+        )
         TCO_init_zup = TCO_init_from_boxes_zup_autodepth(bboxes_gt, points_3d, K)
         TCO_init_zup = add_noise(
-            TCO_init_zup, euler_deg_std=[0, 0, 0], trans_std=[0.01, 0.01, 0.05]
+            TCO_init_zup,
+            euler_deg_std=[0, 0, 0],
+            trans_std=[0.01, 0.01, 0.05],
         )
         hypotheses_TCO_init = TCO_init_zup.unsqueeze(1)
         is_hypothesis_positive = None
@@ -106,7 +111,9 @@ def megapose_forward_loss(
             trans_std=cfg.init_trans_std,
         )
         tOR = torch.zeros(batch_size, 3, device=device, dtype=dtype)
-        tCR = TCO_gt_noise[..., :3, [-1]] + TCO_gt_noise[..., :3, :3] @ tOR.unsqueeze(-1)
+        tCR = TCO_gt_noise[..., :3, [-1]] + TCO_gt_noise[..., :3, :3] @ tOR.unsqueeze(
+            -1,
+        )
         tCR = tCR.squeeze(-1)
         TCV_O = make_TCO_multiview(
             TCO_gt_noise,
@@ -121,7 +128,9 @@ def megapose_forward_loss(
         views_permutation = np.empty((2, batch_size, n_hypotheses), dtype=int)
         for b in range(batch_size):
             views_permutation[0, b, :] = b
-            views_permutation[1, b, :] = np.random.permutation(n_candidate_views)[:n_hypotheses]
+            views_permutation[1, b, :] = np.random.permutation(n_candidate_views)[
+                :n_hypotheses
+            ]
             positive_idx = np.where(views_permutation[1, b] == 0)[0]
             is_hypothesis_positive[b, positive_idx] = 1
             if len(positive_idx) == 0:
@@ -152,7 +161,9 @@ def megapose_forward_loss(
     meshes = mesh_db.select(labels_gt)
     points = meshes.sample_points(cfg.n_points_loss)
     TCO_possible_gt = TCO_gt.unsqueeze(1) @ meshes.symmetries
-    TCO_possible_gt = TCO_possible_gt.unsqueeze(1).repeat(1, n_hypotheses, 1, 1, 1).flatten(0, 1)
+    TCO_possible_gt = (
+        TCO_possible_gt.unsqueeze(1).repeat(1, n_hypotheses, 1, 1, 1).flatten(0, 1)
+    )
     points = points.unsqueeze(1).repeat(1, n_hypotheses, 1, 1).flatten(0, 1)
 
     list_losses_pose = []
@@ -165,7 +176,10 @@ def megapose_forward_loss(
 
         loss_TCO_iter, loss_TCO_iter_data = None, None
         if cfg.predict_pose_update:
-            loss_TCO_iter, loss_TCO_iter_data = loss_refiner_CO_disentangled_reference_point(
+            (
+                loss_TCO_iter,
+                loss_TCO_iter_data,
+            ) = loss_refiner_CO_disentangled_reference_point(
                 TCO_possible_gt=TCO_possible_gt,
                 points=points,
                 TCO_input=iter_outputs.TCO_input,
@@ -179,7 +193,7 @@ def megapose_forward_loss(
 
         if cfg.predict_rendered_views_logits:
             list_rendering_logits.append(
-                iter_outputs.renderings_logits.view(batch_size, n_hypotheses, -1)
+                iter_outputs.renderings_logits.view(batch_size, n_hypotheses, -1),
             )
 
         time_render += iter_outputs.timing_dict["render"]
@@ -198,7 +212,9 @@ def megapose_forward_loss(
 
     # Batch size x N hypotheses x N iterations
     loss_hypotheses = torch.zeros(
-        (batch_size, n_hypotheses, n_iterations), device=device, dtype=dtype
+        (batch_size, n_hypotheses, n_iterations),
+        device=device,
+        dtype=dtype,
     )
     if cfg.predict_pose_update:
         losses_pose = torch.stack(list_losses_pose).permute(1, 2, 0)
@@ -216,8 +232,12 @@ def megapose_forward_loss(
             rendering_logits.flatten(1, 3),
             torch.tensor(is_hypothesis_positive, dtype=torch.float, device=device),
         ).unsqueeze(-1)
-        meters["loss_renderings_confidence"].add(loss_renderings_confidence.mean().item())
-        loss_hypotheses += cfg.loss_alpha_renderings_confidence * loss_renderings_confidence
+        meters["loss_renderings_confidence"].add(
+            loss_renderings_confidence.mean().item(),
+        )
+        loss_hypotheses += (
+            cfg.loss_alpha_renderings_confidence * loss_renderings_confidence
+        )
 
     loss = loss_hypotheses.mean()
 
@@ -226,10 +246,12 @@ def megapose_forward_loss(
     if make_visualization:
 
         def add_mask_to_image(
-            image: torch.Tensor, mask: torch.Tensor, color: str = "red"
+            image: torch.Tensor,
+            mask: torch.Tensor,
+            color: str = "red",
         ) -> torch.Tensor:
             t_color = torch.zeros_like(image)
-            idx = dict(red=0, green=1, blue=2)[color]
+            idx = {"red": 0, "green": 1, "blue": 2}[color]
             t_color[idx, mask > 0] = 1.0
             output = image * 0.8 + t_color * 0.2
             return output
@@ -240,10 +262,18 @@ def megapose_forward_loss(
         n_views = cfg.n_rendered_views
         last_iter_outputs = outputs[f"iteration={n_iterations}"]
         images_crop = last_iter_outputs.images_crop
-        images_crop = images_crop.view(batch_size, n_hypotheses, *images_crop.shape[-3:])
+        images_crop = images_crop.view(
+            batch_size,
+            n_hypotheses,
+            *images_crop.shape[-3:],
+        )
         renders = last_iter_outputs.renders
         renders = renders.view(
-            batch_size, n_hypotheses, n_views, renders.shape[1] // n_views, *renders.shape[-2:]
+            batch_size,
+            n_hypotheses,
+            n_views,
+            renders.shape[1] // n_views,
+            *renders.shape[-2:],
         )
 
         KV_crop = last_iter_outputs.KV_crop
@@ -278,16 +308,27 @@ def megapose_forward_loss(
                     TCO_ = TCV_O[[batch_idx], init_idx, view_idx]
                     TCR_ = TCV_R[[batch_idx], init_idx, view_idx]
 
-
                     image_crop_ = add_mask_to_image(image_crop_[:3], image_crop_[-1])
-                    image_crop_ = add_mask_to_image(image_crop_[:3], render_[-1], "green")
+                    image_crop_ = add_mask_to_image(
+                        image_crop_[:3],
+                        render_[-1],
+                        "green",
+                    )
                     f = plotter.plot_image(image_crop_)
                     f.title.text = f"init of iteration {n_iterations}"
                     row.append(f)
 
                     n_channels = render_.shape[0]
-                    ref_point_uv = project_points_robust(points_orig, KV_crop_, TCR_).flatten()
-                    origin_uv = project_points_robust(points_orig, KV_crop_, TCO_).flatten()
+                    ref_point_uv = project_points_robust(
+                        points_orig,
+                        KV_crop_,
+                        TCR_,
+                    ).flatten()
+                    origin_uv = project_points_robust(
+                        points_orig,
+                        KV_crop_,
+                        TCO_,
+                    ).flatten()
                     f = plotter.plot_image(render_[:3])
                     f.circle(
                         [int(ref_point_uv[0])],
@@ -295,15 +336,15 @@ def megapose_forward_loss(
                         color="red",
                     )
                     f.circle(
-                        [int(origin_uv[0])], [int(render_.shape[1] - origin_uv[1])], color="green"
+                        [int(origin_uv[0])],
+                        [int(render_.shape[1] - origin_uv[1])],
+                        color="green",
                     )
                     f.title.text = f"idx={batch_idx},view={view_idx},init={init_idx}"
                     if cfg.predict_rendered_views_logits:
                         assert is_hypothesis_positive is not None
                         is_positive = is_hypothesis_positive[batch_idx, init_idx]
-                        f.title.text = (
-                            f"idx={batch_idx},view={view_idx},init={init_idx},target={is_positive}"
-                        )
+                        f.title.text = f"idx={batch_idx},view={view_idx},init={init_idx},target={is_positive}"
                     row.append(f)
 
                     if n_channels == 6:

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,10 +14,8 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import os
-import cv2
 
 
 def assign_gpu() -> None:
@@ -40,10 +37,13 @@ os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
 
 if "EGL_VISIBLE_DEVICES" not in os.environ:
-    os.environ['EGL_VISIBLE_DEVICES'] = '0'
+    os.environ["EGL_VISIBLE_DEVICES"] = "0"
 
 for k in (
-    "MKL_NUM_THREADS", "OMP_NUM_THREADS",
-    "CUDA_VISIBLE_DEVICES", "EGL_VISIBLE_DEVICES"):
+    "MKL_NUM_THREADS",
+    "OMP_NUM_THREADS",
+    "CUDA_VISIBLE_DEVICES",
+    "EGL_VISIBLE_DEVICES",
+):
     if k in os.environ:
         print(f"{k}: {os.environ[k]}")

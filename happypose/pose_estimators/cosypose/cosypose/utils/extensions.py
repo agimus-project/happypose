@@ -1,12 +1,15 @@
-from happypose.pose_estimators.cosypose.cosypose.config import PROJECT_DIR
 from torch.utils.cpp_extension import load
 
+from happypose.pose_estimators.cosypose.cosypose.config import PROJECT_DIR
 
-def load_extension(optimization='-O3'):
-    module = load(name='cosypose_cext',
-                  sources=[
-                      PROJECT_DIR / 'cosypose/multiview/csrc/ransac.cpp',
-                  ],
-                  extra_cflags=[optimization],
-                  verbose=True)
+
+def load_extension(optimization="-O3"):
+    module = load(
+        name="cosypose_cext",
+        sources=[
+            PROJECT_DIR / "cosypose/multiview/csrc/ransac.cpp",
+        ],
+        extra_cflags=[optimization],
+        verbose=True,
+    )
     return module

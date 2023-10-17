@@ -1,9 +1,8 @@
-import os
-import pandas as pd
-from collections import deque
 import json
-import typing as tp
+import os
 import pathlib as p
+import typing as tp
+from collections import deque
 from dataclasses import dataclass
 
 
@@ -11,8 +10,8 @@ from dataclasses import dataclass
 class ShapeNetSynset:
     id: str
     name: str
-    parents: tp.List[str]
-    children: tp.List[str]
+    parents: list[str]
+    children: list[str]
 
 
 @dataclass
@@ -25,14 +24,17 @@ class ModelInfo:
 
 def read_models(shapenet_dir):
     # TODO: This probably has issues / is poorly implemented and very slow
-    taxonomy = json.load(open(shapenet_dir / "taxonomy.json", "r"))
+    taxonomy = json.load(open(shapenet_dir / "taxonomy.json"))
 
-    id_to_synset: tp.Dict[int, ShapeNetSynset] = dict()
+    id_to_synset: dict[int, ShapeNetSynset] = {}
 
     for synset in taxonomy:
         synset_id = synset["synsetId"]
         id_to_synset[synset_id] = ShapeNetSynset(
-            id=synset_id, name=synset["name"], children=synset["children"], parents=[]
+            id=synset_id,
+            name=synset["name"],
+            children=synset["children"],
+            parents=[],
         )
 
     for synset in taxonomy:
@@ -53,19 +55,19 @@ def read_models(shapenet_dir):
         return names
 
     models_path = shapenet_dir.glob("**/**/models/model_normalized.obj")
-    models: tp.List[tp.Dict[str, tp.Union[int, str]]] = []
+    models: list[dict[str, tp.Union[int, str]]] = []
     for n, model_path in enumerate(models_path):
         source_id = model_path.parent.parent.name
         synset_id = model_path.parent.parent.parent.name
         names = get_names(synset_id, id_to_synset)
         names = ",".join(names)
         models.append(
-            dict(
-                obj_id=n,
-                shapenet_synset_id=synset_id,
-                shapenet_source_id=source_id,
-                shapenet_name=names,
-            )
+            {
+                "obj_id": n,
+                "shapenet_synset_id": synset_id,
+                "shapenet_source_id": source_id,
+                "shapenet_name": names,
+            },
         )
     return models
 

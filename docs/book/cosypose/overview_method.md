@@ -52,7 +52,7 @@ This repository contains the code for the full CosyPose approach, including:
 ## Single-view single-object 6D pose estimator
 
 ![Single view predictions](./images/example_predictions.png)
-  
+
   Given an RGB image and a 2D bounding box of an object with known 3D model, the 6D pose estimator predicts the full 6D pose of the object with respect to the camera. Our method is inspired by DeepIM with several simplifications and technical improvements. It is fully implemented in pytorch and achieve single-view state-of-the-art on YCB-Video and T-LESS. We provide pre-trained models used in our experiments on both datasets. We make the training code that we used to train them available. It can be parallelized on multiple GPUs and multiple nodes.
 
 ## Synthetic data generation

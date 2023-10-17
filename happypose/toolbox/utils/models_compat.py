@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,9 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+
 def change_keys_of_older_models(state_dict):
-    new_state_dict = dict()
-    for k, v in state_dict.items():
+    new_state_dict = {}
+    for k, _v in state_dict.items():
         if k.startswith("backbone.backbone"):
             new_k = "backbone." + k[len("backbone.backbone.") :]
         elif k.startswith("backbone.head.0."):

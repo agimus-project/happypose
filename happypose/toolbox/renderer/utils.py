@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,9 +14,7 @@ limitations under the License.
 """
 
 
-
 # Standard Library
-from typing import List
 
 # Third Party
 import numpy as np
@@ -28,8 +25,12 @@ import panda3d as p3d
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.renderer.geometry import make_axes, make_box, make_sphere
 
+
 def compute_view_mat(TWC):
-    TCCGL = np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float)
+    TCCGL = np.array(
+        [[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]],
+        dtype=float,
+    )
     TCCGL = Transform(TCCGL)
     TWC = Transform(TWC)
     TWCGL = TWC * TCCGL
@@ -37,12 +38,16 @@ def compute_view_mat(TWC):
     view_mat = p3d.core.LMatrix4f(*view_mat.transpose().flatten().tolist())
     return view_mat
 
+
 def np_to_lmatrix4(np_array: npt.NDArray) -> p3d.core.LMatrix4f:
     return p3d.core.LMatrix4f(*np_array.transpose().flatten().tolist())
 
 
 def depth_image_from_depth_buffer(
-    depth_buffer: npt.NDArray[np.float32], z_near: float, z_far: float, eps: float = 0.001
+    depth_buffer: npt.NDArray[np.float32],
+    z_near: float,
+    z_far: float,
+    eps: float = 0.001,
 ) -> npt.NDArray[np.float32]:
     """Convert depth image to depth buffer.
 
@@ -57,7 +62,13 @@ def depth_image_from_depth_buffer(
 
 def make_rgb_texture_normal_map(size: int = 32) -> p3d.core.Texture:
     tex = p3d.core.Texture()
-    tex.setup3dTexture(size, size, size, p3d.core.Texture.T_unsigned_byte, p3d.core.Texture.F_rgb8)
+    tex.setup3dTexture(
+        size,
+        size,
+        size,
+        p3d.core.Texture.T_unsigned_byte,
+        p3d.core.Texture.F_rgb8,
+    )
     im = np.ones((size, size, size, 3), dtype=np.uint8) * 255
     for x in range(size):
         for y in range(size):

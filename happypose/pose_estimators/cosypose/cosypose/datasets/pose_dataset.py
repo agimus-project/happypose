@@ -1,16 +1,25 @@
-import torch
 import random
-import numpy as np
 from dataclasses import dataclass
-from happypose.pose_estimators.cosypose.cosypose.lib3d import invert_T
-from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
-from .wrappers.visibility_wrapper import VisibilityWrapper
+import numpy as np
+import torch
+
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
+from happypose.pose_estimators.cosypose.cosypose.lib3d import invert_T
+
 from .augmentations import (
-    CropResizeToAspectAugmentation, VOCBackgroundAugmentation,
-    PillowBlur, PillowSharpness, PillowContrast, PillowBrightness, PillowColor, to_torch_uint8,
-    GrayScale
+    CropResizeToAspectAugmentation,
+    GrayScale,
+    PillowBlur,
+    PillowBrightness,
+    PillowColor,
+    PillowContrast,
+    PillowSharpness,
+    VOCBackgroundAugmentation,
+    to_torch_uint8,
 )
+from .wrappers.visibility_wrapper import VisibilityWrapper
+
 
 @dataclass
 class PoseData:
@@ -33,14 +42,15 @@ class NoObjectError(Exception):
 
 
 class PoseDataset(torch.utils.data.Dataset):
-    def __init__(self,
-                 scene_ds,
-                 resize=(640, 480),
-                 min_area=None,
-                 rgb_augmentation=False,
-                 gray_augmentation=False,
-                 background_augmentation=False):
-
+    def __init__(
+        self,
+        scene_ds,
+        resize=(640, 480),
+        min_area=None,
+        rgb_augmentation=False,
+        gray_augmentation=False,
+        background_augmentation=False,
+    ):
         self.scene_ds = VisibilityWrapper(scene_ds)
 
         self.resize_augmentation = CropResizeToAspectAugmentation(resize=resize)
@@ -48,15 +58,17 @@ class PoseDataset(torch.utils.data.Dataset):
 
         self.background_augmentation = background_augmentation
         self.background_augmentations = VOCBackgroundAugmentation(
-            voc_root=LOCAL_DATA_DIR, p=0.3)
+            voc_root=LOCAL_DATA_DIR,
+            p=0.3,
+        )
 
         self.rgb_augmentation = rgb_augmentation
         self.rgb_augmentations = [
             PillowBlur(p=0.4, factor_interval=(1, 3)),
-            PillowSharpness(p=0.3, factor_interval=(0., 50.)),
-            PillowContrast(p=0.3, factor_interval=(0.2, 50.)),
+            PillowSharpness(p=0.3, factor_interval=(0.0, 50.0)),
+            PillowContrast(p=0.3, factor_interval=(0.2, 50.0)),
             PillowBrightness(p=0.5, factor_interval=(0.1, 6.0)),
-            PillowColor(p=0.3, factor_interval=(0., 20.)),
+            PillowColor(p=0.3, factor_interval=(0.0, 20.0)),
         ]
         if gray_augmentation:
             self.rgb_augmentations.append(GrayScale(p=0.5))
@@ -65,10 +77,10 @@ class PoseDataset(torch.utils.data.Dataset):
         return len(self.scene_ds)
 
     def collate_fn(self, batch):
-        data = dict()
+        data = {}
         for k in batch[0].__annotations__:
             v = [getattr(x, k) for x in batch]
-            if k in ('images', 'bboxes', 'TCO', 'K'):
+            if k in ("images", "bboxes", "TCO", "K"):
                 v = torch.as_tensor(np.stack(v))
             data[k] = v
         data = PoseData(**data)
@@ -89,13 +101,13 @@ class PoseDataset(torch.utils.data.Dataset):
         rgb, mask = to_torch_uint8(rgb), to_torch_uint8(mask)
         mask_uniqs = set(np.unique(mask))
         objects_visible = []
-        for obj in state['objects']:
+        for obj in state["objects"]:
             add = False
-            if obj['id_in_segm'] in mask_uniqs and np.all(np.array(obj['bbox']) >= 0):
+            if obj["id_in_segm"] in mask_uniqs and np.all(np.array(obj["bbox"]) >= 0):
                 add = True
 
             if add and self.min_area is not None:
-                bbox = np.array(obj['bbox'])
+                bbox = np.array(obj["bbox"])
                 area = (bbox[3] - bbox[1]) * (bbox[2] - bbox[0])
                 if area >= self.min_area:
                     add = True
@@ -111,15 +123,15 @@ class PoseDataset(torch.utils.data.Dataset):
         assert rgb.shape[0] == 3
 
         obj = random.sample(objects_visible, k=1)[0]
-        TWO = torch.as_tensor(obj['TWO'])
-        TWC = torch.as_tensor(state['camera']['TWC'])
+        TWO = torch.as_tensor(obj["TWO"])
+        TWC = torch.as_tensor(state["camera"]["TWC"])
         TCO = invert_T(TWC) @ TWO
 
         data = PoseData(
             images=np.asarray(rgb),
-            bboxes=np.asarray(obj['bbox']),
+            bboxes=np.asarray(obj["bbox"]),
             TCO=np.asarray(TCO),
-            K=np.asarray(state['camera']['K']),
+            K=np.asarray(state["camera"]["K"]),
             objects=obj,
         )
         return data
@@ -130,7 +142,8 @@ class PoseDataset(torch.utils.data.Dataset):
         n_attempts = 0
         while not valid:
             if n_attempts > 10:
-                raise ValueError('Cannot find valid image in the dataset')
+                msg = "Cannot find valid image in the dataset"
+                raise ValueError(msg)
             try:
                 data = self.get_data(try_index)
                 valid = True

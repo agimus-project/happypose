@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pybullet as pb
+
 from happypose.pose_estimators.cosypose.cosypose.lib3d import Transform, parse_pose_args
 
 from .client import BulletClient
@@ -15,7 +16,7 @@ class Body:
     @property
     def name(self):
         info = self._client.getBodyInfo(self._body_id)
-        return info[-1].decode('utf8')
+        return info[-1].decode("utf8")
 
     @property
     def pose(self):
@@ -33,10 +34,12 @@ class Body:
         self._client.resetBasePositionAndOrientation(self._body_id, pos, orn)
 
     def get_state(self):
-        return dict(TWO=self.pose,
-                    name=self.name,
-                    scale=self._scale,
-                    body_id=self._body_id)
+        return {
+            "TWO": self.pose,
+            "name": self.name,
+            "scale": self._scale,
+            "body_id": self._body_id,
+        }
 
     @property
     def visual_shape_data(self):
@@ -53,6 +56,10 @@ class Body:
     @staticmethod
     def load(urdf_path, scale=1.0, client_id=0):
         urdf_path = Path(urdf_path)
-        assert urdf_path.exists, 'URDF does not exist.'
-        body_id = pb.loadURDF(urdf_path.as_posix(), physicsClientId=client_id, globalScaling=scale)
+        assert urdf_path.exists, "URDF does not exist."
+        body_id = pb.loadURDF(
+            urdf_path.as_posix(),
+            physicsClientId=client_id,
+            globalScaling=scale,
+        )
         return Body(body_id, scale=scale, client_id=client_id)
