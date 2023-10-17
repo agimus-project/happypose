@@ -8,7 +8,7 @@ An example to run the evaluation on `YCBV` dataset. Several datasets can be adde
 python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[ycbv.bop19] result_id=fastsam_kbestdet_1posehyp detection_coarse_types=[["sam","SO3_grid"]] inference.n_pose_hypotheses=1 skip_inference=true run_bop_eval=true
 ```
 
-To reproduce the results we obtained for the BOP-Challenge, please run the following commands : 
+To reproduce the results we obtained for the BOP-Challenge, please run the following commands :
 
 ```sh
 # RGB 1 hyp
@@ -42,7 +42,7 @@ Results :
 
 In particular, for this challenge, we used Jean Zay, a french supercalculator. Here is a quick documentation, for additional information on who can use this calculator, please refer to the [official documentation](http://www.idris.fr/eng/jean-zay/index.html).
 
-You need to create an account to log on Jean Zay : https://www.edari.fr/ 
+You need to create an account to log on Jean Zay : https://www.edari.fr/
 
 To connect by ssh to Jean Zay using this account, you need to register the IP address of the machine you use to connect to Jean Zay. If you work in a french research laboratory, your laboratory probably have a bouncing machine that is registered.
 

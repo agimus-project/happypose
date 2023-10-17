@@ -84,7 +84,7 @@ conda activate happypose
 mamba install compilers -c conda-forge
 pip install open3d
 mkdir /build && cd /build && git clone https://github.com/MIT-SPARK/TEASER-plusplus.git
-cd TEASER-plusplus && mkdir build && cd build 
+cd TEASER-plusplus && mkdir build && cd build
 cmake -DTEASERPP_PYTHON_VERSION=3.9 .. && make teaserpp_python
 cd python && pip install .
 ```

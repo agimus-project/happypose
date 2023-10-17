@@ -1,5 +1,5 @@
 # MegaPose
-This repository contains code, models and dataset for our MegaPose paper. 
+This repository contains code, models and dataset for our MegaPose paper.
 
 Yann Labbé, Lucas Manuelli, Arsalan Mousavian, Stephen Tyree, Stan Birchfield, Jonathan Tremblay, Justin Carpentier, Mathieu Aubry, Dieter Fox, Josef Sivic. “MegaPose: 6D Pose Estimation of Novel Objects via Render & Compare.” In: CoRL 2022.
 
@@ -33,15 +33,15 @@ This repository contains pre-trained models for pose estimation of novel objects
 ## Pose estimation of novel objects
 <img src="./images/pose-estimation.png" width="800">
 
-We provide pre-trained models for 6D pose estimation of novel objects. 
+We provide pre-trained models for 6D pose estimation of novel objects.
 
-Given as inputs: 
+Given as inputs:
 - an RGB image (depth can also be used but is optional),
 - the intrinsic parameters of the camera,
 - a mesh of the object,
 - a bounding box of that object in the image,
 
-our approach estimates the 6D pose of the object (3D rotation + 3D translation) with respect to the camera. 
+our approach estimates the 6D pose of the object (3D rotation + 3D translation) with respect to the camera.
 
 We provide a script and an example for inference on novel objects. After installation, please see the [Inference tutorial](#inference-tutorial).
 

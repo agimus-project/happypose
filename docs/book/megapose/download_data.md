@@ -5,7 +5,7 @@ cd $HAPPYPOSE_DATA_DIR
 wget https://memmo-data.laas.fr/static/examples.tar.xz
 tar xf examples.tar.xz
 ```
- 
+
  # Download pre-trained pose estimation models
 
 Download pose estimation models to $HAPPYPOSE_DATA_DIR/megapose-models:
@@ -19,7 +19,7 @@ python -m happypose.toolbox.utils.download --megapose_models
 ## Dataset information
 The dataset is available at this [url](https://drive.google.com/drive/folders/1CXc_GG11jNVMeGr-Mb4o4iiNjYeKDkKd?usp=sharing). It is split into two datasets: `gso_1M` (Google Scanned Objects) and `shapenet_1M` (ShapeNet objects). Each dataset has 1 million images which were generated using [BlenderProc](https://github.com/DLR-RM/BlenderProc).
 
-Datasets are released in the [webdataset](https://github.com/webdataset/webdataset) format for high reading performance. Each dataset is split into chunks of size ~600MB containing 1000 images each. 
+Datasets are released in the [webdataset](https://github.com/webdataset/webdataset) format for high reading performance. Each dataset is split into chunks of size ~600MB containing 1000 images each.
 
 We provide the pre-processed meshes ready to be used for rendering and training in this [directory](https://drive.google.com/drive/folders/1AYxkv7jpDniOnTcMAxiWbdhPo8WBJaZG):
 - `google_scanned_objects.zip`
