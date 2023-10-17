@@ -90,6 +90,7 @@ class FullEvalConfig(EvalConfig):
     ds_names: Optional[List[str]] = None
     run_bop_eval: bool = True
     modelnet_categories: Optional[List[str]] = None
+    convert_only: bool = False
 
 
 @dataclass
