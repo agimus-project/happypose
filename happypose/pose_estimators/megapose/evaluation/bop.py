@@ -36,6 +36,7 @@ from happypose.pose_estimators.megapose.config import BOP_TOOLKIT_DIR, LOCAL_DAT
 from happypose.pose_estimators.megapose.evaluation.eval_config import BOPEvalConfig
 from happypose.toolbox.datasets.scene_dataset import ObjectData
 from happypose.toolbox.inference.utils import make_detections_from_object_data
+from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -141,12 +142,60 @@ def convert_results_to_coco(results_path, out_json_path, detection_method):
     return
 
 
+
+
+def filter_pose_estimates(
+    data_TCO: PandasTensorCollection,
+    top_K: int,
+    group_cols: list[str],
+    filter_field: str,
+    ascending: bool = False
+) -> PandasTensorCollection:
+    """Filter the pose estimates by retaining only the top-K coarse model scores.
+
+    Retain only the top_K estimates corresponding to each hypothesis_id
+
+    Args:
+        top_K: how many estimates to retain
+        filter_field: The field to filter estimates by
+    """
+
+    # TODO: refactor with definition in pose_estimator.py
+
+    df = data_TCO.infos
+
+    # Logic from https://stackoverflow.com/a/40629420
+    df = df.sort_values(filter_field, ascending=ascending).groupby(group_cols).head(top_K)
+
+    data_TCO_filtered = data_TCO[df.index.tolist()]
+
+    return data_TCO_filtered
+
+
+def get_best_coarse_predictions(coarse_preds: PandasTensorCollection):
+    group_cols = ["scene_id", "view_id", "label", "instance_id"]
+    coarse_preds = filter_pose_estimates(coarse_preds, top_K=1, group_cols=group_cols, filter_field='coarse_score', ascending=False)
+    coarse_preds.infos = coarse_preds.infos.rename(columns={'coarse_score': 'pose_score'})
+    return coarse_preds 
+
+
 def convert_results_to_bop(
     results_path: Path, out_csv_path: Path, method: str,
     use_pose_score: bool = True
 ):
+    """
+    results_path: path to file storing a pickled dictionary, 
+                  with a "predictions" key storing all results of a given evaluation 
+    out_csv_path: path where bop format csv is saved
+    method: key to one of the available method predictions
+    use_pose_score: if true, uses the score obtained from the pose estimator, otherwise from the detector
+    """
+
     predictions = torch.load(results_path)["predictions"]
     predictions = predictions[method]
+    if method=='coarse':
+        predictions = get_best_coarse_predictions(predictions)
+
     print("Predictions from:", results_path)
     print("Method:", method)
     print("Number of predictions: ", len(predictions))

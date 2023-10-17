@@ -141,12 +141,13 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
             if not cfg.skip_inference:
                 eval_out = run_eval(eval_cfg)
 
-            # If we are skpping the inference mimic the output that run_eval
+            # If we are skipping the inference, mimic the output that run_eval
             # would have produced so that we can run the bop_eval
             else:  # Otherwise hack the output so we can run the BOP eval
                 if get_rank() == 0:
                     results_dir = get_save_dir(eval_cfg)
-                    pred_keys = ["refiner/final"]
+                    # pred_keys = ["refiner/final"]
+                    pred_keys = ["coarse"]
                     if eval_cfg.inference.run_depth_refiner:
                         pred_keys.append("depth_refiner")
                     eval_out = {
@@ -162,7 +163,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
             # Run the bop eval for each type of prediction
             if cfg.run_bop_eval and get_rank() == 0:
 
-                bop_eval_keys = set(("refiner/final", "depth_refiner"))
+                bop_eval_keys = set(("coarse", "refiner/final", "depth_refiner"))
                 bop_eval_keys = bop_eval_keys.intersection(set(eval_out["pred_keys"]))
 
                 for method in bop_eval_keys:
@@ -175,7 +176,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
                         split="test",
                         eval_dir=eval_out["save_dir"] / "bop_evaluation",
                         method=method,
-                        convert_only=False,
+                        convert_only=eval_cfg.convert_only,
                     )
                     bop_eval_cfgs.append(bop_eval_cfg)
 
