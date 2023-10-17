@@ -187,7 +187,7 @@ tornado = ">=5.1"
 xyzservices = ">=2021.09.1"
 
 [[package]]
-name = "bop_toolkit_lib"
+name = "bop-toolkit-lib"
 version = "1.0"
 description = ""
 optional = false
@@ -3373,7 +3373,7 @@ files = [
 name = "torch"
 version = "1.11.0+cpu"
 description = "Tensors and Dynamic neural networks in Python with strong GPU acceleration"
-optional = false
+optional = true
 python-versions = ">=3.7.0"
 files = [
     {file = "torch-1.11.0+cpu-cp310-cp310-linux_x86_64.whl", hash = "sha256:32fa00d974707c0183bc4dd0c1d69e853d0f15cc60f157b71ac5718847808943"},
@@ -3398,7 +3398,7 @@ reference = "torch_cpu"
 name = "torchvision"
 version = "0.12.0+cpu"
 description = "image and video datasets and models for torch deep learning"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "torchvision-0.12.0+cpu-cp310-cp310-linux_x86_64.whl", hash = "sha256:1f4da68f79207e7204f77afeb8271b41e7f7b602c7a3f832c8103948c37a8a9a"},
@@ -3708,10 +3708,10 @@ docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.link
 testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-ignore-flaky", "pytest-mypy (>=0.9.1)", "pytest-ruff"]
 
 [extras]
-cuda = []
+cpu = ["torch", "torchvision"]
 render = ["panda3d", "pybullet"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "97a83dc5b0d1957d4db59367c0b073ac7359f3705064fad388b014027deab6a7"
+content-hash = "b300b5b6dc32dd27648fc0ce271ec08cae43a4bfeb975e3bd7ed7c8b778927a6"

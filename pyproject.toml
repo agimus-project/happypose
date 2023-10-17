@@ -50,10 +50,10 @@ scipy = "^1.11.2"
 seaborn = "^0.12.2"
 simplejson = "^3.19.1"
 torch = [
-  {source = "torch_cpu", version = "1.11.0+cpu"}
+  {markers = "extra=='cpu'", optional = true, source = "torch_cpu", version = "1.11.0+cpu"}
 ]
 torchvision = [
-  {source = "torch_cpu", version = "0.12.0+cpu"}
+  {markers = "extra=='cpu'", optional = true, source = "torch_cpu", version = "0.12.0+cpu"}
 ]
 tqdm = "^4.66.1"
 transforms3d = "^0.4.1"
@@ -62,7 +62,7 @@ webdataset = "^0.2.57"
 wget = "^3.2"
 
 [tool.poetry.extras]
-cuda = []
+cpu = ["torch", "torchvision"]
 render = ["panda3d", "pybullet"]
 
 [tool.poetry.group.dev]

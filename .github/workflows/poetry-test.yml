@@ -25,7 +25,7 @@ jobs:
           cache: poetry
 
       - name: Install happypose
-        run: poetry install --with dev --all-extras
+        run: poetry install --with dev -E render -E cpu
 
       - name: Download pre-trained models required for tests
         run: |
