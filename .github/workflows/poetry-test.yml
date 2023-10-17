@@ -1,4 +1,4 @@
-name: Tests & Coverage
+name: Tests with poetry
 
 on: [ push, pull_request ]
 
@@ -41,5 +41,4 @@ jobs:
 
       - name: Run tests
         run: |
-          coverage run --source=happypose -m unittest
-          coverage xml
+          python -m unittest
