@@ -163,7 +163,7 @@ class PredictionRunner:
 
         for _k, v in all_preds.items():
             if "mask" in v.tensors:
-                breakpoint()
+                # breakpoint()
                 v.delete_tensor("mask")
 
         return all_preds
