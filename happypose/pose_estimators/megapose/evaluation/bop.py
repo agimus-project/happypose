@@ -46,47 +46,7 @@ DETECTION_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop22_coco.py"
 DUMMY_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_dummy.py"
 
 
-##################################
-##################################
-import os
-
-# Official Task 4 detections (CNOS fastSAM)
-EXTERNAL_DETECTIONS_FILES = {
-    "ycbv": 'cnos-fastsam_ycbv-test_f4f2127c-6f59-447c-95b3-28e1e591f1a1.json', 
-    "lmo": 'cnos-fastsam_lmo-test_3cb298ea-e2eb-4713-ae9e-5a7134c5da0f.json', 
-    "tless": 'cnos-fastsam_tless-test_8ca61cb0-4472-4f11-bce7-1362a12d396f.json', 
-    "tudl": 'cnos-fastsam_tudl-test_c48a2a95-1b41-4a51-9920-a667cb3d7149.json', 
-    "icbin": 'cnos-fastsam_icbin-test_f21a9faf-7ef2-4325-885f-f4b6460f4432.json', 
-    "itodd": 'cnos-fastsam_itodd-test_df32d45b-301c-4fc9-8769-797904dd9325.json', 
-    "hb": 'cnos-fastsam_hb-test_db836947-020a-45bd-8ec5-c95560b68011.json', 
-}
-
-
-# # Official Task 1 detections (gdrnppdet-pbrreal)
-# EXTERNAL_DETECTIONS_FILES = {
-#     "ycbv": 'gdrnppdet-pbrreal_ycbv-test_abe6c5f1-cb26-4bbd-addc-bb76dd722a96.json', 
-#     "lmo": 'gdrnppdet-pbrreal_lmo-test_202a2f15-cbd0-49df-90de-650428c6d157.json', 
-#     "tless": 'gdrnppdet-pbrreal_tless-test_e112ecb4-7f56-4107-8a21-945bc7661267.json', 
-#     "tudl": 'gdrnppdet-pbrreal_tudl-test_66fd26f1-bebf-493b-a42a-d71e8d10c479.json', 
-#     "icbin": 'gdrnppdet-pbrreal_icbin-test_a46668ed-f76b-40ca-9954-708b198c2ab0.json', 
-#     "itodd": 'gdrnppdet-pbrreal_itodd-test_9559c160-9507-4d09-94a5-ef0d6e8f22ce.json', 
-#     "hb": 'gdrnppdet-pbrreal_hb-test_94485f5a-98ea-48f1-9472-06f4ceecad41.json', 
-# }
-
-
-EXTERNAL_DETECTIONS_DIR = os.environ.get('EXTERNAL_DETECTIONS_DIR')
-assert(EXTERNAL_DETECTIONS_DIR is not None)
-EXTERNAL_DETECTIONS_DIR = Path(EXTERNAL_DETECTIONS_DIR)
-
-CNOS_SUBMISSION_PATHS = {ds_name: EXTERNAL_DETECTIONS_DIR / fname for ds_name, fname in EXTERNAL_DETECTIONS_FILES.items()}
-# Check if all paths exist
-assert( sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()) == len(EXTERNAL_DETECTIONS_FILES))
-##################################
-##################################
-
-
 # Third Party
-import bop_toolkit_lib
 from bop_toolkit_lib import inout  # noqa
 
 
@@ -262,36 +222,62 @@ def run_evaluation(cfg: BOPEvalConfig) -> None:
 
     return scores_pose_path, scores_detection_path
 
-def load_external_detections(ds_name, scene_ds_dir):
+
+def load_external_detections(scene_ds_dir: Path):
     """
     Loads external detections 
     """
-    detections_path = CNOS_SUBMISSION_PATHS[ds_name]  
+    ds_name = scene_ds_dir.name
+
+    bop_detections_paths = get_external_detections_paths()
+    detections_path = bop_detections_paths[ds_name]  
 
     dets_lst = []
     for det in json.loads(detections_path.read_text()):
-        # Segmentation mask not needed
-        if 'segmentation' in det:
-            del det['segmentation']
-        # Bounding box formats:
-        # - BOP format: [xmin, ymin, width, height]
-        # - Megapose expects: [xmin, ymin, xmax, ymax]
-        x, y, w, h = det['bbox']
-        det['bbox'] = [float(v) for v in [x, y, x+w, y+h]]
-        det['bbox_modal'] = det['bbox']
-
-        # HACK: object models are same in lm and lmo -> obj labels start with 'lm'
-        if ds_name == 'lmo':
-            ds_name = 'lm'
-
-        det['label'] = '{}-obj_{}'.format(ds_name, str(det["category_id"]).zfill(6))
-        
+        det = format_det_bop2megapose(det, ds_name)
         dets_lst.append(det)
 
     df_all_dets = pd.DataFrame.from_records(dets_lst)
     df_targets = pd.read_json(scene_ds_dir / "test_targets_bop19.json")
     return df_all_dets, df_targets
 
+
+def get_external_detections_paths():
+    EXTERNAL_DETECTIONS_DIR = os.environ.get('EXTERNAL_DETECTIONS_DIR')
+    assert(EXTERNAL_DETECTIONS_DIR is not None)
+    EXTERNAL_DETECTIONS_DIR = Path(EXTERNAL_DETECTIONS_DIR)
+
+    files_name_path = EXTERNAL_DETECTIONS_DIR / 'bop_detections_filenames.json'
+    try:
+        bop_detections_filenames = json.loads(files_name_path.read_text())
+    except json.decoder.JSONDecodeError as e:
+        print('Check json formatting {files_name_path.as_posix()}')
+        raise e  
+    bop_detections_paths = {ds_name: EXTERNAL_DETECTIONS_DIR / fname 
+                            for ds_name, fname in bop_detections_filenames.items()}
+
+    return bop_detections_paths
+
+
+def format_det_bop2megapose(det, ds_name):
+    # Segmentation mask not needed
+    if 'segmentation' in det:
+        del det['segmentation']
+    # Bounding box formats:
+    # - BOP format: [xmin, ymin, width, height]
+    # - Megapose expects: [xmin, ymin, xmax, ymax]
+    x, y, w, h = det['bbox']
+    det['bbox'] = [float(v) for v in [x, y, x+w, y+h]]
+    det['bbox_modal'] = det['bbox']
+
+    # HACK: object models are same in lm and lmo -> obj labels start with 'lm'
+    if ds_name == 'lmo':
+        ds_name = 'lm'
+
+    det['label'] = '{}-obj_{}'.format(ds_name, str(det["category_id"]).zfill(6))
+
+    return det
+        
 
 def filter_detections_scene_view(scene_id, view_id, df_all_dets, df_targets):
     """
@@ -302,18 +288,9 @@ def filter_detections_scene_view(scene_id, view_id, df_all_dets, df_targets):
     df_dets_scene_img = df_all_dets.loc[(df_all_dets['scene_id'] == scene_id) & (df_all_dets['image_id'] == view_id)]
     df_targets_scene_img = df_targets[(df_targets['scene_id'] == scene_id) & (df_targets['im_id'] == view_id)]
 
-    # Keep only best detections for objects ("targets") given in bop target file
-    lst_df_target = [] 
-    nb_targets = len(df_targets_scene_img)
-    MARGIN = 0
-    for it in range(nb_targets):
-        target = df_targets_scene_img.iloc[it]
-        n_best = target.inst_count + MARGIN
-        df_filt_target = df_dets_scene_img[df_dets_scene_img['category_id'] == target.obj_id].sort_values('score', ascending=False)[:n_best]
-        lst_df_target.append(df_filt_target)
+    df_dets_scene_img = keep_best_detections(df_dets_scene_img, df_targets_scene_img)
 
-    # if missing dets, keep only one detection to avoid downstream error
-    df_dets_scene_img = pd.concat(lst_df_target) if len(lst_df_target) > 0 else df_dets_scene_img[:1]
+    # Keep only best detections for objects ("targets") given in bop target file
     lst_dets_scene_img = df_dets_scene_img.to_dict('records')
 
     # Do not forget the scores that are not present in object img_data
@@ -326,6 +303,21 @@ def filter_detections_scene_view(scene_id, view_id, df_all_dets, df_targets):
     detections.infos['time'] = df_dets_scene_img.time.iloc[0]
     return detections
 
+
+def keep_best_detections(df_dets_scene_img, df_targets_scene_img):
+    lst_df_target = [] 
+    nb_targets = len(df_targets_scene_img)
+    MARGIN = 0
+    for it in range(nb_targets):
+        target = df_targets_scene_img.iloc[it]
+        n_best = target.inst_count + MARGIN
+        df_filt_target = df_dets_scene_img[df_dets_scene_img['category_id'] == target.obj_id].sort_values('score', ascending=False)[:n_best]
+        lst_df_target.append(df_filt_target)
+
+    # if missing dets, keep only one detection to avoid downstream error
+    df_dets_scene_img = pd.concat(lst_df_target) if len(lst_df_target) > 0 else df_dets_scene_img[:1]
+
+    return df_dets_scene_img
 
 if __name__ == "__main__":
     main()

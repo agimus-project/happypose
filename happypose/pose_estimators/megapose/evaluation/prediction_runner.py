@@ -195,7 +195,7 @@ class PredictionRunner:
         ######
         # Temporary solution
         if self.inference_cfg.detection_type == "sam":
-            df_all_dets, df_targets = load_external_detections(self.scene_ds.ds_dir.name, self.scene_ds.ds_dir)
+            df_all_dets, df_targets = load_external_detections(self.scene_ds.ds_dir)
 
         for n, data in enumerate(tqdm(self.dataloader)):
             # data is a dict
