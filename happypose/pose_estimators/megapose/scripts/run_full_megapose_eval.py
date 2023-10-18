@@ -54,17 +54,6 @@ from happypose.toolbox.utils.logging import get_logger, set_logging_level
 
 logger = get_logger(__name__)
 
-BOP_DATASET_NAMES = [
-    "lm",
-    "lmo",
-    "tless",
-    "tudl",
-    "icbin",
-    "itodd",
-    "hb",
-    "ycbv",
-    # 'hope',
-]
 
 BOP_TEST_DATASETS = [
     "lmo.bop19",
