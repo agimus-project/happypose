@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
-from happypose.pose_estimators.cosypose.cosypose.lib3d import invert_T
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 
 from .augmentations import (
     CropResizeToAspectAugmentation,

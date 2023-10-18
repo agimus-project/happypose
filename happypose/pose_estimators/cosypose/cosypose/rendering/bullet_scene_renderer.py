@@ -4,10 +4,10 @@ import pybullet as pb
 from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
     make_urdf_dataset,
 )
-from happypose.pose_estimators.cosypose.cosypose.lib3d import Transform
 from happypose.pose_estimators.cosypose.cosypose.simulator.base_scene import BaseScene
 from happypose.pose_estimators.cosypose.cosypose.simulator.caching import BodyCache
 from happypose.pose_estimators.cosypose.cosypose.simulator.camera import Camera
+from happypose.toolbox.lib3d.transform import Transform
 
 
 class BulletSceneRenderer(BaseScene):

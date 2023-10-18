@@ -50,7 +50,6 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.multiview_predictor 
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor import (
     CoarseRefinePosePredictor,
 )
-from happypose.pose_estimators.cosypose.cosypose.lib3d import Transform
 from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import (
     MeshDataBase,
 )
@@ -68,6 +67,7 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     init_distributed_mode,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.toolbox.lib3d.transform import Transform
 
 logger = get_logger(__name__)
 

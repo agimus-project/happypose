@@ -2,7 +2,8 @@ from pathlib import Path
 
 import pybullet as pb
 
-from happypose.pose_estimators.cosypose.cosypose.lib3d import Transform, parse_pose_args
+from happypose.pose_estimators.cosypose.cosypose.lib3d.transform import parse_pose_args
+from happypose.toolbox.lib3d.transform import Transform
 
 from .client import BulletClient
 

@@ -2,8 +2,8 @@ import numpy as np
 import pybullet as pb
 import transforms3d
 
-from happypose.pose_estimators.cosypose.cosypose.lib3d import Transform
 from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import euler2quat
+from happypose.toolbox.lib3d.transform import Transform
 
 
 def proj_from_K(K, h, w, near, far):
