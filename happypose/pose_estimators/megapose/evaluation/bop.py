@@ -262,19 +262,15 @@ def run_evaluation(cfg: BOPEvalConfig) -> None:
 
     return scores_pose_path, scores_detection_path
 
-def load_sam_predictions(ds_dir_name, scene_ds_dir):
-    ds_name = ds_dir_name
+def load_external_detections(ds_name, scene_ds_dir):
+    """
+    Loads external detections 
+    """
     detections_path = CNOS_SUBMISSION_PATHS[ds_name]  
-    """
-    # dets_lst: list of dictionary, each element = detection of one object in an image
-    $ df_all_dets[0].keys()
-        > ['scene_id', 'image_id', 'category_id', 'bbox', 'score', 'time', 'segmentation']
-    - For the evaluation of Megapose, we only need the 'scene_id', 'image_id', 'category_id', 'score', 'time' and 'bbox'
-    - We also need need to change the format of bounding boxes as explained below 
-    """
+
     dets_lst = []
     for det in json.loads(detections_path.read_text()):
-        # We don't need the segmentation mask (not always present in the submissions)
+        # Segmentation mask not needed
         if 'segmentation' in det:
             del det['segmentation']
         # Bounding box formats:
@@ -293,61 +289,42 @@ def load_sam_predictions(ds_dir_name, scene_ds_dir):
         dets_lst.append(det)
 
     df_all_dets = pd.DataFrame.from_records(dets_lst)
-
     df_targets = pd.read_json(scene_ds_dir / "test_targets_bop19.json")
-
     return df_all_dets, df_targets
 
-def get_sam_detections(data, df_all_dets, df_targets, dt_det):
-    # We assume a unique image ("view") associated with a unique scene_id is 
-    im_info = data['im_infos'][0]
-    scene_id, view_id = im_info['scene_id'], im_info['view_id']
 
+def filter_detections_scene_view(scene_id, view_id, df_all_dets, df_targets):
+    """
+    Retrieve detections associated to 
+
+    img_data: contains
+    """
     df_dets_scene_img = df_all_dets.loc[(df_all_dets['scene_id'] == scene_id) & (df_all_dets['image_id'] == view_id)]
     df_targets_scene_img = df_targets[(df_targets['scene_id'] == scene_id) & (df_targets['im_id'] == view_id)]
 
-    dt_det += df_dets_scene_img.time.iloc[0]
+    # Keep only best detections for objects ("targets") given in bop target file
+    lst_df_target = [] 
+    nb_targets = len(df_targets_scene_img)
+    MARGIN = 0
+    for it in range(nb_targets):
+        target = df_targets_scene_img.iloc[it]
+        n_best = target.inst_count + MARGIN
+        df_filt_target = df_dets_scene_img[df_dets_scene_img['category_id'] == target.obj_id].sort_values('score', ascending=False)[:n_best]
+        lst_df_target.append(df_filt_target)
 
-    #################
-    # Filter detections based on 2 criteria
-    # - 1) Localization 6D task: we can assume that we know which object category and how many instances 
-    # are present in the image
-    obj_ids = df_targets_scene_img.obj_id.to_list()
-    df_dets_scene_img_obj_filt = df_dets_scene_img[df_dets_scene_img['category_id'].isin(obj_ids)]
-    # In case none of the detections category ids match the ones present in the scene,
-    # keep only one detection to avoid downstream error
-    if len(df_dets_scene_img_obj_filt) > 0:
-        df_dets_scene_img = df_dets_scene_img_obj_filt
-    else:
-        df_dets_scene_img = df_dets_scene_img[:1]
-
-    # TODO: retain only corresponding inst_count number for each detection category_id  
-
-    # - 2) Retain detections with best cnos scores (kind of redundant with finalized 1) )
-    # based on expected number of objects in the scene (from groundtruth)
-    nb_gt_dets = df_targets_scene_img.inst_count.sum()
-    
-    # TODO: put that as a parameter somewhere?
-    MARGIN = 1  # if 0, some images will have no detections
-    K_MULT = 1
-    nb_det = K_MULT*nb_gt_dets + MARGIN
-    df_dets_scene_img = df_dets_scene_img.sort_values('score', ascending=False).head(nb_det)
-    #################
-
+    # if missing dets, keep only one detection to avoid downstream error
+    df_dets_scene_img = pd.concat(lst_df_target) if len(lst_df_target) > 0 else df_dets_scene_img[:1]
     lst_dets_scene_img = df_dets_scene_img.to_dict('records')
 
-    if len(lst_dets_scene_img) == 0:
-        raise(ValueError('lst_dets_scene_img empty!: ', f'scene_id: {scene_id}, image_id/view_id: {view_id}'))                
-
-    # Do not forget the scores that are not present in object data
-    scores = []
-    list_object_data = []
+    # Do not forget the scores that are not present in object img_data
+    scores, list_object_data = [], []
     for det in lst_dets_scene_img:
         list_object_data.append(ObjectData.from_json(det))
         scores.append(det['score'])
-    sam_detections = make_detections_from_object_data(list_object_data).to(device)
-    sam_detections.infos['score'] = scores
-    return sam_detections
+    detections = make_detections_from_object_data(list_object_data).to(device)
+    detections.infos['score'] = scores
+    detections.infos['time'] = df_dets_scene_img.time.iloc[0]
+    return detections
 
 
 if __name__ == "__main__":

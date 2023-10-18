@@ -44,8 +44,8 @@ from happypose.pose_estimators.megapose.config import (
     BOP_DS_DIR
 )
 from happypose.pose_estimators.megapose.evaluation.bop import (
-    get_sam_detections,
-    load_sam_predictions
+    filter_detections_scene_view,
+    load_external_detections
 )
 
 from happypose.pose_estimators.megapose.training.utils import CudaTimer
@@ -99,7 +99,7 @@ class PredictionRunner:
         pose_estimator: PoseEstimator,
         obs_tensor: ObservationTensor,
         gt_detections: DetectionsType,
-        sam_detections: DetectionsType,
+        exte_detections: DetectionsType,
         initial_estimates: Optional[PoseEstimatesType] = None,
     ) -> Dict[str, PoseEstimatesType]:
         """Runs inference pipeline, extracts the results.
@@ -117,8 +117,8 @@ class PredictionRunner:
             detections = gt_detections
             run_detector = False
         elif self.inference_cfg.detection_type == "sam":
-            # print("sam_detections =", sam_detections.bboxes)
-            detections = sam_detections
+            # print("exte_detections =", exte_detections.bboxes)
+            detections = exte_detections
             run_detector = False
         elif self.inference_cfg.detection_type == "detector":
             detections = None
@@ -185,8 +185,6 @@ class PredictionRunner:
             - 'depth_refiner'
 
             With the predictions at the various settings/iterations.
-
-
         """
 
         predictions_list = defaultdict(list)
@@ -197,7 +195,7 @@ class PredictionRunner:
         ######
         # Temporary solution
         if self.inference_cfg.detection_type == "sam":
-            df_all_dets, df_targets = load_sam_predictions(self.scene_ds.ds_dir.name, self.scene_ds.ds_dir)
+            df_all_dets, df_targets = load_external_detections(self.scene_ds.ds_dir.name, self.scene_ds.ds_dir)
 
         for n, data in enumerate(tqdm(self.dataloader)):
             # data is a dict
@@ -209,16 +207,12 @@ class PredictionRunner:
             # Dirty but avoids creating error when running with real detector
             dt_det = 0
 
-            ######
-            # Filter the dataframe according to scene id and view id
-            # Transform the data in ObjectData and then Detections
-            ######
             # Temporary solution
             if self.inference_cfg.detection_type == "sam":
-                # We assume a unique image ("view") associated with a unique scene_id is 
-                sam_detections = get_sam_detections(data=data, df_all_dets=df_all_dets, df_targets=df_targets, dt_det=dt_det)
+                exte_detections = filter_detections_scene_view(scene_id, view_id, df_all_dets, df_targets)
+                dt_det += exte_detections.infos['time'].iloc[0]
             else:
-                sam_detections = None
+                exte_detections = None
             gt_detections = data["gt_detections"].cuda()
             initial_data = None
             if data["initial_data"]:
@@ -231,14 +225,14 @@ class PredictionRunner:
             if n == 0:
                 with torch.no_grad():
                     self.run_inference_pipeline(
-                        pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
+                        pose_estimator, obs_tensor, gt_detections, exte_detections, initial_estimates=initial_data
                     )
 
             cuda_timer = CudaTimer()
             cuda_timer.start()
             with torch.no_grad():
                 all_preds = self.run_inference_pipeline(
-                    pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
+                    pose_estimator, obs_tensor, gt_detections, exte_detections, initial_estimates=initial_data
                 )
             cuda_timer.end()
             duration = cuda_timer.elapsed()
