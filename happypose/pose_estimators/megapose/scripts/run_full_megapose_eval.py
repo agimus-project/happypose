@@ -118,7 +118,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
 
         # create the EvalConfig objects that we will call `run_eval` on
         eval_configs: Dict[str, EvalConfig] = dict()
-        for (detection_type, coarse_estimation_type) in cfg.detection_coarse_types:
+        for detection_type, coarse_estimation_type in cfg.detection_coarse_types:
             name, cfg_ = create_eval_cfg(cfg, detection_type, coarse_estimation_type, ds_name)
             eval_configs[name] = cfg_
 
@@ -135,8 +135,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
             else:  # Otherwise hack the output so we can run the BOP eval
                 if get_rank() == 0:
                     results_dir = get_save_dir(eval_cfg)
-                    # pred_keys = ["refiner/final"]
-                    pred_keys = ["coarse"]
+                    pred_keys = ["coarse", "refiner/final"]
                     if eval_cfg.inference.run_depth_refiner:
                         pred_keys.append("depth_refiner")
                     eval_out = {
@@ -151,8 +150,11 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
 
             # Run the bop eval for each type of prediction
             if cfg.run_bop_eval and get_rank() == 0:
+                bop_eval_keys = set(("refiner/final", "depth_refiner"))
+                if cfg.eval_coarse_also:
+                    bop_eval_keys.add('coarse')
 
-                bop_eval_keys = set(("coarse", "refiner/final", "depth_refiner"))
+                # Remove from evaluation predictions that were not produced at inference time
                 bop_eval_keys = bop_eval_keys.intersection(set(eval_out["pred_keys"]))
 
                 for method in bop_eval_keys:

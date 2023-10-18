@@ -89,7 +89,7 @@ class FullEvalConfig(EvalConfig):
     detection_coarse_types: Optional[List] = None
     ds_names: Optional[List[str]] = None
     run_bop_eval: bool = True
-    modelnet_categories: Optional[List[str]] = None
+    eval_coarse_also: bool = False
     convert_only: bool = False
 
 
