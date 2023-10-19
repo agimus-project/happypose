@@ -116,7 +116,7 @@ class PredictionRunner:
         if self.inference_cfg.detection_type == "gt":
             detections = gt_detections
             run_detector = False
-        elif self.inference_cfg.detection_type == "sam":
+        elif self.inference_cfg.detection_type == "exte":
             # print("exte_detections =", exte_detections.bboxes)
             detections = exte_detections
             run_detector = False
@@ -194,7 +194,7 @@ class PredictionRunner:
         # format it and store it in a dataframe that will be accessed later
         ######
         # Temporary solution
-        if self.inference_cfg.detection_type == "sam":
+        if self.inference_cfg.detection_type == "exte":
             df_all_dets, df_targets = load_external_detections(self.scene_ds.ds_dir)
 
         for n, data in enumerate(tqdm(self.dataloader)):
@@ -208,7 +208,7 @@ class PredictionRunner:
             dt_det = 0
 
             # Temporary solution
-            if self.inference_cfg.detection_type == "sam":
+            if self.inference_cfg.detection_type == "exte":
                 exte_detections = filter_detections_scene_view(scene_id, view_id, df_all_dets, df_targets)
                 dt_det += exte_detections.infos['time'].iloc[0]
             else:

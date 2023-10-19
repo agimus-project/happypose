@@ -4,15 +4,30 @@ Please make sure you followed the steps relative to the evaluation in the main r
 
 An example to run the evaluation on `YCBV` dataset. Several datasets can be added to the list.
 
+## Evaluating with Megapose detector
+Run a detector part of Megapose pipeline to detect bounding boxes in the image dataset at run-time.
+
 ```
-python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[ycbv.bop19] result_id=fastsam_kbestdet_1posehyp detection_coarse_types=[["sam","SO3_grid"]] inference.n_pose_hypotheses=1 skip_inference=true run_bop_eval=true
+python -m happypose.pose_estimators.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[ycbv.bop19] result_id=detector_1posehyp detection_coarse_types=[["detector","SO3_grid"]] inference.n_pose_hypotheses=1 skip_inference=true run_bop_eval=true
 ```
+
+## Evaluating with external detections
+
+Read
+
+
+
+```
+python -m happypose.pose_estimators.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[ycbv.bop19] result_id=exte_det_1posehyp detection_coarse_types=[["exte","SO3_grid"]] inference.n_pose_hypotheses=1 skip_inference=true run_bop_eval=true
+```
+
+python -m happypose.pose_estimators.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[tudl.bop19] result_id=results_rgb detection_coarse_types=[["exte","SO3_grid"]] inference.n_pose_hypotheses=1 skip_inference=false run_bop_eval=true
 
 To reproduce the results we obtained for the BOP-Challenge, please run the following commands : 
 
 ```sh
 # RGB 1 hyp
-python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[ycbv.bop19,lmo.bop19,tless.bop19,tudl.bop19,icbin.bop19,hb.bop19,itodd.bop19] result_id=fastsam_kbestdet_1posehyp detection_coarse_types=[["sam","SO3_grid"]] inference.n_pose_hypotheses=1 skip_inference=False run_bop_eval=true
+python -m happypose.pose_estimators.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[ycbv.bop19,lmo.bop19,tless.bop19,tudl.bop19,icbin.bop19,hb.bop19,itodd.bop19] result_id=exte_det_1posehyp detection_coarse_types=[["exte","SO3_grid"]] inference.n_pose_hypotheses=1 skip_inference=False run_bop_eval=true
 ```
 
 Results :
@@ -22,7 +37,7 @@ Results :
 
 ```sh
 # RGB 5 hyp
-python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[ycbv.bop19,lmo.bop19,tless.bop19,tudl.bop19,icbin.bop19,hb.bop19,itodd.bop19] result_id=fastsam_kbestdet_5posehyp detection_coarse_types=[["sam","SO3_grid"]] inference.n_pose_hypotheses=5 skip_inference=False run_bop_eval=true
+python -m happypose.pose_estimators.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[ycbv.bop19,lmo.bop19,tless.bop19,tudl.bop19,icbin.bop19,hb.bop19,itodd.bop19] result_id=exte_det_5posehyp detection_coarse_types=[["exte","SO3_grid"]] inference.n_pose_hypotheses=5 skip_inference=False run_bop_eval=true
 ```
 
 Results :
@@ -31,7 +46,7 @@ Results :
 
 ```sh
 # RGB-D 5 hyp
-python -m torch.distributed.run  --nproc_per_node gpu -m happypose.pose_estimators.megapose.src.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[tless.bop19,tudl.bop19,icbin.bop19,hb.bop19,itodd.bop19] result_id=fastsam_kbestdet_5posehyp_teaserpp detection_coarse_types=[["sam","SO3_grid"]] inference.n_pose_hypotheses=5 inference.run_depth_refiner=true inference.depth_refiner=teaserpp skip_inference=False run_bop_eval=True
+python -m torch.distributed.run  --nproc_per_node gpu -m happypose.pose_estimators.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[tless.bop19,tudl.bop19,icbin.bop19,hb.bop19,itodd.bop19] result_id=exte_det_5posehyp_teaserpp detection_coarse_types=[["exte","SO3_grid"]] inference.n_pose_hypotheses=5 inference.run_depth_refiner=true inference.depth_refiner=teaserpp skip_inference=False run_bop_eval=True
 ```
 
 Results :
@@ -104,5 +119,5 @@ conda activate happypose_pytorch3d
 
 cd happypose
 
-python -m torch.distributed.run  --nproc_per_node gpu -m happypose.pose_estimators.megapose.src.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[lmo.bop19] result_id=fastsam_kbestdet_1posehyp detection_coarse_types=[["sam","SO3_grid"]] inference.n_pose_hypotheses=1 skip_inference=False run_bop_eval=true
+python -m torch.distributed.run  --nproc_per_node gpu -m happypose.pose_estimators.megapose.scripts.run_full_megapose_eval detector_run_id=bop_pbr coarse_run_id=coarse-rgb-906902141 refiner_run_id=refiner-rgb-653307694 ds_names=[lmo.bop19] result_id=exte_det_1posehyp detection_coarse_types=[["exte","SO3_grid"]] inference.n_pose_hypotheses=1 skip_inference=False run_bop_eval=true
 ```
