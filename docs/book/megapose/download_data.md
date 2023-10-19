@@ -1,6 +1,6 @@
  # Download example data for minimal testing
 
-```
+```sh
 cd $HAPPYPOSE_DATA_DIR
 wget https://memmo-data.laas.fr/static/examples.tar.xz
 tar xf examples.tar.xz
@@ -8,11 +8,23 @@ tar xf examples.tar.xz
  
  # Download pre-trained pose estimation models
 
-Download pose estimation models to $HAPPYPOSE_DATA_DIR/megapose-models:
+Download pose estimation models to `$HAPPYPOSE_DATA_DIR/megapose-models`:
 
-```
+```sh
 python -m happypose.toolbox.utils.download --megapose_models
 ```
+
+# Download pre-trained detection models
+Megapose can use pretrained detectors from CosyPose, which can be downloaded to `$HAPPYPOSE_DATA_DIR/experiments`:
+
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-hb-pbr--497808
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-hope-pbr--15246
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-icbin-pbr--947409
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-itodd-pbr--509908
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-lmo-pbr--517542
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-tless-pbr--873074
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-tudl-pbr--728047
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-ycbv-pbr--970850
 
 # Dataset
 

@@ -64,7 +64,7 @@ def main():
     parser.add_argument('--bop_dataset', default='', type=str, choices=BOP_DS_NAMES)
     parser.add_argument('--bop_src', default='bop', type=str, choices=['bop', 'gdrive'])
     parser.add_argument('--bop_extra_files', default='', type=str, choices=['ycbv', 'tless'])
-    parser.add_argument('--cosypose_models', default='', type=str)
+    parser.add_argument('--cosypose_model', default='', type=str)
     parser.add_argument("--megapose_models", action="store_true")
     parser.add_argument('--urdf_models', default='', type=str)
     parser.add_argument('--ycbv_compat_models', action='store_true')
@@ -111,8 +111,8 @@ def main():
         download(f'cosypose/bop_datasets/ycbv/models_bop-compat', BOP_DS_DIR / 'ycbv')
         download(f'cosypose/bop_datasets/ycbv/models_bop-compat_eval', BOP_DS_DIR / 'ycbv')
 
-    if args.cosypose_models:
-        download(f'cosypose/experiments/{args.cosypose_models}', LOCAL_DATA_DIR / 'experiments')
+    if args.cosypose_model:
+        download(f'cosypose/experiments/{args.cosypose_model}', LOCAL_DATA_DIR / 'experiments')
     
     if args.megapose_models:
         # rclone copyto inria_data:megapose-models/ megapose-models/
