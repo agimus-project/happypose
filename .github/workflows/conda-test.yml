@@ -67,11 +67,10 @@ jobs:
       - name: Download pre-trained models required for tests
         run: |
           mkdir local_data
-          python -m happypose.toolbox.utils.download \
-                    --cosypose_models=detector-bop-ycbv-pbr--970850 \
-                    --cosypose_models=coarse-bop-ycbv-pbr--724183 \
-                    --cosypose_models=refiner-bop-ycbv-pbr--604090 \
-                    --megapose_models
+          python -m happypose.toolbox.utils.download --megapose_models --cosypose_models
+                    detector-bop-ycbv-pbr--970850 \
+                    coarse-bop-ycbv-pbr--724183 \
+                    refiner-bop-ycbv-pbr--604090
 
           cd tests/data
           git clone https://github.com/petrikvladimir/happypose_test_data.git crackers_example

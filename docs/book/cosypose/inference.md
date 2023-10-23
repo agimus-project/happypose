@@ -6,9 +6,10 @@ Here are provided the minimal commands you have to run in order to run the infer
 
 ```sh
  #ycbv
-python -m happypose.toolbox.utils.download --cosypose_models=detector-bop-ycbv-pbr--970850
-python -m happypose.toolbox.utils.download --cosypose_models=coarse-bop-ycbv-pbr--724183
-python -m happypose.toolbox.utils.download --cosypose_models=refiner-bop-ycbv-pbr--604090
+python -m happypose.toolbox.utils.download --cosypose_models \
+            detector-bop-ycbv-pbr--970850 \
+            coarse-bop-ycbv-pbr--724183 \
+            refiner-bop-ycbv-pbr--604090
 ```
 
 ## 2. Download YCB-V Dataset
