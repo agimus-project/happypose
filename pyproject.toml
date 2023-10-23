@@ -61,7 +61,6 @@ tqdm = "^4.66.1"
 transforms3d = "^0.4.1"
 trimesh = "^3.23.5"
 webdataset = "^0.2.57"
-wget = "^3.2"
 
 [tool.poetry.extras]
 cpu = ["torch", "torchvision"]
