@@ -49,7 +49,7 @@ from happypose.toolbox.inference.types import (
 from happypose.toolbox.lib3d.cosypose_ops import TCO_init_from_boxes_autodepth_with_R
 from happypose.toolbox.utils import transform_utils
 from happypose.toolbox.utils.logging import get_logger
-from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
+from happypose.toolbox.utils.tensor_collection import PandasTensorCollection, filter_top_pose_estimates
 from happypose.toolbox.utils.timer import Timer
 
 logger = get_logger(__name__)
@@ -591,9 +591,13 @@ class PoseEstimator(PoseEstimationModule):
             timing_str += f"coarse={coarse_extra_data['time']:.2f}, "
 
             # Extract top-K coarse hypotheses
-            data_TCO_filtered = self.filter_pose_estimates(
-                data_TCO_coarse, top_K=n_pose_hypotheses, filter_field="coarse_logit"
+            data_TCO_filtered = filter_top_pose_estimates(
+                data_TCO_coarse, 
+                top_K=n_pose_hypotheses, 
+                group_cols=["batch_im_id", "label", "instance_id"], 
+                filter_field="coarse_logit"
             )
+
         else:
             data_TCO_coarse = coarse_estimates
             coarse_extra_data = None
@@ -618,8 +622,11 @@ class PoseEstimator(PoseEstimationModule):
         timing_str += f"scoring={scoring_extra_data['time']:.2f}, "
 
         # Extract the highest scoring pose estimate for each instance_id
-        data_TCO_final_scored = self.filter_pose_estimates(
-            data_TCO_scored, top_K=1, filter_field="pose_logit"
+        data_TCO_final_scored = self.filter_top_pose_estimates(
+            data_TCO_scored, 
+            top_K=1, 
+            group_cols=["batch_im_id", "label", "instance_id"],
+            filter_field="pose_logit"
         )
 
         # Optionally run ICP or TEASER++
@@ -649,29 +656,3 @@ class PoseEstimator(PoseEstimationModule):
             extra_data["depth_refiner"] = {"preds": data_TCO_depth_refiner}
 
         return data_TCO_final, extra_data
-
-    def filter_pose_estimates(
-        self,
-        data_TCO: PoseEstimatesType,
-        top_K: int,
-        filter_field: str,
-        ascending: bool = False,
-    ) -> PoseEstimatesType:
-        """Filter the pose estimates by retaining only the top-K coarse model scores.
-
-        Retain only the top_K estimates corresponding to each hypothesis_id
-
-        Args:
-            top_K: how many estimates to retain
-            filter_field: The field to filter estimates by
-        """
-
-        df = data_TCO.infos
-
-        group_cols = ["batch_im_id", "label", "instance_id"]
-        # Logic from https://stackoverflow.com/a/40629420
-        df = df.sort_values(filter_field, ascending=ascending).groupby(group_cols).head(top_K)
-
-        data_TCO_filtered = data_TCO[df.index.tolist()]
-
-        return data_TCO_filtered

@@ -194,3 +194,32 @@ class PandasTensorCollection(TensorCollection):
         self.__init__(state["infos"], **state["tensors"])
         self.meta = state["meta"]
         return
+
+
+
+def filter_top_pose_estimates(
+    data_TCO: PandasTensorCollection,
+    top_K: int,
+    group_cols: list[str],
+    filter_field: str,
+    ascending: bool = False
+) -> PandasTensorCollection:
+    """Filter the pose estimates by retaining only the top-K coarse model scores.
+
+    Retain only the top_K estimates corresponding to each hypothesis_id
+
+    Args:
+        top_K: how many estimates to retain
+        group_cols: group of columns among which sorting should be done
+        filter_field: the field to filter estimates by
+        ascending: should filter_field
+    """
+
+    df = data_TCO.infos
+
+    # Logic from https://stackoverflow.com/a/40629420
+    df = df.sort_values(filter_field, ascending=ascending).groupby(group_cols).head(top_K)
+
+    data_TCO_filtered = data_TCO[df.index.tolist()]
+
+    return data_TCO_filtered
