@@ -51,14 +51,14 @@ Notes:
 
 ```sh
  #ycbv
-  python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
-  python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
-  python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
+  python -m happypose.toolbox.utils.download --cosypose_models=detector-bop-ycbv-pbr--970850
+  python -m happypose.toolbox.utils.download --cosypose_models=coarse-bop-ycbv-pbr--724183
+  python -m happypose.toolbox.utils.download --cosypose_models=refiner-bop-ycbv-pbr--604090
 
  #tless
-  python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-tless-pbr--873074
-  python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-tless-pbr--506801
-  python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-tless-pbr--233420
+  python -m happypose.toolbox.utils.download --cosypose_models=detector-bop-tless-pbr--873074
+  python -m happypose.toolbox.utils.download --cosypose_models=coarse-bop-tless-pbr--506801
+  python -m happypose.toolbox.utils.download --cosypose_models=refiner-bop-tless-pbr--233420
 ```
 
 ## Pre-trained models for single-view estimator
@@ -68,15 +68,15 @@ The pre-trained models of the single-view pose estimator can be downloaded using
 
 ```sh
 # YCB-V Single-view refiner
-python -m happypose.toolbox.utils.download --cosypose_model=ycbv-refiner-finetune--251020
+python -m happypose.toolbox.utils.download --cosypose_models=ycbv-refiner-finetune--251020
 
 # YCB-V Single-view refiner trained on synthetic data only
 # Only download this if you are interested in retraining the above model
-python -m happypose.toolbox.utils.download --cosypose_model=ycbv-refiner-syntonly--596719
+python -m happypose.toolbox.utils.download --cosypose_models=ycbv-refiner-syntonly--596719
 
 # T-LESS coarse and refiner models
-python -m happypose.toolbox.utils.download --cosypose_model=tless-coarse--10219
-python -m happypose.toolbox.utils.download --cosypose_model=tless-refiner--585928
+python -m happypose.toolbox.utils.download --cosypose_models=tless-coarse--10219
+python -m happypose.toolbox.utils.download --cosypose_models=tless-refiner--585928
 ```
 
 ## 2D detections

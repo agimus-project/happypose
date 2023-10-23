@@ -68,9 +68,9 @@ jobs:
         run: |
           mkdir local_data
           python -m happypose.toolbox.utils.download \
-                    --cosypose_model=detector-bop-ycbv-pbr--970850 \
-                    --cosypose_model=coarse-bop-ycbv-pbr--724183 \
-                    --cosypose_model=refiner-bop-ycbv-pbr--604090 \
+                    --cosypose_models=detector-bop-ycbv-pbr--970850 \
+                    --cosypose_models=coarse-bop-ycbv-pbr--724183 \
+                    --cosypose_models=refiner-bop-ycbv-pbr--604090 \
                     --megapose_models
 
           cd tests/data
