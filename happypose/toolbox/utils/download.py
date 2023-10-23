@@ -72,6 +72,8 @@ def main():
     parser.add_argument("--all_bop20_results", action="store_true")
     parser.add_argument("--all_bop20_models", action="store_true")
 
+    to_dl = []
+
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
     if args.debug:
@@ -79,7 +81,7 @@ def main():
 
     if args.bop_dataset:
         for dataset in args.bop_dataset:
-            download(BOP_SRC + f"{dataset}_base.zip", BOP_DS_DIR / dataset)
+            to_dl.append((BOP_SRC + f"{dataset}_base.zip", BOP_DS_DIR / dataset))
             download_pbr = args.pbr_training_images and BOP_DATASETS[dataset].get(
                 "has_pbr", True
             )
@@ -87,118 +89,124 @@ def main():
             if download_pbr:
                 suffixes += ["train_pbr"]
             for suffix in suffixes:
-                download(
-                    BOP_SRC + f"{dataset}_{suffix}.zip",
-                    BOP_DS_DIR / dataset,
+                to_dl.append(
+                    (
+                        BOP_SRC + f"{dataset}_{suffix}.zip",
+                        BOP_DS_DIR / dataset,
+                    )
                 )
 
     if args.bop_extra_files:
         for extra in args.bop_extra_files:
             if extra == "tless":
                 # https://github.com/kirumang/Pix2Pose#download-pre-trained-weights
-                download(
-                    f"{DOWNLOAD_URL}/cosypose/bop_datasets/tless/all_target_tless.json",
-                    BOP_DS_DIR / "tless",
+                to_dl.append(
+                    (
+                        f"{DOWNLOAD_URL}/cosypose/bop_datasets/tless/all_target_tless.json",
+                        BOP_DS_DIR / "tless",
+                    )
                 )
                 os.symlink(
                     BOP_DS_DIR / "tless/models_eval", BOP_DS_DIR / "tless/models"
                 )
             elif extra == "ycbv":
                 # Friendly names used with YCB-Video
-                downloads(
+                to_dl += [
                     (
-                        None,
                         f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/ycbv_friendly_names.txt",
                         BOP_DS_DIR / "ycbv",
                     ),
                     # Offsets between YCB-Video and BOP (extracted from BOP readme)
                     (
-                        None,
                         f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/offsets.txt",
                         BOP_DS_DIR / "ycbv",
                     ),
                     # Evaluation models for YCB-Video (used by other works)
                     (
-                        None,
                         f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_original",
                         BOP_DS_DIR / "ycbv",
                     ),
                     # Keyframe definition
                     (
-                        None,
                         f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/keyframe.txt",
                         BOP_DS_DIR / "ycbv",
                     ),
-                )
+                ]
 
     if args.urdf_models:
         for model in args.urdf_models:
-            download(
-                f"{DOWNLOAD_URL}/cosypose/urdfs/{model}",
-                LOCAL_DATA_DIR / "urdfs",
+            to_dl.append(
+                (
+                    f"{DOWNLOAD_URL}/cosypose/urdfs/{model}",
+                    LOCAL_DATA_DIR / "urdfs",
+                )
             )
 
     if args.ycbv_compat_models:
-        downloads(
+        to_dl += [
             (
-                None,
                 f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_bop-compat",
                 BOP_DS_DIR / "ycbv",
             ),
             (
-                None,
                 f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_bop-compat_eval",
                 BOP_DS_DIR / "ycbv",
             ),
-        )
+        ]
 
     if args.cosypose_models:
         for model in args.cosypose_models:
-            download(
-                f"{DOWNLOAD_URL}/cosypose/experiments/{model}",
-                LOCAL_DATA_DIR / "experiments",
+            to_dl.append(
+                (
+                    f"{DOWNLOAD_URL}/cosypose/experiments/{model}",
+                    LOCAL_DATA_DIR / "experiments",
+                )
             )
 
     if args.megapose_models:
         # rclone copyto inria_data:megapose-models/ megapose-models/
         #     --exclude="**epoch**" --config $MEGAPOSE_DIR/rclone.conf -P
-        download(
-            f"{DOWNLOAD_URL}/megapose/megapose-models/",
-            LOCAL_DATA_DIR / "megapose-models/",
-            flags=["--exclude", ".*epoch.*"],
+        to_dl.append(
+            (
+                f"{DOWNLOAD_URL}/megapose/megapose-models/",
+                LOCAL_DATA_DIR / "megapose-models/",
+                ["--exclude", ".*epoch.*"],
+            )
         )
 
     if args.detections:
         for detection in args.detections:
-            download(
-                f"{DOWNLOAD_URL}/cosypose/saved_detections/{detection}.pkl",
-                LOCAL_DATA_DIR / "saved_detections",
+            to_dl.append(
+                (
+                    f"{DOWNLOAD_URL}/cosypose/saved_detections/{detection}.pkl",
+                    LOCAL_DATA_DIR / "saved_detections",
+                )
             )
 
     if args.result_id:
         for result in args.result_id:
-            download(
-                f"{DOWNLOAD_URL}/cosypose/results/{result}",
-                LOCAL_DATA_DIR / "results",
+            to_dl.append(
+                (
+                    f"{DOWNLOAD_URL}/cosypose/results/{result}",
+                    LOCAL_DATA_DIR / "results",
+                )
             )
 
     if args.bop_result_id:
         for result in args.bop_result_id:
-            downloads(
+            to_dl += [
                 (
-                    None,
                     f"{DOWNLOAD_URL}/cosypose/bop_predictions/{result}.csv",
                     LOCAL_DATA_DIR / "bop_predictions",
                 ),
                 (
-                    None,
                     f"{DOWNLOAD_URL}/cosypose/bop_eval_outputs/{result}",
                     LOCAL_DATA_DIR / "bop_predictions",
                 ),
-            )
+            ]
 
     if args.texture_dataset:
-        download(f"{DOWNLOAD_URL}/cosypose/zip_files/textures.zip", DOWNLOAD_DIR)
+        to_dl.append((f"{DOWNLOAD_URL}/cosypose/zip_files/textures.zip", DOWNLOAD_DIR))
         logger.info("Extracting textures ...")
         zipfile.ZipFile(DOWNLOAD_DIR / "textures.zip").extractall(
             LOCAL_DATA_DIR / "texture_datasets",
@@ -206,25 +214,25 @@ def main():
 
     if args.synt_dataset:
         for dataset in args.synt_dataset:
-            download(f"{DOWNLOAD_URL}/cosypose/zip_files/{dataset}.zip", DOWNLOAD_DIR)
+            to_dl.append(
+                (f"{DOWNLOAD_URL}/cosypose/zip_files/{dataset}.zip", DOWNLOAD_DIR)
+            )
             logger.info("Extracting textures ...")
             zipfile.ZipFile(DOWNLOAD_DIR / f"{dataset}.zip").extractall(
                 LOCAL_DATA_DIR / "synt_datasets",
             )
 
     if args.example_scenario:
-        downloads(
+        to_dl += [
             (
-                None,
                 f"{DOWNLOAD_URL}/cosypose/custom_scenarios/example/candidates.csv",
                 LOCAL_DATA_DIR / "custom_scenarios/example",
             ),
             (
-                None,
                 f"{DOWNLOAD_URL}/cosypose/custom_scenarios/example/scene_camera.json",
                 LOCAL_DATA_DIR / "custom_scenarios/example",
             ),
-        )
+        ]
 
     if args.all_bop20_models:
         from happypose.pose_estimators.cosypose.cosypose.bop_config import (
@@ -245,9 +253,11 @@ def main():
             SYNT_REAL_REFINER,
         ):
             for model in model_dict.values():
-                download(
-                    f"{DOWNLOAD_URL}/cosypose/experiments/{model}",
-                    LOCAL_DATA_DIR / "experiments",
+                to_dl.append(
+                    (
+                        f"{DOWNLOAD_URL}/cosypose/experiments/{model}",
+                        LOCAL_DATA_DIR / "experiments",
+                    )
                 )
 
     if args.all_bop20_results:
@@ -266,33 +276,21 @@ def main():
             SYNT_REAL_4VIEWS_INFERENCE_ID,
             SYNT_REAL_8VIEWS_INFERENCE_ID,
         ):
-            download(
-                f"{DOWNLOAD_URL}/cosypose/results/{result_id}",
-                LOCAL_DATA_DIR / "results",
+            to_dl.append(
+                (
+                    f"{DOWNLOAD_URL}/cosypose/results/{result_id}",
+                    LOCAL_DATA_DIR / "results",
+                )
             )
 
-
-def downloads(*args):
-    """Manages multiple downloads in async."""
-    asyncio.run(adownloads(*args))
+    print(f"{to_dl=}")
+    asyncio.run(adownloads(*to_dl))
 
 
 async def adownloads(*args):
     async with DownloadClient() as dl_client:
-        for new_flags, download_path, local_path in args:
-            if new_flags is None:
-                new_flags = []
-            new_flags = Flags(new_flags)
-            dl_client.create_task(
-                dl_client.adownload(download_path, local_path, new_flags),
-            )
-
-
-def download(download_path, local_path, flags=None):
-    if flags is None:
-        flags = []
-    flags = Flags(flags)
-    asyncio.run(DownloadClient.run(download_path, local_path, flags))
+        for arg in args:
+            dl_client.create_task(dl_client.adownload(*arg))
 
 
 class DownloadClient:
@@ -323,7 +321,11 @@ class DownloadClient:
         self.task_set.add(task)
         task.add_done_callback(self.task_set.discard)
 
-    async def adownload(self, download_path, local_path, flags):
+    async def adownload(self, download_path, local_path, flags=None):
+        if flags is None:
+            flags = []
+        flags = Flags(flags)
+
         Path_download = Path(download_path)
         if Path_download.name != local_path.name:
             local_path = local_path / Path_download.name
