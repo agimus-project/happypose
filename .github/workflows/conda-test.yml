@@ -46,23 +46,11 @@ jobs:
         id: cache
 
       - name: Update conda environment with happypose dependencies
-        run:
-          mamba env update -n happypose -f environment.yml
+        run: mamba env update -n happypose -f environment.yml
         if: steps.cache.outputs.cache-hit != 'true'
 
-      #- name: Install bop toolkit (temporal fix)
-        #run: |
-          #cd deps/bop_toolkit_challenge/
-          #sed 's/==.*$//' requirements.txt > req_nover.txt
-          #pip install -r req_nover.txt -e .
-        #if: steps.cache.outputs.cache-hit != 'true'
-
       - name: Install happypose
-        run: |
-          cd happypose/pose_estimators/cosypose
-          pip install .
-          cd ../../..
-          pip install -e .
+        run: pip install -e .
 
       - name: Download pre-trained models required for tests
         run: |
@@ -78,9 +66,10 @@ jobs:
 
       - name: Run tests
         run: |
-          pip install pytest coverage
-          coverage run --source=happypose -m pytest tests
+          pip install coverage
+          coverage run --source=happypose -m unittest
           coverage xml
+
       - uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
