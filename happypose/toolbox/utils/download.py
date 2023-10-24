@@ -19,6 +19,7 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 DOWNLOAD_URL = "https://www.paris.inria.fr/archive_ylabbeprojectsdata"
+LAAS_DOWNLOAD_URL = "https://gepettoweb.laas.fr/data/happypose/"
 
 DOWNLOAD_DIR = LOCAL_DATA_DIR / "downloads"
 DOWNLOAD_DIR.mkdir(exist_ok=True)
@@ -67,6 +68,7 @@ def main():
     parser.add_argument("--bop_result_id", nargs="*")
     parser.add_argument("--synt_dataset", nargs="*")
     parser.add_argument("--detections", nargs="*")
+    parser.add_argument("--examples", nargs="*")
     parser.add_argument("--example_scenario", action="store_true")
     parser.add_argument("--pbr_training_images", action="store_true")
     parser.add_argument("--all_bop20_results", action="store_true")
@@ -280,6 +282,14 @@ def main():
                 (
                     f"{DOWNLOAD_URL}/cosypose/results/{result_id}",
                     LOCAL_DATA_DIR / "results",
+                )
+            )
+    if args.examples:
+        for example in args.examples:
+            to_dl.append(
+                (
+                    f"{LAAS_DOWNLOAD_URL}/examples/{example}",
+                    LOCAL_DATA_DIR / "examples",
                 )
             )
 

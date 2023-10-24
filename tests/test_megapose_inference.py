@@ -1,10 +1,10 @@
 """Set of unit tests for testing inference example for MegaPose."""
 import unittest
-from pathlib import Path
 
 import numpy as np
 import pinocchio as pin
 
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 from happypose.toolbox.datasets.bop_object_datasets import BOPObjectDataset
 from happypose.toolbox.utils.load_model import NAMED_MODELS, load_named_model
 
@@ -25,7 +25,7 @@ class TestMegaPoseInference(unittest.TestCase):
         detections = detections[:1]  # let's keep the most promising one only.
 
         object_dataset = BOPObjectDataset(
-            Path(__file__).parent / "data" / "crackers_example" / "models",
+            LOCAL_DATA_DIR / "examples" / "crackers_example" / "models",
             label_format="ycbv-{label}",
         )
 

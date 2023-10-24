@@ -1,6 +1,5 @@
 """Set of unit tests for testing inference example for CosyPose."""
 import unittest
-from pathlib import Path
 
 import numpy as np
 import pinocchio as pin
@@ -8,7 +7,7 @@ import torch
 import yaml
 from PIL import Image
 
-from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, LOCAL_DATA_DIR
 from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
     PoseEstimator,
@@ -86,7 +85,7 @@ class TestCosyPoseInference(unittest.TestCase):
     ):
         """Load coarse and refiner for the crackers example renderer."""
         object_dataset = BOPObjectDataset(
-            Path(__file__).parent / "data" / "crackers_example" / "models",
+            LOCAL_DATA_DIR / "examples" / "crackers_example" / "models",
             label_format="ycbv-{label}",
         )
         renderer = Panda3dBatchRenderer(
@@ -105,7 +104,7 @@ class TestCosyPoseInference(unittest.TestCase):
     @staticmethod
     def _load_crackers_example_observation():
         """Load cracker example observation tensor."""
-        data_dir = Path(__file__).parent.joinpath("data").joinpath("crackers_example")
+        data_dir = LOCAL_DATA_DIR / "examples" / "crackers_example"
         camera_data = CameraData.from_json((data_dir / "camera_data.json").read_text())
         rgb = np.array(Image.open(data_dir / "image_rgb.png"), dtype=np.uint8)
         assert rgb.shape[:2] == camera_data.resolution
