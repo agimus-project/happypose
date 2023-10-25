@@ -34,10 +34,12 @@ jobs:
         run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
         shell: bash
 
-      - name: Caching of the happypose installation
+      - name: Caching of the happypose installation and data
         uses: actions/cache@v3
         with:
-          path: ${{ env.CONDA }}/envs
+          path: |
+            ${{ env.CONDA }}/envs
+            local_data
           key:
             conda-${{ runner.os }}--${{ runner.arch }}--${{steps.get-date.outputs.today }}-${{hashFiles('environment.yml') }}-${{env.CACHE_NUMBER }}
         env:
@@ -54,7 +56,6 @@ jobs:
 
       - name: Download pre-trained models required for tests
         run: |
-          mkdir local_data
           python -m happypose.toolbox.utils.download \
             --megapose_models \
             --examples \

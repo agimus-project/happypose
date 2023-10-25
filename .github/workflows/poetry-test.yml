@@ -19,6 +19,11 @@ jobs:
       - name: Setup poetry
         run: pipx install poetry
 
+      - name: Caching of the happypose installation and data
+        uses: actions/cache@v3
+        with:
+          path: local_data
+
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -29,7 +34,6 @@ jobs:
 
       - name: Download pre-trained models required for tests
         run: |
-          mkdir local_data
           poetry run python -m happypose.toolbox.utils.download \
             --megapose_models \
             --examples \
