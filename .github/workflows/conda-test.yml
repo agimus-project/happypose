@@ -56,6 +56,7 @@ jobs:
 
       - name: Download pre-trained models required for tests
         run: |
+          mkdir -p local_data
           python -m happypose.toolbox.utils.download \
             --megapose_models \
             --examples \
