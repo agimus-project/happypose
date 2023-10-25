@@ -27,8 +27,8 @@ version = "0.1.0"
 addict = "^2.4.0"
 beautifulsoup4 = "^4.12.2"
 bokeh = "^3.2.2"
-bop_toolkit_lib = {path = "deps/bop_toolkit_challenge"}
-cosypose = {path = "happypose/pose_estimators/cosypose"}
+bop_toolkit_lib = {git = "https://github.com/thodan/bop_toolkit", optional = true}
+cosypose = {optional = true, path = "happypose/pose_estimators/cosypose"}
 httpx = "^0.25.0"
 imageio = "^2.31.4"
 ipython = "^8.12.2"
@@ -64,6 +64,8 @@ webdataset = "^0.2.57"
 
 [tool.poetry.extras]
 cpu = ["torch", "torchvision"]
+evaluation = ["bop_toolkit_lib"]
+multiview = ["cosypose"]
 render = ["panda3d", "pybullet"]
 
 [tool.poetry.group.dev]
@@ -73,7 +75,6 @@ optional = true
 black = "^23.9.1"
 coverage = {extras = ["toml"], version = "^7.2.5"}
 pre-commit = "^3.2.1"
-pytest = "^7.4.2"
 ruff = "^0.0.290"
 
 [tool.poetry.group.docs]
