@@ -293,7 +293,7 @@ def main():
                 )
             )
 
-    print(f"{to_dl=}")
+    # logger.info(f"{to_dl=}")
     asyncio.run(adownloads(*to_dl))
 
 
@@ -380,6 +380,16 @@ class DownloadClient:
                 )
 
     async def download_file(self, download_path, local_path):
+        local_path = Path(local_path)
+        if local_path.exists():
+            # logger.info(f"Existing {download_path=}")
+            local_size = local_path.stat().st_size
+            head = await self.client.head(download_path)
+            if "content-length" in head.headers and local_size == int(
+                head.headers["content-length"]
+            ):
+                logger.info(f"Skipping {download_path} already fully downloaded")
+                return
         try:
             r = await self.client.get(download_path)
         except httpx.PoolTimeout:
@@ -389,8 +399,8 @@ class DownloadClient:
             logger.error(f"Failed {download_path} with code {r.status_code}")
             return
         logger.info(f"Copying {download_path} to {local_path}")
-        Path(local_path.parent).mkdir(parents=True, exist_ok=True)
-        with open(str(local_path), "wb") as f:
+        local_path.parent.mkdir(parents=True, exist_ok=True)
+        with local_path.open("wb") as f:
             f.write(r.content)
 
 
