@@ -622,7 +622,7 @@ class PoseEstimator(PoseEstimationModule):
         timing_str += f"scoring={scoring_extra_data['time']:.2f}, "
 
         # Extract the highest scoring pose estimate for each instance_id
-        data_TCO_final_scored = self.filter_top_pose_estimates(
+        data_TCO_final_scored = filter_top_pose_estimates(
             data_TCO_scored, 
             top_K=1, 
             group_cols=["batch_im_id", "label", "instance_id"],
