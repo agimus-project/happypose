@@ -16,51 +16,35 @@ limitations under the License.
 
 
 # Standard Library
-import time
 from collections import defaultdict
-from typing import Dict, Optional
-from pathlib import Path
-
-
-# Third Party
-import numpy as np
-import torch
-from torch.utils.data import DataLoader
-from tqdm import tqdm
+from typing import Optional
 
 # MegaPose
 import happypose.pose_estimators.megapose
 import happypose.toolbox.utils.tensor_collection as tc
-from happypose.pose_estimators.megapose.inference.pose_estimator import (
-    PoseEstimator,
+
+# Third Party
+import torch
+from happypose.pose_estimators.megapose.evaluation.bop import (
+    get_sam_detections,
+    load_sam_predictions,
 )
+from happypose.pose_estimators.megapose.inference.pose_estimator import PoseEstimator
 from happypose.pose_estimators.megapose.inference.types import (
     DetectionsType,
     InferenceConfig,
     ObservationTensor,
     PoseEstimatesType,
 )
-from happypose.pose_estimators.megapose.config import BOP_DS_DIR
-from happypose.pose_estimators.megapose.evaluation.bop import (
-    get_sam_detections,
-    load_sam_predictions,
-)
-
 from happypose.pose_estimators.megapose.training.utils import CudaTimer
 from happypose.toolbox.datasets.samplers import DistributedSceneSampler
-from happypose.toolbox.datasets.scene_dataset import (
-    SceneDataset,
-    SceneObservation,
-    ObjectData,
-)
-from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, get_world_size
-from happypose.toolbox.utils.logging import get_logger
-
+from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation
 
 # Temporary
-from happypose.toolbox.inference.utils import make_detections_from_object_data
-import pandas as pd
-import json
+from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, get_world_size
+from happypose.toolbox.utils.logging import get_logger
+from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 logger = get_logger(__name__)
 
@@ -81,7 +65,9 @@ class PredictionRunner:
         self.tmp_dir = get_tmp_dir()
 
         sampler = DistributedSceneSampler(
-            scene_ds, num_replicas=self.world_size, rank=self.rank
+            scene_ds,
+            num_replicas=self.world_size,
+            rank=self.rank,
         )
         self.sampler = sampler
         self.scene_ds = scene_ds
@@ -104,12 +90,13 @@ class PredictionRunner:
         gt_detections: DetectionsType,
         sam_detections: DetectionsType,
         initial_estimates: Optional[PoseEstimatesType] = None,
-    ) -> Dict[str, PoseEstimatesType]:
+    ) -> dict[str, PoseEstimatesType]:
         """Runs inference pipeline, extracts the results.
 
         Returns: A dict with keys
             - 'final': final preds
-            - 'refiner/final': preds at final refiner iteration (before depth refinement)
+            - 'refiner/final': preds at final refiner iteration (before depth
+              refinement)
             - 'depth_refinement': preds after depth refinement.
 
 
@@ -128,16 +115,15 @@ class PredictionRunner:
             run_detector = True
 
         else:
-            raise ValueError(
-                f"Unknown detection type {self.inference_cfg.detection_type}"
-            )
+            msg = f"Unknown detection type {self.inference_cfg.detection_type}"
+            raise ValueError(msg)
 
         coarse_estimates = None
         if self.inference_cfg.coarse_estimation_type == "external":
             # TODO (ylabbe): This is hacky, clean this for modelnet eval.
             coarse_estimates = initial_estimates
             coarse_estimates = happypose.toolbox.inference.utils.add_instance_id(
-                coarse_estimates
+                coarse_estimates,
             )
             coarse_estimates.infos["instance_id"] = 0
             run_detector = False
@@ -159,13 +145,13 @@ class PredictionRunner:
         # - 'refiner/iteration=5`
         # - `depth_refiner`
         # Note: Since we support multi-hypotheses we need to potentially
-        # go back and extract out the 'refiner/iteration=1`, `refiner/iteration=5` things for the ones that were actually the highest scoring at the end.
+        # go back and extract out the 'refiner/iteration=1`, `refiner/iteration=5`
+        # things for the ones that were actually the highest scoring at the end.
 
+        ref_str = f"refiner/iteration={self.inference_cfg.n_refiner_iterations}"
         all_preds = {
             "final": preds,
-            f"refiner/iteration={self.inference_cfg.n_refiner_iterations}": extra_data[
-                "refiner"
-            ]["preds"],
+            ref_str: extra_data["refiner"]["preds"],
             "refiner/final": extra_data["refiner"]["preds"],
             "coarse": extra_data["coarse"]["preds"],
             "coarse_filter": extra_data["coarse_filter"]["preds"],
@@ -183,17 +169,18 @@ class PredictionRunner:
             all_preds["depth_refiner"] = extra_data["depth_refiner"]["preds"]
             all_preds_data["depth_refiner"] = extra_data["depth_refiner"]["data"]
 
-        for k, v in all_preds.items():
+        for _k, v in all_preds.items():
             if "mask" in v.tensors:
-                breakpoint()
+                # breakpoint()
                 v.delete_tensor("mask")
 
         return all_preds, all_preds_data
 
     def get_predictions(
-        self, pose_estimator: PoseEstimator
-    ) -> Dict[str, PoseEstimatesType]:
-        """Runs predictions
+        self,
+        pose_estimator: PoseEstimator,
+    ) -> dict[str, PoseEstimatesType]:
+        """Runs predictions.
 
         Returns: A dict with keys
             - 'refiner/iteration=1`
@@ -204,7 +191,6 @@ class PredictionRunner:
 
 
         """
-
         predictions_list = defaultdict(list)
 
         ######
@@ -214,7 +200,8 @@ class PredictionRunner:
         # Temporary solution
         if self.inference_cfg.detection_type == "sam":
             df_all_dets, df_targets = load_sam_predictions(
-                self.scene_ds.ds_dir.name, self.scene_ds.ds_dir
+                self.scene_ds.ds_dir.name,
+                self.scene_ds.ds_dir,
             )
 
         for n, data in enumerate(tqdm(self.dataloader)):
@@ -274,19 +261,20 @@ class PredictionRunner:
             cuda_timer.end()
             duration = cuda_timer.elapsed()
 
-            total_duration = duration + dt_det
+            duration + dt_det
 
             # Add metadata to the predictions for later evaluation
             for pred_name, pred in all_preds.items():
                 pred.infos["time"] = dt_det + compute_pose_est_total_time(
-                    all_preds_data, pred_name
+                    all_preds_data,
+                    pred_name,
                 )
                 pred.infos["scene_id"] = scene_id
                 pred.infos["view_id"] = view_id
                 predictions_list[pred_name].append(pred)
 
         # Concatenate the lists of PandasTensorCollections
-        predictions = dict()
+        predictions = {}
         for k, v in predictions_list.items():
             predictions[k] = tc.concatenate(v)
 
@@ -315,4 +303,5 @@ def compute_pose_est_total_time(all_preds_data: dict, pred_name: str):
             else dt_coarse_refiner
         )
     else:
-        raise ValueError(f"{pred_name} extra data not in {all_preds_data.keys()}")
+        msg = f"{pred_name} extra data not in {all_preds_data.keys()}"
+        raise ValueError(msg)

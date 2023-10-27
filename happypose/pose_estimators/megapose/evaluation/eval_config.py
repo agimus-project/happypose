@@ -17,7 +17,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 # MegaPose
 from happypose.pose_estimators.megapose.inference.types import InferenceConfig
@@ -48,7 +48,8 @@ class EvalConfig:
     2. If `run_id` is None, then use `config_id`, `run_comment`and
     `run_postfix` to create a `run_id`
 
-    In 2., the parameters of the config are set-up using the function `update_cfg_with_config_id`.
+    In 2., the parameters of the config are set-up using the function
+    `update_cfg_with_config_id`.
     """
 
     # Network
@@ -85,8 +86,8 @@ class EvalConfig:
 @dataclass
 class FullEvalConfig(EvalConfig):
     # Full eval
-    detection_coarse_types: Optional[List] = None
-    ds_names: Optional[List[str]] = None
+    detection_coarse_types: Optional[list] = None
+    ds_names: Optional[list[str]] = None
     run_bop_eval: bool = True
     eval_coarse_also: bool = False
     convert_only: bool = False
