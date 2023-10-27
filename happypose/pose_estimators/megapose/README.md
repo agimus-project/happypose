@@ -62,7 +62,7 @@ cd megapose6d && git submodule update --init
 
 ## 1. Set environment variables
 You should set the following environment variables:
-- `MEGAPOSE_DIR`:  The root directory of the `megapose` project.
+- `HAPPYPOSE_DATA_DIR`:  The root directory of the `megapose` project.
 - `HAPPYPOSE_DATA_DIR`: The root directory of the data directory. For example the data for the inference example will be downloaded to `HAPPYPOSE_DATA_DIR/examples`.
 
 ## 2. Install depedencies with conda or use the docker image
@@ -73,7 +73,7 @@ We support running `megapose` either in a [`conda`](#conda-installation) environ
 We will create a `conda` environment named `megapose` that contains all the dependencies, then install the `megapose` python package inside.
 
 ```
-cd $MEGAPOSE_DIR
+cd $HAPPYPOSE_DATA_DIR
 conda env create -f conda/environment_full.yaml
 conda activate megapose
 pip install -e .
@@ -92,19 +92,19 @@ conda env create -f conda/environment.yaml
 
 ### Install dependencies in conda
 
-Activate the conda environment and install `job_runner` and `megapose`. Note that the `megapose` install inside `conda` is just to enable us to run the data download scripts from the host machine rather than from `docker`. Navigate to the project root, if you haven't set `MEGAPOSE_DIR` then do it now
+Activate the conda environment and install `job_runner` and `megapose`. Note that the `megapose` install inside `conda` is just to enable us to run the data download scripts from the host machine rather than from `docker`. Navigate to the project root, if you haven't set `HAPPYPOSE_DATA_DIR` then do it now
 
 ```
-export MEGAPOSE_DIR=`pwd`
+export HAPPYPOSE_DATA_DIR=`pwd`
 ```
 
 Run the commands below to install `job_runner` and `megapose`.
 
 ```
 conda activate megapose
-cd $MEGAPOSE_DIR/runjob_cli && pip install -e .
+cd $HAPPYPOSE_DATA_DIR/runjob_cli && pip install -e .
 runjob-config runjob_config.yml
-cd $MEGAPOSE_DIR && rm -rf src/megapose.egg-info
+cd $HAPPYPOSE_DATA_DIR && rm -rf src/megapose.egg-info
 pip install -e . --no-deps
 ```
 
@@ -212,7 +212,7 @@ We provide a tutorial for running inference on an image with a novel object. You
 Pose estimation models are available at this [url](https://drive.google.com/drive/folders/1c3z8IkyIUThYxTU7CIs4QJ3kvD0RkyCz). You can download it using `rlcone`:
 ```
 cd $HAPPYPOSE_DATA_DIR
-rclone copyto megapose_public_readonly:/megapose-models megapose-models/ --exclude="**epoch**" --config $MEGAPOSE_DIR/rclone.conf -P
+rclone copyto megapose_public_readonly:/megapose-models megapose-models/ --exclude="**epoch**" --config $HAPPYPOSE_DATA_DIR/rclone.conf -P
 ```
 
 ## 2. Download example data
@@ -220,7 +220,7 @@ In this tutorial, we estimate the pose for a barbecue sauce bottle (from the [HO
 
 ```
 cd $HAPPYPOSE_DATA_DIR
-rclone copyto megapose_public_readonly:/examples examples/ --config $MEGAPOSE_DIR/rclone.conf -P
+rclone copyto megapose_public_readonly:/examples examples/ --config $HAPPYPOSE_DATA_DIR/rclone.conf -P
 ```
 
 The input files are the following:
@@ -327,14 +327,14 @@ The following commands download 10 chunks of each dataset as well as metadatas:
 
 ```
 cd $HAPPYPOSE_DATA_DIR
-rclone copyto megapose_public_readonly:/webdatasets/ webdatasets/ --include "0000000*.tar" --include "*.json" --include "*.feather" --config $MEGAPOSE_DIR/rclone.conf -P
+rclone copyto megapose_public_readonly:/webdatasets/ webdatasets/ --include "0000000*.tar" --include "*.json" --include "*.feather" --config $HAPPYPOSE_DATA_DIR/rclone.conf -P
 ```
 
 We then download the object models (please make sure you have access to the original datasets before downloading these preprocessed ones):
 
 ```
 cd $HAPPYPOSE_DATA_DIR
-rclone copyto megapose_public_readonly:/tars tars/ --include "shapenetcorev2.zip" --include "google_scanned_objects.zip" --config $MEGAPOSE_DIR/rclone.conf -P
+rclone copyto megapose_public_readonly:/tars tars/ --include "shapenetcorev2.zip" --include "google_scanned_objects.zip" --config $HAPPYPOSE_DATA_DIR/rclone.conf -P
 unzip tars/shapenetcorev2.zip
 unzip tars/google_scanned_objects.zip
 ```

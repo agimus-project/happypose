@@ -170,7 +170,7 @@ def main():
 
     if args.megapose_models:
         # rclone copyto inria_data:megapose-models/ megapose-models/
-        #     --exclude="**epoch**" --config $MEGAPOSE_DIR/rclone.conf -P
+        #     --exclude="**epoch**" --config $HAPPYPOSE_DATA_DIR/rclone.conf -P
         to_dl.append(
             (
                 f"{DOWNLOAD_URL}/megapose/megapose-models/",
