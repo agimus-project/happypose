@@ -40,17 +40,19 @@ from happypose.pose_estimators.megapose.inference.types import (
     ObservationTensor,
     PoseEstimatesType,
 )
-from happypose.pose_estimators.megapose.config import (
-    BOP_DS_DIR
-)
+from happypose.pose_estimators.megapose.config import BOP_DS_DIR
 from happypose.pose_estimators.megapose.evaluation.bop import (
     get_sam_detections,
-    load_sam_predictions
+    load_sam_predictions,
 )
 
 from happypose.pose_estimators.megapose.training.utils import CudaTimer
 from happypose.toolbox.datasets.samplers import DistributedSceneSampler
-from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation, ObjectData
+from happypose.toolbox.datasets.scene_dataset import (
+    SceneDataset,
+    SceneObservation,
+    ObjectData,
+)
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir, get_world_size
 from happypose.toolbox.utils.logging import get_logger
 
@@ -62,7 +64,7 @@ import json
 
 logger = get_logger(__name__)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class PredictionRunner:
@@ -73,13 +75,14 @@ class PredictionRunner:
         batch_size: int = 1,
         n_workers: int = 4,
     ) -> None:
-
         self.inference_cfg = inference_cfg
         self.rank = get_rank()
         self.world_size = get_world_size()
         self.tmp_dir = get_tmp_dir()
 
-        sampler = DistributedSceneSampler(scene_ds, num_replicas=self.world_size, rank=self.rank)
+        sampler = DistributedSceneSampler(
+            scene_ds, num_replicas=self.world_size, rank=self.rank
+        )
         self.sampler = sampler
         self.scene_ds = scene_ds
         dataloader = DataLoader(
@@ -125,13 +128,17 @@ class PredictionRunner:
             run_detector = True
 
         else:
-            raise ValueError(f"Unknown detection type {self.inference_cfg.detection_type}")
+            raise ValueError(
+                f"Unknown detection type {self.inference_cfg.detection_type}"
+            )
 
         coarse_estimates = None
         if self.inference_cfg.coarse_estimation_type == "external":
             # TODO (ylabbe): This is hacky, clean this for modelnet eval.
             coarse_estimates = initial_estimates
-            coarse_estimates = happypose.toolbox.inference.utils.add_instance_id(coarse_estimates)
+            coarse_estimates = happypose.toolbox.inference.utils.add_instance_id(
+                coarse_estimates
+            )
             coarse_estimates.infos["instance_id"] = 0
             run_detector = False
 
@@ -156,18 +163,20 @@ class PredictionRunner:
 
         all_preds = {
             "final": preds,
-            f"refiner/iteration={self.inference_cfg.n_refiner_iterations}": extra_data["refiner"]["preds"],
+            f"refiner/iteration={self.inference_cfg.n_refiner_iterations}": extra_data[
+                "refiner"
+            ]["preds"],
             "refiner/final": extra_data["refiner"]["preds"],
             "coarse": extra_data["coarse"]["preds"],
             "coarse_filter": extra_data["coarse_filter"]["preds"],
         }
 
         # Only keep necessary metadata
-        del extra_data['coarse']['data']['TCO']
+        del extra_data["coarse"]["data"]["TCO"]
         all_preds_data = {
-            'coarse': extra_data['coarse']['data'],
-            'refiner': extra_data['refiner']['data'],
-            'scoring': extra_data['scoring'],
+            "coarse": extra_data["coarse"]["data"],
+            "refiner": extra_data["refiner"]["data"],
+            "scoring": extra_data["scoring"],
         }
 
         if self.inference_cfg.run_depth_refiner:
@@ -181,7 +190,9 @@ class PredictionRunner:
 
         return all_preds, all_preds_data
 
-    def get_predictions(self, pose_estimator: PoseEstimator) -> Dict[str, PoseEstimatesType]:
+    def get_predictions(
+        self, pose_estimator: PoseEstimator
+    ) -> Dict[str, PoseEstimatesType]:
         """Runs predictions
 
         Returns: A dict with keys
@@ -202,15 +213,17 @@ class PredictionRunner:
         ######
         # Temporary solution
         if self.inference_cfg.detection_type == "sam":
-            df_all_dets, df_targets = load_sam_predictions(self.scene_ds.ds_dir.name, self.scene_ds.ds_dir)
+            df_all_dets, df_targets = load_sam_predictions(
+                self.scene_ds.ds_dir.name, self.scene_ds.ds_dir
+            )
 
         for n, data in enumerate(tqdm(self.dataloader)):
             # data is a dict
             rgb = data["rgb"]
             depth = data["depth"]
             K = data["cameras"].K
-            im_info = data['im_infos'][0]
-            scene_id, view_id = im_info['scene_id'], im_info['view_id']
+            im_info = data["im_infos"][0]
+            scene_id, view_id = im_info["scene_id"], im_info["view_id"]
             # Dirty but avoids creating error when running with real detector
             dt_det = 0
 
@@ -220,8 +233,13 @@ class PredictionRunner:
             ######
             # Temporary solution
             if self.inference_cfg.detection_type == "sam":
-                # We assume a unique image ("view") associated with a unique scene_id is 
-                sam_detections = get_sam_detections(data=data, df_all_dets=df_all_dets, df_targets=df_targets, dt_det=dt_det)
+                # We assume a unique image ("view") associated with a unique scene_id is
+                sam_detections = get_sam_detections(
+                    data=data,
+                    df_all_dets=df_all_dets,
+                    df_targets=df_targets,
+                    dt_det=dt_det,
+                )
             else:
                 sam_detections = None
             gt_detections = data["gt_detections"].cuda()
@@ -236,14 +254,22 @@ class PredictionRunner:
             if n == 0:
                 with torch.no_grad():
                     self.run_inference_pipeline(
-                        pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
+                        pose_estimator,
+                        obs_tensor,
+                        gt_detections,
+                        sam_detections,
+                        initial_estimates=initial_data,
                     )
 
             cuda_timer = CudaTimer()
             cuda_timer.start()
             with torch.no_grad():
                 all_preds, all_preds_data = self.run_inference_pipeline(
-                    pose_estimator, obs_tensor, gt_detections, sam_detections, initial_estimates=initial_data
+                    pose_estimator,
+                    obs_tensor,
+                    gt_detections,
+                    sam_detections,
+                    initial_estimates=initial_data,
                 )
             cuda_timer.end()
             duration = cuda_timer.elapsed()
@@ -252,11 +278,13 @@ class PredictionRunner:
 
             # Add metadata to the predictions for later evaluation
             for pred_name, pred in all_preds.items():
-                pred.infos['time'] = dt_det + compute_pose_est_total_time(all_preds_data, pred_name)
-                pred.infos['scene_id'] = scene_id
-                pred.infos['view_id'] = view_id
+                pred.infos["time"] = dt_det + compute_pose_est_total_time(
+                    all_preds_data, pred_name
+                )
+                pred.infos["scene_id"] = scene_id
+                pred.infos["view_id"] = view_id
                 predictions_list[pred_name].append(pred)
-            
+
         # Concatenate the lists of PandasTensorCollections
         predictions = dict()
         for k, v in predictions_list.items():
@@ -267,18 +295,24 @@ class PredictionRunner:
 
 def compute_pose_est_total_time(all_preds_data: dict, pred_name: str):
     # all_preds_data: dict_keys(['final', 'refiner/iteration=5', 'refiner/final', 'coarse', 'coarse_filter'])  # optionally 'depth_refiner'
-    dt_coarse = all_preds_data['coarse']['time']
-    dt_coarse_refiner = dt_coarse + all_preds_data['refiner']['time']
-    if 'depth_refiner' in all_preds_data:
-        dt_coarse_refiner_depth = dt_coarse_refiner + all_preds_data['depth_refiner']['time']
-    
-    if pred_name.startswith('coarse'):
+    dt_coarse = all_preds_data["coarse"]["time"]
+    dt_coarse_refiner = dt_coarse + all_preds_data["refiner"]["time"]
+    if "depth_refiner" in all_preds_data:
+        dt_coarse_refiner_depth = (
+            dt_coarse_refiner + all_preds_data["depth_refiner"]["time"]
+        )
+
+    if pred_name.startswith("coarse"):
         return dt_coarse
-    elif pred_name.startswith('refiner'):
+    elif pred_name.startswith("refiner"):
         return dt_coarse_refiner
-    elif pred_name == 'depth_refiner':
-        return dt_coarse_refiner_depth 
-    elif pred_name == 'final':
-        return dt_coarse_refiner_depth if 'depth_refiner' in all_preds_data else dt_coarse_refiner
+    elif pred_name == "depth_refiner":
+        return dt_coarse_refiner_depth
+    elif pred_name == "final":
+        return (
+            dt_coarse_refiner_depth
+            if "depth_refiner" in all_preds_data
+            else dt_coarse_refiner
+        )
     else:
-        raise ValueError(f'{pred_name} extra data not in {all_preds_data.keys()}')
+        raise ValueError(f"{pred_name} extra data not in {all_preds_data.keys()}")

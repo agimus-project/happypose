@@ -15,7 +15,6 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import copy
 import os
@@ -47,9 +46,17 @@ from happypose.pose_estimators.megapose.evaluation.eval_config import (
     HardwareConfig,
 )
 
-from happypose.pose_estimators.megapose.evaluation.evaluation import get_save_dir, generate_save_key, run_eval
+from happypose.pose_estimators.megapose.evaluation.evaluation import (
+    get_save_dir,
+    generate_save_key,
+    run_eval,
+)
 from happypose.pose_estimators.megapose.evaluation.bop import run_evaluation
-from happypose.toolbox.utils.distributed import get_rank, get_world_size, init_distributed_mode
+from happypose.toolbox.utils.distributed import (
+    get_rank,
+    get_world_size,
+    init_distributed_mode,
+)
 from happypose.toolbox.utils.logging import get_logger, set_logging_level
 
 logger = get_logger(__name__)
@@ -66,7 +73,9 @@ BOP_TEST_DATASETS = [
 ]
 
 
-MODELNET_TEST_DATASETS = [f"modelnet.{category}.test" for category in MODELNET_TEST_CATEGORIES]
+MODELNET_TEST_DATASETS = [
+    f"modelnet.{category}.test" for category in MODELNET_TEST_CATEGORIES
+]
 
 
 def create_eval_cfg(
@@ -75,7 +84,6 @@ def create_eval_cfg(
     coarse_estimation_type: str,
     ds_name: str,
 ) -> Tuple[str, EvalConfig]:
-
     cfg = copy.deepcopy(cfg)
 
     cfg.inference.detection_type = detection_type
@@ -101,7 +109,6 @@ def create_eval_cfg(
 
 
 def run_full_eval(cfg: FullEvalConfig) -> None:
-
     bop_eval_cfgs = []
 
     init_distributed_mode()
@@ -115,17 +122,17 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
 
     # Iterate over each dataset
     for ds_name in cfg.ds_names:
-
         # create the EvalConfig objects that we will call `run_eval` on
         eval_configs: Dict[str, EvalConfig] = dict()
         for detection_type, coarse_estimation_type in cfg.detection_coarse_types:
-            name, cfg_ = create_eval_cfg(cfg, detection_type, coarse_estimation_type, ds_name)
+            name, cfg_ = create_eval_cfg(
+                cfg, detection_type, coarse_estimation_type, ds_name
+            )
             eval_configs[name] = cfg_
 
         # For each eval_cfg run the evaluation.
         # Note that the results get saved to disk
         for save_key, eval_cfg in eval_configs.items():
-
             # Run the inference
             if not cfg.skip_inference:
                 eval_out = run_eval(eval_cfg)
@@ -152,7 +159,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
             if cfg.run_bop_eval and get_rank() == 0:
                 bop_eval_keys = set(("refiner/final", "depth_refiner"))
                 if cfg.eval_coarse_also:
-                    bop_eval_keys.add('coarse')
+                    bop_eval_keys.add("coarse")
 
                 # Remove from evaluation predictions that were not produced at inference time
                 bop_eval_keys = bop_eval_keys.intersection(set(eval_out["pred_keys"]))

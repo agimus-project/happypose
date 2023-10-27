@@ -84,7 +84,6 @@ class EvalConfig:
 
 @dataclass
 class FullEvalConfig(EvalConfig):
-
     # Full eval
     detection_coarse_types: Optional[List] = None
     ds_names: Optional[List[str]] = None
@@ -95,7 +94,6 @@ class FullEvalConfig(EvalConfig):
 
 @dataclass
 class BOPEvalConfig:
-
     results_path: str
     dataset: str
     split: str
