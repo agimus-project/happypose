@@ -34,14 +34,14 @@ The following commands download 10 chunks of each dataset as well as metadatas:
 
 ```
 cd $HAPPYPOSE_DATA_DIR
-rclone copyto megapose_public_readonly:/webdatasets/ webdatasets/ --include "0000000*.tar" --include "*.json" --include "*.feather" --config $MEGAPOSE_DIR/rclone.conf -P
+rclone copyto megapose_public_readonly:/webdatasets/ webdatasets/ --include "0000000*.tar" --include "*.json" --include "*.feather" --config $HAPPYPOSE_DATA_DIR/rclone.conf -P
 ```
 
 We then download the object models (please make sure you have access to the original datasets before downloading these preprocessed ones):
 
 ```
 cd $HAPPYPOSE_DATA_DIR
-rclone copyto megapose_public_readonly:/tars tars/ --include "shapenetcorev2.zip" --include "google_scanned_objects.zip" --config $MEGAPOSE_DIR/rclone.conf -P
+rclone copyto megapose_public_readonly:/tars tars/ --include "shapenetcorev2.zip" --include "google_scanned_objects.zip" --config $HAPPYPOSE_DATA_DIR/rclone.conf -P
 unzip tars/shapenetcorev2.zip
 unzip tars/google_scanned_objects.zip
 ```
