@@ -15,7 +15,6 @@ limitations under the License.
 
 
 # Standard Library
-import time
 from collections import defaultdict
 from typing import Optional
 
@@ -128,7 +127,6 @@ class PredictionRunner:
             coarse_estimates.infos["instance_id"] = 0
             run_detector = False
 
-        t = time.time()
         preds, extra_data = pose_estimator.run_inference_pipeline(
             obs_tensor,
             detections=detections,
@@ -140,7 +138,6 @@ class PredictionRunner:
             bsz_images=self.inference_cfg.bsz_images,
             bsz_objects=self.inference_cfg.bsz_objects,
         )
-        time.time() - t
 
         # TODO (lmanuelli): Process this into a dict with keys like
         # - 'refiner/iteration=1`
@@ -150,26 +147,33 @@ class PredictionRunner:
         # go back and extract out the 'refiner/iteration=1`, `refiner/iteration=5`
         # things for the ones that were actually the highest scoring at the end.
 
-        all_preds = {}
-        data_TCO_refiner = extra_data["refiner"]["preds"]
-
         ref_str = f"refiner/iteration={self.inference_cfg.n_refiner_iterations}"
         all_preds = {
             "final": preds,
-            ref_str: data_TCO_refiner,
-            "refiner/final": data_TCO_refiner,
+            ref_str: extra_data["refiner"]["preds"],
+            "refiner/final": extra_data["refiner"]["preds"],
             "coarse": extra_data["coarse"]["preds"],
+            "coarse_filter": extra_data["coarse_filter"]["preds"],
+        }
+
+        # Only keep necessary metadata
+        del extra_data["coarse"]["data"]["TCO"]
+        all_preds_data = {
+            "coarse": extra_data["coarse"]["data"],
+            "refiner": extra_data["refiner"]["data"],
+            "scoring": extra_data["scoring"],
         }
 
         if self.inference_cfg.run_depth_refiner:
             all_preds["depth_refiner"] = extra_data["depth_refiner"]["preds"]
+            all_preds_data["depth_refiner"] = extra_data["depth_refiner"]["data"]
 
         for _k, v in all_preds.items():
             if "mask" in v.tensors:
                 # breakpoint()
                 v.delete_tensor("mask")
 
-        return all_preds
+        return all_preds, all_preds_data
 
     def get_predictions(
         self,
@@ -246,7 +250,7 @@ class PredictionRunner:
             cuda_timer = CudaTimer()
             cuda_timer.start()
             with torch.no_grad():
-                all_preds = self.run_inference_pipeline(
+                all_preds, all_preds_data = self.run_inference_pipeline(
                     pose_estimator,
                     obs_tensor,
                     gt_detections,
@@ -256,14 +260,17 @@ class PredictionRunner:
             cuda_timer.end()
             duration = cuda_timer.elapsed()
 
-            total_duration = duration + dt_det
+            duration + dt_det
 
             # Add metadata to the predictions for later evaluation
-            for k, v in all_preds.items():
-                v.infos["time"] = total_duration
-                v.infos["scene_id"] = scene_id
-                v.infos["view_id"] = view_id
-                predictions_list[k].append(v)
+            for pred_name, pred in all_preds.items():
+                pred.infos["time"] = dt_det + compute_pose_est_total_time(
+                    all_preds_data,
+                    pred_name,
+                )
+                pred.infos["scene_id"] = scene_id
+                pred.infos["view_id"] = view_id
+                predictions_list[pred_name].append(pred)
 
         # Concatenate the lists of PandasTensorCollections
         predictions = {}
@@ -271,3 +278,32 @@ class PredictionRunner:
             predictions[k] = tc.concatenate(v)
 
         return predictions
+
+
+def compute_pose_est_total_time(all_preds_data: dict, pred_name: str):
+    # all_preds_data:
+    # dict_keys(
+    # ["final", "refiner/iteration=5", "refiner/final", "coarse", "coarse_filter"]
+    # )  # optionally 'depth_refiner'
+    dt_coarse = all_preds_data["coarse"]["time"]
+    dt_coarse_refiner = dt_coarse + all_preds_data["refiner"]["time"]
+    if "depth_refiner" in all_preds_data:
+        dt_coarse_refiner_depth = (
+            dt_coarse_refiner + all_preds_data["depth_refiner"]["time"]
+        )
+
+    if pred_name.startswith("coarse"):
+        return dt_coarse
+    elif pred_name.startswith("refiner"):
+        return dt_coarse_refiner
+    elif pred_name == "depth_refiner":
+        return dt_coarse_refiner_depth
+    elif pred_name == "final":
+        return (
+            dt_coarse_refiner_depth
+            if "depth_refiner" in all_preds_data
+            else dt_coarse_refiner
+        )
+    else:
+        msg = f"{pred_name} extra data not in {all_preds_data.keys()}"
+        raise ValueError(msg)
