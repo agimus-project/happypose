@@ -322,11 +322,6 @@ class DownloadClient:
             await asyncio.gather(*list(self.task_set))
         await self.client.aclose()
 
-    @classmethod
-    async def run(cls, download_path, local_path, flags):
-        async with cls() as dl_client:
-            await dl_client.adownload(download_path, local_path, flags)
-
     def create_task(self, awaitable):
         task = asyncio.create_task(awaitable)
         self.task_set.add(task)
