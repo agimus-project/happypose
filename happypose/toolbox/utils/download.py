@@ -398,7 +398,11 @@ class DownloadClient:
             async with self.client.stream("GET", download_path) as r:
                 total = int(r.headers["Content-Length"])
                 with tqdm(
-                    total=total, unit_scale=True, unit_divisor=1024, unit="B"
+                    desc=local_path.name,
+                    total=total,
+                    unit_scale=True,
+                    unit_divisor=1024,
+                    unit="B",
                 ) as progress:
                     num_bytes_downloaded = r.num_bytes_downloaded
                     async for chunk in r.aiter_bytes():
