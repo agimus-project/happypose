@@ -9,6 +9,7 @@ from pathlib import Path
 
 import httpx
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 from happypose.pose_estimators.cosypose.cosypose.config import (
     BOP_DS_DIR,
@@ -385,23 +386,28 @@ class DownloadClient:
             # logger.info(f"Existing {download_path=}")
             local_size = local_path.stat().st_size
             head = await self.client.head(download_path)
-            if "content-length" in head.headers and local_size == int(
-                head.headers["content-length"]
-            ):
-                logger.info(f"Skipping {download_path} already fully downloaded")
-                return
-        try:
-            r = await self.client.get(download_path)
-        except httpx.PoolTimeout:
-            logger.error(f"Failed {download_path} with timeout")
-            return
-        if r.status_code != 200:
-            logger.error(f"Failed {download_path} with code {r.status_code}")
-            return
+            if "content-length" in head.headers:
+                if local_size == int(head.headers["content-length"]):
+                    logger.info(f"Skipping {download_path} already fully downloaded")
+                    return
+                else:
+                    logger.info(f"Retrying incomplete {download_path}")
         logger.info(f"Copying {download_path} to {local_path}")
         local_path.parent.mkdir(parents=True, exist_ok=True)
         with local_path.open("wb") as f:
-            f.write(r.content)
+            async with self.client.stream("GET", download_path) as r:
+                total = int(r.headers["Content-Length"])
+                with tqdm(
+                    total=total, unit_scale=True, unit_divisor=1024, unit="B"
+                ) as progress:
+                    num_bytes_downloaded = r.num_bytes_downloaded
+                    async for chunk in r.aiter_bytes():
+                        f.write(chunk)
+                        progress.update(r.num_bytes_downloaded - num_bytes_downloaded)
+                        num_bytes_downloaded = r.num_bytes_downloaded
+            if r.status_code != 200:
+                logger.error(f"Failed {download_path} with code {r.status_code}")
+                return
 
 
 class Flags:
