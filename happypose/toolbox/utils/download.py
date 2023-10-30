@@ -391,7 +391,9 @@ class DownloadClient:
         local_path.parent.mkdir(parents=True, exist_ok=True)
         with local_path.open("wb") as f:
             async with self.client.stream("GET", download_path) as r:
-                total = int(r.headers["Content-Length"])
+                total = None
+                if "Content-Length" in r.headers:
+                    total = int(r.headers["Content-Length"])
                 with tqdm(
                     desc=local_path.name,
                     total=total,
