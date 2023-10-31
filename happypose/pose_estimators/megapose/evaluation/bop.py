@@ -307,12 +307,12 @@ def filter_detections_scene_view(scene_id, view_id, df_all_dets, df_targets):
 def keep_best_detections(df_dets_scene_img, df_targets_scene_img):
     lst_df_target = [] 
     nb_targets = len(df_targets_scene_img)
-    MARGIN = 0
     for it in range(nb_targets):
         target = df_targets_scene_img.iloc[it]
-        n_best = target.inst_count + MARGIN
+        n_best = target.inst_count
         df_filt_target = df_dets_scene_img[df_dets_scene_img['category_id'] == target.obj_id].sort_values('score', ascending=False)[:n_best]
-        lst_df_target.append(df_filt_target)
+        if len(df_filt_target) > 0:            
+            lst_df_target.append(df_filt_target)
 
     # if missing dets, keep only one detection to avoid downstream error
     df_dets_scene_img = pd.concat(lst_df_target) if len(lst_df_target) > 0 else df_dets_scene_img[:1]
