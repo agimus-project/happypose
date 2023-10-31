@@ -1,5 +1,6 @@
-from happypose.pose_estimators.megapose.inference.types import InferenceConfig
+import unittest
 
+from omegaconf import OmegaConf
 
 from happypose.pose_estimators.megapose.evaluation.eval_config import (
     BOPEvalConfig,
@@ -7,10 +8,8 @@ from happypose.pose_estimators.megapose.evaluation.eval_config import (
     FullEvalConfig,
     HardwareConfig,
 )
-from omegaconf import OmegaConf
+from happypose.pose_estimators.megapose.inference.types import InferenceConfig
 
-
-import unittest
 
 class TestOmegaConf(unittest.TestCase):
     """
@@ -25,5 +24,5 @@ class TestOmegaConf(unittest.TestCase):
         OmegaConf.structured(FullEvalConfig)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
