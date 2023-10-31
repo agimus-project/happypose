@@ -17,6 +17,7 @@ limitations under the License.
 from __future__ import annotations
 
 # Standard Library
+from typing import Union
 from dataclasses import dataclass
 
 # Third Party
@@ -93,7 +94,7 @@ class InferenceConfig:
     n_refiner_iterations: int = 5
     n_pose_hypotheses: int = 5
     run_depth_refiner: bool = False
-    depth_refiner: str | None = None  # ['icp', 'teaserpp']
+    depth_refiner: Union[str, None] = None  # ['icp', 'teaserpp']
     bsz_objects: int = 16  # How many parallel refiners to run
     bsz_images: int = 288  # How many images to push through coarse model
 
