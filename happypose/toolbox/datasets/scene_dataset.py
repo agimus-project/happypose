@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 from __future__ import annotations
 
 # Standard Library
@@ -24,7 +23,7 @@ import random
 import time
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 # Third Party
 import numpy as np
@@ -74,12 +73,12 @@ class ObjectData:
     # NOTE (Yann): bbox_amodal, bbox_modal, visib_fract should be moved to
     # SceneObservation
     label: str
-    TWO: Transform | None = None
-    unique_id: int | None = None
-    bbox_amodal: np.ndarray | None = None  # (4, ) array [xmin, ymin, xmax, ymax]
-    bbox_modal: np.ndarray | None = None  # (4, ) array [xmin, ymin, xmax, ymax]
-    visib_fract: float | None = None
-    TWO_init: Transform | None = None
+    TWO: Optional[Transform] = None
+    unique_id: Optional[int] = None
+    bbox_amodal: Optional[np.ndarray] = None  # (4, ) array [xmin, ymin, xmax, ymax]
+    bbox_modal: Optional[np.ndarray] = None  # (4, ) array [xmin, ymin, xmax, ymax]
+    visib_fract: Optional[float] = None
+    TWO_init: Optional[Transform] = None
     # Some pose estimation datasets (ModelNet) provide an initial pose estimate
     #  NOTE: This should be loaded externally
 
@@ -123,11 +122,11 @@ class ObjectData:
 
 @dataclass
 class CameraData:
-    K: np.ndarray | None = None
-    resolution: Resolution | None = None
-    TWC: Transform | None = None
-    camera_id: str | None = None
-    TWC_init: Transform | None = None
+    K: Optional[np.ndarray] = None
+    resolution: Optional[Resolution] = None
+    TWC: Optional[Transform] = None
+    camera_id: Optional[str] = None
+    TWC_init: Optional[Transform] = None
     # Some pose estimation datasets (ModelNet) provide an initial pose estimate
     #  NOTE: This should be loaded externally
 
@@ -192,23 +191,21 @@ class ObservationInfos:
 
 @dataclass
 class SceneObservation:
-    rgb: np.ndarray | None = None  # (h,w,3) uint8 numpy array
-    depth: np.ndarray | None = None  # (h, w), np.float32
-    segmentation: np.ndarray | None = None  # (h, w), np.uint32 (important);
+    rgb: Optional[np.ndarray] = None  # (h,w,3) uint8 numpy array
+    depth: Optional[np.ndarray] = None  # (h, w), np.float32
+    segmentation: Optional[np.ndarray] = None  # (h, w), np.uint32 (important);
     # contains objects unique ids. int64 are not handled and can be dangerous when used
     # with PIL
-    infos: ObservationInfos | None = None
-    object_datas: list[ObjectData] | None = None
-    camera_data: CameraData | None = None
-    binary_masks: dict[
-        int,
-        np.ndarray,
-    ] | None = None  # dict mapping unique id to (h, w) np.bool_
+    infos: Optional[ObservationInfos] = None
+    object_datas: Optional[list[ObjectData]] = None
+    camera_data: Optional[CameraData] = None
+    # dict mapping unique id to (h, w) np.bool_
+    binary_masks: Optional[dict[int, np.ndarray]] = None
 
     @staticmethod
     def collate_fn(
         batch: list[SceneObservation],
-        object_labels: list[str] | None = None,
+        object_labels: Optional[list[str]] = None,
     ) -> dict[Any, Any]:
         """Collate a batch of SceneObservation objects.
 
@@ -305,7 +302,7 @@ class SceneObservation:
 
     def as_pandas_tensor_collection(
         self,
-        object_labels: list[str] | None = None,
+        object_labels: Optional[list[str]] = None,
     ) -> SceneObservationTensorCollection:
         """Convert SceneData to a PandasTensorCollection representation."""
         obs = self
@@ -396,7 +393,7 @@ class SceneObservation:
 class SceneDataset(torch.utils.data.Dataset):
     def __init__(
         self,
-        frame_index: pd.DataFrame | None,
+        frame_index: Optional[pd.DataFrame],
         load_depth: bool = False,
         load_segmentation: bool = True,
     ):

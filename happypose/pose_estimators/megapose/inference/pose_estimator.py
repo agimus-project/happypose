@@ -13,13 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 from __future__ import annotations
 
 # Standard Library
 import time
 from collections import defaultdict
-from typing import Any
+from typing import Any, Optional
 
 # Third Party
 import numpy as np
@@ -57,10 +56,10 @@ class PoseEstimator(PoseEstimationModule):
 
     def __init__(
         self,
-        refiner_model: torch.nn.Module | None = None,
-        coarse_model: torch.nn.Module | None = None,
-        detector_model: torch.nn.Module | None = None,
-        depth_refiner: DepthRefiner | None = None,
+        refiner_model: Optional[torch.nn.Module] = None,
+        coarse_model: Optional[torch.nn.Module] = None,
+        detector_model: Optional[torch.nn.Module] = None,
+        depth_refiner: Optional[DepthRefiner] = None,
         bsz_objects: int = 8,
         bsz_images: int = 256,
         SO3_grid_size: int = 576,
@@ -516,17 +515,17 @@ class PoseEstimator(PoseEstimationModule):
     def run_inference_pipeline(
         self,
         observation: ObservationTensor,
-        detections: DetectionsType | None = None,
-        run_detector: bool | None = None,
+        detections: Optional[DetectionsType] = None,
+        run_detector: Optional[bool] = None,
         n_refiner_iterations: int = 5,
         n_pose_hypotheses: int = 1,
         keep_all_refiner_outputs: bool = False,
-        detection_filter_kwargs: dict | None = None,
+        detection_filter_kwargs: Optional[dict] = None,
         run_depth_refiner: bool = False,
-        bsz_images: int | None = None,
-        bsz_objects: int | None = None,
-        cuda_timer: bool = False,
-        coarse_estimates: PoseEstimatesType | None = None,
+        bsz_images: Optional[int] = None,
+        bsz_objects: Optional[int] = None,
+        cuda_timer: Optional[bool] = False,
+        coarse_estimates: Optional[PoseEstimatesType] = None,
     ) -> tuple[PoseEstimatesType, dict]:
         """Runs the entire pose estimation pipeline.
 

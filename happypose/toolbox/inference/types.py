@@ -13,11 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 from __future__ import annotations
 
 # Standard Library
 from dataclasses import dataclass
+from typing import Optional
 
 # Third Party
 import numpy as np
@@ -93,7 +93,7 @@ class InferenceConfig:
     n_refiner_iterations: int = 5
     n_pose_hypotheses: int = 5
     run_depth_refiner: bool = False
-    depth_refiner: str | None = None  # ['icp', 'teaserpp']
+    depth_refiner: Optional[str] = None  # ['icp', 'teaserpp']
     bsz_objects: int = 16  # How many parallel refiners to run
     bsz_images: int = 576  # How many images to push through coarse model
 
@@ -107,7 +107,7 @@ class ObservationTensor:
     """
 
     images: torch.Tensor  # [B,C,H,W]
-    K: torch.Tensor | None = None  # [B,3,3]
+    K: Optional[torch.Tensor] = None  # [B,3,3]
 
     def cuda(self) -> ObservationTensor:
         self.images = self.images.cuda()
@@ -164,8 +164,8 @@ class ObservationTensor:
     @staticmethod
     def from_numpy(
         rgb: np.ndarray,
-        depth: np.ndarray | None = None,
-        K: np.ndarray | None = None,
+        depth: Optional[np.ndarray] = None,
+        K: Optional[np.ndarray] = None,
     ) -> ObservationTensor:
         """Create an ObservationData type from numpy data.
 
