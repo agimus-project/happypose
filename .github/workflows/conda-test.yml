@@ -1,4 +1,4 @@
-name: Tests & Coverage
+name: Tests with conda
 
 on: [ push, pull_request ]
 
@@ -67,11 +67,4 @@ jobs:
               refiner-bop-ycbv-pbr--604090
 
       - name: Run tests
-        run: |
-          pip install coverage
-          coverage run --source=happypose -m unittest
-          coverage xml
-
-      - uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: python -m unittest
