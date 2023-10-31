@@ -1,0 +1,48 @@
+name: Tests with pip
+
+on: [ push, pull_request ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Install EGL mesa - required for Panda3D renderer
+        run: sudo apt-get update && sudo apt-get install -qqy libegl1-mesa libegl1-mesa-dev rclone
+
+      - name: Caching of the happypose installation and data
+        uses: actions/cache@v3
+        with:
+          path: local_data
+          key: data
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Update pip
+        run: pip install -U pip
+
+      - name: Install happypose
+        run: pip install ".[render,cpu,evaluation]" --extra-index-url https://download.pytorch.org/whl/cpu
+
+      - name: Download pre-trained models required for tests
+        run: |
+          mkdir -p local_data
+          python -m happypose.toolbox.utils.download \
+            --megapose_models \
+            --examples \
+              crackers_example \
+            --cosypose_models  \
+              detector-bop-ycbv-pbr--970850 \
+              coarse-bop-ycbv-pbr--724183 \
+              refiner-bop-ycbv-pbr--604090
+
+      - name: Run tests
+        run: python -m unittest
