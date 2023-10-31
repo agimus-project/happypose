@@ -76,6 +76,8 @@ def main():
     parser.add_argument("--all_bop20_models", action="store_true")
 
     to_dl = []
+    to_symlink = []
+    to_unzip = []
 
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
@@ -109,8 +111,8 @@ def main():
                         BOP_DS_DIR / "tless",
                     )
                 )
-                os.symlink(
-                    BOP_DS_DIR / "tless/models_eval", BOP_DS_DIR / "tless/models"
+                to_symlink.append(
+                    (BOP_DS_DIR / "tless/models_eval", BOP_DS_DIR / "tless/models")
                 )
             elif extra == "ycbv":
                 # Friendly names used with YCB-Video
@@ -210,9 +212,8 @@ def main():
 
     if args.texture_dataset:
         to_dl.append((f"{DOWNLOAD_URL}/cosypose/zip_files/textures.zip", DOWNLOAD_DIR))
-        logger.info("Extracting textures ...")
-        zipfile.ZipFile(DOWNLOAD_DIR / "textures.zip").extractall(
-            LOCAL_DATA_DIR / "texture_datasets",
+        to_unzip.append(
+            (DOWNLOAD_DIR / "textures.zip", LOCAL_DATA_DIR / "texture_datasets")
         )
 
     if args.synt_dataset:
@@ -220,9 +221,8 @@ def main():
             to_dl.append(
                 (f"{DOWNLOAD_URL}/cosypose/zip_files/{dataset}.zip", DOWNLOAD_DIR)
             )
-            logger.info("Extracting textures ...")
-            zipfile.ZipFile(DOWNLOAD_DIR / f"{dataset}.zip").extractall(
-                LOCAL_DATA_DIR / "synt_datasets",
+            to_unzip.append(
+                (DOWNLOAD_DIR / f"{dataset}.zip", LOCAL_DATA_DIR / "synt_datasets")
             )
 
     if args.example_scenario:
@@ -296,6 +296,12 @@ def main():
 
     # logger.info(f"{to_dl=}")
     asyncio.run(adownloads(*to_dl))
+
+    for src, dst in to_symlink:
+        os.symlink(src, dst)
+
+    for src, dst in to_unzip:
+        zipfile.ZipFile(src).extractall(dst)
 
 
 async def adownloads(*args):
