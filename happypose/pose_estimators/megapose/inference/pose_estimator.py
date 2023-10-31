@@ -563,12 +563,15 @@ class PoseEstimator(PoseEstimationModule):
                 start_time = time.time()
                 detections = self.forward_detection_model(observation)
                 detections = detections.cuda()
-                print("detections detector =", detections.bboxes)
+                print("# detections  =", len(detections.bboxes))
                 elapsed = time.time() - start_time
                 timing_str += f"detection={elapsed:.2f}, "
 
             # Ensure that detections has the instance_id column
             assert detections is not None
+            assert (
+                len(detections) > 0
+            ), "TOFIX: currently, dealing with absence of detections is not supported"
             detections = happypose.toolbox.inference.utils.add_instance_id(detections)
 
             # Filter detections

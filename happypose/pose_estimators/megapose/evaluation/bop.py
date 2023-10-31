@@ -1,4 +1,5 @@
-"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""
+Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,10 +39,6 @@ from happypose.pose_estimators.megapose.config import (
 from happypose.pose_estimators.megapose.evaluation.eval_config import BOPEvalConfig
 from happypose.toolbox.datasets.scene_dataset import ObjectData
 from happypose.toolbox.inference.utils import make_detections_from_object_data
-from happypose.toolbox.utils.tensor_collection import (
-    PandasTensorCollection,
-    filter_top_pose_estimates,
-)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -50,49 +47,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 POSE_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_pose.py"
 DETECTION_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop22_coco.py"
 DUMMY_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_dummy.py"
-
-
-##################################
-##################################
-
-# Official Task 4 detections (CNOS fastSAM)
-EXTERNAL_DETECTIONS_FILES = {
-    "ycbv": "cnos-fastsam_ycbv-test_f4f2127c-6f59-447c-95b3-28e1e591f1a1.json",
-    "lmo": "cnos-fastsam_lmo-test_3cb298ea-e2eb-4713-ae9e-5a7134c5da0f.json",
-    "tless": "cnos-fastsam_tless-test_8ca61cb0-4472-4f11-bce7-1362a12d396f.json",
-    "tudl": "cnos-fastsam_tudl-test_c48a2a95-1b41-4a51-9920-a667cb3d7149.json",
-    "icbin": "cnos-fastsam_icbin-test_f21a9faf-7ef2-4325-885f-f4b6460f4432.json",
-    "itodd": "cnos-fastsam_itodd-test_df32d45b-301c-4fc9-8769-797904dd9325.json",
-    "hb": "cnos-fastsam_hb-test_db836947-020a-45bd-8ec5-c95560b68011.json",
-}
-
-
-# # Official Task 1 detections (gdrnppdet-pbrreal)
-# EXTERNAL_DETECTIONS_FILES = {
-#     "ycbv": 'gdrnppdet-pbrreal_ycbv-test_abe6c5f1-cb26-4bbd-addc-bb76dd722a96.json',
-#     "lmo": 'gdrnppdet-pbrreal_lmo-test_202a2f15-cbd0-49df-90de-650428c6d157.json',
-#     "tless": 'gdrnppdet-pbrreal_tless-test_e112ecb4-7f56-4107-8a21-945bc7661267.json',
-#     "tudl": 'gdrnppdet-pbrreal_tudl-test_66fd26f1-bebf-493b-a42a-d71e8d10c479.json',
-#     "icbin": 'gdrnppdet-pbrreal_icbin-test_a46668ed-f76b-40ca-9954-708b198c2ab0.json',
-#     "itodd": 'gdrnppdet-pbrreal_itodd-test_9559c160-9507-4d09-94a5-ef0d6e8f22ce.json',
-#     "hb": 'gdrnppdet-pbrreal_hb-test_94485f5a-98ea-48f1-9472-06f4ceecad41.json',
-# }
-
-
-EXTERNAL_DETECTIONS_DIR = os.environ.get("EXTERNAL_DETECTIONS_DIR")
-assert EXTERNAL_DETECTIONS_DIR is not None
-EXTERNAL_DETECTIONS_DIR = Path(EXTERNAL_DETECTIONS_DIR)
-
-CNOS_SUBMISSION_PATHS = {
-    ds_name: EXTERNAL_DETECTIONS_DIR / fname
-    for ds_name, fname in EXTERNAL_DETECTIONS_FILES.items()
-}
-# Check if all paths exist
-assert sum(p.exists() for p in CNOS_SUBMISSION_PATHS.values()) == len(
-    EXTERNAL_DETECTIONS_FILES,
-)
-##################################
-##################################
 
 
 # Third Party
@@ -137,54 +91,24 @@ def convert_results_to_coco(results_path, out_json_path, detection_method):
         category_id = int(row.label.split("_")[-1])
         mask = predictions.masks[n].numpy().astype(np.uint8)
         rle = binary_mask_to_polygon(mask)
-        info = {
-            "scene_id": int(row.scene_id),
-            "view_id": int(row.view_id),
-            "category_id": category_id,
-            "bbox": [x, y, w, h],
-            "score": score,
-            "segmentation": rle,
-        }
+        info = dict(
+            scene_id=int(row.scene_id),
+            view_id=int(row.view_id),
+            category_id=category_id,
+            bbox=[x, y, w, h],
+            score=score,
+            segmentation=rle,
+        )
         infos.append(info)
     Path(out_json_path).write_text(json.dumps(infos))
     return
 
 
-def get_best_coarse_predictions(coarse_preds: PandasTensorCollection):
-    group_cols = ["scene_id", "view_id", "label", "instance_id"]
-    coarse_preds = filter_top_pose_estimates(
-        coarse_preds,
-        top_K=1,
-        group_cols=group_cols,
-        filter_field="coarse_score",
-        ascending=False,
-    )
-    coarse_preds.infos = coarse_preds.infos.rename(
-        columns={"coarse_score": "pose_score"}
-    )
-    return coarse_preds
-
-
 def convert_results_to_bop(
-    results_path: Path,
-    out_csv_path: Path,
-    method: str,
-    use_pose_score: bool = True,
+    results_path: Path, out_csv_path: Path, method: str, use_pose_score: bool = True
 ):
-    """
-    results_path: path to file storing a pickled dictionary,
-                  with a "predictions" key storing all results of a given evaluation
-    out_csv_path: path where bop format csv is saved
-    method: key to one of the available method predictions
-    use_pose_score: if true, uses the score obtained from the pose estimator, otherwise
-                    from the detector.
-    """
-
     predictions = torch.load(results_path)["predictions"]
     predictions = predictions[method]
-    if method == "coarse":
-        predictions = get_best_coarse_predictions(predictions)
-
     print("Predictions from:", results_path)
     print("Method:", method)
     print("Number of predictions: ", len(predictions))
@@ -204,15 +128,15 @@ def convert_results_to_bop(
             time = row.time
         else:
             time = -1
-        pred = {
-            "scene_id": row.scene_id,
-            "im_id": row.view_id,
-            "obj_id": obj_id,
-            "score": score,
-            "t": t,
-            "R": R,
-            "time": time,
-        }
+        pred = dict(
+            scene_id=row.scene_id,
+            im_id=row.view_id,
+            obj_id=obj_id,
+            score=score,
+            t=t,
+            R=R,
+            time=time,
+        )
         preds.append(pred)
     print("Wrote:", out_csv_path)
     Path(out_csv_path).parent.mkdir(exist_ok=True)
@@ -281,10 +205,7 @@ def run_evaluation(cfg: BOPEvalConfig) -> None:
 
         # pose scores give better AR scores in general
         convert_results_to_bop(
-            results_path,
-            csv_path,
-            cfg.method,
-            use_pose_score=cfg.use_post_score,
+            results_path, csv_path, cfg.method, use_pose_score=cfg.use_post_score
         )
 
         if not cfg.convert_only:
@@ -309,50 +230,70 @@ def run_evaluation(cfg: BOPEvalConfig) -> None:
     return scores_pose_path, scores_detection_path
 
 
-def load_sam_predictions(ds_dir_name, scene_ds_dir):
-    ds_name = ds_dir_name
-    detections_path = CNOS_SUBMISSION_PATHS[ds_name]
+def load_external_detections(scene_ds_dir: Path):
     """
-    # dets_lst: list of dictionary, each element = detection of one object in an image
-    $ df_all_dets[0].keys()
-        > ['scene_id', 'image_id', 'category_id', 'bbox', 'score', 'time',
-        'segmentation']
-    - For the evaluation of Megapose, we only need the 'scene_id', 'image_id',
-      'category_id', 'score', 'time' and 'bbox'
-    - We also need need to change the format of bounding boxes as explained below
+    Loads external detections
     """
+    ds_name = scene_ds_dir.name
+
+    bop_detections_paths = get_external_detections_paths()
+    detections_path = bop_detections_paths[ds_name]
+
     dets_lst = []
     for det in json.loads(detections_path.read_text()):
-        # We don't need the segmentation mask (not always present in the submissions)
-        if "segmentation" in det:
-            del det["segmentation"]
-        # Bounding box formats:
-        # - BOP format: [xmin, ymin, width, height]
-        # - Megapose expects: [xmin, ymin, xmax, ymax]
-        x, y, w, h = det["bbox"]
-        det["bbox"] = [float(v) for v in [x, y, x + w, y + h]]
-        det["bbox_modal"] = det["bbox"]
-
-        # HACK: object models are same in lm and lmo -> obj labels start with 'lm'
-        if ds_name == "lmo":
-            ds_name = "lm"
-
-        det["label"] = "{}-obj_{}".format(ds_name, str(det["category_id"]).zfill(6))
-
+        det = format_det_bop2megapose(det, ds_name)
         dets_lst.append(det)
 
     df_all_dets = pd.DataFrame.from_records(dets_lst)
-
     df_targets = pd.read_json(scene_ds_dir / "test_targets_bop19.json")
-
     return df_all_dets, df_targets
 
 
-def get_sam_detections(data, df_all_dets, df_targets, dt_det):
-    # We assume a unique image ("view") associated with a unique scene_id is
-    im_info = data["im_infos"][0]
-    scene_id, view_id = im_info["scene_id"], im_info["view_id"]
+def get_external_detections_paths():
+    EXTERNAL_DETECTIONS_DIR = os.environ.get("EXTERNAL_DETECTIONS_DIR")
+    assert EXTERNAL_DETECTIONS_DIR is not None
+    EXTERNAL_DETECTIONS_DIR = Path(EXTERNAL_DETECTIONS_DIR)
 
+    files_name_path = EXTERNAL_DETECTIONS_DIR / "bop_detections_filenames.json"
+    try:
+        bop_detections_filenames = json.loads(files_name_path.read_text())
+    except json.decoder.JSONDecodeError as e:
+        print("Check json formatting {files_name_path.as_posix()}")
+        raise e
+    bop_detections_paths = {
+        ds_name: EXTERNAL_DETECTIONS_DIR / fname
+        for ds_name, fname in bop_detections_filenames.items()
+    }
+
+    return bop_detections_paths
+
+
+def format_det_bop2megapose(det, ds_name):
+    # Segmentation mask not needed
+    if "segmentation" in det:
+        del det["segmentation"]
+    # Bounding box formats:
+    # - BOP format: [xmin, ymin, width, height]
+    # - Megapose expects: [xmin, ymin, xmax, ymax]
+    x, y, w, h = det["bbox"]
+    det["bbox"] = [float(v) for v in [x, y, x + w, y + h]]
+    det["bbox_modal"] = det["bbox"]
+
+    # HACK: object models are same in lm and lmo -> obj labels start with 'lm'
+    if ds_name == "lmo":
+        ds_name = "lm"
+
+    det["label"] = "{}-obj_{}".format(ds_name, str(det["category_id"]).zfill(6))
+
+    return det
+
+
+def filter_detections_scene_view(scene_id, view_id, df_all_dets, df_targets):
+    """
+    Retrieve detections associated to
+
+    img_data: contains
+    """
     df_dets_scene_img = df_all_dets.loc[
         (df_all_dets["scene_id"] == scene_id) & (df_all_dets["image_id"] == view_id)
     ]
@@ -360,53 +301,40 @@ def get_sam_detections(data, df_all_dets, df_targets, dt_det):
         (df_targets["scene_id"] == scene_id) & (df_targets["im_id"] == view_id)
     ]
 
-    dt_det += df_dets_scene_img.time.iloc[0]
+    df_dets_scene_img = keep_best_detections(df_dets_scene_img, df_targets_scene_img)
 
-    #################
-    # Filter detections based on 2 criteria
-    # - 1) Localization 6D task: we can assume that we know which object category and
-    # how many instances are present in the image
-    obj_ids = df_targets_scene_img.obj_id.to_list()
-    df_dets_scene_img_obj_filt = df_dets_scene_img[
-        df_dets_scene_img["category_id"].isin(obj_ids)
-    ]
-    # In case none of the detections category ids match the ones present in the scene,
-    # keep only one detection to avoid downstream error
-    if len(df_dets_scene_img_obj_filt) > 0:
-        df_dets_scene_img = df_dets_scene_img_obj_filt
-    else:
-        df_dets_scene_img = df_dets_scene_img[:1]
-
-    # TODO: retain only corresponding inst_count number for each detection category_id
-
-    # - 2) Retain detections with best cnos scores (kind of redundant with finalized 1)
-    # ) based on expected number of objects in the scene (from groundtruth)
-    nb_gt_dets = df_targets_scene_img.inst_count.sum()
-
-    # TODO: put that as a parameter somewhere?
-    MARGIN = 1  # if 0, some images will have no detections
-    K_MULT = 1
-    nb_det = K_MULT * nb_gt_dets + MARGIN
-    df_dets_scene_img = df_dets_scene_img.sort_values("score", ascending=False).head(
-        nb_det,
-    )
-    #################
-
+    # Keep only best detections for objects ("targets") given in bop target file
     lst_dets_scene_img = df_dets_scene_img.to_dict("records")
 
-    if len(lst_dets_scene_img) == 0:
-        msg = "lst_dets_scene_img empty!: "
-        raise (ValueError(msg, f"scene_id: {scene_id}, image_id/view_id: {view_id}"))
-
-    # Do not forget the scores that are not present in object data
-    scores = []
-    list_object_data = []
+    # Do not forget the scores that are not present in object img_data
+    scores, list_object_data = [], []
     for det in lst_dets_scene_img:
         list_object_data.append(ObjectData.from_json(det))
         scores.append(det["score"])
-    sam_detections = make_detections_from_object_data(list_object_data).to(device)
-    sam_detections.infos["score"] = scores
-    return sam_detections
+    detections = make_detections_from_object_data(list_object_data).to(device)
+    detections.infos["score"] = scores
+    detections.infos["time"] = df_dets_scene_img.time.iloc[0]
+    return detections
+
+
+def keep_best_detections(df_dets_scene_img, df_targets_scene_img):
+    lst_df_target = []
+    nb_targets = len(df_targets_scene_img)
+    for it in range(nb_targets):
+        target = df_targets_scene_img.iloc[it]
+        n_best = target.inst_count
+        df_filt_target = df_dets_scene_img[
+            df_dets_scene_img["category_id"] == target.obj_id
+        ].sort_values("score", ascending=False)[:n_best]
+        if len(df_filt_target) > 0:
+            lst_df_target.append(df_filt_target)
+
+    # if missing dets, keep only one detection to avoid downstream error
+    df_dets_scene_img = (
+        pd.concat(lst_df_target) if len(lst_df_target) > 0 else df_dets_scene_img[:1]
+    )
+
+    return df_dets_scene_img
 
 
 if __name__ == "__main__":

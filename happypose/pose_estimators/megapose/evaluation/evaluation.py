@@ -130,7 +130,7 @@ def run_eval(
         )
     elif cfg.inference.detection_type == "gt":
         detector_model = None
-    elif cfg.inference.detection_type == "sam":
+    elif cfg.inference.detection_type == "exte":
         detector_model = None
     else:
         msg = f"Unknown detection_type={cfg.inference.detection_type}"
