@@ -37,7 +37,7 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
-coverage = {extras = ["toml"], version = "^7.2.5"}
+coverage = {extras = ["toml"], version = "^7.3.2"}
 ipython = "^8.12.2"
 pre-commit = "^3.2.1"
 ruff = "^0.0.260"
