@@ -39,6 +39,10 @@ from happypose.pose_estimators.megapose.config import (
 from happypose.pose_estimators.megapose.evaluation.eval_config import BOPEvalConfig
 from happypose.toolbox.datasets.scene_dataset import ObjectData
 from happypose.toolbox.inference.utils import make_detections_from_object_data
+from happypose.toolbox.utils.tensor_collection import (
+    PandasTensorCollection,
+    filter_top_pose_estimates,
+)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -109,6 +113,9 @@ def convert_results_to_bop(
 ):
     predictions = torch.load(results_path)["predictions"]
     predictions = predictions[method]
+    if method == "coarse":
+        predictions = get_best_coarse_predictions(predictions)
+
     print("Predictions from:", results_path)
     print("Method:", method)
     print("Number of predictions: ", len(predictions))
@@ -142,6 +149,21 @@ def convert_results_to_bop(
     Path(out_csv_path).parent.mkdir(exist_ok=True)
     inout.save_bop_results(out_csv_path, preds)
     return out_csv_path
+
+
+def get_best_coarse_predictions(coarse_preds: PandasTensorCollection):
+    group_cols = ["scene_id", "view_id", "label", "instance_id"]
+    coarse_preds = filter_top_pose_estimates(
+        coarse_preds,
+        top_K=1,
+        group_cols=group_cols,
+        filter_field="coarse_score",
+        ascending=False,
+    )
+    coarse_preds.infos = coarse_preds.infos.rename(
+        columns={"coarse_score": "pose_score"}
+    )
+    return coarse_preds
 
 
 def _run_bop_evaluation(filename, eval_dir, eval_detection=False, dummy=False):
@@ -276,10 +298,12 @@ def format_det_bop2megapose(det, ds_name):
     # - BOP format: [xmin, ymin, width, height]
     # - Megapose expects: [xmin, ymin, xmax, ymax]
     x, y, w, h = det["bbox"]
-    det["bbox"] = [float(v) for v in [x, y, x + w, y + h]]
+    x1, y1, x2, y2 = x, y, x + w, y + h
+    det["bbox"] = [float(v) for v in [x1, y1, x2, y2]]
     det["bbox_modal"] = det["bbox"]
 
-    # HACK: object models are same in lm and lmo -> obj labels start with 'lm'
+    # HACK: object models are same in lm and lmo
+    # -> lmo obj labels actually start with 'lm'
     if ds_name == "lmo":
         ds_name = "lm"
 
@@ -290,9 +314,7 @@ def format_det_bop2megapose(det, ds_name):
 
 def filter_detections_scene_view(scene_id, view_id, df_all_dets, df_targets):
     """
-    Retrieve detections associated to
-
-    img_data: contains
+    Retrieve detections of scene/view id pair and filter using bop targets.
     """
     df_dets_scene_img = df_all_dets.loc[
         (df_all_dets["scene_id"] == scene_id) & (df_all_dets["image_id"] == view_id)

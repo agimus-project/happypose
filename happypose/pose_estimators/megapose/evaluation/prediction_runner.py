@@ -16,7 +16,6 @@ limitations under the License.
 
 
 # Standard Library
-import time
 from collections import defaultdict
 from typing import Dict, Optional
 
@@ -39,7 +38,6 @@ from happypose.pose_estimators.megapose.inference.types import (
     ObservationTensor,
     PoseEstimatesType,
 )
-from happypose.pose_estimators.megapose.training.utils import CudaTimer
 from happypose.toolbox.datasets.samplers import DistributedSceneSampler
 from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation
 
@@ -127,7 +125,6 @@ class PredictionRunner:
             coarse_estimates.infos["instance_id"] = 0
             run_detector = False
 
-        t = time.time()
         preds, extra_data = pose_estimator.run_inference_pipeline(
             obs_tensor,
             detections=detections,
@@ -139,7 +136,6 @@ class PredictionRunner:
             bsz_images=self.inference_cfg.bsz_images,
             bsz_objects=self.inference_cfg.bsz_objects,
         )
-        time.time() - t
 
         # TODO (lmanuelli): Process this into a dict with keys like
         # - 'refiner/iteration=1`
@@ -149,25 +145,35 @@ class PredictionRunner:
         # go back and extract out the 'refiner/iteration=1`, `refiner/iteration=5`
         # things for the ones that were actually the highest scoring at the end.
 
-        ref_str = f"refiner/iteration={self.inference_cfg.n_refiner_iterations}"
+        ref_it_str = f"refiner/iteration={self.inference_cfg.n_refiner_iterations}"
         data_TCO_refiner = extra_data["refiner"]["preds"]
 
         all_preds = {
             "final": preds,
-            ref_str: data_TCO_refiner,
+            ref_it_str: data_TCO_refiner,
             "refiner/final": data_TCO_refiner,
             "coarse": extra_data["coarse"]["preds"],
         }
 
+        # Only keep necessary metadata
+        del extra_data["coarse"]["data"]["TCO"]
+        all_preds_data = {
+            "coarse": extra_data["coarse"]["data"],
+            "refiner": extra_data["refiner"]["data"],
+            "scoring": extra_data["scoring"],
+        }
+
+        # If depth refinement, add it to preds and metadata
         if self.inference_cfg.run_depth_refiner:
             all_preds["depth_refiner"] = extra_data["depth_refiner"]["preds"]
+            all_preds_data["depth_refiner"] = extra_data["depth_refiner"]["data"]
 
-        for _k, v in all_preds.items():
+        # remove masks tensors as they are never used by megapose
+        for v in all_preds.values():
             if "mask" in v.tensors:
-                # breakpoint()
                 v.delete_tensor("mask")
 
-        return all_preds
+        return all_preds, all_preds_data
 
     def get_predictions(
         self, pose_estimator: PoseEstimator
@@ -199,15 +205,17 @@ class PredictionRunner:
             K = data["cameras"].K
             im_info = data["im_infos"][0]
             scene_id, view_id = im_info["scene_id"], im_info["view_id"]
+
             # Dirty but avoids creating error when running with real detector
-            dt_det = 0
+            dt_det_exte = 0
 
             # Temporary solution
             if self.inference_cfg.detection_type == "exte":
                 exte_detections = filter_detections_scene_view(
                     scene_id, view_id, df_all_dets, df_targets
                 )
-                dt_det += exte_detections.infos["time"].iloc[0]
+                if len(exte_detections) > 0:
+                    dt_det_exte += exte_detections.infos["time"].iloc[0]
             else:
                 exte_detections = None
             gt_detections = data["gt_detections"].cuda()
@@ -229,27 +237,25 @@ class PredictionRunner:
                         initial_estimates=initial_data,
                     )
 
-            cuda_timer = CudaTimer()
-            cuda_timer.start()
             with torch.no_grad():
-                all_preds = self.run_inference_pipeline(
+                all_preds, all_preds_data = self.run_inference_pipeline(
                     pose_estimator,
                     obs_tensor,
                     gt_detections,
                     exte_detections,
                     initial_estimates=initial_data,
                 )
-            cuda_timer.end()
-            duration = cuda_timer.elapsed()
-
-            total_duration = duration + dt_det
 
             # Add metadata to the predictions for later evaluation
-            for k, v in all_preds.items():
-                v.infos["time"] = total_duration
-                v.infos["scene_id"] = scene_id
-                v.infos["view_id"] = view_id
-                predictions_list[k].append(v)
+            for pred_name, pred in all_preds.items():
+                dt_pipeline = compute_pose_est_total_time(
+                    all_preds_data,
+                    pred_name,
+                )
+                pred.infos["time"] = dt_det_exte + dt_pipeline
+                pred.infos["scene_id"] = scene_id
+                pred.infos["view_id"] = view_id
+                predictions_list[pred_name].append(pred)
 
         # Concatenate the lists of PandasTensorCollections
         predictions = dict()
@@ -257,3 +263,32 @@ class PredictionRunner:
             predictions[k] = tc.concatenate(v)
 
         return predictions
+
+
+def compute_pose_est_total_time(all_preds_data: dict, pred_name: str):
+    # all_preds_data:
+    # dict_keys(
+    # ["final", "refiner/iteration=5", "refiner/final", "coarse", "coarse_filter"]
+    # )  # optionally 'depth_refiner'
+    dt_coarse = all_preds_data["coarse"]["time"]
+    dt_coarse_refiner = dt_coarse + all_preds_data["refiner"]["time"]
+    if "depth_refiner" in all_preds_data:
+        dt_coarse_refiner_depth = (
+            dt_coarse_refiner + all_preds_data["depth_refiner"]["time"]
+        )
+
+    if pred_name.startswith("coarse"):
+        return dt_coarse
+    elif pred_name.startswith("refiner"):
+        return dt_coarse_refiner
+    elif pred_name == "depth_refiner":
+        return dt_coarse_refiner_depth
+    elif pred_name == "final":
+        return (
+            dt_coarse_refiner_depth
+            if "depth_refiner" in all_preds_data
+            else dt_coarse_refiner
+        )
+    else:
+        msg = f"{pred_name} extra data not in {all_preds_data.keys()}"
+        raise ValueError(msg)
