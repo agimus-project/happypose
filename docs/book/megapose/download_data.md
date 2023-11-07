@@ -1,25 +1,37 @@
  # Download example data for minimal testing
 
-```
+```sh
 cd $HAPPYPOSE_DATA_DIR
 wget https://memmo-data.laas.fr/static/examples.tar.xz
 tar xf examples.tar.xz
 ```
- 
+
  # Download pre-trained pose estimation models
 
-Download pose estimation models to $HAPPYPOSE_DATA_DIR/megapose-models:
+Download pose estimation models to `$HAPPYPOSE_DATA_DIR/megapose-models`:
 
-```
+```sh
 python -m happypose.toolbox.utils.download --megapose_models
 ```
+
+# Download pre-trained detection models
+Megapose can use pretrained detectors from CosyPose, which can be downloaded to `$HAPPYPOSE_DATA_DIR/experiments`:
+
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-hb-pbr--497808
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-hope-pbr--15246
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-icbin-pbr--947409
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-itodd-pbr--509908
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-lmo-pbr--517542
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-tless-pbr--873074
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-tudl-pbr--728047
+python -m happypose.toolbox.utils.download --cosypose_model detector-bop-ycbv-pbr--970850
 
 # Dataset
 
 ## Dataset information
 The dataset is available at this [url](https://drive.google.com/drive/folders/1CXc_GG11jNVMeGr-Mb4o4iiNjYeKDkKd?usp=sharing). It is split into two datasets: `gso_1M` (Google Scanned Objects) and `shapenet_1M` (ShapeNet objects). Each dataset has 1 million images which were generated using [BlenderProc](https://github.com/DLR-RM/BlenderProc).
 
-Datasets are released in the [webdataset](https://github.com/webdataset/webdataset) format for high reading performance. Each dataset is split into chunks of size ~600MB containing 1000 images each. 
+Datasets are released in the [webdataset](https://github.com/webdataset/webdataset) format for high reading performance. Each dataset is split into chunks of size ~600MB containing 1000 images each.
 
 We provide the pre-processed meshes ready to be used for rendering and training in this [directory](https://drive.google.com/drive/folders/1AYxkv7jpDniOnTcMAxiWbdhPo8WBJaZG):
 - `google_scanned_objects.zip`

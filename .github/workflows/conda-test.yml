@@ -1,4 +1,4 @@
-name: Tests & Coverage
+name: Tests with conda
 
 on: [ push, pull_request ]
 
@@ -10,7 +10,7 @@ jobs:
         shell: bash -el {0}
     strategy:
       matrix:
-        python-version: [ "3.9" ]
+        python-version: ["3.9", "3.10"]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,10 +34,12 @@ jobs:
         run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
         shell: bash
 
-      - name: Caching of the happypose installation
+      - name: Caching of the happypose installation and data
         uses: actions/cache@v3
         with:
-          path: ${{ env.CONDA }}/envs
+          path: |
+            ${{ env.CONDA }}/envs
+            local_data
           key:
             conda-${{ runner.os }}--${{ runner.arch }}--${{steps.get-date.outputs.today }}-${{hashFiles('environment.yml') }}-${{env.CACHE_NUMBER }}
         env:
@@ -46,41 +48,23 @@ jobs:
         id: cache
 
       - name: Update conda environment with happypose dependencies
-        run:
-          mamba env update -n happypose -f environment.yml
-        if: steps.cache.outputs.cache-hit != 'true'
-
-      - name: Install bop toolkit (temporal fix)
-        run: |
-          cd deps/bop_toolkit_challenge/
-          sed 's/==.*$//' requirements.txt > req_nover.txt
-          pip install -r req_nover.txt -e .
+        run: mamba env update -n happypose -f environment.yml
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Install happypose
-        run: |
-          cd happypose/pose_estimators/cosypose
-          pip install .
-          cd ../../..
-          pip install -e .
+        run: pip install -e ".[render,evaluation]"
 
       - name: Download pre-trained models required for tests
         run: |
-          mkdir local_data
-          python -m happypose.toolbox.utils.download --cosypose_model=detector-bop-ycbv-pbr--970850
-          python -m happypose.toolbox.utils.download --cosypose_model=coarse-bop-ycbv-pbr--724183
-          python -m happypose.toolbox.utils.download --cosypose_model=refiner-bop-ycbv-pbr--604090
-          
-          python -m happypose.toolbox.utils.download --megapose_models
-          
-          cd tests/data
-          git clone https://github.com/petrikvladimir/happypose_test_data.git crackers_example
+          mkdir -p local_data
+          python -m happypose.toolbox.utils.download \
+            --megapose_models \
+            --examples \
+              crackers_example \
+            --cosypose_models  \
+              detector-bop-ycbv-pbr--970850 \
+              coarse-bop-ycbv-pbr--724183 \
+              refiner-bop-ycbv-pbr--604090
 
       - name: Run tests
-        run: |
-          pip install pytest coverage
-          coverage run --source=happypose -m pytest tests
-          coverage xml
-      - uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: python -m unittest

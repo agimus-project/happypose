@@ -21,7 +21,9 @@ class MultiEpochDataLoader:
                 self.sampler_length += len(self.dataloader)
                 next_index_sampler = iter(self.dataloader_iter._index_sampler)
                 self.dataloader_iter._sampler_iter = chain(
-                    self.dataloader_iter._sampler_iter, next_index_sampler)
+                    self.dataloader_iter._sampler_iter,
+                    next_index_sampler,
+                )
 
         self.epoch_id += 1
         self.batch_id = 0
@@ -36,7 +38,9 @@ class MultiEpochDataLoader:
         if self.batch_id == self.epoch_size:
             raise StopIteration
 
-        elif self.id_in_sampler == self.sampler_length - 2 * self.dataloader.num_workers:
+        elif (
+            self.id_in_sampler == self.sampler_length - 2 * self.dataloader.num_workers
+        ):
             next_index_sampler = iter(self.dataloader_iter._index_sampler)
             self.dataloader_iter._sampler_iter = next_index_sampler
             self.id_in_sampler = 0
@@ -51,7 +55,7 @@ class MultiEpochDataLoader:
         return batch
 
     def get_infos(self):
-        return dict()
+        return {}
 
     def __del__(self):
         del self.dataloader_iter

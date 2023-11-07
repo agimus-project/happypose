@@ -1,14 +1,11 @@
-import typing as tp
 import pathlib
+import typing as tp
+
 import submitit
-
-from job_runner.configs import (
-    JobEnvironmentConfig,
-    RunnerConfig
-)
+from job_runner.configs import JobEnvironmentConfig, RunnerConfig
 
 
-def make_setup(cfg: JobEnvironmentConfig) -> tp.List[str]:
+def make_setup(cfg: JobEnvironmentConfig) -> list[str]:
     setup = []
     if cfg.env:
         for k, v in cfg.env.items():
@@ -17,13 +14,15 @@ def make_setup(cfg: JobEnvironmentConfig) -> tp.List[str]:
 
 
 def make_snapshots(
-    code_directories: tp.List[pathlib.Path],
+    code_directories: list[pathlib.Path],
     output_dir: pathlib.Path,
     exclude: tp.Sequence[str] = (),
 ):
     for code_dir in code_directories:
         snapshot = submitit.helpers.RsyncSnapshot(
-            snapshot_dir=output_dir / code_dir.name, root_dir=code_dir, exclude=exclude
+            snapshot_dir=output_dir / code_dir.name,
+            root_dir=code_dir,
+            exclude=exclude,
         )
         with snapshot:
             pass

@@ -2,8 +2,8 @@
 
 This repository is divided into different entry points
 
-- [Inference](./test-install.md): `run_megapose_on_example.py` is used to run the inference pipeline on a single example image. 
-- [Evaluation](./evaluate.md): `run_full_megapose_eval.py` is ued to first run inference on one or several datasets, and then use the results obtained to evaluate the method on these datasets. 
+- [Inference](./test-install.md): `run_megapose_on_example.py` is used to run the inference pipeline on a single example image.
+- [Evaluation](./evaluate.md): `run_full_megapose_eval.py` is ued to first run inference on one or several datasets, and then use the results obtained to evaluate the method on these datasets.
 
 # Model Zoo
 

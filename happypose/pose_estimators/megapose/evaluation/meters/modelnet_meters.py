@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,15 +32,16 @@ from happypose.pose_estimators.megapose.evaluation.meters.utils import (
 from happypose.toolbox.lib3d.camera_geometry import project_points
 from happypose.toolbox.lib3d.distances import dists_add
 from happypose.toolbox.lib3d.transform import Transform
-from happypose.toolbox.lib3d.transform_ops import transform_pts
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class ModelNetErrorMeter(Meter):
     def __init__(self, mesh_db, sample_n_points=None):
         self.reset()
-        self.mesh_db = mesh_db.batched(resample_n_points=sample_n_points).to(device).float()
+        self.mesh_db = (
+            mesh_db.batched(resample_n_points=sample_n_points).to(device).float()
+        )
 
     def is_data_valid(self, data):
         valid = False
@@ -52,9 +52,12 @@ class ModelNetErrorMeter(Meter):
     def add(self, pred_data, gt_data):
         pred_data = pred_data.float()
         gt_data = gt_data.float()
-        
+
         matches = one_to_one_matching(
-            pred_data.infos, gt_data.infos, keys=("scene_id", "view_id"), allow_pred_missing=False
+            pred_data.infos,
+            gt_data.infos,
+            keys=("scene_id", "view_id"),
+            allow_pred_missing=False,
         )
 
         pred_data = pred_data[matches.pred_id]
@@ -84,7 +87,7 @@ class ModelNetErrorMeter(Meter):
         uv_dists = torch.norm(uv_pred - uv_gt, dim=-1)
         uv_avg = uv_dists.mean()
 
-        df = xr.Dataset(matches).rename(dict(dim_0="match_id"))
+        df = xr.Dataset(matches).rename({"dim_0": "match_id"})
         df["add"] = "match_id", np.array([dist_add.item()])
         df["diameter"] = "match_id", np.array([diameter_1])
         df["proj_error"] = "match_id", np.array([uv_avg.item()])

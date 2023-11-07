@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,9 +14,7 @@ limitations under the License.
 """
 
 
-
 # Standard Library
-from typing import Tuple
 
 # Third Party
 import torch
@@ -30,7 +27,10 @@ def project_points(points_3d, K, TCO):
     n_points = points_3d.shape[1]
     device = points_3d.device
     if points_3d.shape[-1] == 3:
-        points_3d = torch.cat((points_3d, torch.ones(batch_size, n_points, 1).to(device)), dim=-1)
+        points_3d = torch.cat(
+            (points_3d, torch.ones(batch_size, n_points, 1).to(device)),
+            dim=-1,
+        )
     P = K @ TCO[:, :3]
     suv = (P.unsqueeze(1) @ points_3d.unsqueeze(-1)).squeeze(-1)
     suv = suv / suv[..., [-1]]
@@ -44,7 +44,10 @@ def project_points_robust(points_3d, K, TCO, z_min=0.1):
     n_points = points_3d.shape[1]
     device = points_3d.device
     if points_3d.shape[-1] == 3:
-        points_3d = torch.cat((points_3d, torch.ones(batch_size, n_points, 1).to(device)), dim=-1)
+        points_3d = torch.cat(
+            (points_3d, torch.ones(batch_size, n_points, 1).to(device)),
+            dim=-1,
+        )
     P = K @ TCO[:, :3]
     suv = (P.unsqueeze(1) @ points_3d.unsqueeze(-1)).squeeze(-1)
     z = suv[..., -1]
@@ -65,14 +68,18 @@ def boxes_from_uv(uv):
 
 
 def get_K_crop_resize(
-    K: torch.Tensor, boxes: torch.Tensor, orig_size: Tuple[int, int], crop_resize: Tuple[int, int]
+    K: torch.Tensor,
+    boxes: torch.Tensor,
+    orig_size: tuple[int, int],
+    crop_resize: tuple[int, int],
 ) -> torch.Tensor:
-    """
-    Adapted from https://github.com/BerkeleyAutomation/perception/blob/master/perception/camera_intrinsics.py
+    """Adapted from https://github.com/BerkeleyAutomation/perception/blob/master/perception/camera_intrinsics.py
     Skew is not handled.
+
     Args:
+    ----
         K: (bsz, 3, 3) float
-        boxes: (bsz, 4) float
+        boxes: (bsz, 4) float.
     """
     assert K.dim() == 3
     assert K.shape[1:] == (3, 3)
@@ -115,12 +122,19 @@ def get_K_crop_resize(
     return new_K
 
 
-def cropresize_backtransform_points2d(input_wh, boxes_2d_crop, output_wh, points_2d_in_output):
+def cropresize_backtransform_points2d(
+    input_wh,
+    boxes_2d_crop,
+    output_wh,
+    points_2d_in_output,
+):
     bsz = input_wh.shape[0]
     assert output_wh.shape == (bsz, 2)
     assert input_wh.shape == (bsz, 2)
     assert points_2d_in_output.dim() == 3
 
     points_2d_normalized = points_2d_in_output / output_wh.unsqueeze(1)
-    points_2d = boxes_2d_crop[:, [0, 1]].unsqueeze(1) + points_2d_normalized * input_wh.unsqueeze(1)
+    points_2d = boxes_2d_crop[:, [0, 1]].unsqueeze(
+        1,
+    ) + points_2d_normalized * input_wh.unsqueeze(1)
     return points_2d

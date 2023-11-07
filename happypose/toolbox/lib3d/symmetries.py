@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,10 +14,9 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 # Third Party
 import numpy as np
@@ -42,23 +40,22 @@ class ContinuousSymmetry:
 
 @dataclass
 class DiscreteSymmetry:
-    """
-    pose: (4, 4) homogeneous matrix
-    """
+    """pose: (4, 4) homogeneous matrix."""
 
     pose: npt.NDArray[np.float_]
 
 
 def make_symmetries_poses(
-    symmetries_discrete: List[DiscreteSymmetry] = [],
-    symmetries_continuous: List[ContinuousSymmetry] = [],
+    symmetries_discrete: list[DiscreteSymmetry] = [],
+    symmetries_continuous: list[ContinuousSymmetry] = [],
     n_symmetries_continuous: int = 8,
     units: str = "mm",
     scale: Optional[float] = None,
 ) -> np.ndarray:
     """Generates the set of object symmetries.
 
-    Returns:
+    Returns
+    -------
         (num_symmetries, 4, 4) array
     """
     # Note: See https://github.com/thodan/bop_toolkit/blob/master/bop_toolkit_lib/misc.py

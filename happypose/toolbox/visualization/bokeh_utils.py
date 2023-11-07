@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +18,7 @@ limitations under the License.
 
 # Standard Library
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 
 # Third Party
 import bokeh
@@ -49,7 +48,7 @@ def save_image_figure(f: bokeh.plotting.figure, im_path: Path) -> PIL.Image:
 def to_rgba(im: np.ndarray) -> np.ndarray:
     """Converts (h, w, 3) to (h, w, 4) data for bokeh.
     im must have values in (0, 255)
-    NOTE: Maybe this could be simplified only using Pillow ?
+    NOTE: Maybe this could be simplified only using Pillow ?.
     """
     out_im = np.empty((im.shape[0], im.shape[1]), dtype=np.uint32)
     view = out_im.view(dtype=np.uint8).reshape((im.shape[0], im.shape[1], 4))
@@ -65,7 +64,7 @@ def plot_image(
     tools: str = "",
     im_size: Optional[Resolution] = None,
     figure: Optional[bokeh.plotting.figure] = None,
-) -> Tuple[bokeh.plotting.figure, bokeh.models.sources.ColumnDataSource]:
+) -> tuple[bokeh.plotting.figure, bokeh.models.sources.ColumnDataSource]:
     if np.asarray(im).ndim == 2:
         gray = True
     else:
@@ -76,7 +75,7 @@ def plot_image(
         h, w = im.shape[:2]
     else:
         h, w = im_size
-    source = bokeh.models.sources.ColumnDataSource(dict(rgba=[im]))
+    source = bokeh.models.sources.ColumnDataSource({"rgba": [im]})
     f = image_figure("rgba", source, im_size=(h, w), gray=gray, figure=figure)
     return f, source
 

@@ -1,41 +1,57 @@
-import torch
-import numpy as np
 import multiprocessing
 
+import numpy as np
+import torch
+
 from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
+
 from .bullet_scene_renderer import BulletSceneRenderer
 
 
 def init_renderer(urdf_ds, preload=True, gpu_renderer=True):
-    renderer = BulletSceneRenderer(urdf_ds=urdf_ds,
-                                   preload_cache=preload,
-                                   background_color=(0, 0, 0),
-                                   gpu_renderer=gpu_renderer)
+    renderer = BulletSceneRenderer(
+        urdf_ds=urdf_ds,
+        preload_cache=preload,
+        background_color=(0, 0, 0),
+        gpu_renderer=gpu_renderer,
+    )
     return renderer
 
 
-def worker_loop(worker_id, in_queue, out_queue, object_set, preload=True, gpu_renderer=True):
+def worker_loop(
+    worker_id,
+    in_queue,
+    out_queue,
+    object_set,
+    preload=True,
+    gpu_renderer=True,
+):
     renderer = init_renderer(object_set, preload=preload, gpu_renderer=gpu_renderer)
     while True:
         kwargs = in_queue.get()
         if kwargs is None:
             return
-        obj_infos = kwargs['obj_infos']
-        cam_infos = kwargs['cam_infos']
-        render_depth = kwargs['render_depth']
-        is_valid = np.isfinite(obj_infos[0]['TWO']).all() \
-            and np.isfinite(cam_infos[0]['TWC']).all() \
-            and np.isfinite(cam_infos[0]['K']).all()
+        obj_infos = kwargs["obj_infos"]
+        cam_infos = kwargs["cam_infos"]
+        render_depth = kwargs["render_depth"]
+        is_valid = (
+            np.isfinite(obj_infos[0]["TWO"]).all()
+            and np.isfinite(cam_infos[0]["TWC"]).all()
+            and np.isfinite(cam_infos[0]["K"]).all()
+        )
         if is_valid:
-            cam_obs = renderer.render_scene(cam_infos=cam_infos, obj_infos=obj_infos,
-                                            render_depth=render_depth)
-            images = np.stack([d['rgb'] for d in cam_obs])
-            depth = np.stack([d['depth'] for d in cam_obs]) if render_depth else None
+            cam_obs = renderer.render_scene(
+                cam_infos=cam_infos,
+                obj_infos=obj_infos,
+                render_depth=render_depth,
+            )
+            images = np.stack([d["rgb"] for d in cam_obs])
+            depth = np.stack([d["depth"] for d in cam_obs]) if render_depth else None
         else:
-            res = cam_infos[0]['resolution']
+            res = cam_infos[0]["resolution"]
             images = np.zeros((1, min(res), max(res), 3), dtype=np.uint8)
             depth = np.zeros((1, min(res), max(res)), dtype=np.float32)
-        out_queue.put((kwargs['data_id'], images, depth))
+        out_queue.put((kwargs["data_id"], images, depth))
 
 
 class BulletBatchRenderer:
@@ -55,23 +71,29 @@ class BulletBatchRenderer:
 
         # NOTE: Could be faster with pytorch 3.8's sharedmemory
         for n in np.arange(bsz):
-            obj_info = dict(
-                name=obj_infos[n]['name'],
-                TWO=np.eye(4)
-            )
-            cam_info = dict(
-                resolution=resolution,
-                K=K[n],
-                TWC=TOC[n],
-            )
-            kwargs = dict(cam_infos=[cam_info], obj_infos=[obj_info], render_depth=render_depth)
+            obj_info = {
+                "name": obj_infos[n]["name"],
+                "TWO": np.eye(4),
+            }
+            cam_info = {
+                "resolution": resolution,
+                "K": K[n],
+                "TWC": TOC[n],
+            }
+            kwargs = {
+                "cam_infos": [cam_info],
+                "obj_infos": [obj_info],
+                "render_depth": render_depth,
+            }
             if self.n_workers > 0:
-                kwargs['data_id'] = n
+                kwargs["data_id"] = n
                 self.in_queue.put(kwargs)
             else:
                 cam_obs = self.plotters[0].render_scene(**kwargs)
-                images = np.stack([d['rgb'] for d in cam_obs])
-                depth = np.stack([d['depth'] for d in cam_obs]) if render_depth else None
+                images = np.stack([d["rgb"] for d in cam_obs])
+                depth = (
+                    np.stack([d["depth"] for d in cam_obs]) if render_depth else None
+                )
                 self.out_queue.put((n, images, depth))
 
         images = [None for _ in np.arange(bsz)]
@@ -82,14 +104,22 @@ class BulletBatchRenderer:
             if render_depth:
                 depths[data_id] = depth[0]
         if self.gpu_renderer:
-            images = torch.as_tensor(np.stack(images, axis=0)).pin_memory().cuda(non_blocking=True)
+            images = (
+                torch.as_tensor(np.stack(images, axis=0))
+                .pin_memory()
+                .cuda(non_blocking=True)
+            )
         else:
             images = torch.as_tensor(np.stack(images, axis=0))
         images = images.float().permute(0, 3, 1, 2) / 255
 
         if render_depth:
             if self.gpu_renderer:
-                depths = torch.as_tensor(np.stack(depths, axis=0)).pin_memory().cuda(non_blocking=True)
+                depths = (
+                    torch.as_tensor(np.stack(depths, axis=0))
+                    .pin_memory()
+                    .cuda(non_blocking=True)
+                )
             else:
                 depths = torch.as_tensor(np.stack(depths, axis=0))
             depths = depths.float()
@@ -104,21 +134,27 @@ class BulletBatchRenderer:
 
         if self.n_workers > 0:
             for n in range(self.n_workers):
-                plotter = multiprocessing.Process(target=worker_loop,
-                                                  kwargs=dict(worker_id=n,
-                                                              in_queue=self.in_queue,
-                                                              out_queue=self.out_queue,
-                                                              object_set=self.object_set,
-                                                              preload=preload_cache,
-                                                              gpu_renderer=gpu_renderer))
+                plotter = multiprocessing.Process(
+                    target=worker_loop,
+                    kwargs={
+                        "worker_id": n,
+                        "in_queue": self.in_queue,
+                        "out_queue": self.out_queue,
+                        "object_set": self.object_set,
+                        "preload": preload_cache,
+                        "gpu_renderer": gpu_renderer,
+                    },
+                )
                 plotter.start()
                 self.plotters.append(plotter)
         else:
-            self.plotters = [init_renderer(self.object_set, preload_cache, gpu_renderer)]
+            self.plotters = [
+                init_renderer(self.object_set, preload_cache, gpu_renderer),
+            ]
 
     def stop(self):
         if self.n_workers > 0:
-            for p in self.plotters:
+            for _p in self.plotters:
                 self.in_queue.put(None)
             for p in self.plotters:
                 p.join()

@@ -1,13 +1,21 @@
 from pathlib import Path
-import pinocchio as pin
+
 import numpy as np
+import pinocchio as pin
 
 from happypose.pose_estimators.cosypose.cosypose.config import ASSET_DIR
-
-from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import make_urdf_dataset, make_texture_dataset
-
-from happypose.pose_estimators.cosypose.cosypose.simulator import BaseScene, Body, Camera
-from happypose.pose_estimators.cosypose.cosypose.simulator import BodyCache, TextureCache, apply_random_textures
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
+    make_texture_dataset,
+    make_urdf_dataset,
+)
+from happypose.pose_estimators.cosypose.cosypose.simulator import (
+    BaseScene,
+    Body,
+    BodyCache,
+    Camera,
+    TextureCache,
+    apply_random_textures,
+)
 
 
 class SamplerError(Exception):
@@ -16,22 +24,23 @@ class SamplerError(Exception):
 
 
 class BopRecordingScene(BaseScene):
-    def __init__(self,
-                 urdf_ds='ycbv',
-                 texture_ds='shapenet',
-                 domain_randomization=True,
-                 textures_on_objects=False,
-                 n_objects_interval=(2, 5),
-                 objects_xyz_interval=((0.0, -0.5, -0.15), (1.0, 0.5, 0.15)),
-                 proba_falling=0.5,
-                 resolution=(640, 480),
-                 focal_interval=((515, 515), (515, 515)),
-                 camera_distance_interval=(0.5, 1.5),
-                 border_check=True,
-                 gpu_renderer=True,
-                 n_textures_cache=50,
-                 seed=0):
-
+    def __init__(
+        self,
+        urdf_ds="ycbv",
+        texture_ds="shapenet",
+        domain_randomization=True,
+        textures_on_objects=False,
+        n_objects_interval=(2, 5),
+        objects_xyz_interval=((0.0, -0.5, -0.15), (1.0, 0.5, 0.15)),
+        proba_falling=0.5,
+        resolution=(640, 480),
+        focal_interval=((515, 515), (515, 515)),
+        camera_distance_interval=(0.5, 1.5),
+        border_check=True,
+        gpu_renderer=True,
+        n_textures_cache=50,
+        seed=0,
+    ):
         # Objects
         self.urdf_ds = make_urdf_dataset(urdf_ds)
         self.n_objects_interval = n_objects_interval
@@ -60,11 +69,11 @@ class BopRecordingScene(BaseScene):
         self.seed = seed
 
     def load_background(self):
-        cage_path = Path(ASSET_DIR / 'cage' / 'cage.urdf').as_posix()
+        cage_path = Path(ASSET_DIR / "cage" / "cage.urdf").as_posix()
         self.background = Body.load(cage_path, client_id=self.client_id, scale=3.0)
 
     def load_plane(self):
-        plane_path = Path(ASSET_DIR / 'plane' / 'plane.urdf').as_posix()
+        plane_path = Path(ASSET_DIR / "plane" / "plane.urdf").as_posix()
         self.plane = Body.load(plane_path, client_id=self.client_id, scale=2.0)
 
     def background_pos_orn_rand(self):
@@ -84,7 +93,10 @@ class BopRecordingScene(BaseScene):
 
     def load_texture_cache(self):
         assert self._connected
-        ds_texture_ids = self.np_random.choice(len(self.texture_ds), size=self.n_textures_cache)
+        ds_texture_ids = self.np_random.choice(
+            len(self.texture_ds),
+            size=self.n_textures_cache,
+        )
         self.texture_cache = TextureCache(self.texture_ds, self.client_id)
         [self.texture_cache.get_texture(idx) for idx in ds_texture_ids]
 
@@ -112,8 +124,11 @@ class BopRecordingScene(BaseScene):
         if self.textures_on_objects and self.np_random.rand() > 0.9:
             bodies = self.bodies + bodies
         for body in bodies:
-            apply_random_textures(body, self.texture_cache.cached_textures,
-                                  np_random=self.np_random)
+            apply_random_textures(
+                body,
+                self.texture_cache.cached_textures,
+                np_random=self.np_random,
+            )
 
     def objects_pos_orn_rand(self):
         self.hide_plane()
@@ -145,14 +160,20 @@ class BopRecordingScene(BaseScene):
         K[1, 2] = H / 2
         K[2, 2] = 1.0
         rho = self.np_random.uniform(*self.camera_distance_interval)
-        theta = self.np_random.uniform(0, np.pi/2)
+        theta = self.np_random.uniform(0, np.pi / 2)
         phi = self.np_random.uniform(0, 2 * np.pi)
         roll = self.np_random.uniform(-10, 10) * np.pi / 180
         box_center = np.mean(self.objects_xyz_interval, axis=0)
 
         cam = Camera(resolution=self.resolution, client_id=self._client_id)
         cam.set_intrinsic_K(K)
-        cam.set_extrinsic_spherical(target=box_center, rho=rho, phi=phi, theta=theta, roll=roll)
+        cam.set_extrinsic_spherical(
+            target=box_center,
+            rho=rho,
+            phi=phi,
+            theta=theta,
+            roll=roll,
+        )
         return cam
 
     def camera_rand(self):
@@ -162,31 +183,38 @@ class BopRecordingScene(BaseScene):
         while not valid:
             cam = self.sample_camera()
             cam_obs_ = cam.get_state()
-            mask = cam_obs_['mask']
+            mask = cam_obs_["mask"]
             mask[mask == self.background._body_id] = 0
             mask[mask == 255] = 0
-            uniqs = np.unique(cam_obs_['mask'])
+            uniqs = np.unique(cam_obs_["mask"])
 
             valid = len(uniqs) == len(self.bodies) + 1
             if valid and self.border_check:
                 for uniq in uniqs[uniqs > 0]:
-                    H, W = cam_obs_['mask'].shape
-                    ids = np.where(cam_obs_['mask'] == uniq)
-                    if ids[0].max() == H-1 or ids[0].min() == 0 or \
-                       ids[1].max() == W-1 or ids[1].min() == 0:
+                    H, W = cam_obs_["mask"].shape
+                    ids = np.where(cam_obs_["mask"] == uniq)
+                    if (
+                        ids[0].max() == H - 1
+                        or ids[0].min() == 0
+                        or ids[1].max() == W - 1
+                        or ids[1].min() == 0
+                    ):
                         valid = False
             N += 1
             if N >= 3:
-                raise SamplerError('Cannot sample valid camera configuration.')
+                msg = "Cannot sample valid camera configuration."
+                raise SamplerError(msg)
             self.cam_obs = cam_obs_
 
-    def _full_rand(self,
-                   objects=True,
-                   objects_pos_orn=True,
-                   falling=False,
-                   background_pos_orn=True,
-                   camera=True,
-                   visuals=True):
+    def _full_rand(
+        self,
+        objects=True,
+        objects_pos_orn=True,
+        falling=False,
+        background_pos_orn=True,
+        camera=True,
+        visuals=True,
+    ):
         if background_pos_orn:
             self.background_pos_orn_rand()
         if objects:
@@ -205,13 +233,13 @@ class BopRecordingScene(BaseScene):
         objects = []
         for body in self.bodies:
             state = body.get_state()
-            state['id_in_segm'] = body._body_id
+            state["id_in_segm"] = body._body_id
             objects.append(state)
 
-        state = dict(
-            camera=self.cam_obs,
-            objects=objects,
-        )
+        state = {
+            "camera": self.cam_obs,
+            "objects": objects,
+        }
         return state
 
     def try_rand(self):
@@ -221,20 +249,21 @@ class BopRecordingScene(BaseScene):
                 falling = self.np_random.rand() < self.proba_falling
                 visuals = self.domain_randomization
                 background_pos_orn = self.domain_randomization
-                kwargs = dict(
-                    objects=True,
-                    objects_pos_orn=True,
-                    falling=falling,
-                    background_pos_orn=background_pos_orn,
-                    camera=True,
-                    visuals=visuals,
-                )
+                kwargs = {
+                    "objects": True,
+                    "objects_pos_orn": True,
+                    "falling": falling,
+                    "background_pos_orn": background_pos_orn,
+                    "camera": True,
+                    "visuals": visuals,
+                }
                 self._full_rand(**kwargs)
                 return
             except SamplerError as e:
                 print("Sampling failed: ", e)
                 n_iter += 1
-        raise SamplerError('Sampling failed')
+        msg = "Sampling failed"
+        raise SamplerError(msg)
 
     def make_new_scene(self):
         self.try_rand()

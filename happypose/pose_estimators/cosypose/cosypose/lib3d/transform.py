@@ -1,6 +1,6 @@
 import numpy as np
 import pinocchio as pin
-import eigenpy
+
 
 def parse_pose_args(pose_args):
     if len(pose_args) == 2:

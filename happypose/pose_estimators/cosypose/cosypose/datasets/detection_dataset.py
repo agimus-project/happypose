@@ -1,41 +1,51 @@
-import torch
-import numpy as np
 import random
+
+import numpy as np
+import torch
+
 from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
-from .wrappers.visibility_wrapper import VisibilityWrapper
 from .augmentations import (
-    CropResizeToAspectAugmentation, VOCBackgroundAugmentation,
-    PillowBlur, PillowSharpness, PillowContrast, PillowBrightness, PillowColor, to_torch_uint8,
-    GrayScale
+    CropResizeToAspectAugmentation,
+    PillowBlur,
+    PillowBrightness,
+    PillowColor,
+    PillowContrast,
+    PillowSharpness,
+    VOCBackgroundAugmentation,
+    to_torch_uint8,
 )
+from .wrappers.visibility_wrapper import VisibilityWrapper
 
 
 class DetectionDataset(torch.utils.data.Dataset):
-    def __init__(self,
-                 scene_ds,
-                 label_to_category_id,
-                 min_area=50,
-                 resize=(640, 480),
-                 gray_augmentation=False,
-                 rgb_augmentation=False,
-                 background_augmentation=False):
-
+    def __init__(
+        self,
+        scene_ds,
+        label_to_category_id,
+        min_area=50,
+        resize=(640, 480),
+        gray_augmentation=False,
+        rgb_augmentation=False,
+        background_augmentation=False,
+    ):
         self.scene_ds = VisibilityWrapper(scene_ds)
 
         self.resize_augmentation = CropResizeToAspectAugmentation(resize=resize)
 
         self.background_augmentation = background_augmentation
         self.background_augmentations = VOCBackgroundAugmentation(
-            voc_root=LOCAL_DATA_DIR / 'VOCdevkit/VOC2012', p=0.3)
+            voc_root=LOCAL_DATA_DIR / "VOCdevkit/VOC2012",
+            p=0.3,
+        )
 
         self.rgb_augmentation = rgb_augmentation
         self.rgb_augmentations = [
             PillowBlur(p=0.4, factor_interval=(1, 3)),
-            PillowSharpness(p=0.3, factor_interval=(0., 50.)),
-            PillowContrast(p=0.3, factor_interval=(0.2, 50.)),
+            PillowSharpness(p=0.3, factor_interval=(0.0, 50.0)),
+            PillowContrast(p=0.3, factor_interval=(0.2, 50.0)),
             PillowBrightness(p=0.5, factor_interval=(0.1, 6.0)),
-            PillowColor(p=0.3, factor_interval=(0., 20.))
+            PillowColor(p=0.3, factor_interval=(0.0, 20.0)),
         ]
 
         self.label_to_category_id = label_to_category_id
@@ -58,16 +68,22 @@ class DetectionDataset(torch.utils.data.Dataset):
 
         rgb, mask = to_torch_uint8(rgb), to_torch_uint8(mask)
 
-        categories = torch.tensor([self.label_to_category_id[obj['name']] for obj in state['objects']])
-        obj_ids = np.array([obj['id_in_segm'] for obj in state['objects']])
-        boxes = np.array([torch.as_tensor(obj['bbox']).tolist() for obj in state['objects']])
+        categories = torch.tensor(
+            [self.label_to_category_id[obj["name"]] for obj in state["objects"]],
+        )
+        obj_ids = np.array([obj["id_in_segm"] for obj in state["objects"]])
+        boxes = np.array(
+            [torch.as_tensor(obj["bbox"]).tolist() for obj in state["objects"]],
+        )
         boxes = torch.as_tensor(boxes, dtype=torch.float32).view(-1, 4)
-        area = torch.as_tensor((boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0]))
+        area = torch.as_tensor(
+            (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0]),
+        )
         mask = np.array(mask)
         masks = mask == obj_ids[:, None, None]
         masks = torch.as_tensor(masks)
 
-        keep = (area > self.min_area)
+        keep = area > self.min_area
         boxes = boxes[keep]
         area = area[keep]
         categories = categories[keep]
@@ -96,9 +112,10 @@ class DetectionDataset(torch.utils.data.Dataset):
         n_attempts = 0
         while not valid:
             if n_attempts > 10:
-                raise ValueError('Cannot find valid image in the dataset')
+                msg = "Cannot find valid image in the dataset"
+                raise ValueError(msg)
             im, target = self.get_data(try_index)
-            valid = len(target['boxes']) > 0
+            valid = len(target["boxes"]) > 0
             if not valid:
                 try_index = random.randint(0, len(self.scene_ds) - 1)
                 n_attempts += 1

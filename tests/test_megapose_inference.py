@@ -3,18 +3,19 @@ import unittest
 
 import numpy as np
 import pinocchio as pin
-from pathlib import Path
 
-from .test_cosypose_inference import TestCosyPoseInference
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 from happypose.toolbox.datasets.bop_object_datasets import BOPObjectDataset
 from happypose.toolbox.utils.load_model import NAMED_MODELS, load_named_model
+
+from .test_cosypose_inference import TestCosyPoseInference
 
 
 class TestMegaPoseInference(unittest.TestCase):
     """Unit tests for MegaPose inference example."""
 
     def test_megapose_pipeline(self):
-        """Run detector from CosyPose with coarse and refiner from MegaPose"""
+        """Run detector from CosyPose with coarse and refiner from MegaPose."""
         observation = TestCosyPoseInference._load_crackers_example_observation()
 
         detector = TestCosyPoseInference._load_detector()
@@ -24,7 +25,7 @@ class TestMegaPoseInference(unittest.TestCase):
         detections = detections[:1]  # let's keep the most promising one only.
 
         object_dataset = BOPObjectDataset(
-            Path(__file__).parent / "data" / "crackers_example" / "models",
+            LOCAL_DATA_DIR / "examples" / "crackers_example" / "models",
             label_format="ycbv-{label}",
         )
 
@@ -33,7 +34,9 @@ class TestMegaPoseInference(unittest.TestCase):
         # let's limit the grid, 278 is the most promising one, 477 the least one
         pose_estimator._SO3_grid = pose_estimator._SO3_grid[[278, 477]]
         preds, data = pose_estimator.run_inference_pipeline(
-            observation, detections=detections, **model_info["inference_parameters"]
+            observation,
+            detections=detections,
+            **model_info["inference_parameters"],
         )
 
         scores = data["coarse"]["data"]["logits"]
@@ -44,7 +47,8 @@ class TestMegaPoseInference(unittest.TestCase):
 
         pose = pin.SE3(preds.poses[0].numpy())
         exp_pose = pin.SE3(
-            pin.exp3(np.array([1.44, 1.19, -0.91])), np.array([0, 0, 0.52])
+            pin.exp3(np.array([1.44, 1.19, -0.91])),
+            np.array([0, 0, 0.52]),
         )
         diff = pose.inverse() * exp_pose
         self.assertLess(np.linalg.norm(pin.log6(diff).vector), 0.3)

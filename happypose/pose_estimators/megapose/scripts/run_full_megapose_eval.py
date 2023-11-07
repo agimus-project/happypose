@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,56 +14,42 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import copy
 import os
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 # Third Party
 from omegaconf import OmegaConf
 
 # MegaPose
-from happypose.pose_estimators.megapose.bop_config import (
-    PBR_COARSE,
-    PBR_DETECTORS,
-    PBR_REFINER,
-    SYNT_REAL_COARSE,
-    SYNT_REAL_DETECTORS,
-    SYNT_REAL_REFINER,
-)
+from happypose.pose_estimators.megapose.bop_config import PBR_DETECTORS
 from happypose.pose_estimators.megapose.config import (
     DEBUG_RESULTS_DIR,
-    EXP_DIR,
     MODELNET_TEST_CATEGORIES,
     RESULTS_DIR,
 )
+from happypose.pose_estimators.megapose.evaluation.bop import run_evaluation
 from happypose.pose_estimators.megapose.evaluation.eval_config import (
     BOPEvalConfig,
     EvalConfig,
     FullEvalConfig,
     HardwareConfig,
 )
-
-from happypose.pose_estimators.megapose.evaluation.evaluation import get_save_dir, generate_save_key, run_eval
-from happypose.pose_estimators.megapose.evaluation.bop import run_evaluation
-from happypose.toolbox.utils.distributed import get_rank, get_world_size, init_distributed_mode
+from happypose.pose_estimators.megapose.evaluation.evaluation import (
+    generate_save_key,
+    get_save_dir,
+    run_eval,
+)
+from happypose.toolbox.utils.distributed import (
+    get_rank,
+    get_world_size,
+    init_distributed_mode,
+)
 from happypose.toolbox.utils.logging import get_logger, set_logging_level
 
 logger = get_logger(__name__)
 
-BOP_DATASET_NAMES = [
-    "lm",
-    "lmo",
-    "tless",
-    "tudl",
-    "icbin",
-    "itodd",
-    "hb",
-    "ycbv",
-    # 'hope',
-]
 
 BOP_TEST_DATASETS = [
     "lmo.bop19",
@@ -77,7 +62,9 @@ BOP_TEST_DATASETS = [
 ]
 
 
-MODELNET_TEST_DATASETS = [f"modelnet.{category}.test" for category in MODELNET_TEST_CATEGORIES]
+MODELNET_TEST_DATASETS = [
+    f"modelnet.{category}.test" for category in MODELNET_TEST_CATEGORIES
+]
 
 
 def create_eval_cfg(
@@ -85,8 +72,7 @@ def create_eval_cfg(
     detection_type: str,
     coarse_estimation_type: str,
     ds_name: str,
-) -> Tuple[str, EvalConfig]:
-
+) -> tuple[str, EvalConfig]:
     cfg = copy.deepcopy(cfg)
 
     cfg.inference.detection_type = detection_type
@@ -101,10 +87,11 @@ def create_eval_cfg(
             cfg.detector_run_id = PBR_DETECTORS[ds_name_root]
     elif detection_type == "gt":
         pass
-    elif detection_type == "sam":
+    elif detection_type == "exte":
         pass
     else:
-        raise ValueError(f"Unknown detector type {cfg.detector_type}")
+        msg = f"Unknown detector type {cfg.detector_type}"
+        raise ValueError(msg)
 
     name = generate_save_key(detection_type, coarse_estimation_type)
 
@@ -112,7 +99,6 @@ def create_eval_cfg(
 
 
 def run_full_eval(cfg: FullEvalConfig) -> None:
-
     bop_eval_cfgs = []
 
     init_distributed_mode()
@@ -126,27 +112,30 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
 
     # Iterate over each dataset
     for ds_name in cfg.ds_names:
-
         # create the EvalConfig objects that we will call `run_eval` on
-        eval_configs: Dict[str, EvalConfig] = dict()
-        for (detection_type, coarse_estimation_type) in cfg.detection_coarse_types:
-            name, cfg_ = create_eval_cfg(cfg, detection_type, coarse_estimation_type, ds_name)
+        eval_configs: dict[str, EvalConfig] = {}
+        for detection_type, coarse_estimation_type in cfg.detection_coarse_types:
+            name, cfg_ = create_eval_cfg(
+                cfg,
+                detection_type,
+                coarse_estimation_type,
+                ds_name,
+            )
             eval_configs[name] = cfg_
 
         # For each eval_cfg run the evaluation.
         # Note that the results get saved to disk
-        for save_key, eval_cfg in eval_configs.items():
-
+        for _save_key, eval_cfg in eval_configs.items():
             # Run the inference
             if not cfg.skip_inference:
                 eval_out = run_eval(eval_cfg)
 
-            # If we are skpping the inference mimic the output that run_eval
+            # If we are skipping the inference, mimic the output that run_eval
             # would have produced so that we can run the bop_eval
             else:  # Otherwise hack the output so we can run the BOP eval
                 if get_rank() == 0:
                     results_dir = get_save_dir(eval_cfg)
-                    pred_keys = ["refiner/final"]
+                    pred_keys = ["coarse", "refiner/final"]
                     if eval_cfg.inference.run_depth_refiner:
                         pred_keys.append("depth_refiner")
                     eval_out = {
@@ -156,17 +145,21 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
                     }
 
                     assert Path(
-                        eval_out["results_path"]
+                        eval_out["results_path"],
                     ).is_file(), f"The file {eval_out['results_path']} doesn't exist"
 
             # Run the bop eval for each type of prediction
             if cfg.run_bop_eval and get_rank() == 0:
+                bop_eval_keys = {"refiner/final", "depth_refiner"}
+                if cfg.eval_coarse_also:
+                    bop_eval_keys.add("coarse")
 
-                bop_eval_keys = set(("refiner/final", "depth_refiner"))
+                # Remove from evaluation predictions that were not produced at inference
+                # time
                 bop_eval_keys = bop_eval_keys.intersection(set(eval_out["pred_keys"]))
 
                 for method in bop_eval_keys:
-                    if not "bop19" in ds_name:
+                    if "bop19" not in ds_name:
                         continue
 
                     bop_eval_cfg = BOPEvalConfig(
@@ -175,7 +168,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
                         split="test",
                         eval_dir=eval_out["save_dir"] / "bop_evaluation",
                         method=method,
-                        convert_only=False,
+                        convert_only=eval_cfg.convert_only,
                     )
                     bop_eval_cfgs.append(bop_eval_cfg)
 

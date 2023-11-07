@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@ limitations under the License.
 # Standard Library
 import time
 from collections import defaultdict
-from typing import Dict, Optional
+from typing import Optional
 
 # Third Party
 import numpy as np
@@ -55,13 +54,16 @@ class PredictionRunner:
         batch_size: int = 1,
         n_workers: int = 4,
     ) -> None:
-
         self.inference_cfg = inference_cfg
         self.rank = get_rank()
         self.world_size = get_world_size()
         self.tmp_dir = get_tmp_dir()
 
-        sampler = DistributedSceneSampler(scene_ds, num_replicas=self.world_size, rank=self.rank)
+        sampler = DistributedSceneSampler(
+            scene_ds,
+            num_replicas=self.world_size,
+            rank=self.rank,
+        )
         self.sampler = sampler
         self.scene_ds = scene_ds
         dataloader = DataLoader(
@@ -82,17 +84,17 @@ class PredictionRunner:
         obs_tensor: ObservationTensor,
         gt_detections: DetectionsType,
         initial_estimates: Optional[PoseEstimatesType] = None,
-    ) -> Dict[str, PoseEstimatesType]:
+    ) -> dict[str, PoseEstimatesType]:
         """Runs inference pipeline, extracts the results.
 
         Returns: A dict with keys
             - 'final': final preds
-            - 'refiner/final': preds at final refiner iteration (before depth refinement)
+            - 'refiner/final': preds at final refiner iteration (before depth
+              refinement)
             - 'depth_refinement': preds after depth refinement.
 
 
         """
-
         if self.inference_cfg.detection_type == "gt":
             detections = gt_detections
             run_detector = False
@@ -100,13 +102,16 @@ class PredictionRunner:
             detections = None
             run_detector = True
         else:
-            raise ValueError(f"Unknown detection type {self.inference_cfg.detection_type}")
+            msg = f"Unknown detection type {self.inference_cfg.detection_type}"
+            raise ValueError(msg)
 
         coarse_estimates = None
         if self.inference_cfg.coarse_estimation_type == "external":
             # TODO (ylabbe): This is hacky, clean this for modelnet eval.
             coarse_estimates = initial_estimates
-            coarse_estimates = happypose.toolbox.inference.utils.add_instance_id(coarse_estimates)
+            coarse_estimates = happypose.toolbox.inference.utils.add_instance_id(
+                coarse_estimates,
+            )
             coarse_estimates.infos["instance_id"] = 0
             run_detector = False
 
@@ -117,32 +122,34 @@ class PredictionRunner:
             run_detector=run_detector,
             data_TCO_init=None,
             n_coarse_iterations=1,
-            n_refiner_iterations=4
+            n_refiner_iterations=4,
         )
-        elapsed = time.time() - t
+        time.time() - t
 
         # TODO (lmanuelli): Process this into a dict with keys like
         # - 'refiner/iteration=1`
         # - 'refiner/iteration=5`
         # - `depth_refiner`
         # Note: Since we support multi-hypotheses we need to potentially
-        # go back and extract out the 'refiner/iteration=1`, `refiner/iteration=5` things for the ones that were actually the highest scoring at the end.
+        # go back and extract out the 'refiner/iteration=1`, `refiner/iteration=5`
+        # things for the ones that were actually the highest scoring at the end.
 
-        all_preds = dict()
+        all_preds = {}
         data_TCO_refiner = extra_data["refiner"]["preds"]
 
+        k_0 = f"refiner/iteration={self.inference_cfg.n_refiner_iterations}"
         all_preds = {
             "final": preds,
-            f"refiner/iteration={self.inference_cfg.n_refiner_iterations}": data_TCO_refiner,
+            k_0: data_TCO_refiner,
             "refiner/final": data_TCO_refiner,
             "coarse": extra_data["coarse"]["preds"],
         }
 
         if self.inference_cfg.run_depth_refiner:
-            all_preds[f"depth_refiner"] = extra_data["depth_refiner"]["preds"]
+            all_preds["depth_refiner"] = extra_data["depth_refiner"]["preds"]
 
         # Remove any mask tensors
-        for k, v in all_preds.items():
+        for _k, v in all_preds.items():
             v.infos["scene_id"] = np.unique(gt_detections.infos["scene_id"]).item()
             v.infos["view_id"] = np.unique(gt_detections.infos["view_id"]).item()
             if "mask" in v.tensors:
@@ -150,8 +157,11 @@ class PredictionRunner:
 
         return all_preds
 
-    def get_predictions(self, pose_estimator: PoseEstimator) -> Dict[str, PoseEstimatesType]:
-        """Runs predictions
+    def get_predictions(
+        self,
+        pose_estimator: PoseEstimator,
+    ) -> dict[str, PoseEstimatesType]:
+        """Runs predictions.
 
         Returns: A dict with keys
             - 'refiner/iteration=1`
@@ -162,10 +172,8 @@ class PredictionRunner:
 
 
         """
-
         predictions_list = defaultdict(list)
         for n, data in enumerate(tqdm(self.dataloader)):
-
             # data is a dict
             rgb = data["rgb"]
             depth = None
@@ -183,23 +191,29 @@ class PredictionRunner:
             if n == 0:
                 with torch.no_grad():
                     self.run_inference_pipeline(
-                        pose_estimator, obs_tensor, gt_detections, initial_estimates=initial_data
+                        pose_estimator,
+                        obs_tensor,
+                        gt_detections,
+                        initial_estimates=initial_data,
                     )
 
             cuda_timer = CudaTimer()
             cuda_timer.start()
             with torch.no_grad():
                 all_preds = self.run_inference_pipeline(
-                    pose_estimator, obs_tensor, gt_detections, initial_estimates=initial_data
+                    pose_estimator,
+                    obs_tensor,
+                    gt_detections,
+                    initial_estimates=initial_data,
                 )
             cuda_timer.end()
-            duration = cuda_timer.elapsed()
+            cuda_timer.elapsed()
 
             for k, v in all_preds.items():
                 predictions_list[k].append(v)
 
         # Concatenate the lists of PandasTensorCollections
-        predictions = dict()
+        predictions = {}
         for k, v in predictions_list.items():
             predictions[k] = tc.concatenate(v)
 

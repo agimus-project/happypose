@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 
 
 # Standard Library
@@ -52,12 +50,13 @@ def get_cuda_memory():
 
 
 def get_gpu_memory():
-
     devices = os.environ.get(
         "CUDA_VISIBLE_DEVICES",
     ).split(",")
     assert len(devices) == 1
-    out = subprocess.check_output(["nvidia-smi", "--id=" + str(devices[0]), "-q", "--xml-format"])
+    out = subprocess.check_output(
+        ["nvidia-smi", "--id=" + str(devices[0]), "-q", "--xml-format"],
+    )
     tree = ET.fromstring(out)
     gpu = tree.findall("gpu")[0]
     memory = float(gpu.find("fb_memory_usage").find("used").text.split(" ")[0]) / 1024

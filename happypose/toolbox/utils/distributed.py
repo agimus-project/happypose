@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,19 +14,19 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import datetime
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
+
+import omegaconf
 
 # Third Party
 import torch
 import torch.distributed as dist
 from omegaconf import OmegaConf
-import omegaconf
 
 # MegaPose
 from happypose.toolbox.utils.logging import get_logger
@@ -46,7 +45,8 @@ def get_tmp_dir() -> Path:
 
 
 def sync_config(
-    cfg: omegaconf.dictconfig.DictConfig, local_fields: List[str] = []
+    cfg: omegaconf.dictconfig.DictConfig,
+    local_fields: list[str] = [],
 ) -> omegaconf.dictconfig.DictConfig:
     cfg_path = get_tmp_dir() / "config.yaml"
     if get_rank() == 0:
@@ -104,11 +104,10 @@ def get_world_size() -> int:
 
 
 def reduce_dict(
-    input_dict: Dict[str, Any],
-    average: bool = True
-) -> Dict[str, Any]:
-    """
-    https://github.com/pytorch/vision/blob/master/references/detection/utils.py
+    input_dict: dict[str, Any],
+    average: bool = True,
+) -> dict[str, Any]:
+    """https://github.com/pytorch/vision/blob/master/references/detection/utils.py
     Args:
         input_dict (dict): all the values will be reduced
         average (bool): whether to do average or sum

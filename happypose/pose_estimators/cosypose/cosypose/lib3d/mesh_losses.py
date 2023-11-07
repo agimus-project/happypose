@@ -1,4 +1,5 @@
 import torch
+
 from .transform_ops import transform_pts
 
 
@@ -22,5 +23,9 @@ def compute_ADD_L1_loss(TCO_gt, TCO_pred, points):
     bsz = len(TCO_gt)
     assert TCO_pred.shape == (bsz, 4, 4) and TCO_gt.shape == (bsz, 4, 4)
     assert points.dim() == 3 and points.shape[-1] == 3
-    dists = (transform_pts(TCO_gt, points) - transform_pts(TCO_pred, points)).abs().mean(dim=(-1, -2))
+    dists = (
+        (transform_pts(TCO_gt, points) - transform_pts(TCO_pred, points))
+        .abs()
+        .mean(dim=(-1, -2))
+    )
     return dists

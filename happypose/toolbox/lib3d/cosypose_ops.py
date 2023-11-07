@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,19 +14,21 @@ limitations under the License.
 """
 
 
-
 # Third Party
 import torch
 
 # Local Folder
-from .rotations import (
-    compute_rotation_matrix_from_ortho6d,
-    compute_rotation_matrix_from_quaternions,
-)
+from .camera_geometry import project_points
+from .rotations import compute_rotation_matrix_from_ortho6d
 from .transform_ops import invert_transform_matrices, transform_pts
 
-l1 = lambda diff: diff.abs()
-l2 = lambda diff: diff**2
+
+def l1(diff):
+    return diff.abs()
+
+
+def l2(diff):
+    return diff**2
 
 
 def pose_update_with_reference_point(TCO, K, vxvyvz, dRCO, tCR):
@@ -48,7 +49,10 @@ def pose_update_with_reference_point(TCO, K, vxvyvz, dRCO, tCR):
     xsrcysrc = tCR[:, :2]
     tCR_out = tCR.clone()
     tCR_out[:, 2] = ztgt.flatten()
-    tCR_out[:, :2] = ((vxvy / fxfy) + (xsrcysrc / zsrc.repeat(1, 2))) * ztgt.repeat(1, 2)
+    tCR_out[:, :2] = ((vxvy / fxfy) + (xsrcysrc / zsrc.repeat(1, 2))) * ztgt.repeat(
+        1,
+        2,
+    )
 
     tCO_out = dRCO @ (TCO[:, :3, 3] - tCR).unsqueeze(-1) + tCR_out.unsqueeze(-1)
     tCO_out = tCO_out.squeeze(-1)
@@ -68,7 +72,7 @@ def loss_CO_symmetric(TCO_possible_gt, TCO_pred, points, l1_or_l2=l1):
     TCO_points_possible_gt = transform_pts(TCO_possible_gt, points)
     TCO_pred_points = transform_pts(TCO_pred, points)
     losses_possible = l1_or_l2(
-        (TCO_pred_points.unsqueeze(1) - TCO_points_possible_gt).flatten(-2, -1)
+        (TCO_pred_points.unsqueeze(1) - TCO_points_possible_gt).flatten(-2, -1),
     ).mean(-1)
     loss, min_id = losses_possible.min(dim=1)
     TCO_assign = TCO_possible_gt[torch.arange(bsz), min_id]
@@ -84,7 +88,6 @@ def loss_refiner_CO_disentangled_reference_point(
     tCR,
 ):
     # MegaPose
-    from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
     bsz = TCO_possible_gt.shape[0]
     assert TCO_possible_gt.shape[0] == bsz
@@ -112,19 +115,31 @@ def loss_refiner_CO_disentangled_reference_point(
     # First term
     TCO_pred_orn = TCO_gt.clone()
     TCO_pred_orn[:, :3, :3] = pose_update_with_reference_point(
-        TCO_input, K_crop, torch.cat((vxvy_gt, vz_gt), dim=-1), dR, tCR
+        TCO_input,
+        K_crop,
+        torch.cat((vxvy_gt, vz_gt), dim=-1),
+        dR,
+        tCR,
     )[:, :3, :3].to(TCO_pred_orn.dtype)
 
     # Second term: influence of vxvy
     TCO_pred_xy = TCO_gt.clone()
     TCO_pred_xy[:, :2, [3]] = pose_update_with_reference_point(
-        TCO_input, K_crop, torch.cat((vxvy, vz_gt), dim=-1), dR_gt, tCR
+        TCO_input,
+        K_crop,
+        torch.cat((vxvy, vz_gt), dim=-1),
+        dR_gt,
+        tCR,
     )[:, :2, [3]].to(TCO_pred_xy.dtype)
 
     # Third term: influence of vz
     TCO_pred_z = TCO_gt.clone()
     TCO_pred_z[:, [2], [3]] = pose_update_with_reference_point(
-        TCO_input, K_crop, torch.cat((vxvy_gt, vz.unsqueeze(-1)), dim=-1), dR_gt, tCR
+        TCO_input,
+        K_crop,
+        torch.cat((vxvy_gt, vz.unsqueeze(-1)), dim=-1),
+        dR_gt,
+        tCR,
     )[:, [2], [3]].to(TCO_pred_z.dtype)
 
     loss_orn, _ = loss_CO_symmetric(TCO_possible_gt, TCO_pred_orn, points, l1_or_l2=l1)
@@ -167,14 +182,15 @@ def TCO_init_from_boxes(z_range, boxes, K):
 
 
 def TCO_init_from_boxes_autodepth_with_R(boxes_2d, model_points_3d, K, R):
-    """
-    Args:
+    """Args:
+    ----
         boxes_2d: [B,4], in (xmin, ymin, xmax, ymax) convention
         model_points_3d: [B,N,3]
         K: [B,3,3]
-        R: [B,3,3]
+        R: [B,3,3].
 
-    Returns:
+    Returns
+    -------
         TCO: [B,4,4]
     """
     # User in BOP20 challenge
@@ -198,8 +214,12 @@ def TCO_init_from_boxes_autodepth_with_R(boxes_2d, model_points_3d, K, R):
     C_pts_3d = transform_pts(TCO, model_points_3d)
 
     if bsz > 0:
-        deltax_3d = C_pts_3d[:, :, 0].max(dim=1).values - C_pts_3d[:, :, 0].min(dim=1).values
-        deltay_3d = C_pts_3d[:, :, 1].max(dim=1).values - C_pts_3d[:, :, 1].min(dim=1).values
+        deltax_3d = (
+            C_pts_3d[:, :, 0].max(dim=1).values - C_pts_3d[:, :, 0].min(dim=1).values
+        )
+        deltay_3d = (
+            C_pts_3d[:, :, 1].max(dim=1).values - C_pts_3d[:, :, 1].min(dim=1).values
+        )
     else:
         deltax_3d = C_pts_3d[:, 0, 0]
         deltay_3d = C_pts_3d[:, 0, 1]
@@ -239,8 +259,12 @@ def TCO_init_from_boxes_zup_autodepth(boxes_2d, model_points_3d, K):
     C_pts_3d = transform_pts(TCO, model_points_3d)
 
     if bsz > 0:
-        deltax_3d = C_pts_3d[:, :, 0].max(dim=1).values - C_pts_3d[:, :, 0].min(dim=1).values
-        deltay_3d = C_pts_3d[:, :, 1].max(dim=1).values - C_pts_3d[:, :, 1].min(dim=1).values
+        deltax_3d = (
+            C_pts_3d[:, :, 0].max(dim=1).values - C_pts_3d[:, :, 0].min(dim=1).values
+        )
+        deltay_3d = (
+            C_pts_3d[:, :, 1].max(dim=1).values - C_pts_3d[:, :, 1].min(dim=1).values
+        )
     else:
         deltax_3d = C_pts_3d[:, 0, 0]
         deltay_3d = C_pts_3d[:, 0, 1]
@@ -261,6 +285,7 @@ def TCO_init_from_boxes_zup_autodepth(boxes_2d, model_points_3d, K):
 
 def TCO_init_from_boxes_v3(layer, boxes, K):
     # TODO: Clean these 2 functions
+    # TODO: F821 Undefined name `_TCO_init_from_boxes_v2`
     # MegaPose
     from happypose.pose_estimators.megapose.math_utils.meshes import get_T_offset
 
@@ -278,7 +303,7 @@ def TCO_init_from_boxes_v3(layer, boxes, K):
         .to(boxes.device)
         .to(boxes.dtype)
     )
-    TCO = _TCO_init_from_boxes_v2(z, boxes, K)
+    TCO = _TCO_init_from_boxes_v2(z, boxes, K)  # noqa: F821
     pts2d = project_points(pts, K, TCO)
     deltax = pts2d[..., 0].max() - pts2d[..., 0].min()
     deltay = pts2d[..., 1].max() - pts2d[..., 1].min()
@@ -290,7 +315,7 @@ def TCO_init_from_boxes_v3(layer, boxes, K):
     ratio_y = deltay / bb_deltay
 
     z2 = z * (ratio_y.unsqueeze(1) + ratio_x.unsqueeze(1)) / 2
-    TCO = _TCO_init_from_boxes_v2(z2, boxes, K)
+    TCO = _TCO_init_from_boxes_v2(z2, boxes, K)  # noqa: F821
     return TCO
 
 
@@ -301,18 +326,29 @@ def init_K_TCO_from_boxes(boxes_2d, model_points_3d, z_guess, resolution):
     H, W = min(resolution), max(resolution)
     bsz = boxes_2d.shape[0]
 
-    z = torch.as_tensor(z_guess).unsqueeze(0).unsqueeze(0).repeat(bsz, 1).to(device).float()
+    z = (
+        torch.as_tensor(z_guess)
+        .unsqueeze(0)
+        .unsqueeze(0)
+        .repeat(bsz, 1)
+        .to(device)
+        .float()
+    )
     TCO = torch.eye(4).unsqueeze(0).to(torch.float).to(device).repeat(bsz, 1, 1)
     TCO[:, 2, 3] = z.flatten()
 
     C_pts_3d = transform_pts(TCO, model_points_3d)
-    deltax_3d = C_pts_3d[:, :, 0].max(dim=1).values - C_pts_3d[:, :, 0].min(dim=1).values
-    deltay_3d = C_pts_3d[:, :, 1].max(dim=1).values - C_pts_3d[:, :, 1].min(dim=1).values
+    deltax_3d = (
+        C_pts_3d[:, :, 0].max(dim=1).values - C_pts_3d[:, :, 0].min(dim=1).values
+    )
+    deltay_3d = (
+        C_pts_3d[:, :, 1].max(dim=1).values - C_pts_3d[:, :, 1].min(dim=1).values
+    )
 
     bb_deltax = boxes_2d[:, 2] - boxes_2d[:, 0]
     bb_deltay = boxes_2d[:, 3] - boxes_2d[:, 1]
 
-    f_from_dx = bb_deltax * z_guess / deltax_3d
+    bb_deltax * z_guess / deltax_3d
     f_from_dy = bb_deltay * z_guess / deltay_3d
     f = f_from_dy
 

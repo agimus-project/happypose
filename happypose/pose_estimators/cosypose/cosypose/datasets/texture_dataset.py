@@ -1,5 +1,7 @@
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+
 from happypose.pose_estimators.cosypose.cosypose.config import MEMORY
 
 
@@ -13,9 +15,9 @@ class TextureDataset:
     def parse_image_dir(ds_dir):
         ds_dir = Path(ds_dir)
         index = []
-        for im_path in ds_dir.glob('*'):
-            if im_path.suffix in {'.png', '.jpg'}:
-                index.append(dict(texture_path=im_path))
+        for im_path in ds_dir.glob("*"):
+            if im_path.suffix in {".png", ".jpg"}:
+                index.append({"texture_path": im_path})
         index = pd.DataFrame(index)
         return index
 

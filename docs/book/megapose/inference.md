@@ -1,6 +1,6 @@
 # Inference
 
-Here are provided the minimal commands you have to run in order to run the inference of CosyPose. You need to set up the environment variable `$HAPPYPOSE_DATA_DIR` as explained in the README. 
+Here are provided the minimal commands you have to run in order to run the inference of CosyPose. You need to set up the environment variable `$HAPPYPOSE_DATA_DIR` as explained in the README.
 
  ## 1. Download pre-trained pose estimation models
 
@@ -15,7 +15,7 @@ We estimate the pose for a barbecue sauce bottle (from the [HOPE](https://github
 ```sh
 cd $HAPPYPOSE_DATA_DIR
 wget https://memmo-data.laas.fr/static/examples.tar.xz
-tar xf examples.tar.xz 
+tar xf examples.tar.xz
 ```
 
 The input files are the following:
@@ -67,7 +67,7 @@ This file contains a list of objects with their estimated poses . For each objec
 
     [{"label": "barbecue-sauce", "TWO": [[0.5453961536730983, 0.6226545207599095, -0.43295293693197473, 0.35692612413663855], [0.10723329335451126, 0.07313819974660873, 0.45735278725624084]]}]
 
-Finally, you can visualize the results using: 
+Finally, you can visualize the results using:
 
 ```sh
 python -m happypose.pose_estimators.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs

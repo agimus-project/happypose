@@ -1,8 +1,12 @@
-from pathlib import Path
-import torch
 from collections import defaultdict
+from pathlib import Path
 
-from happypose.pose_estimators.cosypose.cosypose.utils.distributed import get_world_size, get_rank
+import torch
+
+from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
+    get_rank,
+    get_world_size,
+)
 
 
 class Meter:
@@ -22,7 +26,7 @@ class Meter:
         tmp_dir = Path(tmp_dir)
         tmp_dir.mkdir(exist_ok=True, parents=True)
         rank, world_size = get_rank(), get_world_size()
-        tmp_file_template = (tmp_dir / 'rank={rank}.pth.tar').as_posix()
+        tmp_file_template = (tmp_dir / "rank={rank}.pth.tar").as_posix()
         if rank > 0:
             tmp_file = tmp_file_template.format(rank=rank)
             torch.save(self.datas, tmp_file)

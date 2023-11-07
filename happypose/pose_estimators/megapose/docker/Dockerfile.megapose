@@ -10,7 +10,7 @@ SHELL ["/bin/bash", "-c"]
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Needed to deal with this issue 
+# Needed to deal with this issue
 # https://forums.developer.nvidia.com/t/the-repository-https-developer-download-nvidia-com-compute-cuda-repos-ubuntu1804-x86-64-release-does-not-have-a-release-file/175263
 RUN apt-get install -y --no-install-recommends ca-certificates \
   && rm -rf /var/lib/apt/lists/* \
@@ -26,7 +26,7 @@ RUN rm -f /etc/apt/sources.list.d/nvidia-ml.list
 
 
 RUN apt update && apt upgrade -y && \
-  apt install -y vim tar wget htop xorg openbox bzip2 \ 
+  apt install -y vim tar wget htop xorg openbox bzip2 \
   tar apt-utils
 
 # Install Anaconda
@@ -59,7 +59,7 @@ RUN source $CONDA_DIR/bin/activate && \
   scipy pypng h5py seaborn kornia meshcat pyarrow dt_apriltags open3d structlog \
   imageio
 
-# Blender 
+# Blender
 RUN cd $HOME && \
   wget https://mirrors.dotsrc.org/blender/release/Blender2.93/blender-2.93.8-linux-x64.tar.xz && \
   tar -xvf blender-2.93.8-linux-x64.tar.xz && rm blender-2.93.8-linux-x64.tar.xz

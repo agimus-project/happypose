@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +17,6 @@ limitations under the License.
 # Third Party
 import numpy as np
 import open3d as o3d
-import transforms3d as t3d
 
 
 def numpy_to_open3d(xyz):
@@ -28,17 +26,16 @@ def numpy_to_open3d(xyz):
 
 
 def compute_masks(mask_type, depth_rendered, depth_measured, depth_delta_thresh=0.1):
-    """
-    Function for computing masks
+    """Function for computing masks.
 
     Args:
+    ----
         mask_type: str
         depth_rendered: [H,W]
         depth_measured: [H,W]
         depth_delta_thresh: 0.1
 
     """
-
     mask_rendered = depth_rendered > 0
     mask_measured = np.logical_and(depth_measured > 0, depth_rendered > 0)
 
@@ -48,7 +45,8 @@ def compute_masks(mask_type, depth_rendered, depth_measured, depth_delta_thresh=
         depth_delta = np.abs(depth_measured - depth_rendered)
         mask_measured[depth_delta > depth_delta_thresh] = 0
     else:
-        raise ValueError(f"Unknown mask type {mask_type}")
+        msg = f"Unknown mask type {mask_type}"
+        raise ValueError(msg)
 
     # Most conservative
     mask_rendered = mask_measured

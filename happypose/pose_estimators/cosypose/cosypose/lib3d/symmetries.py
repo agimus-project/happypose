@@ -1,13 +1,13 @@
 import numpy as np
 
-from .transform import Transform
 from .rotations import euler2quat
+from .transform import Transform
 
 
 def make_bop_symmetries(dict_symmetries, n_symmetries_continuous=8, scale=0.001):
     # Note: See https://github.com/thodan/bop_toolkit/blob/master/bop_toolkit_lib/misc.py
-    sym_discrete = dict_symmetries.get('symmetries_discrete', [])
-    sym_continous = dict_symmetries.get('symmetries_continuous', [])
+    sym_discrete = dict_symmetries.get("symmetries_discrete", [])
+    sym_continous = dict_symmetries.get("symmetries_continuous", [])
     all_M_discrete = [Transform((0, 0, 0, 1), (0, 0, 0))]
     all_M_continuous = []
     all_M = []
@@ -17,8 +17,8 @@ def make_bop_symmetries(dict_symmetries, n_symmetries_continuous=8, scale=0.001)
         M = Transform(M)
         all_M_discrete.append(M)
     for sym_n in sym_continous:
-        assert np.allclose(sym_n['offset'], 0)
-        axis = np.array(sym_n['axis'])
+        assert np.allclose(sym_n["offset"], 0)
+        axis = np.array(sym_n["axis"])
         assert axis.sum() == 1
         for n in range(n_symmetries_continuous):
             euler = axis * 2 * np.pi * n / n_symmetries_continuous

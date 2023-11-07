@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,12 +14,10 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 import shutil
 import time
-from concurrent.futures import ProcessPoolExecutor as Pool
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 from pathlib import Path
 
 # Third Party
@@ -40,8 +37,16 @@ def make_ply_scaled(mesh_path, scale=SCALE):
     n, mesh_path = mesh_path
     mesh_path = Path(mesh_path)
     new_mesh_path = str(mesh_path.with_suffix("")) + "_scaled.ply"
-    new_mesh_path = new_mesh_path.replace("models_orig", MODELS_DIR_TEMPLATE.format(scale=scale))
-    mesh = trimesh.load(str(mesh_path), skip_materials=True, process=False, maintain_order=True)
+    new_mesh_path = new_mesh_path.replace(
+        "models_orig",
+        MODELS_DIR_TEMPLATE.format(scale=scale),
+    )
+    mesh = trimesh.load(
+        str(mesh_path),
+        skip_materials=True,
+        process=False,
+        maintain_order=True,
+    )
     mesh = as_mesh(mesh)
     mesh.apply_scale(scale)
     mesh.apply_scale(1000)
@@ -72,6 +77,5 @@ if __name__ == "__main__":
 
     for mesh_path in tqdm(mesh_paths):
         make_ply_scaled_(mesh_path)
-
 
     time.sleep(60)

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 # Third Party
 import torch
@@ -25,13 +24,12 @@ from omegaconf import OmegaConf
 
 # MegaPose
 import happypose
+
 # import happypose.pose_estimators.megapose as megapose
 import happypose.pose_estimators.megapose.evaluation.evaluation_runner
 import happypose.toolbox.datasets.datasets_cfg
 import happypose.toolbox.inference.utils
-from happypose.pose_estimators.megapose.evaluation.eval_config import (
-    EvalConfig,
-)
+from happypose.pose_estimators.megapose.evaluation.eval_config import EvalConfig
 from happypose.pose_estimators.megapose.evaluation.evaluation_runner import (
     EvaluationRunner,
 )
@@ -41,20 +39,11 @@ from happypose.pose_estimators.megapose.evaluation.meters.modelnet_meters import
 from happypose.pose_estimators.megapose.evaluation.prediction_runner import (
     PredictionRunner,
 )
-from happypose.pose_estimators.megapose.evaluation.runner_utils import (
-    format_results,
-)
-from happypose.pose_estimators.megapose.inference.depth_refiner import (
-    DepthRefiner,
-)
-from happypose.pose_estimators.megapose.inference.icp_refiner import (
-    ICPRefiner,
-)
-from happypose.pose_estimators.megapose.inference.pose_estimator import (
-    PoseEstimator,
-)
+from happypose.pose_estimators.megapose.evaluation.runner_utils import format_results
+from happypose.pose_estimators.megapose.inference.depth_refiner import DepthRefiner
+from happypose.pose_estimators.megapose.inference.icp_refiner import ICPRefiner
+from happypose.pose_estimators.megapose.inference.pose_estimator import PoseEstimator
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
-
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir
 from happypose.toolbox.utils.logging import get_logger
@@ -69,15 +58,18 @@ def generate_save_key(detection_type: str, coarse_estimation_type: str) -> str:
 def get_save_dir(cfg: EvalConfig) -> Path:
     """Returns a save dir.
 
-    Example
-
+    Example:
+    -------
     .../ycbv.bop19/gt+SO3_grid
 
     You must remove the '.bop19' from the name in order for the
     bop_toolkit_lib to process it correctly.
 
     """
-    save_key = generate_save_key(cfg.inference.detection_type, cfg.inference.coarse_estimation_type)
+    save_key = generate_save_key(
+        cfg.inference.detection_type,
+        cfg.inference.coarse_estimation_type,
+    )
 
     assert cfg.save_dir is not None
     assert cfg.ds_name is not None
@@ -88,7 +80,7 @@ def get_save_dir(cfg: EvalConfig) -> Path:
 def run_eval(
     cfg: EvalConfig,
     save_dir: Optional[Path] = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run eval for a single setting on a single dataset.
 
     A single setting is a (detection_type, coarse_estimation_type) such
@@ -98,12 +90,15 @@ def run_eval(
 
     cfg.save_dir / ds_name / eval_key / results.pth.tar
 
-    Returns:
+    Returns
+    -------
         dict: If you are rank_0 process, otherwise returns None
 
     """
-
-    save_key = generate_save_key(cfg.inference.detection_type, cfg.inference.coarse_estimation_type)
+    save_key = generate_save_key(
+        cfg.inference.detection_type,
+        cfg.inference.coarse_estimation_type,
+    )
     if save_dir is None:
         save_dir = get_save_dir(cfg)
 
@@ -112,33 +107,48 @@ def run_eval(
     logger.info(f"Running eval on ds_name={cfg.ds_name} with setting={save_key}")
 
     # Load the dataset
-    ds_kwargs = dict(load_depth=True)
-    scene_ds = happypose.toolbox.datasets.datasets_cfg.make_scene_dataset(cfg.ds_name, **ds_kwargs)
-    urdf_ds_name, obj_ds_name = happypose.toolbox.datasets.datasets_cfg.get_obj_ds_info(cfg.ds_name)
+    ds_kwargs = {"load_depth": True}
+    scene_ds = happypose.toolbox.datasets.datasets_cfg.make_scene_dataset(
+        cfg.ds_name,
+        **ds_kwargs,
+    )
+    urdf_ds_name, obj_ds_name = happypose.toolbox.datasets.datasets_cfg.get_obj_ds_info(
+        cfg.ds_name,
+    )
 
     # drop frames if this was specified
     if cfg.n_frames is not None:
-        scene_ds.frame_index = scene_ds.frame_index[: cfg.n_frames].reset_index(drop=True)
+        scene_ds.frame_index = scene_ds.frame_index[: cfg.n_frames].reset_index(
+            drop=True,
+        )
 
     # Load detector model
     if cfg.inference.detection_type == "detector":
         assert cfg.detector_run_id is not None
-        detector_model = happypose.toolbox.inference.utils.load_detector(cfg.detector_run_id)
+        detector_model = happypose.toolbox.inference.utils.load_detector(
+            cfg.detector_run_id,
+        )
     elif cfg.inference.detection_type == "gt":
         detector_model = None
-    elif cfg.inference.detection_type == "sam":
+    elif cfg.inference.detection_type == "exte":
         detector_model = None
     else:
-        raise ValueError(f"Unknown detection_type={cfg.inference.detection_type}")
+        msg = f"Unknown detection_type={cfg.inference.detection_type}"
+        raise ValueError(msg)
 
     # Load the coarse and mrefiner models
     # Needed to deal with the fact that str and Optional[str] are incompatible types.
     # See https://stackoverflow.com/a/53287330
     assert cfg.coarse_run_id is not None
     assert cfg.refiner_run_id is not None
-    # TODO (emaitre): This fuction seems to take the wrong parameters. Trying to fix this
+    # TODO (emaitre): This fuction seems to take the wrong parameters.
+    # Trying to fix this
     """
-    coarse_model, refiner_model, mesh_db = happypose.toolbox.inference.utils.load_pose_models(
+    (
+        coarse_model,
+        refiner_model,
+        mesh_db,
+    ) = happypose.toolbox.inference.utils.load_pose_models(
         coarse_run_id=cfg.coarse_run_id,
         refiner_run_id=cfg.refiner_run_id,
         n_workers=cfg.n_rendering_workers,
@@ -149,14 +159,16 @@ def run_eval(
     """
     object_ds = make_object_dataset(obj_ds_name)
 
-
-    coarse_model, refiner_model, mesh_db = happypose.toolbox.inference.utils.load_pose_models(
+    (
+        coarse_model,
+        refiner_model,
+        mesh_db,
+    ) = happypose.toolbox.inference.utils.load_pose_models(
         coarse_run_id=cfg.coarse_run_id,
         refiner_run_id=cfg.refiner_run_id,
         object_dataset=object_ds,
         force_panda3d_renderer=True,
     )
-
 
     renderer = refiner_model.renderer
 
@@ -164,7 +176,10 @@ def run_eval(
         if cfg.inference.depth_refiner == "icp":
             depth_refiner: Optional[DepthRefiner] = ICPRefiner(mesh_db, renderer)
         elif cfg.inference.depth_refiner == "teaserpp":
-            from happypose.pose_estimators.megapose.inference.teaserpp_refiner import TeaserppRefiner
+            from happypose.pose_estimators.megapose.inference.teaserpp_refiner import (
+                TeaserppRefiner,
+            )
+
             depth_refiner = TeaserppRefiner(mesh_db, renderer)
         else:
             depth_refiner = None
@@ -203,7 +218,7 @@ def run_eval(
     # Compute eval metrics
     # TODO (lmanuelli): Fix this up.
     # TODO (ylabbe): Clean this.
-    eval_metrics, eval_dfs = dict(), dict()
+    eval_metrics, eval_dfs = {}, {}
     if not cfg.skip_evaluation:
         assert "modelnet" in cfg.ds_name
         object_ds = make_object_dataset(obj_ds_name)

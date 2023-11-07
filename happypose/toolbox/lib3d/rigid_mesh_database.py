@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,10 +14,8 @@ limitations under the License.
 """
 
 
-
 # Standard Library
 from copy import deepcopy
-from typing import List
 
 # Third Party
 import numpy as np
@@ -27,16 +24,12 @@ import trimesh
 
 # MegaPose
 from happypose.toolbox.datasets.object_dataset import RigidObject
-
-
 from happypose.toolbox.lib3d.mesh_ops import get_meshes_bounding_boxes, sample_points
-from happypose.toolbox.lib3d.symmetries import make_symmetries_poses
 from happypose.toolbox.utils.tensor_collection import TensorCollection
 
 
 def as_mesh(scene_or_mesh):
-    """
-    Convert a possible scene to a mesh.
+    """Convert a possible scene to a mesh.
 
     If conversion occurs, the returned mesh has only vertex and face data.
     """
@@ -49,7 +42,7 @@ def as_mesh(scene_or_mesh):
                 tuple(
                     trimesh.Trimesh(vertices=g.vertices, faces=g.faces)
                     for g in scene_or_mesh.geometry.values()
-                )
+                ),
             )
     else:
         mesh = scene_or_mesh
@@ -57,26 +50,25 @@ def as_mesh(scene_or_mesh):
 
 
 class MeshDataBase:
-    def __init__(self, obj_list: List[RigidObject]):
+    def __init__(self, obj_list: list[RigidObject]):
         self.obj_dict = {obj.label: obj for obj in obj_list}
         self.obj_list = obj_list
-        self.infos = {obj.label: dict() for obj in obj_list}
+        self.infos = {obj.label: {} for obj in obj_list}
         self.meshes = {
-            l: as_mesh(
+            label: as_mesh(
                 trimesh.load(
                     obj.mesh_path,
                     group_material=False,
                     process=False,
                     skip_materials=True,
                     maintain_order=True,
-                )
+                ),
             )
-            for l, obj in self.obj_dict.items()
+            for label, obj in self.obj_dict.items()
         }
 
         for label, obj in self.obj_dict.items():
             if obj.diameter_meters is None:
-
                 mesh = self.meshes[label]
                 points = np.array(mesh.vertices) * obj.scale
                 extent = points.max(0) - points.min(0)
@@ -97,7 +89,9 @@ class MeshDataBase:
         new_infos = deepcopy(self.infos)
         for label, mesh in self.meshes.items():
             if aabb:
-                points_n = get_meshes_bounding_boxes(torch.as_tensor(mesh.vertices).unsqueeze(0))[0]
+                points_n = get_meshes_bounding_boxes(
+                    torch.as_tensor(mesh.vertices).unsqueeze(0),
+                )[0]
             elif resample_n_points:
                 if isinstance(mesh, trimesh.PointCloud):
                     points_n = sample_points(
@@ -107,7 +101,7 @@ class MeshDataBase:
                     )[0]
                 else:
                     points_n = torch.tensor(
-                        trimesh.sample.sample_surface(mesh, resample_n_points)[0]
+                        trimesh.sample.sample_surface(mesh, resample_n_points)[0],
                     )
             else:
                 points_n = torch.tensor(mesh.vertices)
@@ -128,7 +122,11 @@ class MeshDataBase:
 
         labels = np.array(labels)
         points = pad_stack_tensors(points, fill="select_random", deterministic=True)
-        symmetries = pad_stack_tensors(symmetries, fill=torch.eye(4), deterministic=True)
+        symmetries = pad_stack_tensors(
+            symmetries,
+            fill=torch.eye(4),
+            deterministic=True,
+        )
         return BatchedMeshes(new_infos, labels, points, symmetries).float()
 
 
@@ -147,9 +145,9 @@ class BatchedMeshes(TensorCollection):
         return {label: obj["n_sym"] for label, obj in self.infos.items()}
 
     def select(self, labels):
-        ids = [self.label_to_id[l] for l in labels]
+        ids = [self.label_to_id[label] for label in labels]
         return Meshes(
-            infos=[self.infos[l] for l in labels],
+            infos=[self.infos[label] for label in labels],
             labels=self.labels[ids],
             points=self.points[ids],
             symmetries=self.symmetries[ids],

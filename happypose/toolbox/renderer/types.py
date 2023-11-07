@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional
 
 # Third Party
 import numpy as np
@@ -31,22 +30,24 @@ from happypose.toolbox.lib3d.transform import Transform
 # Local Folder
 from .utils import depth_image_from_depth_buffer
 
-RgbaColor = Tuple[float, float, float, float]
+RgbaColor = tuple[float, float, float, float]
 NodeFunction = Callable[
-    [p3d.core.NodePath, p3d.core.NodePath], None
+    [p3d.core.NodePath, p3d.core.NodePath],
+    None,
 ]  # (root_node_path, object_node_path)
-Resolution = Tuple[int, int]
+Resolution = tuple[int, int]
 
-TCCGL = Transform(np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float))
+TCCGL = Transform(
+    np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float),
+)
 
 
 @dataclass
 class CameraRenderingData:
-    """
-    rgb: (h, w, 3) uint8
+    """rgb: (h, w, 3) uint8
     normals: (h, w, 3) uint8
     depth: (h, w, 1) float32
-    binary_mask: (h, w, 1) np.bool_
+    binary_mask: (h, w, 1) np.bool_.
     """
 
     rgb: np.ndarray
@@ -58,7 +59,7 @@ class CameraRenderingData:
 @dataclass
 class Panda3dCameraData:
     K: np.ndarray
-    resolution: Tuple[int, int]
+    resolution: tuple[int, int]
     TWC: Transform = Transform((0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0))
     z_near: float = 0.1
     z_far: float = 10
@@ -92,7 +93,7 @@ class Panda3dCameraData:
                 [0, 0, A, 1],
                 [0, fy, 0, 0],
                 [0, 0, B, 0],
-            ]
+            ],
         )
 
         lens.setFilmSize(w, h)
@@ -106,7 +107,7 @@ class Panda3dLightData:
     """Data used to to define a light in a panda3d scene.
     light_type: ambient, point, or directional
     NOTE: Alpha is largely irrelevant
-    https://docs.panda3d.org/1.10/python/programming/render-attributes/lighting#colored-lights
+    https://docs.panda3d.org/1.10/python/programming/render-attributes/lighting#colored-lights.
     """
 
     light_type: str
@@ -185,7 +186,9 @@ class Panda3dCamera:
         depth_texture = p3d.core.Texture()
         depth_texture.setFormat(p3d.core.Texture.FDepthComponent)
         graphics_buffer.addRenderTexture(
-            depth_texture, p3d.core.GraphicsOutput.RTMCopyRam, p3d.core.GraphicsOutput.RTPDepth
+            depth_texture,
+            p3d.core.GraphicsOutput.RTMCopyRam,
+            p3d.core.GraphicsOutput.RTPDepth,
         )
 
         cam_node = p3d.core.Camera(f"Camera [{name}]")
@@ -210,9 +213,10 @@ class Panda3dCamera:
         )
 
     def get_rgb_image(self) -> np.ndarray:
-        """_summary_
+        """_summary_.
 
-        Returns:
+        Returns
+        -------
             np.ndarray: (h, w, 3) uint8 array
         """
         # TODO : Extract data from the rgb texture ?
@@ -234,7 +238,8 @@ class Panda3dCamera:
 
         https://developer.nvidia.com/content/depth-precision-visualized#:~:text=GPU%20hardware%20depth%20buffers%20don,reciprocal%20of%20world%2Dspace%20depth.
 
-        Returns:
+        Returns
+        -------
             depth_buffer: [H,W,1] numpy array with values in [0,1]
 
         """

@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,10 +11,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-"""
 
-
-"""
 https://github.com/ikalevatykh/panda3d_viewer/blob/master/panda3d_viewer/geometry.py
 """
 
@@ -59,7 +55,8 @@ class ViewerClosedError(ViewerError):
 def make_axes():
     """Make an axes geometry.
 
-    Returns:
+    Returns
+    -------
         Geom -- p3d geometry
     """
     vformat = GeomVertexFormat.get_v3c4()
@@ -87,10 +84,12 @@ def make_grid(num_ticks=10, step=1.0):
     """Make a grid geometry.
 
     Keyword Arguments:
+    -----------------
         step {float} -- step in meters (default: {1.0})
         num_ticks {int} -- ticks number per axis (default: {5})
 
     Returns:
+    -------
         Geom -- p3d geometry
     """
     ticks = np.arange(-num_ticks // 2, num_ticks // 2 + 1) * step
@@ -119,14 +118,17 @@ def make_capsule(radius, length, num_segments=16, num_rings=16):
     """Make capsule geometry.
 
     Arguments:
+    ---------
         radius {float} -- capsule radius
         length {float} -- capsule length
 
     Keyword Arguments:
+    -----------------
         num_segments {int} -- segments number (default: {16})
         num_rings {int} -- rings number (default: {16})
 
     Returns:
+    -------
         Geom -- p3d geometry
     """
     vformat = GeomVertexFormat.get_v3n3t2()
@@ -164,10 +166,12 @@ def make_cylinder(num_segments=16, closed=True):
     """Make a uniform cylinder geometry.
 
     Keyword Arguments:
+    -----------------
         num_segments {int} -- segments number (default: {16})
         closed {bool} -- add caps (default: {True})
 
     Returns:
+    -------
         Geom -- p3d geometry
     """
     vformat = GeomVertexFormat.get_v3n3t2()
@@ -222,7 +226,8 @@ def make_cylinder(num_segments=16, closed=True):
 def make_box():
     """Make a uniform box geometry.
 
-    Returns:
+    Returns
+    -------
         Geom -- p3d geometry
     """
     vformat = GeomVertexFormat.get_v3n3t2()
@@ -257,9 +262,11 @@ def make_plane(size=(1.0, 1.0)):
     """Make a plane geometry.
 
     Arguments:
+    ---------
         size {tuple} -- plane size x,y
 
     Returns:
+    -------
         Geom -- p3d geometry
     """
     vformat = GeomVertexFormat.get_v3n3t2()
@@ -290,10 +297,12 @@ def make_sphere(num_segments=16, num_rings=16):
     """Make a uniform UV sphere geometry.
 
     Keyword Arguments:
+    -----------------
         num_segments {int} -- segments number (default: {16})
         num_rings {int} -- rings number (default: {16})
 
     Returns:
+    -------
         Geom -- p3d geometry
     """
     return make_capsule(1.0, 0.0, num_segments, num_rings)
@@ -303,16 +312,19 @@ def make_points(vertices, colors=None, texture_coords=None, geom=None):
     """Make or update existing points set geometry.
 
     Arguments:
+    ---------
         root_path {str} -- path to the group's root node
         name {str} -- node name within a group
         vertices {list} -- point coordinates (and other data in a point cloud format)
 
     Keyword Arguments:
+    -----------------
         colors {list} -- colors (default: {None})
         texture_coords {list} -- texture coordinates (default: {None})
         geom {Geom} -- geometry to update (default: {None})
 
     Returns:
+    -------
         Geom -- p3d geometry
     """
     if not isinstance(vertices, np.ndarray):
@@ -324,7 +336,10 @@ def make_points(vertices, colors=None, texture_coords=None, geom=None):
         if colors.dtype != np.uint8:
             colors = np.uint8(colors * 255)
         vertices = np.column_stack(
-            (vertices.view(dtype=np.uint32).reshape(-1, 3), colors.view(dtype=np.uint32))
+            (
+                vertices.view(dtype=np.uint32).reshape(-1, 3),
+                colors.view(dtype=np.uint32),
+            ),
         )
 
     if texture_coords is not None:
@@ -334,7 +349,7 @@ def make_points(vertices, colors=None, texture_coords=None, geom=None):
             (
                 vertices.view(dtype=np.uint32).reshape(-1, 3),
                 texture_coords.view(dtype=np.uint32).reshape(-1, 2),
-            )
+            ),
         )
 
     data = vertices.tostring()
@@ -347,8 +362,9 @@ def make_points(vertices, colors=None, texture_coords=None, geom=None):
         elif vertices.strides[0] == 20:
             vformat = GeomVertexFormat.get_v3t2()
         else:
+            msg = f"Incompatible point clout format: {vertices.dtype},{vertices.shape}"
             raise ViewerError(
-                "Incompatible point clout format: {},{}".format(vertices.dtype, vertices.shape)
+                msg,
             )
 
         vdata = GeomVertexData("vdata", vformat, Geom.UHDynamic)

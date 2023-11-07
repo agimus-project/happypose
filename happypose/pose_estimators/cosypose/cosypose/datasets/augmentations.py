@@ -1,14 +1,18 @@
+import random
+from copy import deepcopy
+
 import numpy as np
 import PIL
 import torch
-import random
+import torch.nn.functional as F
 from PIL import ImageEnhance, ImageFilter
 from torchvision.datasets import VOCSegmentation
-import torch.nn.functional as F
-from copy import deepcopy
 
-from happypose.pose_estimators.cosypose.cosypose.lib3d.camera_geometry import get_K_crop_resize
-from .utils import make_detections_from_segmentation, crop_to_aspect_ratio
+from happypose.pose_estimators.cosypose.cosypose.lib3d.camera_geometry import (
+    get_K_crop_resize,
+)
+
+from .utils import crop_to_aspect_ratio, make_detections_from_segmentation
 
 
 def to_pil(im):
@@ -19,7 +23,8 @@ def to_pil(im):
     elif isinstance(im, np.ndarray):
         return PIL.Image.fromarray(im)
     else:
-        raise ValueError('Type not supported', type(im))
+        msg = "Type not supported"
+        raise ValueError(msg, type(im))
 
 
 def to_torch_uint8(im):
@@ -31,7 +36,8 @@ def to_torch_uint8(im):
         assert im.dtype == np.uint8
         im = torch.as_tensor(im)
     else:
-        raise ValueError('Type not supported', type(im))
+        msg = "Type not supported"
+        raise ValueError(msg, type(im))
     if im.dim() == 3:
         assert im.shape[-1] in {1, 3}
     return im
@@ -58,36 +64,46 @@ class PillowRGBAugmentation:
     def __call__(self, im, mask, obs):
         im = to_pil(im)
         if random.random() <= self.p:
-            im = self._pillow_fn(im).enhance(factor=random.uniform(*self.factor_interval))
+            im = self._pillow_fn(im).enhance(
+                factor=random.uniform(*self.factor_interval),
+            )
         return im, mask, obs
 
 
 class PillowSharpness(PillowRGBAugmentation):
-    def __init__(self, p=0.3, factor_interval=(0., 50.)):
-        super().__init__(pillow_fn=ImageEnhance.Sharpness,
-                         p=p,
-                         factor_interval=factor_interval)
+    def __init__(self, p=0.3, factor_interval=(0.0, 50.0)):
+        super().__init__(
+            pillow_fn=ImageEnhance.Sharpness,
+            p=p,
+            factor_interval=factor_interval,
+        )
 
 
 class PillowContrast(PillowRGBAugmentation):
-    def __init__(self, p=0.3, factor_interval=(0.2, 50.)):
-        super().__init__(pillow_fn=ImageEnhance.Contrast,
-                         p=p,
-                         factor_interval=factor_interval)
+    def __init__(self, p=0.3, factor_interval=(0.2, 50.0)):
+        super().__init__(
+            pillow_fn=ImageEnhance.Contrast,
+            p=p,
+            factor_interval=factor_interval,
+        )
 
 
 class PillowBrightness(PillowRGBAugmentation):
     def __init__(self, p=0.5, factor_interval=(0.1, 6.0)):
-        super().__init__(pillow_fn=ImageEnhance.Brightness,
-                         p=p,
-                         factor_interval=factor_interval)
+        super().__init__(
+            pillow_fn=ImageEnhance.Brightness,
+            p=p,
+            factor_interval=factor_interval,
+        )
 
 
 class PillowColor(PillowRGBAugmentation):
     def __init__(self, p=0.3, factor_interval=(0.0, 20.0)):
-        super().__init__(pillow_fn=ImageEnhance.Color,
-                         p=p,
-                         factor_interval=factor_interval)
+        super().__init__(
+            pillow_fn=ImageEnhance.Color,
+            p=p,
+            factor_interval=factor_interval,
+        )
 
 
 class GrayScale(PillowRGBAugmentation):
@@ -128,7 +144,12 @@ class BackgroundAugmentation:
 class VOCBackgroundAugmentation(BackgroundAugmentation):
     def __init__(self, voc_root, p=0.3):
         print("voc_root =", voc_root)
-        image_dataset = VOCSegmentation(root=voc_root, year='2012', image_set='trainval', download=False)
+        image_dataset = VOCSegmentation(
+            root=voc_root,
+            year="2012",
+            image_set="trainval",
+            download=False,
+        )
         super().__init__(image_dataset=image_dataset, p=p)
 
     def get_bg_image(self, idx):
@@ -143,26 +164,26 @@ class CropResizeToAspectAugmentation:
     def __call__(self, im, mask, obs):
         im = to_torch_uint8(im)
         mask = to_torch_uint8(mask)
-        obs['orig_camera'] = deepcopy(obs['camera'])
+        obs["orig_camera"] = deepcopy(obs["camera"])
         assert im.shape[-1] == 3
         h, w = im.shape[:2]
         if (h, w) == self.resize:
-            obs['orig_camera']['crop_resize_bbox'] = (0, 0, w-1, h-1)
+            obs["orig_camera"]["crop_resize_bbox"] = (0, 0, w - 1, h - 1)
             return im, mask, obs
 
         images = (torch.as_tensor(im).float() / 255).unsqueeze(0).permute(0, 3, 1, 2)
         masks = torch.as_tensor(mask).unsqueeze(0).unsqueeze(0).float()
-        K = torch.tensor(obs['camera']['K']).unsqueeze(0)
+        K = torch.tensor(obs["camera"]["K"]).unsqueeze(0)
 
         # Match the width on input image with an image of target aspect ratio.
-        if not np.isclose(w/h, self.aspect):
+        if not np.isclose(w / h, self.aspect):
             x0, y0 = images.shape[-1] / 2, images.shape[-2] / 2
             w = images.shape[-1]
             r = self.aspect
-            h = w * 1/r
+            h = w * 1 / r
             box_size = (h, w)
             h, w = min(box_size), max(box_size)
-            x1, y1, x2, y2 = x0-w/2, y0-h/2, x0+w/2, y0+h/2
+            x1, y1, x2, y2 = x0 - w / 2, y0 - h / 2, x0 + w / 2, y0 + h / 2
             box = torch.tensor([x1, y1, x2, y2])
             images, masks, K = crop_to_aspect_ratio(images, box, masks=masks, K=K)
 
@@ -172,24 +193,34 @@ class CropResizeToAspectAugmentation:
         h_output, w_output = min(self.resize), max(self.resize)
         box_size = (h_input, w_input)
         h, w = min(box_size), max(box_size)
-        x1, y1, x2, y2 = x0-w/2, y0-h/2, x0+w/2, y0+h/2
+        x1, y1, x2, y2 = x0 - w / 2, y0 - h / 2, x0 + w / 2, y0 + h / 2
         box = torch.tensor([x1, y1, x2, y2])
-        images = F.interpolate(images, size=(h_output, w_output), mode='bilinear', align_corners=False)
-        masks = F.interpolate(masks, size=(h_output, w_output), mode='nearest')
-        obs['orig_camera']['crop_resize_bbox'] = tuple(box.tolist())
-        K = get_K_crop_resize(K, box.unsqueeze(0), orig_size=(h_input, w_input), crop_resize=(h_output, w_output))
+        images = F.interpolate(
+            images,
+            size=(h_output, w_output),
+            mode="bilinear",
+            align_corners=False,
+        )
+        masks = F.interpolate(masks, size=(h_output, w_output), mode="nearest")
+        obs["orig_camera"]["crop_resize_bbox"] = tuple(box.tolist())
+        K = get_K_crop_resize(
+            K,
+            box.unsqueeze(0),
+            orig_size=(h_input, w_input),
+            crop_resize=(h_output, w_output),
+        )
 
         # Update the bounding box annotations
         dets_gt = make_detections_from_segmentation(masks)[0]
-        for n, obj in enumerate(obs['objects']):
-            if 'bbox' in obj:
-                assert 'id_in_segm' in obj
-                obj['bbox'] = dets_gt[obj['id_in_segm']]
+        for _n, obj in enumerate(obs["objects"]):
+            if "bbox" in obj:
+                assert "id_in_segm" in obj
+                obj["bbox"] = dets_gt[obj["id_in_segm"]]
 
         im = (images[0].permute(1, 2, 0) * 255).to(torch.uint8)
         mask = masks[0, 0].to(torch.uint8)
-        obs['camera']['K'] = K.squeeze(0).numpy()
-        obs['camera']['resolution'] = (w_output, h_output)
+        obs["camera"]["K"] = K.squeeze(0).numpy()
+        obs["camera"]["resolution"] = (w_output, h_output)
         return im, mask, obs
 
 
@@ -201,23 +232,23 @@ class CenterCrop:
     def __call__(self, im, mask, obs):
         im = to_torch_uint8(im)
         mask = to_torch_uint8(mask)
-        obs['orig_camera'] = deepcopy(obs['camera'])
+        obs["orig_camera"] = deepcopy(obs["camera"])
         assert im.shape[-1] == 3
         h, w = im.shape[:2]
         if (h, w) == self.resize:
-            obs['orig_camera']['crop_resize_bbox'] = (0, 0, w-1, h-1)
+            obs["orig_camera"]["crop_resize_bbox"] = (0, 0, w - 1, h - 1)
             return im, mask, obs
 
         images = (torch.as_tensor(im).float() / 255).unsqueeze(0).permute(0, 3, 1, 2)
         masks = torch.as_tensor(mask).unsqueeze(0).unsqueeze(0).float()
-        K = torch.tensor(obs['camera']['K']).unsqueeze(0)
+        K = torch.tensor(obs["camera"]["K"]).unsqueeze(0)
 
         # Match the width on input image with an image of target aspect ratio.
-        if not np.isclose(w/h, self.aspect):
+        if not np.isclose(w / h, self.aspect):
             x0, y0 = images.shape[-1] / 2, images.shape[-2] / 2
             box_size = self.resize
             h, w = min(box_size), max(box_size)
-            x1, y1, x2, y2 = x0-w/2, y0-h/2, x0+w/2, y0+h/2
+            x1, y1, x2, y2 = x0 - w / 2, y0 - h / 2, x0 + w / 2, y0 + h / 2
             box = torch.tensor([x1, y1, x2, y2])
             images, masks, K = crop_to_aspect_ratio(images, box, masks=masks, K=K)
 
@@ -227,22 +258,32 @@ class CenterCrop:
         h_output, w_output = min(self.resize), max(self.resize)
         box_size = (h_input, w_input)
         h, w = min(box_size), max(box_size)
-        x1, y1, x2, y2 = x0-w/2, y0-h/2, x0+w/2, y0+h/2
+        x1, y1, x2, y2 = x0 - w / 2, y0 - h / 2, x0 + w / 2, y0 + h / 2
         box = torch.tensor([x1, y1, x2, y2])
-        images = F.interpolate(images, size=(h_output, w_output), mode='bilinear', align_corners=False)
-        masks = F.interpolate(masks, size=(h_output, w_output), mode='nearest')
-        obs['orig_camera']['crop_resize_bbox'] = tuple(box.tolist())
-        K = get_K_crop_resize(K, box.unsqueeze(0), orig_size=(h_input, w_input), crop_resize=(h_output, w_output))
+        images = F.interpolate(
+            images,
+            size=(h_output, w_output),
+            mode="bilinear",
+            align_corners=False,
+        )
+        masks = F.interpolate(masks, size=(h_output, w_output), mode="nearest")
+        obs["orig_camera"]["crop_resize_bbox"] = tuple(box.tolist())
+        K = get_K_crop_resize(
+            K,
+            box.unsqueeze(0),
+            orig_size=(h_input, w_input),
+            crop_resize=(h_output, w_output),
+        )
 
         # Update the bounding box annotations
         dets_gt = make_detections_from_segmentation(masks)[0]
-        for n, obj in enumerate(obs['objects']):
-            if 'bbox' in obj:
-                assert 'id_in_segm' in obj
-                obj['bbox'] = dets_gt[obj['id_in_segm']]
+        for _n, obj in enumerate(obs["objects"]):
+            if "bbox" in obj:
+                assert "id_in_segm" in obj
+                obj["bbox"] = dets_gt[obj["id_in_segm"]]
 
         im = (images[0].permute(1, 2, 0) * 255).to(torch.uint8)
         mask = masks[0, 0].to(torch.uint8)
-        obs['camera']['K'] = K.squeeze(0).numpy()
-        obs['camera']['resolution'] = (w_output, h_output)
+        obs["camera"]["K"] = K.squeeze(0).numpy()
+        obs["camera"]["resolution"] = (w_output, h_output)
         return im, mask, obs

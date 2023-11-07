@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import List, Optional, Tuple
+from typing import Optional
 
 # Third Party
 import cv2
@@ -25,7 +24,6 @@ import torch
 from scipy import ndimage
 
 # MegaPose
-from happypose.pose_estimators.megapose.config import DEBUG_DATA_DIR
 from happypose.pose_estimators.megapose.inference.depth_refiner import DepthRefiner
 from happypose.pose_estimators.megapose.inference.refiner_utils import compute_masks
 from happypose.toolbox.inference.types import PoseEstimatesType
@@ -34,11 +32,17 @@ from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRender
 from happypose.toolbox.renderer.types import Panda3dLightData
 
 
-def get_normal(depth_refine, fx=-1, fy=-1, cx=-1, cy=-1, bbox=np.array([0]), refine=True):
+def get_normal(
+    depth_refine,
+    fx=-1,
+    fy=-1,
+    cx=-1,
+    cy=-1,
+    bbox=np.array([0]),
+    refine=True,
+):
     # Copied from https://github.com/kirumang/Pix2Pose/blob/master/pix2pose_util/common_util.py
-    """
-    fast normal computation
-    """
+    """Fast normal computation."""
     res_y = depth_refine.shape[0]
     res_x = depth_refine.shape[1]
     centerX = cx
@@ -64,22 +68,26 @@ def get_normal(depth_refine, fx=-1, fy=-1, cx=-1, cy=-1, bbox=np.array([0]), ref
         uv_table = uv_table[bbox[0] : bbox[2], bbox[1] : bbox[3]]
         v_x = np.zeros((bbox[2] - bbox[0], bbox[3] - bbox[1], 3))
         v_y = np.zeros((bbox[2] - bbox[0], bbox[3] - bbox[1], 3))
-        normals = np.zeros((bbox[2] - bbox[0], bbox[3] - bbox[1], 3))
+        np.zeros((bbox[2] - bbox[0], bbox[3] - bbox[1], 3))
         depth_refine = depth_refine[bbox[0] : bbox[2], bbox[1] : bbox[3]]
     else:
         v_x = np.zeros((res_y, res_x, 3))
         v_y = np.zeros((res_y, res_x, 3))
-        normals = np.zeros((res_y, res_x, 3))
+        np.zeros((res_y, res_x, 3))
 
     uv_table_sign = np.copy(uv_table)
     uv_table = np.abs(np.copy(uv_table))
 
     dig = np.gradient(depth_refine, 2, edge_order=2)
     v_y[:, :, 0] = uv_table_sign[:, :, 1] * constant_x * dig[0]
-    v_y[:, :, 1] = depth_refine * constant_y + (uv_table_sign[:, :, 0] * constant_y) * dig[0]
+    v_y[:, :, 1] = (
+        depth_refine * constant_y + (uv_table_sign[:, :, 0] * constant_y) * dig[0]
+    )
     v_y[:, :, 2] = dig[0]
 
-    v_x[:, :, 0] = depth_refine * constant_x + uv_table_sign[:, :, 1] * constant_x * dig[1]
+    v_x[:, :, 0] = (
+        depth_refine * constant_x + uv_table_sign[:, :, 1] * constant_x * dig[1]
+    )
     v_x[:, :, 1] = uv_table_sign[:, :, 0] * constant_y * dig[1]
     v_x[:, :, 2] = dig[1]
 
@@ -126,27 +134,56 @@ def getXYZ(depth, fx, fy, cx, cy, bbox=np.array([0])):
 
 
 def icp_refinement(
-    depth_measured, depth_rendered, object_mask_measured, cam_K, TCO_pred, n_min_points=1000
+    depth_measured,
+    depth_rendered,
+    object_mask_measured,
+    cam_K,
+    TCO_pred,
+    n_min_points=1000,
 ):
     # Inspired from https://github.com/kirumang/Pix2Pose/blob/843effe0097e9982f4b07dd90b04ede2b9ee9294/tools/5_evaluation_bop_icp3d.py#L57
 
-    points_tgt = np.zeros((depth_measured.shape[0], depth_measured.shape[1], 6), np.float32)
+    points_tgt = np.zeros(
+        (depth_measured.shape[0], depth_measured.shape[1], 6),
+        np.float32,
+    )
     points_tgt[:, :, :3] = getXYZ(
-        depth_measured, fx=cam_K[0, 0], fy=cam_K[1, 1], cx=cam_K[0, 2], cy=cam_K[1, 2]
+        depth_measured,
+        fx=cam_K[0, 0],
+        fy=cam_K[1, 1],
+        cx=cam_K[0, 2],
+        cy=cam_K[1, 2],
     )
     points_tgt[:, :, 3:] = get_normal(
-        depth_measured, fx=cam_K[0, 0], fy=cam_K[1, 1], cx=cam_K[0, 2], cy=cam_K[1, 2], refine=True
+        depth_measured,
+        fx=cam_K[0, 0],
+        fy=cam_K[1, 1],
+        cx=cam_K[0, 2],
+        cy=cam_K[1, 2],
+        refine=True,
     )
     depth_valid = np.logical_and(depth_measured > 0.2, depth_measured < 5)
     depth_valid = np.logical_and(depth_valid, object_mask_measured)
     points_tgt = points_tgt[depth_valid]
 
-    points_src = np.zeros((depth_measured.shape[0], depth_measured.shape[1], 6), np.float32)
+    points_src = np.zeros(
+        (depth_measured.shape[0], depth_measured.shape[1], 6),
+        np.float32,
+    )
     points_src[:, :, :3] = getXYZ(
-        depth_rendered, cam_K[0, 0], cam_K[1, 1], cam_K[0, 2], cam_K[1, 2]
+        depth_rendered,
+        cam_K[0, 0],
+        cam_K[1, 1],
+        cam_K[0, 2],
+        cam_K[1, 2],
     )
     points_src[:, :, 3:] = get_normal(
-        depth_rendered, fx=cam_K[0, 0], fy=cam_K[1, 1], cx=cam_K[0, 2], cy=cam_K[1, 2], refine=True
+        depth_rendered,
+        fx=cam_K[0, 0],
+        fy=cam_K[1, 1],
+        cx=cam_K[0, 2],
+        cy=cam_K[1, 2],
+        refine=True,
     )
     points_src = points_src[np.logical_and(depth_valid, depth_rendered > 0)]
 
@@ -165,7 +202,8 @@ def icp_refinement(
     tolerence = 0.05
     icp_fnc = cv2.ppf_match_3d_ICP(100, tolerence=tolerence, numLevels=4)
     retval, residual, pose = icp_fnc.registerModelToScene(
-        points_src.reshape(-1, 6), points_tgt.reshape(-1, 6)
+        points_src.reshape(-1, 6),
+        points_tgt.reshape(-1, 6),
     )
     TCO_pred_refined = pose @ TCO_pred_refined
     TCO_pred_refined = torch.tensor(TCO_pred_refined, dtype=torch.float32).cuda()
@@ -198,9 +236,8 @@ class ICPRefiner(DepthRefiner):
         masks: Optional[torch.tensor] = None,
         depth: Optional[torch.tensor] = None,
         K: Optional[torch.tensor] = None,
-    ) -> Tuple[PoseEstimatesType, dict]:
+    ) -> tuple[PoseEstimatesType, dict]:
         """Runs icp refinement. See superclass DepthRefiner for full documentation."""
-
         assert depth is not None
         assert K is not None
 
@@ -250,7 +287,12 @@ class ICPRefiner(DepthRefiner):
                 mask = masks[view_id].squeeze().cpu().numpy()
 
             TCO_refined, retval = icp_refinement(
-                depth_measured, depth_rendered, mask, cam_K, TCO_pred, n_min_points=1000
+                depth_measured,
+                depth_rendered,
+                mask,
+                cam_K,
+                TCO_pred,
+                n_min_points=1000,
             )
 
             # Assign poses to predictions refined
@@ -258,5 +300,5 @@ class ICPRefiner(DepthRefiner):
             if retval != -1:
                 predictions_refined.poses[n] = TCO_refined
 
-        extra_data = dict()
+        extra_data = {}
         return (predictions_refined, extra_data)

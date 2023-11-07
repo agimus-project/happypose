@@ -165,11 +165,11 @@ The pre-trained models of the single-view pose estimator can be downloaded using
 # YCB-V Single-view refiner
 python -m cosypose.scripts.download --model=ycbv-refiner-finetune--251020
 
-# YCB-V Single-view refiner trained on synthetic data only 
-# Only download this if you are interested in retraining the above model 
+# YCB-V Single-view refiner trained on synthetic data only
+# Only download this if you are interested in retraining the above model
 python -m cosypose.scripts.download --model=ycbv-refiner-syntonly--596719
 
-# T-LESS coarse and refiner models 
+# T-LESS coarse and refiner models
 python -m cosypose.scripts.download --model=tless-coarse--10219
 python -m cosypose.scripts.download --model=tless-refiner--585928
 ```
@@ -419,7 +419,7 @@ The results can be also downloaded directly:
 
 ```sh
 # YCB-Video 5 views
-python -m cosypose.scripts.download --result_id=ycbv-n_views=5--8073381555 
+python -m cosypose.scripts.download --result_id=ycbv-n_views=5--8073381555
 
 # T-LESS ViVo 4 views
 python -m cosypose.scripts.download --result_id=tless-vivo-n_views=4--2731943061

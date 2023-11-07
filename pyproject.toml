@@ -24,39 +24,87 @@ readme = "README.md"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
+addict = "^2.4.0"
+beautifulsoup4 = "^4.12.2"
+bokeh = "^3.2.2"
+bop_toolkit_lib = {git = "https://github.com/thodan/bop_toolkit", optional = true}
+cosypose = {optional = true, path = "happypose/pose_estimators/cosypose"}
+httpx = "^0.25.0"
+imageio = "^2.31.4"
+ipython = "^8.12.2"
+joblib = "^1.3.2"
+omegaconf = "^2.3.0"
+open3d = "^0.17.0"
+opencv-contrib-python = "^4.8.0.76"
+opencv-python = "^4.8.0.76"
 panda3d = {optional = true, version = "=1.10.13"}
-pin = "^2.6.17"
+pin = "^2.6.20"
+plyfile = "^1.0.1"
+pybind11 = "^2.10.4"
 pybullet = {optional = true, version = "^3.2.5"}
-python = "^3.8"
+pypng = "^0.20220715.0"
+python = ">=3.9,<3.11"
+pyyaml = "^6.0.1"
+roma = "^1.4.0"
+scikit-image = "^0.21.0"
+scikit-learn = "^1.3.1"
+scipy = "^1.11.2"
+seaborn = "^0.12.2"
+simplejson = "^3.19.1"
+torch = [
+  {markers = "extra=='cpu'", optional = true, source = "torch_cpu", version = "1.11.0+cpu"}
+]
+torchvision = [
+  {markers = "extra=='cpu'", optional = true, source = "torch_cpu", version = "0.12.0+cpu"}
+]
+tqdm = "^4.66.1"
+transforms3d = "^0.4.1"
+trimesh = "^3.23.5"
+webdataset = "^0.2.57"
 
 [tool.poetry.extras]
+cpu = ["torch", "torchvision"]
+evaluation = ["bop_toolkit_lib"]
+multiview = ["cosypose"]
 render = ["panda3d", "pybullet"]
 
 [tool.poetry.group.dev]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
+black = "^23.9.1"
 coverage = {extras = ["toml"], version = "^7.2.5"}
-ipython = "^8.12.2"
 pre-commit = "^3.2.1"
-ruff = "^0.0.260"
+ruff = "^0.0.290"
 
 [tool.poetry.group.docs]
 optional = true
 
 [tool.poetry.group.docs.dependencies]
-myst-parser = "^1.0.0"
+myst-parser = "^2.0.0"
 sphinx = "^6.2.1"
+
+[[tool.poetry.source]]
+name = "torch_cpu"
+priority = "supplemental"
+url = "https://download.pytorch.org/whl/cpu"
+
+[[tool.poetry.source]]
+name = "torch_cu113"
+priority = "supplemental"
+url = "https://download.pytorch.org/whl/cu113"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
 
 [tool.poetry.urls]
 changelog = "https://github.com/agimus-project/happypose/blob/main/CHANGELOG.md"
 
 [tool.ruff]
-extend-exclude = ["cosypose", "megapose6d"]
 extend-ignore = ["D203", "D213"]
-extend-select = ["A", "B", "C", "COM", "D", "EM", "EXE", "G", "N", "PTH", "RET", "RUF", "UP", "W", "YTT"]
-target-version = "py38"
+# extend-select = ["A", "B", "C", "COM", "D", "EM", "EXE", "G", "N", "PTH", "RET", "RUF", "UP", "W", "YTT"]
+target-version = "py39"
 
 [tool.tomlsort]
 all = true

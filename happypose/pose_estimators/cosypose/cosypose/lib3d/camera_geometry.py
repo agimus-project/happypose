@@ -8,7 +8,10 @@ def project_points(points_3d, K, TCO):
     n_points = points_3d.shape[1]
     device = points_3d.device
     if points_3d.shape[-1] == 3:
-        points_3d = torch.cat((points_3d, torch.ones(batch_size, n_points, 1).to(device)), dim=-1)
+        points_3d = torch.cat(
+            (points_3d, torch.ones(batch_size, n_points, 1).to(device)),
+            dim=-1,
+        )
     P = K @ TCO[:, :3]
     suv = (P.unsqueeze(1) @ points_3d.unsqueeze(-1)).squeeze(-1)
     suv = suv / suv[..., [-1]]
@@ -22,7 +25,10 @@ def project_points_robust(points_3d, K, TCO, z_min=0.1):
     n_points = points_3d.shape[1]
     device = points_3d.device
     if points_3d.shape[-1] == 3:
-        points_3d = torch.cat((points_3d, torch.ones(batch_size, n_points, 1).to(device)), dim=-1)
+        points_3d = torch.cat(
+            (points_3d, torch.ones(batch_size, n_points, 1).to(device)),
+            dim=-1,
+        )
     P = K @ TCO[:, :3]
     suv = (P.unsqueeze(1) @ points_3d.unsqueeze(-1)).squeeze(-1)
     z = suv[..., -1]
@@ -43,12 +49,11 @@ def boxes_from_uv(uv):
 
 
 def get_K_crop_resize(K, boxes, orig_size, crop_resize):
-    """
-    Adapted from https://github.com/BerkeleyAutomation/perception/blob/master/perception/camera_intrinsics.py
-    Skew is not handled !
+    """Adapted from https://github.com/BerkeleyAutomation/perception/blob/master/perception/camera_intrinsics.py
+    Skew is not handled !.
     """
     assert K.shape[1:] == (3, 3)
-    assert boxes.shape[1:] == (4, )
+    assert boxes.shape[1:] == (4,)
     K = K.float()
     boxes = boxes.float()
     new_K = K.clone()

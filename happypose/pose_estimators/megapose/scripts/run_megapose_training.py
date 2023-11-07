@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +14,8 @@ limitations under the License.
 """
 
 
-# SPDX-FileCopyrightText: Copyright (c) <year> NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) <year> NVIDIA CORPORATION & AFFILIATES.
+# All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -38,7 +38,7 @@ limitations under the License.
 
 # Standard Library
 import os
-from typing import List, Optional
+from typing import Optional
 
 # Third Party
 import numpy as np
@@ -48,14 +48,23 @@ from omegaconf import OmegaConf
 # MegaPose
 from happypose.pose_estimators.megapose.bop_config import BOP_CONFIG
 from happypose.pose_estimators.megapose.config import EXP_DIR
-from happypose.pose_estimators.megapose.training.train_megapose import DatasetConfig, train_megapose
-from happypose.pose_estimators.megapose.training.training_config import HardwareConfig, TrainingConfig
+from happypose.pose_estimators.megapose.training.train_megapose import (
+    DatasetConfig,
+    train_megapose,
+)
+from happypose.pose_estimators.megapose.training.training_config import (
+    HardwareConfig,
+    TrainingConfig,
+)
 from happypose.toolbox.utils.logging import get_logger, set_logging_level
 
 logger = get_logger(__name__)
 
 
-def train_on_bop_pbr_datasets(cfg: TrainingConfig, use_webdataset: bool = True) -> TrainingConfig:
+def train_on_bop_pbr_datasets(
+    cfg: TrainingConfig,
+    use_webdataset: bool = True,
+) -> TrainingConfig:
     bop_names = ["lm", "tless", "itodd", "hb", "ycbv", "icbin", "tudl"]
     for bop_name in bop_names:
         bop_cfg = BOP_CONFIG[bop_name]
@@ -75,12 +84,11 @@ def train_on_bop_pbr_datasets(cfg: TrainingConfig, use_webdataset: bool = True) 
 def train_on_shapenet(
     cfg: TrainingConfig,
     ds_name: str = "shapenet_1M",
-    obj_filters: List[str] = [
+    obj_filters: list[str] = [
         "10mb_20k",
     ],
     remove_modelnet: bool = False,
 ) -> TrainingConfig:
-
     if remove_modelnet:
         obj_filters.append("remove_modelnet")
 
@@ -92,7 +100,7 @@ def train_on_shapenet(
             ds_name="webdataset." + ds_name,
             mesh_obj_ds_name=f"{obj_ds_name}.pointcloud",
             renderer_obj_ds_name=f"{obj_ds_name}.panda3d_bam",
-        )
+        ),
     )
     cfg.n_symmetries_batch = 1
     return cfg
@@ -103,7 +111,6 @@ def train_on_gso(
     ds_name: str = "gso_1M",
     n_objects: int = 940,
 ) -> TrainingConfig:
-
     cfg.input_resize = (540, 720)
     obj_ds_name = f"gso.nobjects={n_objects}"
     cfg.train_datasets.append(
@@ -111,7 +118,7 @@ def train_on_gso(
             ds_name="webdataset." + ds_name,
             mesh_obj_ds_name=f"{obj_ds_name}.pointcloud",
             renderer_obj_ds_name=f"{obj_ds_name}.normalized",
-        )
+        ),
     )
     cfg.n_symmetries_batch = 1
     return cfg
@@ -144,7 +151,7 @@ def make_coarse_cfg(cfg: TrainingConfig) -> TrainingConfig:
 
 
 def enable_depth_in_cfg(cfg: TrainingConfig) -> TrainingConfig:
-    """Adds flags for input depth + render depth to cfg"""
+    """Adds flags for input depth + render depth to cfg."""
     cfg.depth_normalization_type = "tCR_scale_clamp_center"
     cfg.input_depth = True
     cfg.render_depth = True
@@ -157,7 +164,7 @@ def update_cfg_with_config_id(cfg: TrainingConfig, config_id: str) -> TrainingCo
     def train_on_gso_and_shapenet(
         cfg: TrainingConfig,
         shapenet_obj_ds_name: Optional[str] = "shapenet_1M",
-        shapenet_obj_filters: List[str] = ["10mb_20k"],
+        shapenet_obj_filters: list[str] = ["10mb_20k"],
         gso_obj_ds_name: Optional[str] = "gso_1M",
         gso_n_objects: int = 940,
         remove_modelnet: bool = False,
@@ -204,31 +211,45 @@ def update_cfg_with_config_id(cfg: TrainingConfig, config_id: str) -> TrainingCo
     elif config_id == "refiner-gso_shapenet-4views-normals-objects50p":
         cfg = make_refiner_cfg(cfg)
         cfg = train_on_gso_and_shapenet(
-            cfg, shapenet_obj_ds_name="shapenet_10mb_10k", gso_obj_ds_name="gso_500"
+            cfg,
+            shapenet_obj_ds_name="shapenet_10mb_10k",
+            gso_obj_ds_name="gso_500",
         )
     elif config_id == "refiner-gso_shapenet-4views-normals-objects25p":
         cfg = make_refiner_cfg(cfg)
         cfg = train_on_gso_and_shapenet(
-            cfg, shapenet_obj_ds_name="shapenet_10mb_2k", gso_obj_ds_name="gso_250"
+            cfg,
+            shapenet_obj_ds_name="shapenet_10mb_2k",
+            gso_obj_ds_name="gso_250",
         )
     elif config_id == "refiner-gso_shapenet-4views-normals-objects10p":
         cfg = make_refiner_cfg(cfg)
         cfg = train_on_gso_and_shapenet(
-            cfg, shapenet_obj_ds_name="shapenet_10mb_1k", gso_obj_ds_name="gso_100"
+            cfg,
+            shapenet_obj_ds_name="shapenet_10mb_1k",
+            gso_obj_ds_name="gso_100",
         )
     elif config_id == "refiner-gso_shapenet-4views-normals-objects1p":
         cfg = make_refiner_cfg(cfg)
         cfg = train_on_gso_and_shapenet(
-            cfg, shapenet_obj_ds_name="shapenet_10mb_100", gso_obj_ds_name="gso_10"
+            cfg,
+            shapenet_obj_ds_name="shapenet_10mb_100",
+            gso_obj_ds_name="gso_10",
         )
 
     elif config_id == "refiner-gso-4views-normals":
         cfg = make_refiner_cfg(cfg)
-        cfg = train_on_gso_and_shapenet(cfg, shapenet_obj_ds_name=None, gso_obj_ds_name="gso_940")
+        cfg = train_on_gso_and_shapenet(
+            cfg,
+            shapenet_obj_ds_name=None,
+            gso_obj_ds_name="gso_940",
+        )
     elif config_id == "refiner-shapenet-4views-normals":
         cfg = make_refiner_cfg(cfg)
         cfg = train_on_gso_and_shapenet(
-            cfg, shapenet_obj_ds_name="shapenet_10mb_20k", gso_obj_ds_name=None
+            cfg,
+            shapenet_obj_ds_name="shapenet_10mb_20k",
+            gso_obj_ds_name=None,
         )
     elif config_id == "refiner-gso_shapenet_nomodelnet-4views-normals":
         cfg = make_refiner_cfg(cfg)
@@ -263,7 +284,8 @@ def update_cfg_with_config_id(cfg: TrainingConfig, config_id: str) -> TrainingCo
         cfg = train_on_gso_and_shapenet(cfg)
 
     else:
-        raise ValueError("Unknown config")
+        msg = "Unknown config"
+        raise ValueError(msg)
 
     if cfg.run_id is None:
         cfg.run_postfix = str(np.random.randint(int(1e6)))

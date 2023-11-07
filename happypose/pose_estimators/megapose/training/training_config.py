@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +15,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
+from typing import Optional
 
 # Third Party
 import numpy as np
@@ -47,15 +46,16 @@ class TrainingConfig(omegaconf.dictconfig.DictConfig):
     Two options for creating a training configuration:
     1. Create it manually, and set `run_id`.
     2. If `run_id` is None, then use `config_id`, `run_comment`and
-    `run_postfix` to create a `run_id`
+    `run_postfix` to create a `run_id`.
 
-    In 2., the parameters of the config are set-up using the function `update_cfg_with_config_id`.
+    In 2., the parameters of the config are set-up using the function
+    `update_cfg_with_config_id`.
     """
 
     # Datasets
-    train_datasets: List[DatasetConfig] = field(default_factory=lambda: [])
+    train_datasets: list[DatasetConfig] = field(default_factory=lambda: [])
     input_resize: Resolution = (540, 720)
-    val_datasets: List[DatasetConfig] = field(default_factory=lambda: [])
+    val_datasets: list[DatasetConfig] = field(default_factory=lambda: [])
     val_epoch_interval: int = 10
     split_objects_across_gpus: bool = True
     n_max_objects: Optional[int] = None
@@ -106,8 +106,8 @@ class TrainingConfig(omegaconf.dictconfig.DictConfig):
     # Hypotheses
     hypotheses_init_method: str = "refiner_gt+noise"
     n_hypotheses: int = 1
-    init_euler_deg_std: Tuple[float, float, float] = (15, 15, 15)
-    init_trans_std: Tuple[float, float, float] = (0.01, 0.01, 0.05)
+    init_euler_deg_std: tuple[float, float, float] = (15, 15, 15)
+    init_trans_std: tuple[float, float, float] = (0.01, 0.01, 0.05)
 
     # Optimizer
     optimizer: str = "adam"

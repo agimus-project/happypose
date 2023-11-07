@@ -1,17 +1,23 @@
-import numpy as np
-import trimesh
-import torch
 from copy import deepcopy
+
+import numpy as np
+import torch
+import trimesh
+
+from happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection import (
+    TensorCollection,
+)
 
 from .mesh_ops import get_meshes_bounding_boxes, sample_points
 from .symmetries import make_bop_symmetries
-from happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection import TensorCollection
 
 
 class MeshDataBase:
     def __init__(self, obj_list):
-        self.infos = {obj['label']: obj for obj in obj_list}
-        self.meshes = {l: trimesh.load(obj['mesh_path']) for l, obj in self.infos.items()}
+        self.infos = {obj["label"]: obj for obj in obj_list}
+        self.meshes = {
+            m: trimesh.load(obj["mesh_path"]) for m, obj in self.infos.items()
+        }
 
     @staticmethod
     def from_object_ds(object_ds):
@@ -26,33 +32,49 @@ class MeshDataBase:
         new_infos = deepcopy(self.infos)
         for label, mesh in self.meshes.items():
             if aabb:
-                points_n = get_meshes_bounding_boxes(torch.as_tensor(mesh.vertices).unsqueeze(0))[0]
+                points_n = get_meshes_bounding_boxes(
+                    torch.as_tensor(mesh.vertices).unsqueeze(0),
+                )[0]
             elif resample_n_points:
-                points_n = torch.tensor(trimesh.sample.sample_surface(mesh, resample_n_points)[0])
+                points_n = torch.tensor(
+                    trimesh.sample.sample_surface(mesh, resample_n_points)[0],
+                )
             else:
                 points_n = torch.tensor(mesh.vertices)
             points_n = points_n.clone()
             infos = self.infos[label]
-            if infos['mesh_units'] == 'mm':
+            if infos["mesh_units"] == "mm":
                 scale = 0.001
-            elif infos['mesh_units'] == 'm':
+            elif infos["mesh_units"] == "m":
                 scale = 1.0
             else:
-                raise ValueError('Unit not supported', infos['mesh_units'])
+                msg = "Unit not supported"
+                raise ValueError(msg, infos["mesh_units"])
             points_n *= scale
 
-            dict_symmetries = {k: infos.get(k, []) for k in ('symmetries_discrete', 'symmetries_continuous')}
-            symmetries_n = make_bop_symmetries(dict_symmetries, n_symmetries_continuous=n_sym, scale=scale)
+            dict_symmetries = {
+                k: infos.get(k, [])
+                for k in ("symmetries_discrete", "symmetries_continuous")
+            }
+            symmetries_n = make_bop_symmetries(
+                dict_symmetries,
+                n_symmetries_continuous=n_sym,
+                scale=scale,
+            )
 
-            new_infos[label]['n_points'] = points_n.shape[0]
-            new_infos[label]['n_sym'] = symmetries_n.shape[0]
+            new_infos[label]["n_points"] = points_n.shape[0]
+            new_infos[label]["n_sym"] = symmetries_n.shape[0]
             symmetries.append(torch.as_tensor(symmetries_n))
             points.append(torch.as_tensor(points_n))
             labels.append(label)
 
         labels = np.array(labels)
-        points = pad_stack_tensors(points, fill='select_random', deterministic=True)
-        symmetries = pad_stack_tensors(symmetries, fill=torch.eye(4), deterministic=True)
+        points = pad_stack_tensors(points, fill="select_random", deterministic=True)
+        symmetries = pad_stack_tensors(
+            symmetries,
+            fill=torch.eye(4),
+            deterministic=True,
+        )
         return BatchedMeshes(new_infos, labels, points, symmetries).float()
 
 
@@ -62,17 +84,17 @@ class BatchedMeshes(TensorCollection):
         self.infos = infos
         self.label_to_id = {label: n for n, label in enumerate(labels)}
         self.labels = np.asarray(labels)
-        self.register_tensor('points', points)
-        self.register_tensor('symmetries', symmetries)
+        self.register_tensor("points", points)
+        self.register_tensor("symmetries", symmetries)
 
     @property
     def n_sym_mapping(self):
-        return {label: obj['n_sym'] for label, obj in self.infos.items()}
+        return {label: obj["n_sym"] for label, obj in self.infos.items()}
 
     def select(self, labels):
-        ids = [self.label_to_id[l] for l in labels]
+        ids = [self.label_to_id[label] for label in labels]
         return Meshes(
-            infos=[self.infos[l] for l in labels],
+            infos=[self.infos[label] for label in labels],
             labels=self.labels[ids],
             points=self.points[ids],
             symmetries=self.symmetries[ids],
@@ -84,8 +106,8 @@ class Meshes(TensorCollection):
         super().__init__()
         self.infos = infos
         self.labels = np.asarray(labels)
-        self.register_tensor('points', points)
-        self.register_tensor('symmetries', symmetries)
+        self.register_tensor("points", points)
+        self.register_tensor("symmetries", symmetries)
 
     def select_labels(self, labels):
         raise NotImplementedError
@@ -94,7 +116,7 @@ class Meshes(TensorCollection):
         return sample_points(self.points, n_points, deterministic=deterministic)
 
 
-def pad_stack_tensors(tensor_list, fill='select_random', deterministic=True):
+def pad_stack_tensors(tensor_list, fill="select_random", deterministic=True):
     n_max = max([t.shape[0] for t in tensor_list])
     if deterministic:
         np_random = np.random.RandomState(0)
@@ -108,9 +130,14 @@ def pad_stack_tensors(tensor_list, fill='select_random', deterministic=True):
             if isinstance(fill, torch.Tensor):
                 assert isinstance(fill, torch.Tensor)
                 assert fill.shape == tensor_n.shape[1:]
-                pad = fill.unsqueeze(0).repeat(n_pad, *[1 for _ in fill.shape]).to(tensor_n.device).to(tensor_n.dtype)
+                pad = (
+                    fill.unsqueeze(0)
+                    .repeat(n_pad, *[1 for _ in fill.shape])
+                    .to(tensor_n.device)
+                    .to(tensor_n.dtype)
+                )
             else:
-                assert fill == 'select_random'
+                assert fill == "select_random"
                 ids_pad = np_random.choice(np.arange(len(tensor_n)), size=n_pad)
                 pad = tensor_n[ids_pad]
             tensor_n_padded = torch.cat((tensor_n, pad), dim=0)

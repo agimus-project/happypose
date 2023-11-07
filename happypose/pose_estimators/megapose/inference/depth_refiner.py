@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from abc import ABC, abstractmethod
-from typing import Optional, Tuple
+from typing import Optional
 
 # Third Party
 import torch
@@ -34,10 +33,11 @@ class DepthRefiner(ABC):
         masks: Optional[torch.tensor] = None,
         depth: Optional[torch.tensor] = None,
         K: Optional[torch.tensor] = None,
-    ) -> Tuple[PoseEstimatesType, dict]:
+    ) -> tuple[PoseEstimatesType, dict]:
         """Run the depth refinement.
 
         Args:
+        ----
             predictions: len(predictions) = N, index into depth, masks, K using
                 the batch_im_id field.
             depth: [B, H, W]

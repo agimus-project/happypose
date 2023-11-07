@@ -1,5 +1,6 @@
 import typing as tp
 from dataclasses import dataclass
+
 from hydra.core.config_store import ConfigStore
 
 
@@ -30,21 +31,21 @@ class SlurmJobConfig(JobConfig):
     account: str
     qos: str
     time: str
-    additional_parameters: tp.Optional[tp.Dict[str, tp.Any]]
+    additional_parameters: tp.Optional[dict[str, tp.Any]]
 
 
 @dataclass
 class CodeSnapshotConfig:
     snapshot_dir: tp.Optional[str]
     exclude_path: tp.Optional[str]
-    python_packages_dir: tp.Optional[tp.List[str]] = None
+    python_packages_dir: tp.Optional[list[str]] = None
 
 
 @dataclass
 class JobEnvironmentConfig:
     conda_env: str
     code_snapshot: tp.Optional[CodeSnapshotConfig] = None
-    env: tp.Optional[tp.Dict[str, str]] = None
+    env: tp.Optional[dict[str, str]] = None
 
 
 @dataclass

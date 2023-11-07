@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+"""Copyright (c) 2022 Inria & NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 
 
 # Third Party
@@ -71,7 +69,9 @@ class CustomDistributedSampler(Sampler):
         # NOTE: Epoch size is local.
         total_epoch_size = epoch_size * num_replicas
         n_repeats = 1 + total_epoch_size // len(ds)
-        self.all_indices = np.concatenate([np.arange(len(ds)) for _ in range(n_repeats)])
+        self.all_indices = np.concatenate(
+            [np.arange(len(ds)) for _ in range(n_repeats)],
+        )
         assert len(self.all_indices) >= total_epoch_size
         self.total_epoch_size = total_epoch_size
         self.seed = seed
@@ -86,6 +86,10 @@ class CustomDistributedSampler(Sampler):
     def __iter__(self):
         self.epoch += 1
         with temp_numpy_seed(self.epoch + self.seed):
-            indices_shuffled = np.random.permutation(self.all_indices)[: self.total_epoch_size]
-            local_indices = np.array_split(indices_shuffled, self.num_replicas)[self.rank]
+            indices_shuffled = np.random.permutation(self.all_indices)[
+                : self.total_epoch_size
+            ]
+            local_indices = np.array_split(indices_shuffled, self.num_replicas)[
+                self.rank
+            ]
         return iter(local_indices)

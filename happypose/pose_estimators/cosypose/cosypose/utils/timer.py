@@ -9,7 +9,7 @@ class Timer:
 
     def reset(self):
         self.start_time = None
-        self.elapsed = 0.
+        self.elapsed = 0.0
         self.is_running = False
 
     def start(self):
