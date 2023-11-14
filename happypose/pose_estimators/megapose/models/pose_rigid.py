@@ -744,6 +744,9 @@ class PosePredictor(nn.Module):
         def has_nans(tensor):
             return bool(tensor.isnan().any())
 
+        def has_infs(tensor):
+            return bool(tensor.isinf().any())
+
         assert (
             self.predict_rendered_views_logits
         ), "Method only valid if coarse classification model"
@@ -763,6 +766,8 @@ class PosePredictor(nn.Module):
             print("K has NANS")
         if has_nans(TCO_input):
             print("TCO_input has NANS")
+        if has_infs(TCO_input):
+            print("TCO_input has INFS")
 
         TCO_input = normalize_T(TCO_input).detach()
         if has_nans(TCO_input):

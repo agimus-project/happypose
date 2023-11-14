@@ -84,8 +84,7 @@ class PredictionRunner:
         self,
         pose_estimator: PoseEstimator,
         obs_tensor: ObservationTensor,
-        gt_detections: DetectionsType,
-        exte_detections: DetectionsType,
+        detections: DetectionsType,
         initial_estimates: Optional[PoseEstimatesType] = None,
     ) -> Dict[str, PoseEstimatesType]:
         """Runs inference pipeline, extracts the results.
@@ -95,22 +94,13 @@ class PredictionRunner:
             - 'refiner/final': preds at final refiner iteration (before depth
                                refinement).
             - 'depth_refinement': preds after depth refinement.
-
-
         """
-        # TODO: this check could be done outside of run_inference_pipeline
-        # and then only check if detections are None
-        if self.inference_cfg.detection_type == "gt":
-            detections = gt_detections
-            run_detector = False
-        elif self.inference_cfg.detection_type == "exte":
-            # print("exte_detections =", exte_detections.bboxes)
-            detections = exte_detections
+
+        if self.inference_cfg.detection_type in ["gt", "exte"]:
             run_detector = False
         elif self.inference_cfg.detection_type == "detector":
             detections = None
             run_detector = True
-
         else:
             msg = f"Unknown detection type {self.inference_cfg.detection_type}"
             raise ValueError(msg)
@@ -194,7 +184,6 @@ class PredictionRunner:
         # This section opens the detections stored in "baseline.json"
         # format it and store it in a dataframe that will be accessed later
         ######
-        # Temporary solution
         if self.inference_cfg.detection_type == "exte":
             df_all_dets, df_targets = load_external_detections(self.scene_ds.ds_dir)
 
@@ -209,16 +198,27 @@ class PredictionRunner:
             # Dirty but avoids creating error when running with real detector
             dt_det_exte = 0
 
-            # Temporary solution
+            # Select view detections depending detection type
             if self.inference_cfg.detection_type == "exte":
-                exte_detections = filter_detections_scene_view(
+                detections = filter_detections_scene_view(
                     scene_id, view_id, df_all_dets, df_targets
                 )
-                if len(exte_detections) > 0:
-                    dt_det_exte += exte_detections.infos["time"].iloc[0]
+                if len(detections) > 0:
+                    dt_det_exte += detections.infos["time"].iloc[0]
+            elif self.inference_cfg.detection_type == "gt":
+                detections = data["gt_detections"].cuda()
+                """
+                Some groundtruth detections have non zero visibility and
+                zero sized bounding boxes
+                -> remove them to avoid division by zero errors later
+                """
+                min_visibility_fract = 0.05
+                detections.infos = detections.infos[
+                    detections.infos["visib_fract"] > min_visibility_fract
+                ]
             else:
-                exte_detections = None
-            gt_detections = data["gt_detections"].cuda()
+                detections = None
+
             initial_data = None
             if data["initial_data"]:
                 initial_data = data["initial_data"].cuda()
@@ -232,8 +232,7 @@ class PredictionRunner:
                     self.run_inference_pipeline(
                         pose_estimator,
                         obs_tensor,
-                        gt_detections,
-                        exte_detections,
+                        detections,
                         initial_estimates=initial_data,
                     )
 
@@ -241,8 +240,7 @@ class PredictionRunner:
                 all_preds, all_preds_data = self.run_inference_pipeline(
                     pose_estimator,
                     obs_tensor,
-                    gt_detections,
-                    exte_detections,
+                    detections,
                     initial_estimates=initial_data,
                 )
 
