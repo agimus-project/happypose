@@ -29,7 +29,7 @@ git clone --branch dev --recurse-submodules https://github.com/agimus-project/ha
 cd happypose
 conda env create -f environment.yml
 conda activate happypose
-pip install .[cpu,evaluation,multiview,render] --extra-index-url https://download.pytorch.org/whl/cpu
+pip install .
 ```
 
 ### With venv
@@ -39,8 +39,14 @@ git clone --branch dev --recurse-submodules https://github.com/agimus-project/ha
 cd happypose
 python -m venv .venv
 source .venv/bin/activate
-pip install .[cpu,evaluation,multiview,render]
+pip install .[cpu] --extra-index-url https://download.pytorch.org/whl/cpu
 ```
+
+### Install extras:
+
+- cpu: required to get pytorch CPU from PyPI (don't use this for GPU or with conda)
+- evaluation: installs bop_toolkit
+- multiview: installs cosypose c++ extension
 
 ## Create data directory
 

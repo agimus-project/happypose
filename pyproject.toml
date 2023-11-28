@@ -37,11 +37,11 @@ omegaconf = "^2.3.0"
 open3d = "^0.17.0"
 opencv-contrib-python = "^4.8.0.76"
 opencv-python = "^4.8.0.76"
-panda3d = {optional = true, version = "=1.10.13"}
+panda3d = "=1.10.13"
 pin = "^2.6.20"
 plyfile = "^1.0.1"
 pybind11 = "^2.10.4"
-pybullet = {optional = true, version = "^3.2.5"}
+pybullet = "^3.2.5"
 pypng = "^0.20220715.0"
 python = ">=3.9,<3.11"
 pyyaml = "^6.0.1"
@@ -66,7 +66,6 @@ webdataset = "^0.2.57"
 cpu = ["torch", "torchvision"]
 evaluation = ["bop_toolkit_lib"]
 multiview = ["cosypose"]
-render = ["panda3d", "pybullet"]
 
 [tool.poetry.group.dev]
 optional = true
