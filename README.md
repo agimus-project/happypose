@@ -1,7 +1,10 @@
 # HappyPose
 
-[![Tests](https://github.com/agimus-project/happypose/actions/workflows/test.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/test.yml)
-[![Packaging](https://github.com/agimus-project/happypose/actions/workflows/packaging.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/packaging.yml)
+[![Conda](https://github.com/agimus-project/happypose/actions/workflows/conda.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/conda.yml)
+[![Pip](https://github.com/agimus-project/happypose/actions/workflows/pip.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/pip.yml)
+[![Poetry](https://github.com/agimus-project/happypose/actions/workflows/poetry.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/poetry.yml)
+[![Book](https://github.com/agimus-project/happypose/actions/workflows/book.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/book.yml)
+
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/agimus-project/happypose/main.svg)](https://results.pre-commit.ci/latest/github/agimus-project/happypose/main)
 [![Documentation Status](https://readthedocs.org/projects/happypose/badge/?version=latest)](https://happypose.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/agimus-project/happypose/branch/main/graph/badge.svg?token=TODO)](https://codecov.io/gh/agimus-project/happypose)
