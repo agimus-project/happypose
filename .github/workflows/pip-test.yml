@@ -14,7 +14,7 @@ jobs:
           submodules: 'recursive'
 
       - name: Install EGL mesa - required for Panda3D renderer
-        run: sudo apt-get update && sudo apt-get install -qqy libegl1-mesa libegl1-mesa-dev rclone
+        run: sudo apt-get update && sudo apt-get install -qqy libegl1-mesa libegl1-mesa-dev
 
       - name: Caching of the happypose installation and data
         uses: actions/cache@v3
