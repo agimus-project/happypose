@@ -29,7 +29,7 @@ git clone --branch dev --recurse-submodules https://github.com/agimus-project/ha
 cd happypose
 conda env create -f environment.yml
 conda activate happypose
-pip install .[cpu,evaluation,multiview,render]
+pip install .[cpu,evaluation,multiview,render] --extra-index-url https://download.pytorch.org/whl/cpu
 ```
 
 ### With venv
