@@ -4,3 +4,7 @@ language = "en"
 multilingual = false
 src = "docs/book"
 title = "HappyPose"
+
+[output.html]
+git-repository-icon = "fa-github"
+git-repository-url = "https://github.com/agimus-project/happypose"
