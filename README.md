@@ -13,17 +13,30 @@ Toolbox and trackers for object pose-estimation. Based on the work [CosyPose](ht
 
 ## Installation
 
-This installation procedure will be curated.
+To install happypose, you can use pip or poetry.
+
+We strongly suggest to install it in either a
+[venv](https://docs.python.org/fr/3/library/venv.html) or a
+[conda environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
+
+### With conda
 
 ```
 git clone --branch dev --recurse-submodules https://github.com/agimus-project/happypose.git
 cd happypose
 conda env create -f environment.yml
 conda activate happypose
-cd happypose/pose_estimators/cosypose
-pip install .
-cd ../../..
-pip install -e .
+pip install .[cpu,evaluation,multiview,render]
+```
+
+### With venv
+
+```
+git clone --branch dev --recurse-submodules https://github.com/agimus-project/happypose.git
+cd happypose
+python -m venv .venv
+source .venv/bin/activate
+pip install .[cpu,evaluation,multiview,render]
 ```
 
 ## Create data directory
