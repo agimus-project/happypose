@@ -1,8 +1,8 @@
 # HappyPose
 
-[![Conda](https://github.com/agimus-project/happypose/actions/workflows/conda.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/conda.yml)
-[![Pip](https://github.com/agimus-project/happypose/actions/workflows/pip.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/pip.yml)
-[![Poetry](https://github.com/agimus-project/happypose/actions/workflows/poetry.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/poetry.yml)
+[![Conda](https://github.com/agimus-project/happypose/actions/workflows/conda-test.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/conda-test.yml)
+[![Pip](https://github.com/agimus-project/happypose/actions/workflows/pip-test.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/pip-test.yml)
+[![Poetry](https://github.com/agimus-project/happypose/actions/workflows/poetry-test.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/poetry-test.yml)
 [![Book](https://github.com/agimus-project/happypose/actions/workflows/book.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/book.yml)
 
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/agimus-project/happypose/main.svg)](https://results.pre-commit.ci/latest/github/agimus-project/happypose/main)
