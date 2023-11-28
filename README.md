@@ -11,7 +11,7 @@
 Toolbox and trackers for object pose-estimation. Based on the work [CosyPose](https://github.com/Simple-Robotics/cosypose) and [MegaPose](https://github.com/megapose6d/megapose6d). This directory is currently under development. Please refer to the [documentation](https://agimus-project.github.io/happypose/) for more details.
 
 
-# Installation
+## Installation
 
 This installation procedure will be curated.
 
@@ -26,65 +26,9 @@ cd ../../..
 pip install -e .
 ```
 
-Installation of bop_toolkit :
-
-```
-conda activate happypose
-cd happypose/pose_estimators/megapose/deps/bop_toolkit_challenge/
-# Remove all versions enforcing on requirements.txt
-pip install -r requirements.txt -e .
-```
-
-
-# Create data directory
+## Create data directory
 
 ```
 Create data dir /somewhere/convenient. The dataset to store are quite large.
 export HAPPYPOSE_DATA_DIR=/somewhere/convenient
-```
-
-# Configuration for the evaluation
-
-If you plan on evaluating CosyPose and Megapose, you need to modify the following lines in `bop_toolkit_lib/config.py`, replace
-
-```
-######## Basic ########
-
-
-# Folder with the BOP datasets.
-if 'BOP_PATH' in os.environ:
-  datasets_path = os.environ['BOP_PATH']
-else:
-  datasets_path = r'/path/to/bop/datasets'
-
-# Folder with pose results to be evaluated.
-results_path = r'/path/to/folder/with/results'
-
-# Folder for the calculated pose errors and performance scores.
-eval_path = r'/path/to/eval/folder'
-```
-
-with
-
-```
-######## Basic ########
-
-# Folder with the BOP datasets.
-datasets_path = str(os.environ['BOP_DATASETS_PATH'])
-results_path = str(os.environ['BOP_RESULTS_PATH'])
-eval_path = str(os.environ['BOP_EVAL_PATH'])
-```
-
-You will also need to install [TEASER++](https://github.com/MIT-SPARK/TEASER-plusplus) if you want to use the depth for MegaPose. To do so, please run the following commands to install it :
-
-```
-# Go to HappyPose root directory
-apt install -y cmake libeigen3-dev libboost-all-dev
-conda activate happypose
-mamba install compilers -c conda-forge
-pip install open3d
-mkdir /build && cd /build && git clone https://github.com/MIT-SPARK/TEASER-plusplus.git
-cd TEASER-plusplus && mkdir build && cd build
-cmake -DTEASERPP_PYTHON_VERSION=3.9 .. && make teaserpp_python
-cd python && pip install .
 ```
