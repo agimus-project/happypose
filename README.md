@@ -22,7 +22,7 @@ We strongly suggest to install it in either a
 [venv](https://docs.python.org/fr/3/library/venv.html) or a
 [conda environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
 
-### With conda
+### Example with conda
 
 ```
 git clone --branch dev --recurse-submodules https://github.com/agimus-project/happypose.git
@@ -32,7 +32,7 @@ conda activate happypose
 pip install .
 ```
 
-### With venv
+### Example with venv
 
 ```
 git clone --branch dev --recurse-submodules https://github.com/agimus-project/happypose.git
@@ -44,9 +44,9 @@ pip install .[cpu] --extra-index-url https://download.pytorch.org/whl/cpu
 
 ### Install extras:
 
-- cpu: required to get pytorch CPU from PyPI (don't use this for GPU or with conda)
-- evaluation: installs bop_toolkit
-- multiview: installs cosypose c++ extension
+- `cpu`: required to get pytorch CPU from PyPI (don't use this for GPU or with conda)
+- `evaluation`: installs bop_toolkit
+- `multiview`: installs cosypose c++ extension
 
 ## Create data directory
 
