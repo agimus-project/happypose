@@ -10,6 +10,7 @@ from happypose.toolbox.inference.detector import DetectorModule
 from happypose.toolbox.inference.types import DetectionsType, ObservationTensor
 from happypose.toolbox.inference.utils import add_instance_id, filter_detections
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class Detector(DetectorModule):
     def __init__(self, model, ds_name):
@@ -78,21 +79,21 @@ class Detector(DetectorModule):
 
         if len(bboxes) > 0:
             if torch.cuda.is_available():
-                bboxes = torch.stack(bboxes).cuda().float()
-                masks = torch.stack(masks).cuda()
+                bboxes = torch.stack(bboxes).to(device).float()
+                masks = torch.stack(masks).to(device)
             else:
                 bboxes = torch.stack(bboxes).float()
                 masks = torch.stack(masks)
         else:
             infos = {"score": [], "label": [], "batch_im_id": []}
             if torch.cuda.is_available():
-                bboxes = torch.empty(0, 4).cuda().float()
+                bboxes = torch.empty(0, 4).to(device).float()
                 masks = torch.empty(
                     0,
                     images.shape[1],
                     images.shape[2],
                     dtype=torch.bool,
-                ).cuda()
+                ).to(device)
             else:
                 bboxes = torch.empty(0, 4).float()
                 masks = torch.empty(

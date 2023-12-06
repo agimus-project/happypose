@@ -29,6 +29,7 @@ import happypose.toolbox.utils.tensor_collection as tc
 from happypose.toolbox.inference.detector import DetectorModule
 from happypose.toolbox.inference.types import DetectionsType, ObservationTensor
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class Detector(DetectorModule):
     def __init__(self, model: torch.nn.Module) -> None:
@@ -112,17 +113,17 @@ class Detector(DetectorModule):
                 infos.append(info)
 
         if len(bboxes) > 0:
-            bboxes = torch.stack(bboxes).cuda().float()
-            masks = torch.stack(masks).cuda()
+            bboxes = torch.stack(bboxes).to(device).float()
+            masks = torch.stack(masks).to(device)
         else:
             infos = {"score": [], "label": [], "batch_im_id": []}
-            bboxes = torch.empty(0, 4).cuda().float()
+            bboxes = torch.empty(0, 4).to(device).float()
             masks = torch.empty(
                 0,
                 images.shape[1],
                 images.shape[2],
                 dtype=torch.bool,
-            ).cuda()
+            ).to(device)
 
         outputs = tc.PandasTensorCollection(
             infos=pd.DataFrame(infos),

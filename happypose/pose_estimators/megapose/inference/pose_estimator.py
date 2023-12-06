@@ -562,7 +562,7 @@ class PoseEstimator(PoseEstimationModule):
             if detections is None and run_detector:
                 start_time = time.time()
                 detections = self.forward_detection_model(observation)
-                detections = detections.cuda()
+                detections = detections.to(device)
                 print("# detections  =", len(detections.bboxes))
                 elapsed = time.time() - start_time
                 timing_str += f"detection={elapsed:.2f}, "
