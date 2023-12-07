@@ -145,7 +145,7 @@ async def main():
         for model in args.urdf_models:
             to_dl.append(
                 (
-                    "cosypose/urdfs/{model}",
+                    f"cosypose/urdfs/{model}",
                     LOCAL_DATA_DIR / "urdfs",
                 )
             )
@@ -166,7 +166,7 @@ async def main():
         for model in args.cosypose_models:
             to_dl.append(
                 (
-                    "cosypose/experiments/{model}",
+                    f"cosypose/experiments/{model}",
                     LOCAL_DATA_DIR / "experiments",
                 )
             )
@@ -184,7 +184,7 @@ async def main():
         for detection in args.detections:
             to_dl.append(
                 (
-                    "cosypose/saved_detections/{detection}.pkl",
+                    f"cosypose/saved_detections/{detection}.pkl",
                     LOCAL_DATA_DIR / "saved_detections",
                 )
             )
@@ -193,7 +193,7 @@ async def main():
         for result in args.result_id:
             to_dl.append(
                 (
-                    "cosypose/results/{result}",
+                    f"cosypose/results/{result}",
                     LOCAL_DATA_DIR / "results",
                 )
             )
@@ -202,11 +202,11 @@ async def main():
         for result in args.bop_result_id:
             to_dl += [
                 (
-                    "cosypose/bop_predictions/{result}.csv",
+                    f"cosypose/bop_predictions/{result}.csv",
                     LOCAL_DATA_DIR / "bop_predictions",
                 ),
                 (
-                    "cosypose/bop_eval_outputs/{result}",
+                    f"cosypose/bop_eval_outputs/{result}",
                     LOCAL_DATA_DIR / "bop_predictions",
                 ),
             ]
@@ -219,7 +219,7 @@ async def main():
 
     if args.synt_dataset:
         for dataset in args.synt_dataset:
-            to_dl.append(("cosypose/zip_files/{dataset}.zip", DOWNLOAD_DIR))
+            to_dl.append((f"cosypose/zip_files/{dataset}.zip", DOWNLOAD_DIR))
             to_unzip.append(
                 (DOWNLOAD_DIR / f"{dataset}.zip", LOCAL_DATA_DIR / "synt_datasets")
             )
@@ -257,7 +257,7 @@ async def main():
             for model in model_dict.values():
                 to_dl.append(
                     (
-                        "cosypose/experiments/{model}",
+                        f"cosypose/experiments/{model}",
                         LOCAL_DATA_DIR / "experiments",
                     )
                 )
@@ -280,7 +280,7 @@ async def main():
         ):
             to_dl.append(
                 (
-                    "cosypose/results/{result_id}",
+                    f"cosypose/results/{result_id}",
                     LOCAL_DATA_DIR / "results",
                 )
             )
@@ -288,7 +288,7 @@ async def main():
         for example in args.examples:
             to_dl.append(
                 (
-                    "examples/{example}",
+                    f"examples/{example}",
                     LOCAL_DATA_DIR / "examples",
                 )
             )
