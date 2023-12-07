@@ -348,8 +348,10 @@ class DownloadClient:
             return
 
         for mirror in self.mirrors:
-            if httpx.head(mirror + download_path).is_success:
-                download_path = mirror + download_path
+            dl = mirror + download_path
+            head = await self.client.head(dl)
+            if head.is_success or head.is_redirect:
+                download_path = dl
                 break
         else:
             err = f"Can't find mirror for {download_path}."
