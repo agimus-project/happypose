@@ -12,6 +12,7 @@ from happypose.toolbox.inference.utils import add_instance_id, filter_detections
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 class Detector(DetectorModule):
     def __init__(self, model, ds_name):
         super().__init__()
