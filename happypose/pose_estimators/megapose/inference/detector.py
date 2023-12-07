@@ -31,6 +31,7 @@ from happypose.toolbox.inference.types import DetectionsType, ObservationTensor
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 class Detector(DetectorModule):
     def __init__(self, model: torch.nn.Module) -> None:
         super().__init__()

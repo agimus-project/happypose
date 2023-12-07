@@ -81,7 +81,7 @@ optional = true
 
 [tool.poetry.group.docs.dependencies]
 myst-parser = "^2.0.0"
-sphinx = "^6.2.1"
+sphinx = "^7.2.6"
 
 [[tool.poetry.source]]
 name = "torch_cpu"
