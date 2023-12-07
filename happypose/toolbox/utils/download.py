@@ -19,12 +19,14 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-DOWNLOAD_URL = "https://www.paris.inria.fr/archive_ylabbeprojectsdata"
-LAAS_DOWNLOAD_URL = "https://gepettoweb.laas.fr/data/happypose/"
+MIRRORS = {
+    "inria": "https://www.paris.inria.fr/archive_ylabbeprojectsdata/",
+    "laas": "https://gepettoweb.laas.fr/data/happypose/",
+    "bop": "https://bop.felk.cvut.cz/media/data/bop_datasets/",
+}
 
 DOWNLOAD_DIR = LOCAL_DATA_DIR / "downloads"
 DOWNLOAD_DIR.mkdir(exist_ok=True)
-BOP_SRC = "https://bop.felk.cvut.cz/media/data/bop_datasets/"
 BOP_DATASETS = {
     "ycbv": {
         "splits": ["train_real", "train_synt", "test_all"],
@@ -56,7 +58,7 @@ BOP_DATASETS = {
 BOP_DS_NAMES = list(BOP_DATASETS.keys())
 
 
-def main():
+async def main():
     parser = argparse.ArgumentParser("CosyPose download utility")
     parser.add_argument("--bop_dataset", nargs="*", choices=BOP_DS_NAMES)
     parser.add_argument("--bop_extra_files", nargs="*", choices=["ycbv", "tless"])
@@ -70,6 +72,7 @@ def main():
     parser.add_argument("--synt_dataset", nargs="*")
     parser.add_argument("--detections", nargs="*")
     parser.add_argument("--examples", nargs="*")
+    parser.add_argument("--mirror", default="")
     parser.add_argument("--example_scenario", action="store_true")
     parser.add_argument("--pbr_training_images", action="store_true")
     parser.add_argument("--all_bop20_results", action="store_true")
@@ -86,7 +89,7 @@ def main():
 
     if args.bop_dataset:
         for dataset in args.bop_dataset:
-            to_dl.append((BOP_SRC + f"{dataset}_base.zip", BOP_DS_DIR / dataset))
+            to_dl.append((f"{dataset}_base.zip", BOP_DS_DIR / dataset))
             download_pbr = args.pbr_training_images and BOP_DATASETS[dataset].get(
                 "has_pbr", True
             )
@@ -96,7 +99,7 @@ def main():
             for suffix in suffixes:
                 to_dl.append(
                     (
-                        BOP_SRC + f"{dataset}_{suffix}.zip",
+                        f"{dataset}_{suffix}.zip",
                         BOP_DS_DIR / dataset,
                     )
                 )
@@ -107,7 +110,7 @@ def main():
                 # https://github.com/kirumang/Pix2Pose#download-pre-trained-weights
                 to_dl.append(
                     (
-                        f"{DOWNLOAD_URL}/cosypose/bop_datasets/tless/all_target_tless.json",
+                        "cosypose/bop_datasets/tless/all_target_tless.json",
                         BOP_DS_DIR / "tless",
                     )
                 )
@@ -118,22 +121,22 @@ def main():
                 # Friendly names used with YCB-Video
                 to_dl += [
                     (
-                        f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/ycbv_friendly_names.txt",
+                        "cosypose/bop_datasets/ycbv/ycbv_friendly_names.txt",
                         BOP_DS_DIR / "ycbv",
                     ),
                     # Offsets between YCB-Video and BOP (extracted from BOP readme)
                     (
-                        f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/offsets.txt",
+                        "cosypose/bop_datasets/ycbv/offsets.txt",
                         BOP_DS_DIR / "ycbv",
                     ),
                     # Evaluation models for YCB-Video (used by other works)
                     (
-                        f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_original",
+                        "cosypose/bop_datasets/ycbv/models_original",
                         BOP_DS_DIR / "ycbv",
                     ),
                     # Keyframe definition
                     (
-                        f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/keyframe.txt",
+                        "cosypose/bop_datasets/ycbv/keyframe.txt",
                         BOP_DS_DIR / "ycbv",
                     ),
                 ]
@@ -142,7 +145,7 @@ def main():
         for model in args.urdf_models:
             to_dl.append(
                 (
-                    f"{DOWNLOAD_URL}/cosypose/urdfs/{model}",
+                    "cosypose/urdfs/{model}",
                     LOCAL_DATA_DIR / "urdfs",
                 )
             )
@@ -150,11 +153,11 @@ def main():
     if args.ycbv_compat_models:
         to_dl += [
             (
-                f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_bop-compat",
+                "cosypose/bop_datasets/ycbv/models_bop-compat",
                 BOP_DS_DIR / "ycbv",
             ),
             (
-                f"{DOWNLOAD_URL}/cosypose/bop_datasets/ycbv/models_bop-compat_eval",
+                "cosypose/bop_datasets/ycbv/models_bop-compat_eval",
                 BOP_DS_DIR / "ycbv",
             ),
         ]
@@ -163,7 +166,7 @@ def main():
         for model in args.cosypose_models:
             to_dl.append(
                 (
-                    f"{DOWNLOAD_URL}/cosypose/experiments/{model}",
+                    "cosypose/experiments/{model}",
                     LOCAL_DATA_DIR / "experiments",
                 )
             )
@@ -171,7 +174,7 @@ def main():
     if args.megapose_models:
         to_dl.append(
             (
-                f"{DOWNLOAD_URL}/megapose/megapose-models/",
+                "megapose/megapose-models/",
                 LOCAL_DATA_DIR / "megapose-models/",
                 ["--exclude", ".*epoch.*"],
             )
@@ -181,7 +184,7 @@ def main():
         for detection in args.detections:
             to_dl.append(
                 (
-                    f"{DOWNLOAD_URL}/cosypose/saved_detections/{detection}.pkl",
+                    "cosypose/saved_detections/{detection}.pkl",
                     LOCAL_DATA_DIR / "saved_detections",
                 )
             )
@@ -190,7 +193,7 @@ def main():
         for result in args.result_id:
             to_dl.append(
                 (
-                    f"{DOWNLOAD_URL}/cosypose/results/{result}",
+                    "cosypose/results/{result}",
                     LOCAL_DATA_DIR / "results",
                 )
             )
@@ -199,26 +202,24 @@ def main():
         for result in args.bop_result_id:
             to_dl += [
                 (
-                    f"{DOWNLOAD_URL}/cosypose/bop_predictions/{result}.csv",
+                    "cosypose/bop_predictions/{result}.csv",
                     LOCAL_DATA_DIR / "bop_predictions",
                 ),
                 (
-                    f"{DOWNLOAD_URL}/cosypose/bop_eval_outputs/{result}",
+                    "cosypose/bop_eval_outputs/{result}",
                     LOCAL_DATA_DIR / "bop_predictions",
                 ),
             ]
 
     if args.texture_dataset:
-        to_dl.append((f"{DOWNLOAD_URL}/cosypose/zip_files/textures.zip", DOWNLOAD_DIR))
+        to_dl.append(("cosypose/zip_files/textures.zip", DOWNLOAD_DIR))
         to_unzip.append(
             (DOWNLOAD_DIR / "textures.zip", LOCAL_DATA_DIR / "texture_datasets")
         )
 
     if args.synt_dataset:
         for dataset in args.synt_dataset:
-            to_dl.append(
-                (f"{DOWNLOAD_URL}/cosypose/zip_files/{dataset}.zip", DOWNLOAD_DIR)
-            )
+            to_dl.append(("cosypose/zip_files/{dataset}.zip", DOWNLOAD_DIR))
             to_unzip.append(
                 (DOWNLOAD_DIR / f"{dataset}.zip", LOCAL_DATA_DIR / "synt_datasets")
             )
@@ -226,11 +227,11 @@ def main():
     if args.example_scenario:
         to_dl += [
             (
-                f"{DOWNLOAD_URL}/cosypose/custom_scenarios/example/candidates.csv",
+                "cosypose/custom_scenarios/example/candidates.csv",
                 LOCAL_DATA_DIR / "custom_scenarios/example",
             ),
             (
-                f"{DOWNLOAD_URL}/cosypose/custom_scenarios/example/scene_camera.json",
+                "cosypose/custom_scenarios/example/scene_camera.json",
                 LOCAL_DATA_DIR / "custom_scenarios/example",
             ),
         ]
@@ -256,7 +257,7 @@ def main():
             for model in model_dict.values():
                 to_dl.append(
                     (
-                        f"{DOWNLOAD_URL}/cosypose/experiments/{model}",
+                        "cosypose/experiments/{model}",
                         LOCAL_DATA_DIR / "experiments",
                     )
                 )
@@ -279,7 +280,7 @@ def main():
         ):
             to_dl.append(
                 (
-                    f"{DOWNLOAD_URL}/cosypose/results/{result_id}",
+                    "cosypose/results/{result_id}",
                     LOCAL_DATA_DIR / "results",
                 )
             )
@@ -287,13 +288,15 @@ def main():
         for example in args.examples:
             to_dl.append(
                 (
-                    f"{LAAS_DOWNLOAD_URL}/examples/{example}",
+                    "examples/{example}",
                     LOCAL_DATA_DIR / "examples",
                 )
             )
 
     # logger.info(f"{to_dl=}")
-    asyncio.run(adownloads(*to_dl))
+    async with DownloadClient(mirror=args.mirror) as dl_client:
+        for args in to_dl:
+            dl_client.create_task(dl_client.adownload(*args))
 
     for src, dst in to_symlink:
         os.symlink(src, dst)
@@ -302,14 +305,15 @@ def main():
         zipfile.ZipFile(src).extractall(dst)
 
 
-async def adownloads(*args):
-    async with DownloadClient() as dl_client:
-        for arg in args:
-            dl_client.create_task(dl_client.adownload(*arg))
-
-
 class DownloadClient:
-    def __init__(self):
+    def __init__(self, mirror):
+        if mirror in MIRRORS:
+            mirror = MIRRORS.pop(mirror)
+            self.mirrors = [mirror, *MIRRORS.values()]
+        elif mirror:
+            self.mirrors = [mirror, *MIRRORS.values()]
+        else:
+            self.mirrors = MIRRORS.values()
         self.client = httpx.AsyncClient()
         self.task_set = set()
 
@@ -343,6 +347,13 @@ class DownloadClient:
         if not flags.flags_managing(Path_download.name):  # if the dl_path is --excluded
             return
 
+        for mirror in self.mirrors:
+            if httpx.head(mirror + download_path).is_success:
+                download_path = mirror + download_path
+                break
+        else:
+            err = f"Can't find mirror for {download_path}."
+            raise ValueError(err)
         if (
             not download_path.endswith("/")
             and not httpx.head(download_path).is_redirect
@@ -437,4 +448,4 @@ class Flags:
 
 if __name__ == "__main__":
     loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
-    main()
+    asyncio.run(main())
