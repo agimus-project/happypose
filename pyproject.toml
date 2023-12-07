@@ -59,7 +59,7 @@ torchvision = [
 ]
 tqdm = "^4.66.1"
 transforms3d = "^0.4.1"
-trimesh = "^3.23.5"
+trimesh = "^4.0.5"
 webdataset = "^0.2.57"
 
 [tool.poetry.extras]

@@ -3522,23 +3522,23 @@ files = [
 
 [[package]]
 name = "trimesh"
-version = "3.23.5"
+version = "4.0.5"
 description = "Import, export, process, analyze and view triangular meshes."
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "trimesh-3.23.5-py3-none-any.whl", hash = "sha256:9cfc592c7ad6475ebfe51c90b0a1e686d627735cea6e6e18e40745be3ecfaab9"},
-    {file = "trimesh-3.23.5.tar.gz", hash = "sha256:bdfd669eccc4b3faff2328200a49408cd5ecad9f19b6022c4adb554bbb3a2621"},
+    {file = "trimesh-4.0.5-py3-none-any.whl", hash = "sha256:d139a9108fc7d68a9cd3f5788528eadc20f25a10ae915922b4a2768e0b23d943"},
+    {file = "trimesh-4.0.5.tar.gz", hash = "sha256:b9bfcfec03b70ab4d21f055df1ab73e8740dd0bc8fd5648273eef8fec76cddf9"},
 ]
 
 [package.dependencies]
 numpy = "*"
 
 [package.extras]
-all = ["chardet", "colorlog", "embreex", "jsonschema", "lxml", "mapbox-earcut", "networkx", "pillow", "psutil", "pycollada", "pyglet (<2)", "python-fcl", "requests", "rtree", "scikit-image", "scipy", "setuptools", "shapely", "svg.path", "xatlas", "xxhash"]
-easy = ["chardet", "colorlog", "embreex", "jsonschema", "lxml", "mapbox-earcut", "networkx", "pillow", "pycollada", "requests", "rtree", "scipy", "setuptools", "shapely", "svg.path", "xxhash"]
-recommends = ["glooey", "meshio", "sympy"]
-test = ["autopep8 (<2)", "coveralls", "ezdxf", "pyinstrument", "pymeshlab", "pytest", "pytest-cov", "ruff"]
+all = ["trimesh[easy,recommend,test]"]
+easy = ["chardet", "colorlog", "embreex", "httpx", "jsonschema", "lxml", "mapbox-earcut", "networkx", "pillow", "pycollada", "rtree", "scipy", "setuptools", "shapely", "svg.path", "xxhash"]
+recommend = ["glooey", "manifold3d", "meshio", "psutil", "pyglet (<2)", "python-fcl", "scikit-image", "sympy", "vhacdx", "xatlas"]
+test = ["black", "coveralls", "ezdxf", "matplotlib", "mypy", "pyinstrument", "pymeshlab", "pytest", "pytest-cov", "ruff"]
 
 [[package]]
 name = "typing-extensions"
@@ -3732,4 +3732,4 @@ multiview = ["cosypose"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "a58768177de00db9c0da8da6d529bc03a7281ed0db456ca561f7ebb84000d8f2"
+content-hash = "03022edab76c352b97fbbcd0cc8f8b8dfb7438973d162e8b9463f668784288c0"
