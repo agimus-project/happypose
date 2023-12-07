@@ -2493,19 +2493,18 @@ global = ["pybind11-global (==2.11.1)"]
 
 [[package]]
 name = "pybullet"
-version = "3.2.5"
+version = "3.2.6"
 description = "Official Python Interface for the Bullet Physics SDK specialized for Robotics Simulation and Reinforcement Learning"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pybullet-3.2.5-cp27-cp27m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:4970aec0dd968924f6b1820655a20f80650da2f85ba38b641937c9701a8a2b14"},
-    {file = "pybullet-3.2.5-cp27-cp27mu-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:b64e4523a11d03729035e0a5baa0ce4d2ca58de8d0a242c0b91e8253781b24c4"},
-    {file = "pybullet-3.2.5-cp35-cp35m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:49e80fd708a3ffd1d0dac3149e13852bd59cca056bb328bf35b25ea26a8bf504"},
-    {file = "pybullet-3.2.5-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:56456b7b53ab00f33d52a3eb96fb0d7b4b8e16f21987d727b34baecc2019702f"},
-    {file = "pybullet-3.2.5-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:3e22fdb949d0a67e18cc3e248d6199ff788704c68c3edbfc3b5c02fc58f52f9a"},
-    {file = "pybullet-3.2.5-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:3f9c4289f1773b55915f4efb7514b088539d59b4a082465d68ee7caac11355d1"},
-    {file = "pybullet-3.2.5-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:9adcaa00de674a02549949f6f8d51b485bd7a23fbc87a1defb2067e1364f8202"},
-    {file = "pybullet-3.2.5.tar.gz", hash = "sha256:1bcb9afb87a086be1b2de18f084d1fdab8194da1bf71f264743ca26baa39c351"},
+    {file = "pybullet-3.2.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6f71d0bed6824875b521066571d612274f1d2dead3ede50f8fbdde1946ec0c40"},
+    {file = "pybullet-3.2.6-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a476d51726efa7aabe1dc8c4ee676b78bcd9fc19d4a2ce9776f2c9a9dacd9e8b"},
+    {file = "pybullet-3.2.6-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8af791050e927f407a85fa9de15754fbe0973f8c798fd2893773b52fa1fc70e0"},
+    {file = "pybullet-3.2.6-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:72be1e68c61bbe49af5b7c609d59ede92d3fbbfca072e9b31d4819575c8f332b"},
+    {file = "pybullet-3.2.6-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ba46f9d8ae76d2bcae4bf4b5768b1dccc0b3b15110b69ba3d78cd0b11f8f21cf"},
+    {file = "pybullet-3.2.6-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f928444471186c5d6092d71371b03436e23ec96acd7800dfefcd8e96572c6581"},
+    {file = "pybullet-3.2.6.tar.gz", hash = "sha256:da27525433c88698dc9fd8bc20fa4ae4d07738b4656633659ebd82c2d2884e08"},
 ]
 
 [[package]]
@@ -3732,4 +3731,4 @@ multiview = ["cosypose"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "a58768177de00db9c0da8da6d529bc03a7281ed0db456ca561f7ebb84000d8f2"
+content-hash = "9787d82c531533f003dd0d81b4b718d9eab7b44161cd28ffe925a69a68434ea7"
