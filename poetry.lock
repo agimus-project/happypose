@@ -444,196 +444,6 @@ files = [
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
-name = "cmeel"
-version = "0.53.0"
-description = "Create Wheel from CMake projects"
-optional = false
-python-versions = ">=3.8,<4.0"
-files = [
-    {file = "cmeel-0.53.0-py3-none-any.whl", hash = "sha256:0667737bb8b61044ff25396c1450520c3d3cc52dcbd603c41682f589d0b3d8b7"},
-    {file = "cmeel-0.53.0.tar.gz", hash = "sha256:db62977716a97a3971c5ceede57a656a33091a4c8ca31531c8a04e63806625c1"},
-]
-
-[package.dependencies]
-tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
-
-[package.extras]
-build = ["cmake (>=3.27.7,<4.0.0)", "git-archive-all (>=1.23.1,<2.0.0)", "packaging (>=23.2,<24.0)", "wheel (>=0.41.1,<0.42.0)"]
-
-[[package]]
-name = "cmeel-assimp"
-version = "5.3.1"
-description = "cmeel distribution for assimp, Open-Asset-Importer-Library Repository"
-optional = false
-python-versions = ">= 3.8"
-files = [
-    {file = "cmeel_assimp-5.3.1-0-py3-none-macosx_12_0_arm64.whl", hash = "sha256:05ea5f78b4a9ea87fc5b102872962625c5e2b27bc3c30277efc3916905c477f6"},
-    {file = "cmeel_assimp-5.3.1-0-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:b3c0a07981403bd402728f1a2cd5524893f342bfef6d1db5ae34dcdb5f79d7e2"},
-    {file = "cmeel_assimp-5.3.1-0-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:c33678fcd7b35d4bdc9ccaac8311c05aaa6cb475d63eca4f83cc91c34d71ce41"},
-    {file = "cmeel_assimp-5.3.1-0-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:0bcb4f649377632698de7a8a56a6bb9772aff2cccd8532b796e223ccb1e579d6"},
-    {file = "cmeel_assimp-5.3.1-0-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:360594e4c80d1dd9371db583856e815d9b990ebf205aea6392a15a8b5fb13b8c"},
-    {file = "cmeel_assimp-5.3.1.tar.gz", hash = "sha256:b2da7360f5e865b92da53f3392582738de1ca25d5f4d7cbf953249c14c20a530"},
-]
-
-[package.dependencies]
-cmeel = "*"
-
-[[package]]
-name = "cmeel-boost"
-version = "1.83.0"
-description = "cmeel distribution for boost, which provides free peer-reviewed portable C++ source libraries."
-optional = false
-python-versions = ">= 3.8"
-files = [
-    {file = "cmeel_boost-1.83.0-0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b26e6b9dd0ad459542e1d0249863847e756fb6ed88529c6f6a0d563183115e8d"},
-    {file = "cmeel_boost-1.83.0-0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:a9e6cf9a095998446248479c219533426692ac75f3bac990d5992a845fa2a6df"},
-    {file = "cmeel_boost-1.83.0-0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:2abb8bd9d3856aada2ddad9c924d4139afa2308c1c53183e4710937d3ff83354"},
-    {file = "cmeel_boost-1.83.0-0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:4b75573ca0722a5a701d4efefe349ac3b920faee6a9c0dcfc4b1c36a176dc4d4"},
-    {file = "cmeel_boost-1.83.0-0-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:0a710dd563604f21a67a666988fd114a9f655aa7b7af0f6e2657d50109bbd9ce"},
-    {file = "cmeel_boost-1.83.0-0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:c282779f774e43fc955665f3e650a62ded9b2b6c8417400541f59a3ae3467e14"},
-    {file = "cmeel_boost-1.83.0-0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:776aa2c403dcc8909550546505c8063c189a7e0577e477519462c6596fc85480"},
-    {file = "cmeel_boost-1.83.0-0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:64f785085244b7ba15c511eb036b5edfb32fd2a933186d6ccf46dc38436c06fa"},
-    {file = "cmeel_boost-1.83.0-0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:bf653000a94d1876210a2ab68010651358814234e64b6ed6852705b375284307"},
-    {file = "cmeel_boost-1.83.0-0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:85d46fff2093bb5fe1576918dbf69cc0c3f1f0f87028353687ffd8d0b3491f73"},
-    {file = "cmeel_boost-1.83.0-0-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:7d16828ee42a1da24eb91635ecb6c62948fe3689780c3eab0dd1553b0a197554"},
-    {file = "cmeel_boost-1.83.0-0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:48a1cd8150b8b605299f1a199a7ecb2d199be48e882144920ec418aba35e5fb1"},
-    {file = "cmeel_boost-1.83.0-0-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:34178d3f7733d33e226f5916120e7ac89c1d81f9ec241347cc2ccc7a6d2634e0"},
-    {file = "cmeel_boost-1.83.0-0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:2916d2befe99c641f89b63c3cc2a93e2a46c18e5dbea51494116a84a18391560"},
-    {file = "cmeel_boost-1.83.0-0-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:c7550b4990b92b3ccd83a216aab96b9567ec7d3eaa46a85d38d85b1293de5c74"},
-    {file = "cmeel_boost-1.83.0-0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:9821065b64449a79c220fac3f1f425251d3448ad78dbac72f9d8841ee0b81e0c"},
-    {file = "cmeel_boost-1.83.0-0-cp312-cp312-musllinux_1_1_aarch64.whl", hash = "sha256:4c42e100b749137ad3a652445e3b05c94f94ce86b99036b8070a41a830aa13de"},
-    {file = "cmeel_boost-1.83.0-0-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:572ac2816c4ce01509f274814692737c14748e65744493f8e639a94e0652456f"},
-    {file = "cmeel_boost-1.83.0-0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:0bd96af4b9afb53390aa74c6c60c2731075ca99b09291a87b20b858b4f3b32d9"},
-    {file = "cmeel_boost-1.83.0-0-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:604ee9e7b80677f8c9c9063c33c9fd0bc64f0417a1465509110f6422cd2c80f3"},
-    {file = "cmeel_boost-1.83.0-0-cp38-cp38-manylinux_2_28_aarch64.whl", hash = "sha256:2d45f421b8b80065e17087858ff66eabd2ece9e851d196a156924d4d7c3aadf1"},
-    {file = "cmeel_boost-1.83.0-0-cp38-cp38-manylinux_2_28_x86_64.whl", hash = "sha256:c18e2cfe01ec145799c98fe4a0d88f4658f5b7fb7442f37cb01e6875ee582c62"},
-    {file = "cmeel_boost-1.83.0-0-cp38-cp38-musllinux_1_1_aarch64.whl", hash = "sha256:6e81442aea5b3bc545ed6c0af93058e7979fc8b0ecd0e8bee71bfc30a6e835cd"},
-    {file = "cmeel_boost-1.83.0-0-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:2eff0508a15ac0fb7157e891724dd3890d75f7d97431702bf94c99b799fea9e8"},
-    {file = "cmeel_boost-1.83.0-0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:e8081fb91af18de1ce719c0f8becc700a6786cd79cc27a18bd607d52ffd9aa1d"},
-    {file = "cmeel_boost-1.83.0-0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:faa31d46653637570215f74a3effa767db72f6f66fa5388adfc5cacc86bfe668"},
-    {file = "cmeel_boost-1.83.0-0-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:5580ae636f00dec1820afe981b41234744863eff8f7b5adbbf0d38abdaa6c817"},
-    {file = "cmeel_boost-1.83.0-0-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:a3813356e2e79c693cb44fe0adfffdf66b8fa413b3d00f22ae69a9bda6bc94f7"},
-    {file = "cmeel_boost-1.83.0-0-cp39-cp39-musllinux_1_1_aarch64.whl", hash = "sha256:6a4bc6e79c7a729e7690f176b48e864d62bfd46a5ce96a8a83cdefd0f8d12bcc"},
-    {file = "cmeel_boost-1.83.0-0-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:6f6d4bd699da4c0ae6eb53cf370b480fd58a78bbbb4c28e9617d83495743e7fe"},
-    {file = "cmeel_boost-1.83.0-0-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:b10f7285d3760d287686fa7be7696b78db6c343ee9bfd36d95be11595e7a9d61"},
-    {file = "cmeel_boost-1.83.0-0-pp38-pypy38_pp73-macosx_11_0_arm64.whl", hash = "sha256:6232e593ecfda1766aca88989894bdee1b8ec663f02582cb1c2376b8253b4165"},
-    {file = "cmeel_boost-1.83.0-0-pp39-pypy39_pp73-macosx_11_0_arm64.whl", hash = "sha256:a38117059dfb42737fccab05541b1dbe8fd065948489a8c2d074b2f082930f0f"},
-    {file = "cmeel_boost-1.83.0.tar.gz", hash = "sha256:253da2e8bc52288ad1d225c1a07c93a85b60c638b24fcb7de934150908c6ec25"},
-]
-
-[package.dependencies]
-cmeel = "*"
-numpy = {version = ">=1.26.0,<1.27.0", markers = "python_version >= \"3.9\""}
-
-[[package]]
-name = "cmeel-console-bridge"
-version = "1.0.2.2"
-description = "cmeel distribution for console-bridge, A ROS-independent package for logging that seamlessly pipes into rosconsole/rosout for ROS-dependent packages."
-optional = false
-python-versions = ">= 3.7"
-files = [
-    {file = "cmeel_console_bridge-1.0.2.2-0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:16d97047ae4d732db0af48993b145bf11e6ef4d1579b29e3ed2f65ad4349d0f1"},
-    {file = "cmeel_console_bridge-1.0.2.2-1-py3-none-macosx_11_0_arm64.whl", hash = "sha256:55b10444c7f09525e93f9db406020db56d08ed023a2eb27010077db476057d6b"},
-    {file = "cmeel_console_bridge-1.0.2.2-1-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:9326a6cf1a2eda3447ddfecae92769a15df0327803c34e148090d54c95d79871"},
-    {file = "cmeel_console_bridge-1.0.2.2-1-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:ff004576e9877c4a7555aa1275e5c2cefef0a68f69f65669ff4da842bb2621bb"},
-    {file = "cmeel_console_bridge-1.0.2.2-1-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:a2d992ee22b4671d9a695b1ac2aa738a862262f78fa393c38cbaad06d8205b89"},
-    {file = "cmeel_console_bridge-1.0.2.2-1-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:d6dcc5f8eadf18cd3e3d6155ba4aadd9b45e791912659bc14e5efdda7b5c2af2"},
-    {file = "cmeel_console_bridge-1.0.2.2-2-py3-none-macosx_12_0_arm64.whl", hash = "sha256:d5ccf73b733e480bf71d0430da9c569101f5019bb97abeb397d41515085b344c"},
-    {file = "cmeel_console_bridge-1.0.2.2-2-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:e2b4b33f6c81bb935315cd8b243dcad3b151bd6da47c6dc5f46d1facfaae4d7d"},
-    {file = "cmeel_console_bridge-1.0.2.2-2-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:23cb0e37678a75778ba63444e598c41b4a694dab46037966357e81374bf4d182"},
-    {file = "cmeel_console_bridge-1.0.2.2-2-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:5933c56b6d5f4c1d1642c8088ad2c01d31bd6ec6fa8c0d2cd1683791e8242f9a"},
-    {file = "cmeel_console_bridge-1.0.2.2-2-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:375eb20ff3eb0bc7d7002e7a5b04cfdbb17ec9ed29b28e66bfe1644e9588a99c"},
-]
-
-[package.dependencies]
-cmeel = "*"
-
-[[package]]
-name = "cmeel-octomap"
-version = "1.9.8.2"
-description = "cmeel distribution for OctoMap, An Efficient Probabilistic 3D Mapping Framework Based on Octrees"
-optional = false
-python-versions = ">= 3.7"
-files = [
-    {file = "cmeel_octomap-1.9.8.2-0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:4d510a9d5766ef15af40e4e3943a5ee589ba0357cfe10b5a710e2f04b0b19f57"},
-    {file = "cmeel_octomap-1.9.8.2-0-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:21e4779766c9fa76e2cafa8c7f2a60712b0010523bfc8d51d7c8f4e2aff95267"},
-    {file = "cmeel_octomap-1.9.8.2-0-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:0003eae2cd8ce1dee194a21350a9f6e9e0b3dec89a8a6f80ab4c6ff58986276d"},
-    {file = "cmeel_octomap-1.9.8.2-0-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:f07ab209481ff5a9ad44d9d649bf3b04119e2947f9d52b16cf3e4408b7653e88"},
-    {file = "cmeel_octomap-1.9.8.2-0-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:14adc8913cf44a5b570588926d84fff440733ad0d4b8ec781269137e277cfe18"},
-    {file = "cmeel_octomap-1.9.8.2-1-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:fce38aa60c22b77396678e8f9406b98475312851a96ebf6cd654d2d60a3aa73f"},
-    {file = "cmeel_octomap-1.9.8.2-1-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:5c4671f89f1b1dd4a0e868d464ae218ad8c5fe8a120fd6b4bcfca64b4bcfc45d"},
-    {file = "cmeel_octomap-1.9.8.2-1-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:8af40226c6c82d86630f8d3093d9b2405d0a4eed1adbd79fee4cc18e19d27f96"},
-    {file = "cmeel_octomap-1.9.8.2-1-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:1477026e475da08e6a596ff640f787b445f6d61f27a2551d1a33ede1a52960e3"},
-    {file = "cmeel_octomap-1.9.8.2-2-py3-none-macosx_12_0_arm64.whl", hash = "sha256:f053dd94c1c90b70cab3eb54906893222167272ba3d5f7f24a1713a9e014beca"},
-    {file = "cmeel_octomap-1.9.8.2-2-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:ca93c09b0fcd3a5830b1238235599adad22cce8630771b33bf318507ab564efc"},
-    {file = "cmeel_octomap-1.9.8.2-2-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:175aa7e03c0d0e7beaa4fe4f7ea7c89e55165ddf7668c470687f369889c7481c"},
-    {file = "cmeel_octomap-1.9.8.2-2-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:18886ebeb30e3355efef4321bee31f8eab93dfb4745aaf2ccd0e7effeab117cb"},
-    {file = "cmeel_octomap-1.9.8.2-2-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:b5f986f3c6b18306769f441d7f1667023ac847bd79f90cab549596313b2bf780"},
-]
-
-[package.dependencies]
-cmeel = "*"
-
-[[package]]
-name = "cmeel-qhull"
-version = "8.0.2.1"
-description = "cmeel distribution for qhull: Convex hull, Delaunay triangulation, Voronoi diagrams, Halfspace intersection"
-optional = false
-python-versions = ">= 3.8"
-files = [
-    {file = "cmeel_qhull-8.0.2.1-0-py3-none-macosx_12_0_arm64.whl", hash = "sha256:39f5183a6e026754c3c043239bac005bf1825240d72e1d8fdf090a0f3ea27307"},
-    {file = "cmeel_qhull-8.0.2.1-0-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:f135c5a4f4c8ed53f061bc86b794aaca2c0c34761c9269c06b71329c9da56f82"},
-    {file = "cmeel_qhull-8.0.2.1-0-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:17f519106df79aed9fc5ec92833d4958d132d23021f02a78a9564cdf83a36c7c"},
-    {file = "cmeel_qhull-8.0.2.1-0-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:c513abafa40e2b8eb7cd3640e3f92d5391fbd6ec0f4182dbf9536934d8a8ea3e"},
-    {file = "cmeel_qhull-8.0.2.1-0-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:20a69cb34b6250aee1f018412989734c9ddcad6ff66717a7c5516fc19f55d5ff"},
-    {file = "cmeel_qhull-8.0.2.1.tar.gz", hash = "sha256:68e8d41d95f61830f2d460af1e4d760f0dbe4d46413d7c736f0ed701153ebe52"},
-]
-
-[package.dependencies]
-cmeel = "*"
-
-[[package]]
-name = "cmeel-tinyxml"
-version = "2.6.2.3"
-description = "cmeel distribution for TinyXML, an obsolete thing."
-optional = false
-python-versions = ">= 3.8"
-files = [
-    {file = "cmeel_tinyxml-2.6.2.3-0-py3-none-macosx_12_0_arm64.whl", hash = "sha256:7fdf4df7abbb2a6bd48cddf2c103477110eb48caed92d4a4d8ac98c75ee53c89"},
-    {file = "cmeel_tinyxml-2.6.2.3-0-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:e69044b68d1f9c2597169a4099ae95a2e33cdbf98b5061c3ffafad4b9eed9c27"},
-    {file = "cmeel_tinyxml-2.6.2.3-0-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:ecb6107a6777b5bc0339b8f7fb4a76c95958648382244ac44e278a3a05db37df"},
-    {file = "cmeel_tinyxml-2.6.2.3-0-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:fe4bddefce9832c2c5f6e75c1d8af2b8282127180eb3f2aecbd02f5f152bad94"},
-    {file = "cmeel_tinyxml-2.6.2.3-0-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:fe088221f78ad7d35fbeb828ecb17709d20f60b68c0dcfef6f7d86ec6a57ee9b"},
-    {file = "cmeel_tinyxml-2.6.2.3.tar.gz", hash = "sha256:7404308e7a578df4d480223fbe4ff867563e267ef69c95d65b6dd28e42661ef2"},
-]
-
-[package.dependencies]
-cmeel = "*"
-
-[[package]]
-name = "cmeel-urdfdom"
-version = "3.1.1.1"
-description = "cmeel distribution for urdfdom, URDF parser"
-optional = false
-python-versions = ">= 3.8"
-files = [
-    {file = "cmeel_urdfdom-3.1.1.1-0-py3-none-macosx_12_0_arm64.whl", hash = "sha256:354a44dce4692d19af61487ced4ee279b06fcc34fad8184c404ce91c41c73b67"},
-    {file = "cmeel_urdfdom-3.1.1.1-0-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:7b4386a2d8db65208fd722cc11959bd5f42dd19b0c2caba361e315517d6513ab"},
-    {file = "cmeel_urdfdom-3.1.1.1-0-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:42faf8a6e7437a7c03e38dad07a65cace8bf77aa594acc58f87726178802771d"},
-    {file = "cmeel_urdfdom-3.1.1.1-0-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:83eafe0e494cd285b3a57805c72b12500d906586ff93a57a03d09a87d25ec62d"},
-    {file = "cmeel_urdfdom-3.1.1.1-0-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:646dde19c61029ef1ccd9be39b301a6d0642516a159a2bbd9441a9590d3c97f4"},
-    {file = "cmeel_urdfdom-3.1.1.1.tar.gz", hash = "sha256:c37c2c4627593e8a6955421d83e3c4d592d6a18276ecefed95eefad0cd82251f"},
-]
-
-[package.dependencies]
-cmeel = "*"
-cmeel-console-bridge = "*"
-cmeel-tinyxml = "*"
-
-[package.extras]
-build = ["cmeel-urdfdom-headers"]
-
-[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -985,50 +795,6 @@ files = [
 ]
 
 [[package]]
-name = "eigenpy"
-version = "3.1.4"
-description = "Bindings between Numpy and Eigen using Boost.Python"
-optional = false
-python-versions = ">= 3.8"
-files = [
-    {file = "eigenpy-3.1.4-0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:6c32eaef7f47d589662839e9c8fb014d378e60cbe0918bb4421bc6055c76553e"},
-    {file = "eigenpy-3.1.4-0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ffb5b681c8b4253c87a1e8398f7e85f96fcf252257da860ce06b16cd89804818"},
-    {file = "eigenpy-3.1.4-0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:442225433adbf6e917a9e1b028f9300ac7bbe9b4b80194b475aa5659bf849c2f"},
-    {file = "eigenpy-3.1.4-0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:ceb6cecaa074e89a0e25aa9f3400d7be01e129e038d72bd763512f0ebd97b357"},
-    {file = "eigenpy-3.1.4-0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:559a88bc3d02ea4dd37db43fc0958dbe79b9ea0161f881f09c0e13f722148e17"},
-    {file = "eigenpy-3.1.4-0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:f37e29846a690303377c772b097648d312a322a2f14b2b285aaafed893e90647"},
-    {file = "eigenpy-3.1.4-0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:e243cfcdef9a3229251ce60eb57688b593ecc3d974be63918bb5b31ea1d4e4db"},
-    {file = "eigenpy-3.1.4-0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:212fb018733ea0dbc2f64a90f53513cf440cab4411ba718210c2b04888b87ad2"},
-    {file = "eigenpy-3.1.4-0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:e948b1b2bf6efe7bad92164f537991005ca61f1892b7504f7a58926505189b9a"},
-    {file = "eigenpy-3.1.4-0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:a9e979d6ccab156bcae8cf9e9732aa3526ab3bb6dc96b079fca14476c9e91d29"},
-    {file = "eigenpy-3.1.4-0-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:88824d7fa10856b7cfe070de1b965e045c7d1ce34c0ab7bd1f8d60b6b103b85e"},
-    {file = "eigenpy-3.1.4-0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:36ebb388970df4d83d8d3bfcfaa9aaa059de92a9dba0f2ef95bb22cef819b78a"},
-    {file = "eigenpy-3.1.4-0-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:2c73ba471e1ae4e32243271851cc8b93d32904193237e78025a738f38ceba6db"},
-    {file = "eigenpy-3.1.4-0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:6624a5a0186c9891c14bb4cd4a9216c7f61487a71810d0898ca3ddb0a1b21598"},
-    {file = "eigenpy-3.1.4-0-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:53ed2f58b17e9974b28125274a6bee9a5cfd9e9aa50029006a85a1f5acf73c3c"},
-    {file = "eigenpy-3.1.4-0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:64fe93a7094d5cf00e149dd272d4aa5be98ba6079272e9f63551da85e766ca27"},
-    {file = "eigenpy-3.1.4-0-cp38-cp38-manylinux_2_28_aarch64.whl", hash = "sha256:9ce6f812a1d995cffad6a6586f331cf354c30417df78d486d4856922ecfe952f"},
-    {file = "eigenpy-3.1.4-0-cp38-cp38-manylinux_2_28_x86_64.whl", hash = "sha256:c4a936a1305a508b1cc9a284793540f6a0ffd3d2a7a33da25efbd0a0996a9444"},
-    {file = "eigenpy-3.1.4-0-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:f720e98b00610d83ed7ff27eda73e5b89293518876b4a6f98486d6ad5fd50a31"},
-    {file = "eigenpy-3.1.4-0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:f9cb9b5c1b8347fb590657d3f5409ecc8967618ce6a835672122bada368a3872"},
-    {file = "eigenpy-3.1.4-0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:cfe743ca10d38bb77a893617cdefb234afa93922336615161ec585796fe89159"},
-    {file = "eigenpy-3.1.4-0-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:9182a552f13893ecfab1076ed2c3502fbe30a85798c7930dc2087fd11744739b"},
-    {file = "eigenpy-3.1.4-0-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:8c2df0818b3f7a604ee7af007568d45e6d4bca1fcb4fb1ea84d2160b371e7e7c"},
-    {file = "eigenpy-3.1.4-0-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:145fcf706e3a98c87513eb4b1f14eabf4b145d0b1d2f6f8c47d7bd5652d54aeb"},
-    {file = "eigenpy-3.1.4-0-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:cbeed7a05e63fe31fb48dbd8baf6be0caf8584d6f419d6a6b126ab15664db555"},
-    {file = "eigenpy-3.1.4-0-pp38-pypy38_pp73-macosx_11_0_arm64.whl", hash = "sha256:1557c707b81a4f1da00aad6770f5735e76fc5fb2e1942af61aab55cac9e7ac0f"},
-    {file = "eigenpy-3.1.4-0-pp39-pypy39_pp73-macosx_11_0_arm64.whl", hash = "sha256:319180aca2c8c49dcd06723865cb952a021e04973a2e87ae6072730a1236d5df"},
-    {file = "eigenpy-3.1.4.tar.gz", hash = "sha256:91b3ec01e11de8aec76cfdf95433cfea60a24c1f5769c9c600edf1fc072454c1"},
-]
-
-[package.dependencies]
-cmeel = "*"
-cmeel-boost = ">=1.83.0,<1.84.0"
-
-[package.extras]
-build = ["cmeel-eigen (>=3.4.0.2)"]
-
-[[package]]
 name = "exceptiongroup"
 version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -1200,47 +966,6 @@ files = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
     {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
 ]
-
-[[package]]
-name = "hpp-fcl"
-version = "2.4.0"
-description = "An extension of the Flexible Collision Library"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "hpp_fcl-2.4.0-0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:8e2f1b45691ec464ed6cca754cb0ee5e51fbee455159bf1ebdc0f2209ed60560"},
-    {file = "hpp_fcl-2.4.0-0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:a1108f298c977e8e4fff977cd84f0d8d7155f71861bb7e0ce969d57752d86873"},
-    {file = "hpp_fcl-2.4.0-0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:5b000d4f99498214106c7addc97affbfada334bc3de15fc24d9b47ee6e5fecf4"},
-    {file = "hpp_fcl-2.4.0-0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:9e520b3a51986ab256459f2e67cb26e2d0fa50f88280e0e0390ceceb0b63703b"},
-    {file = "hpp_fcl-2.4.0-0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:1faaf2c90d4218e8aee0c504d5c38ca23826ba003db2c53686768f55c8fd094f"},
-    {file = "hpp_fcl-2.4.0-0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:51ce9114a7203d3cdfc35b721f153a4a11f4ace5f0f7660b55d12795d40d7809"},
-    {file = "hpp_fcl-2.4.0-0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:882f16e5028ebbe7ae0b94639cf6fa8bb53f806d48469406641c6a88d9633e8a"},
-    {file = "hpp_fcl-2.4.0-0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:4c2b793c1b4828dad192d0bedaee26f1242b1a42b12c313de0b79c70ef58aafd"},
-    {file = "hpp_fcl-2.4.0-0-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:6873e5af559bf0229eb9ebe4590fb603f282fe90aa03daae2703bf02391d0487"},
-    {file = "hpp_fcl-2.4.0-0-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:840573523af4d0680d04908bfb8e9c64f83bac24a6648566b263503ee0c763cd"},
-    {file = "hpp_fcl-2.4.0-0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:372ffa1d43c34c1511c61c02b1b03ad5c6860f288f118967616f65965b1f3670"},
-    {file = "hpp_fcl-2.4.0-0-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:a70e1f1edc3470d97ce8bc57baae4d4723e014b9f97ea639c0fc9944607b1f37"},
-    {file = "hpp_fcl-2.4.0-0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:d458a97e0799c5ee263a364446e0830fd7447a62301cdb80bd99ec8c6ed16cdd"},
-    {file = "hpp_fcl-2.4.0-0-cp38-cp38-manylinux_2_28_aarch64.whl", hash = "sha256:d1a4f51b9a3a49edba05d1ecc4fb735478a9c0be88f1994dc21c52c6b26539e0"},
-    {file = "hpp_fcl-2.4.0-0-cp38-cp38-manylinux_2_28_x86_64.whl", hash = "sha256:208c8257a05d7e8739bdcb08673f7d777bbf663d6d9a14c35b9011a926b38534"},
-    {file = "hpp_fcl-2.4.0-0-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:7e4cc472c50d8f7fbc7032b5eab81ad6262995e87e16546c82544e2625bf59ab"},
-    {file = "hpp_fcl-2.4.0-0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:b105f2e5d258f18dd9e21615a70501b7ec2d103ac6642afe0663b6e79cea411d"},
-    {file = "hpp_fcl-2.4.0-0-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:3fecc67be69737f465f3ec1ec9eef2b068385a26e0e8a02596b4a703cd18418e"},
-    {file = "hpp_fcl-2.4.0-0-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:ff5ef559bbd3412fe8053c33919bfe46b65a101d4a037570f86f99352185dd2d"},
-    {file = "hpp_fcl-2.4.0-0-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:a4c081e07247ef7143973dbd704bdf198d71e5c0f719f67d089fd043d5432874"},
-    {file = "hpp_fcl-2.4.0.tar.gz", hash = "sha256:0bdb835326703e67e89dca473767b39a5d346ec569372eb6200c428f6d6a137c"},
-]
-
-[package.dependencies]
-cmeel = "*"
-cmeel-assimp = ">=5.3.1,<6"
-cmeel-boost = ">=1.83.0,<1.84.0"
-cmeel-octomap = ">=1.9.8.2,<2"
-cmeel-qhull = ">=8.0.2.1,<8.0.3"
-eigenpy = ">=3.1,<4"
-
-[package.extras]
-build = ["eigenpy[build] (>=3.1,<4)"]
 
 [[package]]
 name = "hsluv"
@@ -2385,13 +2110,13 @@ testing = ["docopt", "pytest (<6.0.0)"]
 
 [[package]]
 name = "pathspec"
-version = "0.11.2"
+version = "0.12.0"
 description = "Utility library for gitignore style pattern matching of file paths."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "pathspec-0.11.2-py3-none-any.whl", hash = "sha256:1d6ed233af05e679efb96b1851550ea95bbb64b7c490b0f5aa52996c11e92a20"},
-    {file = "pathspec-0.11.2.tar.gz", hash = "sha256:e0d8d0ac2f12da61956eb2306b69f9469b42f4deb0f3cb6ed47b9cce9996ced3"},
+    {file = "pathspec-0.12.0-py3-none-any.whl", hash = "sha256:f1f8a7eab698c357945c85ed79715e014612b8584faebe209dca4558e2b09513"},
+    {file = "pathspec-0.12.0.tar.gz", hash = "sha256:c57e16065a97b7beb175f13c84d27cb05f7b7315741c2fbd5de541042f4ea6e1"},
 ]
 
 [[package]]
@@ -2476,47 +2201,6 @@ docs = ["furo", "olefile", "sphinx (>=2.4)", "sphinx-copybutton", "sphinx-inline
 tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout"]
 
 [[package]]
-name = "pin"
-version = "2.6.21"
-description = "A fast and flexible implementation of Rigid Body Dynamics algorithms and their analytical derivatives"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "pin-2.6.21-1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:e671bbdefef2397c10ccc388a1324c81b6a5d6868c5c68360925214429aa93c1"},
-    {file = "pin-2.6.21-1-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:71d80895b415c7ca0b30e77499edef3d92d51b13a1a46c4f6808cc5e4baec337"},
-    {file = "pin-2.6.21-1-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:3e7471cb4caa5db146e84e9328bb64117e7aecb8da7da42e1f259f8202ee48fd"},
-    {file = "pin-2.6.21-1-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:bab941082e6670b05034d5600811e0a54cba2b3cc7568befadae5262cc6f6f92"},
-    {file = "pin-2.6.21-1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:25729d5c04840be10fca3cc096db105fa9250a8e244ff28c41ea5aed82689275"},
-    {file = "pin-2.6.21-1-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:b5e2aa988c2a1de3f82043d36e2b54e5960da47b16e5fd5daee6815d7ed07e18"},
-    {file = "pin-2.6.21-1-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:6c2cd3f8897e3f11a0327358b80cb4cf986b68ca45c06ce7cd39423899ae6fba"},
-    {file = "pin-2.6.21-1-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:218daebcdf4f314639ef542bc08d2fb05d451fde16510fd5a9576623030dbea4"},
-    {file = "pin-2.6.21-1-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:9a424257938d419056e3937d3b1a2c7d291f0de8b8d38c7d241962a859f36e9b"},
-    {file = "pin-2.6.21-1-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:ea206d1f48d38abcbf774ebe8b0fdd35a35c5ee3ab7237f0b6da3ed268939ccb"},
-    {file = "pin-2.6.21-1-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:e99c30ce16dff93a81ea3b2fdb200085976f0310e948e38d61713fd3940dc044"},
-    {file = "pin-2.6.21-1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:86f4654ae9f3d28a17c251eda06b1d786dbe4a49b5676dc94232325e20f52de3"},
-    {file = "pin-2.6.21-1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:2ef4af1321718b80c4984e594f1d82a724282d21a916750513949e56801e1517"},
-    {file = "pin-2.6.21-1-cp38-cp38-manylinux_2_28_aarch64.whl", hash = "sha256:ca535e9a80ec44f138b5a28561f41675e302e009897e7dd54fcc05eda641ba50"},
-    {file = "pin-2.6.21-1-cp38-cp38-manylinux_2_28_x86_64.whl", hash = "sha256:6f703536dc116745a40fb9ac96fee992c71b8e8a151f927854bd272ee1647d73"},
-    {file = "pin-2.6.21-1-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:dc3078acb388392b376b539d3207a620dc9b5854586f9faf60a34230b4917695"},
-    {file = "pin-2.6.21-1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:6706d0dc5385846c6c611ff6604237fcd8c41b0efef54dea2afba234fe009220"},
-    {file = "pin-2.6.21-1-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:3c85d78ecc066690e97e3449702bf856f8e7de1a3a88001c888cc2029df23a8d"},
-    {file = "pin-2.6.21-1-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:e641e15086c14e5803d76c1698b99973ff2239b90e58bfa7bbfc094a21f15858"},
-    {file = "pin-2.6.21-1-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:389b68b307e55e97f45ca0972e86731b4b71af39e8ba0c71c4fe878dca8a5d8d"},
-    {file = "pin-2.6.21.tar.gz", hash = "sha256:a3b06eb1ab54695431185699b9d068e388f2d7d958ec02f3910111f0da6f1fc2"},
-]
-
-[package.dependencies]
-cmeel = "*"
-cmeel-boost = ">=1.83.0,<1.84.0"
-cmeel-console-bridge = ">=1.0.2.2,<2"
-cmeel-tinyxml = ">=2.6.2.2,<3"
-cmeel-urdfdom = ">=3.1.0.3,<4"
-hpp-fcl = ">=2.3.4,<4"
-
-[package.extras]
-build = ["cmeel-urdfdom[build] (>=3.1.0.3,<4)", "hpp-fcl[build] (>=2.3.4,<4)"]
-
-[[package]]
 name = "platformdirs"
 version = "4.1.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -2562,13 +2246,13 @@ numpy = ">=1.17"
 
 [[package]]
 name = "pre-commit"
-version = "3.5.0"
+version = "3.6.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "pre_commit-3.5.0-py2.py3-none-any.whl", hash = "sha256:841dc9aef25daba9a0238cd27984041fa0467b4199fc4852e27950664919f660"},
-    {file = "pre_commit-3.5.0.tar.gz", hash = "sha256:5804465c675b659b0862f07907f96295d490822a450c4c40e747d0b1c6ebcb32"},
+    {file = "pre_commit-3.6.0-py2.py3-none-any.whl", hash = "sha256:c255039ef399049a5544b6ce13d135caba8f2c28c3b4033277a788f434308376"},
+    {file = "pre_commit-3.6.0.tar.gz", hash = "sha256:d30bad9abf165f7785c15a21a1f46da7d0677cb00ee7ff4c579fd38922efe15d"},
 ]
 
 [package.dependencies]
@@ -3680,13 +3364,13 @@ files = [
 
 [[package]]
 name = "tifffile"
-version = "2023.9.26"
+version = "2023.12.9"
 description = "Read and write TIFF files"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "tifffile-2023.9.26-py3-none-any.whl", hash = "sha256:1de47fa945fddaade256e25ad4f375ae65547f3c1354063aded881c32a64cf89"},
-    {file = "tifffile-2023.9.26.tar.gz", hash = "sha256:67e355e4595aab397f8405d04afe1b4ae7c6f62a44e22d933fee1a571a48c7ae"},
+    {file = "tifffile-2023.12.9-py3-none-any.whl", hash = "sha256:9b066e4b1a900891ea42ffd33dab8ba34c537935618b9893ddef42d7d422692f"},
+    {file = "tifffile-2023.12.9.tar.gz", hash = "sha256:9dd1da91180a6453018a241ff219e1905f169384355cd89c9ef4034c1b46cdb8"},
 ]
 
 [package.dependencies]
@@ -4202,4 +3886,4 @@ multiview = ["cosypose"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "63f47fe8eb04204b0405828b4cf16d84bdc686f285e2587bca330a83beefa6e6"
+content-hash = "68af3576e697fc309df5b1f9cd06299320ede3bed2461dccafc0b72af690a205"
