@@ -2147,54 +2147,6 @@ numpy = ">=1.18.0"
 werkzeug = ">=2.2.3"
 
 [[package]]
-name = "opencv-contrib-python"
-version = "4.8.1.78"
-description = "Wrapper package for OpenCV python bindings."
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "opencv-contrib-python-4.8.1.78.tar.gz", hash = "sha256:81804332299d656905d4f404fcec5f400d692c652d7a47926b7a441272ce795b"},
-    {file = "opencv_contrib_python-4.8.1.78-cp37-abi3-macosx_10_16_x86_64.whl", hash = "sha256:8d97192471c7d42532103ecebf8ad9d9534b7cd655ffadbccacb9ff3d4d49b40"},
-    {file = "opencv_contrib_python-4.8.1.78-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:8d6feb39d4af2cd1e8919110229bfedd13d4798a089bbe88fbd1a001b664d552"},
-    {file = "opencv_contrib_python-4.8.1.78-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6cad1720ac701cb3742f48f95bef5cfa288b916b6ac5700f63d5809e3ad5999e"},
-    {file = "opencv_contrib_python-4.8.1.78-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3fb62bc5967a79bce7c576ef94dea0b9172e52bab91630103e042cb5f29a148a"},
-    {file = "opencv_contrib_python-4.8.1.78-cp37-abi3-win32.whl", hash = "sha256:f8737cf3055a6156c66c75432ed28ee3c1d52532b17d91ed73d508ae351b3e66"},
-    {file = "opencv_contrib_python-4.8.1.78-cp37-abi3-win_amd64.whl", hash = "sha256:377936b02dcf82dc70261101381a8ad82b03d1298f185886be298d74fe35c328"},
-]
-
-[package.dependencies]
-numpy = [
-    {version = ">=1.21.0", markers = "python_version == \"3.9\" and platform_system == \"Darwin\" and platform_machine == \"arm64\""},
-    {version = ">=1.21.4", markers = "python_version >= \"3.10\" and platform_system == \"Darwin\""},
-    {version = ">=1.21.2", markers = "platform_system != \"Darwin\" and python_version >= \"3.10\""},
-    {version = ">=1.19.3", markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\" and python_version >= \"3.8\" and python_version < \"3.10\" or python_version > \"3.9\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_system != \"Darwin\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_machine != \"arm64\" and python_version < \"3.10\""},
-]
-
-[[package]]
-name = "opencv-python"
-version = "4.8.1.78"
-description = "Wrapper package for OpenCV python bindings."
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "opencv-python-4.8.1.78.tar.gz", hash = "sha256:cc7adbbcd1112877a39274106cb2752e04984bc01a031162952e97450d6117f6"},
-    {file = "opencv_python-4.8.1.78-cp37-abi3-macosx_10_16_x86_64.whl", hash = "sha256:91d5f6f5209dc2635d496f6b8ca6573ecdad051a09e6b5de4c399b8e673c60da"},
-    {file = "opencv_python-4.8.1.78-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:bc31f47e05447da8b3089faa0a07ffe80e114c91ce0b171e6424f9badbd1c5cd"},
-    {file = "opencv_python-4.8.1.78-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9814beca408d3a0eca1bae7e3e5be68b07c17ecceb392b94170881216e09b319"},
-    {file = "opencv_python-4.8.1.78-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c4c406bdb41eb21ea51b4e90dfbc989c002786c3f601c236a99c59a54670a394"},
-    {file = "opencv_python-4.8.1.78-cp37-abi3-win32.whl", hash = "sha256:a7aac3900fbacf55b551e7b53626c3dad4c71ce85643645c43e91fcb19045e47"},
-    {file = "opencv_python-4.8.1.78-cp37-abi3-win_amd64.whl", hash = "sha256:b983197f97cfa6fcb74e1da1802c7497a6f94ed561aba6980f1f33123f904956"},
-]
-
-[package.dependencies]
-numpy = [
-    {version = ">=1.21.0", markers = "python_version == \"3.9\" and platform_system == \"Darwin\" and platform_machine == \"arm64\""},
-    {version = ">=1.21.4", markers = "python_version >= \"3.10\" and platform_system == \"Darwin\""},
-    {version = ">=1.21.2", markers = "platform_system != \"Darwin\" and python_version >= \"3.10\""},
-    {version = ">=1.19.3", markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\" and python_version >= \"3.8\" and python_version < \"3.10\" or python_version > \"3.9\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_system != \"Darwin\" and python_version < \"3.10\" or python_version >= \"3.9\" and platform_machine != \"arm64\" and python_version < \"3.10\""},
-]
-
-[[package]]
 name = "outcome"
 version = "1.3.0.post0"
 description = "Capture the outcome of Python function calls."
@@ -2385,13 +2337,13 @@ testing = ["docopt", "pytest (<6.0.0)"]
 
 [[package]]
 name = "pathspec"
-version = "0.11.2"
+version = "0.12.0"
 description = "Utility library for gitignore style pattern matching of file paths."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "pathspec-0.11.2-py3-none-any.whl", hash = "sha256:1d6ed233af05e679efb96b1851550ea95bbb64b7c490b0f5aa52996c11e92a20"},
-    {file = "pathspec-0.11.2.tar.gz", hash = "sha256:e0d8d0ac2f12da61956eb2306b69f9469b42f4deb0f3cb6ed47b9cce9996ced3"},
+    {file = "pathspec-0.12.0-py3-none-any.whl", hash = "sha256:f1f8a7eab698c357945c85ed79715e014612b8584faebe209dca4558e2b09513"},
+    {file = "pathspec-0.12.0.tar.gz", hash = "sha256:c57e16065a97b7beb175f13c84d27cb05f7b7315741c2fbd5de541042f4ea6e1"},
 ]
 
 [[package]]
@@ -2562,13 +2514,13 @@ numpy = ">=1.17"
 
 [[package]]
 name = "pre-commit"
-version = "3.5.0"
+version = "3.6.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "pre_commit-3.5.0-py2.py3-none-any.whl", hash = "sha256:841dc9aef25daba9a0238cd27984041fa0467b4199fc4852e27950664919f660"},
-    {file = "pre_commit-3.5.0.tar.gz", hash = "sha256:5804465c675b659b0862f07907f96295d490822a450c4c40e747d0b1c6ebcb32"},
+    {file = "pre_commit-3.6.0-py2.py3-none-any.whl", hash = "sha256:c255039ef399049a5544b6ce13d135caba8f2c28c3b4033277a788f434308376"},
+    {file = "pre_commit-3.6.0.tar.gz", hash = "sha256:d30bad9abf165f7785c15a21a1f46da7d0677cb00ee7ff4c579fd38922efe15d"},
 ]
 
 [package.dependencies]
@@ -3680,13 +3632,13 @@ files = [
 
 [[package]]
 name = "tifffile"
-version = "2023.9.26"
+version = "2023.12.9"
 description = "Read and write TIFF files"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "tifffile-2023.9.26-py3-none-any.whl", hash = "sha256:1de47fa945fddaade256e25ad4f375ae65547f3c1354063aded881c32a64cf89"},
-    {file = "tifffile-2023.9.26.tar.gz", hash = "sha256:67e355e4595aab397f8405d04afe1b4ae7c6f62a44e22d933fee1a571a48c7ae"},
+    {file = "tifffile-2023.12.9-py3-none-any.whl", hash = "sha256:9b066e4b1a900891ea42ffd33dab8ba34c537935618b9893ddef42d7d422692f"},
+    {file = "tifffile-2023.12.9.tar.gz", hash = "sha256:9dd1da91180a6453018a241ff219e1905f169384355cd89c9ef4034c1b46cdb8"},
 ]
 
 [package.dependencies]
@@ -3969,13 +3921,13 @@ wsproto = ">=0.14"
 
 [[package]]
 name = "typing-extensions"
-version = "4.8.0"
+version = "4.9.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "typing_extensions-4.8.0-py3-none-any.whl", hash = "sha256:8f92fc8806f9a6b641eaa5318da32b44d401efaac0f6678c9bc448ba3605faa0"},
-    {file = "typing_extensions-4.8.0.tar.gz", hash = "sha256:df8e4339e9cb77357558cbdbceca33c303714cf861d1eef15e1070055ae8b7ef"},
+    {file = "typing_extensions-4.9.0-py3-none-any.whl", hash = "sha256:af72aea155e91adfc61c3ae9e0e342dbc0cba726d6cba4b6c72c1f34e47291cd"},
+    {file = "typing_extensions-4.9.0.tar.gz", hash = "sha256:23478f88c37f27d76ac8aee6c905017a143b0b1b886c3c9f66bc2fd94f9f5783"},
 ]
 
 [[package]]
@@ -4202,4 +4154,4 @@ multiview = ["cosypose"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "63f47fe8eb04204b0405828b4cf16d84bdc686f285e2587bca330a83beefa6e6"
+content-hash = "703b6745929b484af4929b6588e414f050c699b219391d6f8664807c715cc46e"
