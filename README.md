@@ -39,7 +39,7 @@ git clone --branch dev --recurse-submodules https://github.com/agimus-project/ha
 cd happypose
 python -m venv .venv
 source .venv/bin/activate
-pip install .[cpu] --extra-index-url https://download.pytorch.org/whl/cpu
+pip install .[pypi,cpu] --extra-index-url https://download.pytorch.org/whl/cpu
 ```
 
 ### Install extras:
