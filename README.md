@@ -45,8 +45,10 @@ pip install .[pypi,cpu] --extra-index-url https://download.pytorch.org/whl/cpu
 ### Install extras:
 
 - `cpu`: required to get pytorch CPU from PyPI (don't use this for GPU or with conda)
+- `gpu`: required to get pytorch GPU from PyPI (don't use this for CPU or with conda)
 - `evaluation`: installs bop_toolkit
 - `multiview`: installs cosypose c++ extension
+- `pypi`: install pinocchio & opncv from PyPI (don't use this with conda)
 
 ## Create data directory
 
