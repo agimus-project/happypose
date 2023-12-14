@@ -369,7 +369,7 @@ class DownloadClient:
     async def download_dir(self, download_path, local_path, flags):
         try:
             r = await self.client.get(download_path)
-        except httpx.PoolTimeout:
+        except (httpx.PoolTimeout, httpx.ReadTimeout):
             logger.error(f"Failed {download_path} with timeout")
             return
         if r.status_code != 200:
