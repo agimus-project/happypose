@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import logging
 import os
+import random
 import re
 import zipfile
 from pathlib import Path
@@ -20,6 +21,8 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 MIRRORS = {
+    "wired": "https://aws-w.saurel.me/",
+    "eduroam": "https://aws.saurel.me/",
     "inria": "https://www.paris.inria.fr/archive_ylabbeprojectsdata/",
     "laas": "https://gepettoweb.laas.fr/data/happypose/",
     "bop": "https://bop.felk.cvut.cz/media/data/bop_datasets/",
@@ -349,7 +352,11 @@ class DownloadClient:
 
         for mirror in self.mirrors:
             dl = mirror + download_path
-            head = await self.client.head(dl)
+            try:
+                await asyncio.sleep(random.randint(1, 5))
+                head = await self.client.head(dl)
+            except (httpx.PoolTimeout, httpx.ReadTimeout, httpx.ConnectTimeout):
+                continue
             if head.is_success or head.is_redirect:
                 download_path = dl
                 break
@@ -368,9 +375,10 @@ class DownloadClient:
 
     async def download_dir(self, download_path, local_path, flags):
         try:
+            await asyncio.sleep(random.randint(1, 5))
             r = await self.client.get(download_path)
-        except (httpx.PoolTimeout, httpx.ReadTimeout):
-            logger.error(f"Failed {download_path} with timeout")
+        except (httpx.PoolTimeout, httpx.ReadTimeout, httpx.ConnectTimeout):
+            logger.error(f"Failed {download_path} with GET timeout")
             return
         if r.status_code != 200:
             logger.error(f"Failed {download_path} with code {r.status_code}")
@@ -379,8 +387,10 @@ class DownloadClient:
         soup = BeautifulSoup(r.content, "html.parser")
         logger.info(f"Copying {download_path} to {local_path}")
 
-        for link in soup.find_all("a")[5:]:
+        for link in soup.find_all("a"):
             href: str = link.get("href")
+            if any(href.startswith(wrong) for wrong in ["?", ".."]):
+                continue
             if not flags.flags_managing(href):
                 continue
             if href.endswith("/"):
@@ -397,7 +407,12 @@ class DownloadClient:
         if local_path.exists():
             # logger.info(f"Existing {download_path=}")
             local_size = local_path.stat().st_size
-            head = await self.client.head(download_path)
+            try:
+                await asyncio.sleep(random.randint(1, 5))
+                head = await self.client.head(download_path)
+            except (httpx.PoolTimeout, httpx.ReadTimeout, httpx.ConnectTimeout):
+                logger.error(f"Failed {download_path} with HEAD timeout")
+                return
             if "content-length" in head.headers:
                 if local_size == int(head.headers["content-length"]):
                     logger.info(f"Skipping {download_path} already fully downloaded")
@@ -407,24 +422,31 @@ class DownloadClient:
         logger.info(f"Copying {download_path} to {local_path}")
         local_path.parent.mkdir(parents=True, exist_ok=True)
         with local_path.open("wb") as f:
-            async with self.client.stream("GET", download_path) as r:
-                total = None
-                if "Content-Length" in r.headers:
-                    total = int(r.headers["Content-Length"])
-                with tqdm(
-                    desc=local_path.name,
-                    total=total,
-                    unit_scale=True,
-                    unit_divisor=1024,
-                    unit="B",
-                ) as progress:
-                    num_bytes_downloaded = r.num_bytes_downloaded
-                    async for chunk in r.aiter_bytes():
-                        f.write(chunk)
-                        progress.update(r.num_bytes_downloaded - num_bytes_downloaded)
+            try:
+                await asyncio.sleep(random.randint(5, 20))
+                async with self.client.stream("GET", download_path) as r:
+                    total = None
+                    if "Content-Length" in r.headers:
+                        total = int(r.headers["Content-Length"])
+                    with tqdm(
+                        desc=local_path.name,
+                        total=total,
+                        unit_scale=True,
+                        unit_divisor=1024,
+                        unit="B",
+                    ) as progress:
                         num_bytes_downloaded = r.num_bytes_downloaded
-            if r.status_code != 200:
-                logger.error(f"Failed {download_path} with code {r.status_code}")
+                        async for chunk in r.aiter_bytes():
+                            f.write(chunk)
+                            progress.update(
+                                r.num_bytes_downloaded - num_bytes_downloaded
+                            )
+                            num_bytes_downloaded = r.num_bytes_downloaded
+                if r.status_code != 200:
+                    logger.error(f"Failed {download_path} with code {r.status_code}")
+                    return
+            except (httpx.PoolTimeout, httpx.ReadTimeout, httpx.ConnectTimeout):
+                logger.error(f"Failed {download_path} with stream timeout")
                 return
 
 
