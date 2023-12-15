@@ -21,8 +21,6 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 MIRRORS = {
-    "wired": "https://aws-w.saurel.me/",
-    "eduroam": "https://aws.saurel.me/",
     "inria": "https://www.paris.inria.fr/archive_ylabbeprojectsdata/",
     "laas": "https://gepettoweb.laas.fr/data/happypose/",
     "bop": "https://bop.felk.cvut.cz/media/data/bop_datasets/",
@@ -353,7 +351,7 @@ class DownloadClient:
         for mirror in self.mirrors:
             dl = mirror + download_path
             try:
-                await asyncio.sleep(random.randint(1, 5))
+                await asyncio.sleep(random.uniform(0, 3))
                 head = await self.client.head(dl)
             except (httpx.PoolTimeout, httpx.ReadTimeout, httpx.ConnectTimeout):
                 continue
@@ -375,7 +373,7 @@ class DownloadClient:
 
     async def download_dir(self, download_path, local_path, flags):
         try:
-            await asyncio.sleep(random.randint(1, 5))
+            await asyncio.sleep(random.uniform(0, 3))
             r = await self.client.get(download_path)
         except (httpx.PoolTimeout, httpx.ReadTimeout, httpx.ConnectTimeout):
             logger.error(f"Failed {download_path} with GET timeout")
@@ -408,7 +406,7 @@ class DownloadClient:
             # logger.info(f"Existing {download_path=}")
             local_size = local_path.stat().st_size
             try:
-                await asyncio.sleep(random.randint(1, 5))
+                await asyncio.sleep(random.uniform(0, 3))
                 head = await self.client.head(download_path)
             except (httpx.PoolTimeout, httpx.ReadTimeout, httpx.ConnectTimeout):
                 logger.error(f"Failed {download_path} with HEAD timeout")
@@ -423,7 +421,7 @@ class DownloadClient:
         local_path.parent.mkdir(parents=True, exist_ok=True)
         with local_path.open("wb") as f:
             try:
-                await asyncio.sleep(random.randint(5, 20))
+                await asyncio.sleep(random.uniform(5, 10))
                 async with self.client.stream("GET", download_path) as r:
                     total = None
                     if "Content-Length" in r.headers:
