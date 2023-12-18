@@ -5,7 +5,6 @@ import logging
 import os
 import random
 import re
-import zipfile
 from pathlib import Path
 from typing import Set
 
