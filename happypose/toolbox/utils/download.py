@@ -5,6 +5,7 @@ import logging
 import os
 import random
 import re
+import zipfile
 from pathlib import Path
 from typing import Set
 
@@ -302,8 +303,8 @@ async def main():
     for src, dst in to_symlink:
         os.symlink(src, dst)
 
-    # for src, dst in to_unzip:
-    # zipfile.ZipFile(src).extractall(dst)
+    for src, dst in to_unzip:
+        zipfile.ZipFile(src).extractall(dst)
 
 
 class DownloadClient:
