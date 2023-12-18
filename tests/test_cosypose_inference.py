@@ -37,7 +37,7 @@ class TestCosyPoseInference(unittest.TestCase):
 
     @staticmethod
     def _load_detector(
-        device="cpu",
+        device="cuda",
         ds_name="ycbv",
         run_id="detector-bop-ycbv-pbr--970850",
     ):
@@ -81,7 +81,7 @@ class TestCosyPoseInference(unittest.TestCase):
         coarse_run_id="coarse-bop-ycbv-pbr--724183",
         refiner_run_id="refiner-bop-ycbv-pbr--604090",
         n_workers=1,
-        device="cpu",
+        device="cuda",
     ):
         """Load coarse and refiner for the crackers example renderer."""
         object_dataset = BOPObjectDataset(
@@ -112,7 +112,7 @@ class TestCosyPoseInference(unittest.TestCase):
 
     def test_detector(self):
         """Run detector on known image to see if cracker box is detected."""
-        observation = self._load_crackers_example_observation()
+        observation = self._load_crackers_example_observation().cuda()
         detector = self._load_detector()
         detections = detector.get_detections(observation=observation)
         for s1, s2 in zip(detections.infos.score, detections.infos.score[1:]):
@@ -138,7 +138,7 @@ class TestCosyPoseInference(unittest.TestCase):
 
     def test_cosypose_pipeline(self):
         """Run detector with coarse and refiner."""
-        observation = self._load_crackers_example_observation()
+        observation = self._load_crackers_example_observation().cuda()
         detector = self._load_detector()
         coarse_model, refiner_model = self._load_pose_models()
         pose_estimator = PoseEstimator(
@@ -155,7 +155,7 @@ class TestCosyPoseInference(unittest.TestCase):
         self.assertEqual(len(preds), 1)
         self.assertEqual(preds.infos.label[0], "ycbv-obj_000002")
 
-        pose = pin.SE3(preds.poses[0].numpy())
+        pose = pin.SE3(preds.poses[0].cpu().numpy())
         exp_pose = pin.SE3(
             pin.exp3(np.array([1.44, 1.19, -0.91])),
             np.array([0, 0, 0.52]),
