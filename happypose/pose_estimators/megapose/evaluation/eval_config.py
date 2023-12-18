@@ -16,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 # MegaPose
 from happypose.pose_estimators.megapose.inference.types import InferenceConfig
@@ -85,8 +85,8 @@ class EvalConfig:
 @dataclass
 class FullEvalConfig(EvalConfig):
     # Full eval
-    detection_coarse_types: Optional[list] = None
-    ds_names: Optional[list[str]] = None
+    detection_coarse_types: Optional[List] = None
+    ds_names: Optional[List[str]] = None
     run_bop_eval: bool = True
     eval_coarse_also: bool = False
     convert_only: bool = False

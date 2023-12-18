@@ -17,7 +17,7 @@ limitations under the License.
 # Standard Library
 import itertools
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional, Set, Tuple
 
 # Third Party
 import numpy as np
@@ -38,9 +38,9 @@ class RigidObject:
         category: Optional[str] = None,
         mesh_diameter: Optional[float] = None,
         mesh_units: str = "m",
-        symmetries_discrete: list[DiscreteSymmetry] = [],
-        symmetries_continuous: list[ContinuousSymmetry] = [],
-        ypr_offset_deg: tuple[float, float, float] = (0.0, 0.0, 0.0),
+        symmetries_discrete: List[DiscreteSymmetry] = [],
+        symmetries_continuous: List[ContinuousSymmetry] = [],
+        ypr_offset_deg: Tuple[float, float, float] = (0.0, 0.0, 0.0),
         scaling_factor: float = 1.0,
         scaling_factor_mesh_units_to_meters: Optional[float] = None,
     ):
@@ -147,7 +147,7 @@ class RigidObject:
 class RigidObjectDataset:
     def __init__(
         self,
-        objects: list[RigidObject],
+        objects: List[RigidObject],
     ):
         self.list_objects = objects
         self.label_to_objects = {obj.label: obj for obj in objects}
@@ -165,11 +165,11 @@ class RigidObjectDataset:
         return len(self.list_objects)
 
     @property
-    def objects(self) -> list[RigidObject]:
+    def objects(self) -> List[RigidObject]:
         """Returns a list of objects in this dataset."""
         return self.list_objects
 
-    def filter_objects(self, keep_labels: set[str]) -> "RigidObjectDataset":
+    def filter_objects(self, keep_labels: Set[str]) -> "RigidObjectDataset":
         list_objects = [obj for obj in self.list_objects if obj.label in keep_labels]
         return RigidObjectDataset(list_objects)
 
@@ -183,6 +183,6 @@ def append_dataset_name_to_object_labels(
     return object_dataset
 
 
-def concat_object_datasets(datasets: list[RigidObjectDataset]) -> RigidObjectDataset:
+def concat_object_datasets(datasets: List[RigidObjectDataset]) -> RigidObjectDataset:
     objects = list(itertools.chain.from_iterable([ds.list_objects for ds in datasets]))
     return RigidObjectDataset(objects)

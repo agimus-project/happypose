@@ -16,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass
-from typing import Optional
+from typing import List, Optional
 
 # Third Party
 import numpy as np
@@ -46,8 +46,8 @@ class DiscreteSymmetry:
 
 
 def make_symmetries_poses(
-    symmetries_discrete: list[DiscreteSymmetry] = [],
-    symmetries_continuous: list[ContinuousSymmetry] = [],
+    symmetries_discrete: List[DiscreteSymmetry] = [],
+    symmetries_continuous: List[ContinuousSymmetry] = [],
     n_symmetries_continuous: int = 8,
     units: str = "mm",
     scale: Optional[float] = None,

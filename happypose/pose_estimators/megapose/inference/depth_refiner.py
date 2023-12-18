@@ -16,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Tuple
 
 # Third Party
 import torch
@@ -33,7 +33,7 @@ class DepthRefiner(ABC):
         masks: Optional[torch.tensor] = None,
         depth: Optional[torch.tensor] = None,
         K: Optional[torch.tensor] = None,
-    ) -> tuple[PoseEstimatesType, dict]:
+    ) -> Tuple[PoseEstimatesType, dict]:
         """Run the depth refinement.
 
         Args:
