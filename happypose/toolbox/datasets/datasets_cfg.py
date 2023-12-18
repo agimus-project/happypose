@@ -16,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 import json
-from typing import Optional
+from typing import List, Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -376,7 +376,7 @@ def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     elif ds_name.startswith("shapenet."):
         ds_name = ds_name[len("shapenet.") :]
 
-        filters_list: list[str] = []
+        filters_list: List[str] = []
         if ds_name.startswith("filters="):
             filter_str = ds_name.split(".")[0]
             filters_list = filter_str.split("filters=")[1].split(",")
@@ -494,7 +494,7 @@ def make_urdf_dataset(ds_name: str) -> RigidObjectDataset:
     return ds
 
 
-def get_obj_ds_info(ds_name: str) -> tuple[Optional[str], str]:
+def get_obj_ds_info(ds_name: str) -> Tuple[Optional[str], str]:
     urdf_ds_name = None  # Only used for bullet compatibility
     if ds_name == "ycbv.bop19":
         ds_name = "ycbv"

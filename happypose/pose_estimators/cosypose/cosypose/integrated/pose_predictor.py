@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Tuple
 
 import torch
 from torch.utils.data import DataLoader, TensorDataset
@@ -133,7 +134,7 @@ class CoarseRefinePosePredictor(PoseEstimationModule):
         K,
         data_TCO_init,
         n_coarse_iterations,
-    ) -> tuple[PoseEstimatesType, dict]:
+    ) -> Tuple[PoseEstimatesType, dict]:
         return self.batched_model_predictions(
             self.coarse_model,
             images,
@@ -148,7 +149,7 @@ class CoarseRefinePosePredictor(PoseEstimationModule):
         K,
         data_TCO,
         n_refiner_iterations,
-    ) -> tuple[dict, dict]:
+    ) -> Tuple[dict, dict]:
         return self.batched_model_predictions(
             self.refiner_model,
             images,

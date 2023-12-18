@@ -13,9 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, List, Optional, Union
 
 # Third Party
 import torch
@@ -192,13 +191,13 @@ class Bottleneck(nn.Module):
 class ResNet(nn.Module):
     def __init__(
         self,
-        block: type[Union[BasicBlock, Bottleneck]],
-        layers: list[int],
+        block: Union[BasicBlock, Bottleneck],
+        layers: List[int],
         num_classes: int = 1000,
         zero_init_residual: bool = False,
         groups: int = 1,
         width_per_group: int = 64,
-        replace_stride_with_dilation: Optional[list[bool]] = None,
+        replace_stride_with_dilation: Optional[List[bool]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
         n_input_channels: int = 3,
     ) -> None:
@@ -277,7 +276,7 @@ class ResNet(nn.Module):
 
     def _make_layer(
         self,
-        block: type[Union[BasicBlock, Bottleneck]],
+        block: Union[BasicBlock, Bottleneck],
         planes: int,
         blocks: int,
         stride: int = 1,
@@ -347,8 +346,8 @@ class ResNet(nn.Module):
 
 def _resnet(
     arch: str,
-    block: type[Union[BasicBlock, Bottleneck]],
-    layers: list[int],
+    block: Union[BasicBlock, Bottleneck],
+    layers: List[int],
     pretrained: bool,
     progress: bool,
     **kwargs: Any,

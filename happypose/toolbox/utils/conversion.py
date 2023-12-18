@@ -15,6 +15,7 @@ limitations under the License.
 
 
 # Standard Library
+from typing import List, Tuple
 
 # MegaPose
 from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
@@ -23,8 +24,8 @@ from happypose.toolbox.renderer.types import Panda3dCameraData, Panda3dObjectDat
 
 def convert_scene_observation_to_panda3d(
     camera_data: CameraData,
-    object_datas: list[ObjectData],
-) -> tuple[Panda3dCameraData, list[Panda3dObjectData]]:
+    object_datas: List[ObjectData],
+) -> Tuple[Panda3dCameraData, list[Panda3dObjectData]]:
     assert camera_data.TWC is not None
     assert camera_data.K is not None
     assert camera_data.resolution is not None

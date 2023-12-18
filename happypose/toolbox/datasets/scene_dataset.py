@@ -23,7 +23,7 @@ import random
 import time
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 # Third Party
 import numpy as np
@@ -38,8 +38,8 @@ from happypose.toolbox.utils.random import make_seed
 from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 from happypose.toolbox.utils.types import Resolution
 
-ListBbox = list[int]
-ListPose = list[list[float]]
+ListBbox = List[int]
+ListPose = List[List[float]]
 
 """
 infos: pd.DataFrame with fields
@@ -61,7 +61,7 @@ tensors:
 SceneObservationTensorCollection = PandasTensorCollection
 
 SingleDataJsonType = Union[str, float, ListPose, int, ListBbox, Any]
-DataJsonType = Union[dict[str, SingleDataJsonType], list[SingleDataJsonType]]
+DataJsonType = Union[Dict[str, SingleDataJsonType], List[SingleDataJsonType]]
 
 
 def transform_to_list(T: Transform) -> ListPose:
@@ -82,8 +82,8 @@ class ObjectData:
     # Some pose estimation datasets (ModelNet) provide an initial pose estimate
     #  NOTE: This should be loaded externally
 
-    def to_json(self) -> dict[str, SingleDataJsonType]:
-        d: dict[str, SingleDataJsonType] = {"label": self.label}
+    def to_json(self) -> Dict[str, SingleDataJsonType]:
+        d: Dict[str, SingleDataJsonType] = {"label": self.label}
         for k in ("TWO", "TWO_init"):
             if getattr(self, k) is not None:
                 d[k] = transform_to_list(getattr(self, k))
@@ -131,7 +131,7 @@ class CameraData:
     #  NOTE: This should be loaded externally
 
     def to_json(self) -> str:
-        d: dict[str, SingleDataJsonType] = {}
+        d: Dict[str, SingleDataJsonType] = {}
         for k in ("TWC", "TWC_init"):
             if getattr(self, k) is not None:
                 d[k] = transform_to_list(getattr(self, k))
@@ -197,16 +197,16 @@ class SceneObservation:
     # contains objects unique ids. int64 are not handled and can be dangerous when used
     # with PIL
     infos: Optional[ObservationInfos] = None
-    object_datas: Optional[list[ObjectData]] = None
+    object_datas: Optional[List[ObjectData]] = None
     camera_data: Optional[CameraData] = None
     # dict mapping unique id to (h, w) np.bool_
-    binary_masks: Optional[dict[int, np.ndarray]] = None
+    binary_masks: Optional[Dict[int, np.ndarray]] = None
 
     @staticmethod
     def collate_fn(
-        batch: list[SceneObservation],
-        object_labels: Optional[list[str]] = None,
-    ) -> dict[Any, Any]:
+        batch: List[SceneObservation],
+        object_labels: Optional[List[str]] = None,
+    ) -> Dict[Any, Any]:
         """Collate a batch of SceneObservation objects.
 
         Args:
@@ -302,7 +302,7 @@ class SceneObservation:
 
     def as_pandas_tensor_collection(
         self,
-        object_labels: Optional[list[str]] = None,
+        object_labels: Optional[List[str]] = None,
     ) -> SceneObservationTensorCollection:
         """Convert SceneData to a PandasTensorCollection representation."""
         obs = self
@@ -475,7 +475,7 @@ class RandomIterableSceneDataset(IterableSceneDataset):
 class IterableMultiSceneDataset(IterableSceneDataset):
     def __init__(
         self,
-        list_iterable_scene_ds: list[IterableSceneDataset],
+        list_iterable_scene_ds: List[IterableSceneDataset],
         deterministic: bool = False,
     ):
         self.list_iterable_scene_ds = list_iterable_scene_ds

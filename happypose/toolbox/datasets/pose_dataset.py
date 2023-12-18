@@ -19,7 +19,7 @@ import random
 import time
 from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import List, Optional, Union, Set
 
 # Third Party
 import numpy as np
@@ -86,7 +86,7 @@ class BatchPoseData:
     """
 
     rgbs: torch.Tensor
-    object_datas: list[ObjectData]
+    object_datas: List[ObjectData]
     bboxes: torch.Tensor
     TCO: torch.Tensor
     K: torch.Tensor
@@ -119,7 +119,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
         apply_depth_augmentation: bool = False,
         apply_background_augmentation: bool = False,
         return_first_object: bool = False,
-        keep_labels_set: Optional[set[str]] = None,
+        keep_labels_set: Optional[Set[str]] = None,
         depth_augmentation_level: int = 1,
     ):
         self.scene_ds = scene_ds
@@ -224,7 +224,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
         if keep_labels_set is not None:
             self.keep_labels_set = keep_labels_set
 
-    def collate_fn(self, list_data: list[PoseData]) -> BatchPoseData:
+    def collate_fn(self, list_data: List[PoseData]) -> BatchPoseData:
         batch_data = BatchPoseData(
             rgbs=torch.from_numpy(np.stack([d.rgb for d in list_data])).permute(
                 0,
@@ -338,7 +338,8 @@ class PoseDataset(torch.utils.data.IterableDataset):
         obs = self.scene_ds[index]
         return self.make_data_from_obs(obs)
 
-    def find_valid_data(self, iterator: Iterator[SceneObservation]) -> PoseData:
+    # def find_valid_data(self, iterator: Iterator[SceneObservation]) -> PoseData:
+    def find_valid_data(self, iterator) -> PoseData:
         n_attempts = 0
         while True:
             obs = next(iterator)
@@ -350,7 +351,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
                 msg = "Cannot find valid image in the dataset"
                 raise ValueError(msg)
 
-    def __iter__(self) -> Iterator[PoseData]:
+    def __iter__(self): # -> Iterator[PoseData]:
         assert isinstance(self.scene_ds, IterableSceneDataset)
         iterator = iter(self.scene_ds)
         while True:

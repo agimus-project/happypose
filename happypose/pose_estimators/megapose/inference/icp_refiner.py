@@ -15,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import Optional
+from typing import Optional, Tuple, Dict
 
 # Third Party
 import cv2
@@ -236,7 +236,7 @@ class ICPRefiner(DepthRefiner):
         masks: Optional[torch.tensor] = None,
         depth: Optional[torch.tensor] = None,
         K: Optional[torch.tensor] = None,
-    ) -> tuple[PoseEstimatesType, dict]:
+    ) -> Tuple[PoseEstimatesType, Dict]:
         """Runs icp refinement. See superclass DepthRefiner for full documentation."""
         assert depth is not None
         assert K is not None

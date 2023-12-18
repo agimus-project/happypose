@@ -1,6 +1,6 @@
 import time
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 import numpy as np
 import torch
@@ -146,7 +146,7 @@ class PoseEstimator(PoseEstimationModule):
         coarse_estimates: Optional[PoseEstimatesType] = None,
         detection_th: float = 0.7,
         mask_th: float = 0.8,
-    ) -> tuple[PoseEstimatesType, dict]:
+    ) -> Tuple[PoseEstimatesType, dict]:
         timing_str = ""
         timer = SimpleTimer()
         timer.start()
@@ -248,7 +248,7 @@ class PoseEstimator(PoseEstimationModule):
         n_iterations: int = 5,
         keep_all_outputs: bool = False,
         cuda_timer: bool = False,
-    ) -> tuple[dict, dict]:
+    ) -> Tuple[dict, dict]:
         """Runs the refiner model for the specified number of iterations.
 
         Will actually use the batched_model_predictions to stay within
@@ -357,7 +357,7 @@ class PoseEstimator(PoseEstimationModule):
         n_iterations: int = 5,
         keep_all_outputs: bool = False,
         cuda_timer: bool = False,
-    ) -> tuple[dict, dict]:
+    ) -> Tuple[dict, dict]:
         """Runs the refiner model for the specified number of iterations.
 
         Will actually use the batched_model_predictions to stay within

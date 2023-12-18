@@ -15,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 # Third Party
 import cv2
@@ -55,9 +55,9 @@ def get_mask_from_rgb(img: np.ndarray) -> np.ndarray:
 def make_contour_overlay(
     img: np.ndarray,
     render: np.ndarray,
-    color: Optional[tuple[int, int, int]] = None,
+    color: Optional[Tuple[int, int, int]] = None,
     dilate_iterations: int = 1,
-) -> dict[str, Any]:
+) -> Dict[str, Any]:
     if color is None:
         color = (0, 255, 0)
 

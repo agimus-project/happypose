@@ -21,6 +21,7 @@ from copy import deepcopy
 import numpy as np
 import torch
 import trimesh
+from typing import List
 
 # MegaPose
 from happypose.toolbox.datasets.object_dataset import RigidObject
@@ -50,7 +51,7 @@ def as_mesh(scene_or_mesh):
 
 
 class MeshDataBase:
-    def __init__(self, obj_list: list[RigidObject]):
+    def __init__(self, obj_list: List[RigidObject]):
         self.obj_dict = {obj.label: obj for obj in obj_list}
         self.obj_list = obj_list
         self.infos = {obj.label: {} for obj in obj_list}

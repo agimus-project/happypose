@@ -13,12 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 import time
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 # Third Party
 import numpy as np
@@ -55,7 +54,7 @@ class PosePredictorOutputCosypose:
     TCO_input: torch.Tensor
     renders: torch.Tensor
     images_crop: torch.Tensor
-    labels: list[str]
+    labels: List[str]
     K: torch.Tensor
     K_crop: torch.Tensor
     boxes_rend: torch.Tensor
@@ -71,14 +70,14 @@ class PosePredictorOutput:
     TCV_O_input: torch.Tensor
     KV_crop: torch.Tensor
     tCR: torch.Tensor
-    labels: list[str]
+    labels: List[str]
     K: torch.Tensor
     K_crop: torch.Tensor
-    network_outputs: dict[str, torch.Tensor]
+    network_outputs: Dict[str, torch.Tensor]
     boxes_rend: torch.Tensor
     boxes_crop: torch.Tensor
     renderings_logits: torch.Tensor
-    timing_dict: dict[str, float]
+    timing_dict: Dict[str, float]
 
 
 @dataclass
@@ -132,7 +131,7 @@ class PosePredictor(nn.Module):
         assert isinstance(n_features, int)
 
         # TODO: Change to torch ModuleDict
-        self.heads: dict[str, Union[torch.nn.Linear, Callable]] = {}
+        self.heads: Dict[str, Union[torch.nn.Linear, Callable]] = {}
         self.predict_pose_update = predict_pose_update
         if self.predict_pose_update:
             self._pose_dim = 9
@@ -177,23 +176,23 @@ class PosePredictor(nn.Module):
         )
 
         self.debug = False
-        self.timing_dict: dict[str, float] = defaultdict(float)
+        self.timing_dict: Dict[str, float] = defaultdict(float)
         self.debug_data = PosePredictorDebugData()
 
     @property
-    def input_rgb_dims(self) -> list[int]:
+    def input_rgb_dims(self) -> List[int]:
         return self._input_rgb_dims
 
     @property
-    def input_depth_dims(self) -> list[int]:
+    def input_depth_dims(self) -> List[int]:
         return self._input_depth_dims
 
     @property
-    def render_rgb_dims(self) -> list[int]:
+    def render_rgb_dims(self) -> List[int]:
         return self._render_rgb_dims
 
     @property
-    def render_depth_dims(self) -> list[int]:
+    def render_depth_dims(self) -> List[int]:
         return self._render_depth_dims
 
     def crop_inputs(
@@ -202,8 +201,8 @@ class PosePredictor(nn.Module):
         K: torch.Tensor,
         TCO: torch.Tensor,
         tCR: torch.Tensor,
-        labels: list[str],
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        labels: List[str],
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """Crop input images.
 
         The image is cropped using the reprojection of the object points in the input
@@ -282,7 +281,7 @@ class PosePredictor(nn.Module):
         K: torch.Tensor,
         TCV_O: torch.Tensor,
         tCR: torch.Tensor,
-        labels: list[str],
+        labels: List[str],
     ) -> torch.Tensor:
         """Computes the intrinsics of the fictive camera used to
             render the additional viewpoints.
@@ -349,7 +348,7 @@ class PosePredictor(nn.Module):
         TCO_updated = pose_update_with_reference_point(TCO, K_crop, vxvyvz, dR, tCR)
         return TCO_updated
 
-    def net_forward(self, x: torch.Tensor) -> dict[str, torch.Tensor]:
+    def net_forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         """Forward pass of the neural network.
 
         Args:
@@ -375,7 +374,7 @@ class PosePredictor(nn.Module):
 
     def render_images_multiview(
         self,
-        labels: list[str],
+        labels: List[str],
         TCV_O: torch.Tensor,
         KV: torch.Tensor,
         random_ambient_light: bool = False,
@@ -384,7 +383,7 @@ class PosePredictor(nn.Module):
 
         Args:
         ----
-            labels: list[str] with length bsz
+            labels: List[str] with length bsz
             TCV_O: [bsz, n_views, 4, 4] pose of the cameras defining each view
             KV: [bsz, n_views, 4, 4] intrinsics of the associated cameras
             random_ambient_light: Whether to use randomize ambient light parameter.
@@ -461,7 +460,7 @@ class PosePredictor(nn.Module):
         tCR: torch.Tensor,
         images_inplace: bool = False,
         renders_inplace: bool = False,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Normalize the depth images by the distance from the camera.
 
         If we are using depth then this involves inplace ops so to be
@@ -549,12 +548,12 @@ class PosePredictor(nn.Module):
         self,
         images: torch.Tensor,
         K: torch.Tensor,
-        labels: list[str],
+        labels: List[str],
         TCO: torch.Tensor,
         n_iterations: int = 1,
         random_ambient_light: bool = False,
-    ) -> dict[str, PosePredictorOutput]:
-        timing_dict: dict[str, float] = defaultdict(float)
+    ) -> Dict[str, PosePredictorOutput]:
+        timing_dict: Dict[str, float] = defaultdict(float)
 
         if not self.input_depth:
             # Remove the depth dimension if it is not used
@@ -679,7 +678,7 @@ class PosePredictor(nn.Module):
         self,
         x: torch.Tensor,
         cuda_timer: bool = False,
-    ) -> dict[str, Union[torch.Tensor, float]]:
+    ) -> Dict[str, Union[torch.Tensor, float]]:
         """Forward pass on coarse model given an input tensor.
 
         The input already contains the concatenated input + rendered images and has
@@ -711,11 +710,11 @@ class PosePredictor(nn.Module):
         self,
         images: torch.Tensor,
         K: torch.Tensor,
-        labels: list[str],
+        labels: List[str],
         TCO_input: torch.Tensor,
         cuda_timer: bool = False,
         return_debug_data: bool = False,
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         # TODO: Is this still necessary ?
         """Run the coarse model given images + poses.
 

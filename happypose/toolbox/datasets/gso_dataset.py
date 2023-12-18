@@ -17,6 +17,7 @@ limitations under the License.
 # Standard Library
 import json
 from pathlib import Path
+from typing import List
 
 # MegaPose
 from happypose.pose_estimators.megapose.config import MEMORY
@@ -26,7 +27,7 @@ from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDa
 
 
 @MEMORY.cache
-def make_gso_infos(gso_dir: Path, model_name: str = "model.obj") -> list[str]:
+def make_gso_infos(gso_dir: Path, model_name: str = "model.obj") -> List[str]:
     gso_dir = Path(gso_dir)
     models_dir = gso_dir.iterdir()
     invalid_ids = set(json.loads((gso_dir.parent / "invalid_meshes.json").read_text()))

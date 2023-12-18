@@ -3,7 +3,7 @@ import argparse
 import json
 import os
 from pathlib import Path
-from typing import Union
+from typing import List, Tuple, Union
 
 # Third Party
 import numpy as np
@@ -43,7 +43,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def load_observation(
     example_dir: Path,
     load_depth: bool = False,
-) -> tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
+) -> Tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
     camera_data = CameraData.from_json((example_dir / "camera_data.json").read_text())
 
     rgb = np.array(Image.open(example_dir / "image_rgb.png"), dtype=np.uint8)
@@ -69,7 +69,7 @@ def load_observation_tensor(
     return observation
 
 
-def load_object_data(data_path: Path) -> list[ObjectData]:
+def load_object_data(data_path: Path) -> List[ObjectData]:
     object_data = json.loads(data_path.read_text())
     object_data = [ObjectData.from_json(d) for d in object_data]
     return object_data

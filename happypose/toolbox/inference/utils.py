@@ -16,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from pathlib import Path
-from typing import Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 # Third Party
 import numpy as np
@@ -88,9 +88,9 @@ def load_pose_models(
     refiner_run_id: str,
     object_dataset: RigidObjectDataset,
     force_panda3d_renderer: bool = False,
-    renderer_kwargs: Optional[dict] = None,
+    renderer_kwargs: Optional[Dict] = None,
     models_root: Path = EXP_DIR,
-) -> tuple[
+) -> Tuple[
     torch.nn.Module,
     torch.nn.Module,
     happypose.toolbox.lib3d.rigid_mesh_database.BatchedMeshes,
@@ -188,7 +188,7 @@ def add_instance_id(
 
 def filter_detections(
     detections: DetectionsType,
-    labels: Optional[list[str]] = None,
+    labels: Optional[List[str]] = None,
     one_instance_per_class: bool = False,
 ) -> DetectionsType:
     """Filter detections based on kwargs."""
@@ -208,7 +208,7 @@ def filter_detections(
     return detections
 
 
-def make_cameras(camera_data: list[CameraData]) -> PandasTensorCollection:
+def make_cameras(camera_data: List[CameraData]) -> PandasTensorCollection:
     """Creates a PandasTensorCollection from list of camera data.
 
     Returns
@@ -226,7 +226,7 @@ def make_cameras(camera_data: list[CameraData]) -> PandasTensorCollection:
     return tc.PandasTensorCollection(infos=pd.DataFrame(infos), K=torch.stack(K))
 
 
-def make_detections_from_object_data(object_data: list[ObjectData]) -> DetectionsType:
+def make_detections_from_object_data(object_data: List[ObjectData]) -> DetectionsType:
     infos = pd.DataFrame(
         {
             "label": [data.label for data in object_data],
