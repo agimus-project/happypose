@@ -19,7 +19,7 @@ import dataclasses
 import random
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, Union, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 # Third Party
 import cv2

@@ -14,5 +14,4 @@ limitations under the License.
 """
 from typing import Tuple
 
-
 Resolution = Tuple[int, int]

@@ -17,9 +17,8 @@ limitations under the License.
 # Standard Library
 import random
 import time
-from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import List, Optional, Union, Set
+from typing import List, Optional, Set, Union
 
 # Third Party
 import numpy as np
@@ -351,7 +350,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
                 msg = "Cannot find valid image in the dataset"
                 raise ValueError(msg)
 
-    def __iter__(self): # -> Iterator[PoseData]:
+    def __iter__(self):  # -> Iterator[PoseData]:
         assert isinstance(self.scene_ds, IterableSceneDataset)
         iterator = iter(self.scene_ds)
         while True:

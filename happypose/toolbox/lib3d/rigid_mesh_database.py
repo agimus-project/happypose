@@ -16,12 +16,12 @@ limitations under the License.
 
 # Standard Library
 from copy import deepcopy
+from typing import List
 
 # Third Party
 import numpy as np
 import torch
 import trimesh
-from typing import List
 
 # MegaPose
 from happypose.toolbox.datasets.object_dataset import RigidObject

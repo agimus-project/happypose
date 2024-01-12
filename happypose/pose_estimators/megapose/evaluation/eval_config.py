@@ -16,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
 # MegaPose
 from happypose.pose_estimators.megapose.inference.types import InferenceConfig

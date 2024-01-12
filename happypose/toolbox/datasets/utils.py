@@ -15,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import List, Dict
+from typing import Dict, List
 
 # Third Party
 import numpy as np

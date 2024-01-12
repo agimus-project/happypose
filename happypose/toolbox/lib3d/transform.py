@@ -15,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 # Third Party
 import numpy as np

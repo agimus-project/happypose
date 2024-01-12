@@ -1,6 +1,6 @@
 # Standard Library
 from pathlib import Path
-from typing import Any, Optional, Dict
+from typing import Any, Dict, Optional
 
 # Third Party
 import torch

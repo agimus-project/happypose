@@ -18,7 +18,6 @@ limitations under the License.
 import io
 import json
 from collections import defaultdict
-from collections.abc import Iterator
 from functools import partial
 from hashlib import sha1
 from pathlib import Path

@@ -19,7 +19,7 @@ import datetime
 import os
 import sys
 from pathlib import Path
-from typing import Any, List, Dict
+from typing import Any, Dict, List
 
 import omegaconf
 

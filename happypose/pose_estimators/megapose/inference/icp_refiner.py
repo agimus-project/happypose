@@ -15,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import Optional, Tuple, Dict
+from typing import Dict, Optional, Tuple
 
 # Third Party
 import cv2

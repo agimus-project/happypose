@@ -15,7 +15,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass, field
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
 
 # Third Party
 import numpy as np
