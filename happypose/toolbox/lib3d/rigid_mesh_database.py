@@ -16,6 +16,7 @@ limitations under the License.
 
 # Standard Library
 from copy import deepcopy
+from typing import List
 
 # Third Party
 import numpy as np
@@ -50,7 +51,7 @@ def as_mesh(scene_or_mesh):
 
 
 class MeshDataBase:
-    def __init__(self, obj_list: list[RigidObject]):
+    def __init__(self, obj_list: List[RigidObject]):
         self.obj_dict = {obj.label: obj for obj in obj_list}
         self.obj_list = obj_list
         self.infos = {obj.label: {} for obj in obj_list}

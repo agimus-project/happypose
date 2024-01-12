@@ -15,6 +15,7 @@ limitations under the License.
 
 
 # Standard Library
+from typing import Tuple
 
 # Third Party
 import torch
@@ -70,8 +71,8 @@ def boxes_from_uv(uv):
 def get_K_crop_resize(
     K: torch.Tensor,
     boxes: torch.Tensor,
-    orig_size: tuple[int, int],
-    crop_resize: tuple[int, int],
+    orig_size: Tuple[int, int],
+    crop_resize: Tuple[int, int],
 ) -> torch.Tensor:
     """Adapted from https://github.com/BerkeleyAutomation/perception/blob/master/perception/camera_intrinsics.py
     Skew is not handled.

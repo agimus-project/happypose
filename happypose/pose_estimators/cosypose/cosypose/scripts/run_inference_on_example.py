@@ -5,7 +5,7 @@ import os
 ########################
 # Add cosypose to my path -> dirty
 from pathlib import Path
-from typing import Union
+from typing import Tuple, Union
 
 # Third Party
 import numpy as np
@@ -47,7 +47,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def load_observation(
     example_dir: Path,
     load_depth: bool = False,
-) -> tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
+) -> Tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
     camera_data = CameraData.from_json((example_dir / "camera_data.json").read_text())
 
     rgb = np.array(Image.open(example_dir / "image_rgb.png"), dtype=np.uint8)

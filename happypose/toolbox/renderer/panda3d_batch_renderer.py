@@ -16,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import List, Optional, Set, Union
 
 # Third Party
 import numpy as np
@@ -72,8 +72,8 @@ class BatchRenderOutput:
 @dataclass
 class SceneData:
     camera_data: Panda3dCameraData
-    light_datas: list[Panda3dLightData]
-    object_datas: list[Panda3dObjectData]
+    light_datas: List[Panda3dLightData]
+    object_datas: List[Panda3dObjectData]
 
 
 @dataclass
@@ -89,7 +89,7 @@ def worker_loop(
     in_queue: torch.multiprocessing.Queue,
     out_queue: torch.multiprocessing.Queue,
     object_dataset: RigidObjectDataset,
-    preload_labels: set[str] = set(),
+    preload_labels: Set[str] = set(),
 ) -> None:
     logger.debug(f"Init worker: {worker_id}")
     renderer = Panda3dSceneRenderer(
@@ -161,12 +161,12 @@ class Panda3dBatchRenderer:
 
     def make_scene_data(
         self,
-        labels: list[str],
+        labels: List[str],
         TCO: torch.Tensor,
         K: torch.Tensor,
-        light_datas: list[list[Panda3dLightData]],
+        light_datas: List[List[Panda3dLightData]],
         resolution: Resolution,
-    ) -> list[SceneData]:
+    ) -> List[SceneData]:
         """_summary_.
 
         Args:
@@ -210,10 +210,10 @@ class Panda3dBatchRenderer:
 
     def render(
         self,
-        labels: list[str],
+        labels: List[str],
         TCO: torch.Tensor,
         K: torch.Tensor,
-        light_datas: list[list[Panda3dLightData]],
+        light_datas: List[List[Panda3dLightData]],
         resolution: Resolution,
         render_depth: bool = False,
         render_mask: bool = False,
@@ -288,9 +288,9 @@ class Panda3dBatchRenderer:
     def _init_renderers(self, preload_cache: bool) -> None:
         object_labels = [obj.label for obj in self._object_dataset.list_objects]
 
-        self._renderers: list[torch.multiprocessing.Process] = []
+        self._renderers: List[torch.multiprocessing.Process] = []
         if self._split_objects:
-            self._in_queues: list[torch.multiprocessing.Queue] = [
+            self._in_queues: List[torch.multiprocessing.Queue] = [
                 torch.multiprocessing.Queue() for _ in range(self._n_workers)
             ]
             self._worker_id_to_queue = {

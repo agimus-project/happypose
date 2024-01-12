@@ -16,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -30,12 +30,12 @@ from happypose.toolbox.lib3d.transform import Transform
 # Local Folder
 from .utils import depth_image_from_depth_buffer
 
-RgbaColor = tuple[float, float, float, float]
+RgbaColor = Tuple[float, float, float, float]
 NodeFunction = Callable[
     [p3d.core.NodePath, p3d.core.NodePath],
     None,
 ]  # (root_node_path, object_node_path)
-Resolution = tuple[int, int]
+Resolution = Tuple[int, int]
 
 TCCGL = Transform(
     np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float),
@@ -59,7 +59,7 @@ class CameraRenderingData:
 @dataclass
 class Panda3dCameraData:
     K: np.ndarray
-    resolution: tuple[int, int]
+    resolution: Tuple[int, int]
     TWC: Transform = Transform((0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0))
     z_near: float = 0.1
     z_far: float = 10

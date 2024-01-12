@@ -15,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import Optional
+from typing import List, Optional
 
 # Third Party
 import numpy as np
@@ -30,7 +30,7 @@ from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 
 def parse_obs_data(
     obs: SceneObservation,
-    object_labels: Optional[list[str]] = None,
+    object_labels: Optional[List[str]] = None,
 ) -> PandasTensorCollection:
     """Parses object data into PandasTensorCollection.
 

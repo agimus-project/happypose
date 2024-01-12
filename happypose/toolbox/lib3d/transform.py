@@ -15,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import Union
+from typing import Tuple, Union
 
 # Third Party
 import numpy as np
@@ -34,9 +34,9 @@ class Transform:
                 pin.Quaternion,
                 np.ndarray,
                 torch.Tensor,
-                tuple[float, float, float, float],
+                Tuple[float, float, float, float],
             ],  # rotation
-            Union[np.ndarray, torch.Tensor, tuple[float, float, float]],  # translation
+            Union[np.ndarray, torch.Tensor, Tuple[float, float, float]],  # translation
         ],
     ):
         """- Transform(T): SE3 or (4, 4) array

@@ -18,7 +18,7 @@ limitations under the License.
 
 # Standard Library
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 # Third Party
 import bokeh
@@ -64,7 +64,7 @@ def plot_image(
     tools: str = "",
     im_size: Optional[Resolution] = None,
     figure: Optional[bokeh.plotting.figure] = None,
-) -> tuple[bokeh.plotting.figure, bokeh.models.sources.ColumnDataSource]:
+) -> Tuple[bokeh.plotting.figure, bokeh.models.sources.ColumnDataSource]:
     if np.asarray(im).ndim == 2:
         gray = True
     else:

@@ -16,7 +16,6 @@ limitations under the License.
 
 # Standard Library
 import time
-from collections.abc import Iterator
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -115,7 +114,7 @@ def cast_raw_numpy_images_to_tensor(images):
 
 
 def make_optimizer(
-    parameters: Iterator[torch.nn.Parameter],
+    parameters,  # : Iterator[torch.nn.Parameter],
     cfg: TrainingConfig,
 ) -> torch.optim.Optimizer:
     optimizer: Optional[torch.optim.Optimizer] = None

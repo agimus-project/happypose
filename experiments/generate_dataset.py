@@ -2,6 +2,7 @@ import copy
 import time
 import typing as tp
 from dataclasses import dataclass
+from typing import List
 
 import hydra
 import numpy as np
@@ -15,7 +16,7 @@ from job_runner.utils import make_setup
 @dataclass
 class DatasetGenerationConfig:
     dataset_id: str
-    chunk_ids: tp.Optional[list[int]]
+    chunk_ids: tp.Optional[List[int]]
     debug: bool = False
     verbose: bool = True
     overwrite: bool = False

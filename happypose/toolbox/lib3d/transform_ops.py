@@ -15,6 +15,7 @@ limitations under the License.
 
 
 # Standard Library
+from typing import Tuple
 
 # Third Party
 import numpy as np
@@ -69,8 +70,8 @@ def invert_transform_matrices(T: torch.Tensor) -> torch.Tensor:
 
 def add_noise(
     TCO: torch.Tensor,
-    euler_deg_std: tuple[float, float, float] = (15, 15, 15),
-    trans_std: tuple[float, float, float] = (0.01, 0.01, 0.05),
+    euler_deg_std: Tuple[float, float, float] = (15, 15, 15),
+    trans_std: Tuple[float, float, float] = (0.01, 0.01, 0.05),
 ) -> torch.Tensor:
     TCO_out = TCO.clone()
     device = TCO_out.device

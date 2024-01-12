@@ -17,7 +17,7 @@ limitations under the License.
 # Standard Library
 import time
 from collections import defaultdict
-from typing import Optional
+from typing import Dict, Optional
 
 # Third Party
 import numpy as np
@@ -84,7 +84,7 @@ class PredictionRunner:
         obs_tensor: ObservationTensor,
         gt_detections: DetectionsType,
         initial_estimates: Optional[PoseEstimatesType] = None,
-    ) -> dict[str, PoseEstimatesType]:
+    ) -> Dict[str, PoseEstimatesType]:
         """Runs inference pipeline, extracts the results.
 
         Returns: A dict with keys
@@ -160,7 +160,7 @@ class PredictionRunner:
     def get_predictions(
         self,
         pose_estimator: PoseEstimator,
-    ) -> dict[str, PoseEstimatesType]:
+    ) -> Dict[str, PoseEstimatesType]:
         """Runs predictions.
 
         Returns: A dict with keys

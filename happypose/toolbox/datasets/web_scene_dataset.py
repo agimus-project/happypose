@@ -18,11 +18,10 @@ limitations under the License.
 import io
 import json
 from collections import defaultdict
-from collections.abc import Iterator
 from functools import partial
 from hashlib import sha1
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Dict, List, Optional, Set, Union
 
 # Third Party
 import imageio
@@ -59,9 +58,9 @@ def write_scene_ds_as_wds(
     n_reading_workers: int = 8,
     maxcount: int = 1000,
     shard_format: str = "shard-%08d.tar",
-    keep_labels_set: Optional[set] = None,
+    keep_labels_set: Optional[Set] = None,
     n_max_frames: Optional[int] = None,
-    frame_ids: Optional[list[int]] = None,
+    frame_ids: Optional[List[int]] = None,
     depth_scale: int = 1000,
 ) -> None:
     assert scene_ds.frame_index is not None
@@ -102,7 +101,7 @@ def write_scene_ds_as_wds(
                 continue
 
         key = sha1(obs.rgb.data).hexdigest()
-        sample: dict[str, Any] = {
+        sample: Dict[str, Any] = {
             "__key__": key,
         }
         if obs.rgb is not None:
@@ -135,7 +134,7 @@ def write_scene_ds_as_wds(
 
 
 def load_scene_ds_obs(
-    sample: dict[str, Union[bytes, str]],
+    sample: Dict[str, Union[bytes, str]],
     depth_scale: float = 1000.0,
     load_depth: bool = False,
     label_format: str = "{label}",
@@ -155,7 +154,7 @@ def load_scene_ds_obs(
         depth = np.asarray(depth, dtype=np.float32)
         depth /= depth_scale
 
-    object_datas_json: list[DataJsonType] = json.loads(sample["object_datas.json"])
+    object_datas_json: List[DataJsonType] = json.loads(sample["object_datas.json"])
     object_datas = [ObjectData.from_json(d) for d in object_datas_json]
     for obj in object_datas:
         obj.label = label_format.format(label=obj.label)
@@ -203,7 +202,7 @@ class WebSceneDataset(SceneDataset):
             load_segmentation=load_segmentation,
         )
 
-    def get_tar_list(self) -> list[str]:
+    def get_tar_list(self) -> List[str]:
         tar_files = [str(x) for x in self.wds_dir.iterdir() if x.suffix == ".tar"]
         tar_files.sort()
         return tar_files
@@ -238,8 +237,8 @@ class IterableWebSceneDataset(IterableSceneDataset):
         )
 
         def load_scene_ds_obs_iterator(
-            samples: Iterator[SceneObservation],
-        ) -> Iterator[SceneObservation]:
+            samples,
+        ):
             for sample in samples:
                 yield load_scene_ds_obs_(sample)
 
@@ -250,5 +249,5 @@ class IterableWebSceneDataset(IterableSceneDataset):
             wds.shuffle(buffer_size),
         )
 
-    def __iter__(self) -> Iterator[SceneObservation]:
+    def __iter__(self):
         return iter(self.datapipeline)

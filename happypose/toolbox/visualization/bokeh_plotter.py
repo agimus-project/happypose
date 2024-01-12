@@ -20,7 +20,7 @@ from collections.abc import Iterator
 from hashlib import sha1
 from itertools import cycle
 from pathlib import Path
-from typing import Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 # Third Party
 import bokeh
@@ -48,7 +48,7 @@ class BokehPlotter:
         Contains an internal state `source_map` holding pointers to image data.
         This can be useful for updating images in real-time without re-creating figures.
         """
-        self.source_map: dict[str, bokeh.models.sources.ColumnDataSource] = {}
+        self.source_map: Dict[str, bokeh.models.sources.ColumnDataSource] = {}
         self.dump_image_dir = dump_image_dir
         self.read_image_dir = read_image_dir
         if is_notebook:
@@ -59,13 +59,13 @@ class BokehPlotter:
         return cycle(sns.color_palette(n_colors=40).as_hex())
 
     @property
-    def colors(self) -> Iterator[tuple[float, float, float]]:
+    def colors(self) -> Iterator[Tuple[float, float, float]]:
         return cycle(sns.color_palette(n_colors=40))
 
     def get_source(
         self,
         name: str,
-    ) -> tuple[bokeh.models.sources.ColumnDataSource, bool]:
+    ) -> Tuple[bokeh.models.sources.ColumnDataSource, bool]:
         if name in self.source_map:
             source = self.source_map[name]
             new = False
@@ -145,7 +145,7 @@ class BokehPlotter:
         self,
         f: bokeh.plotting.figure,
         detections: PandasTensorCollection,
-        colors: Union[str, list[str]] = "red",
+        colors: Union[str, List[str]] = "red",
         text: Optional[Union[str, list[str]]] = None,
         text_auto: bool = True,
         text_font_size: str = "8pt",

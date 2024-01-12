@@ -16,6 +16,7 @@ limitations under the License.
 
 # Standard Library
 from pathlib import Path
+from typing import List
 
 # Third Party
 import pandas as pd
@@ -201,7 +202,7 @@ class PandasTensorCollection(TensorCollection):
 def filter_top_pose_estimates(
     data_TCO: PandasTensorCollection,
     top_K: int,
-    group_cols: list[str],
+    group_cols: List[str],
     filter_field: str,
     ascending: bool = False,
 ) -> PandasTensorCollection:

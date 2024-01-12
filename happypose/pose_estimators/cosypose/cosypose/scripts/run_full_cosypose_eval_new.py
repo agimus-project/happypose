@@ -2,6 +2,7 @@
 import copy
 import os
 from pathlib import Path
+from typing import Dict, Tuple
 
 # Third Party
 from omegaconf import OmegaConf
@@ -68,7 +69,7 @@ def create_eval_cfg(
     detection_type: str,
     coarse_estimation_type: str,
     ds_name: str,
-) -> tuple[str, EvalConfig]:
+) -> Tuple[str, EvalConfig]:
     cfg = copy.deepcopy(cfg)
 
     cfg.inference.detection_type = detection_type
@@ -107,7 +108,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
     # Iterate over each dataset
     for ds_name in cfg.ds_names:
         # create the EvalConfig objects that we will call `run_eval` on
-        eval_configs: dict[str, EvalConfig] = {}
+        eval_configs: Dict[str, EvalConfig] = {}
         for detection_type, coarse_estimation_type in cfg.detection_coarse_types:
             name, cfg_ = create_eval_cfg(
                 cfg,

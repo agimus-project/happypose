@@ -3,7 +3,7 @@ import argparse
 import json
 import os
 from pathlib import Path
-from typing import Union
+from typing import List, Tuple, Union
 
 # Third Party
 import numpy as np
@@ -45,7 +45,7 @@ def load_observation(
     scene_id: str,
     image_id: str,
     load_depth: bool = False,
-) -> tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
+) -> Tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
     camera_data_json = json.loads((dataset_dir / "scene_camera.json").read_text())
     camera_data = CameraData(
         K=np.array(camera_data_json[str(image_id)]["cam_K"]).reshape(3, 3),
@@ -88,7 +88,7 @@ def load_observation_tensor(
     return observation
 
 
-def load_object_data(data_path: Path) -> list[ObjectData]:
+def load_object_data(data_path: Path) -> List[ObjectData]:
     object_data = json.loads(data_path.read_text())
     for object in object_data:
         object["bbox_modal"] = object["bbox"]

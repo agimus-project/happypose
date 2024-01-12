@@ -15,7 +15,7 @@ limitations under the License.
 
 
 # Standard Library
-from typing import Any
+from typing import Any, Dict
 
 # Third Party
 import numpy as np
@@ -48,10 +48,10 @@ def megapose_forward_loss(
     model: PosePredictor,
     cfg: TrainingConfig,
     data: BatchPoseData,
-    meters: dict[str, torchnet.meter.AverageValueMeter],
+    meters: Dict[str, torchnet.meter.AverageValueMeter],
     mesh_db: BatchedMeshes,
     n_iterations: int,
-    debug_dict: dict[str, Any],
+    debug_dict: Dict[str, Any],
     make_visualization: bool = False,
     train: bool = True,
     is_notebook: bool = False,

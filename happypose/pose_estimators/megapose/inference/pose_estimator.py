@@ -18,7 +18,7 @@ from __future__ import annotations
 # Standard Library
 import time
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -109,7 +109,7 @@ class PoseEstimator(PoseEstimationModule):
         keep_all_outputs: bool = False,
         cuda_timer: bool = False,
         **refiner_kwargs,
-    ) -> tuple[dict, dict]:
+    ) -> Tuple[dict, dict]:
         """Runs the refiner model for the specified number of iterations.
 
         Will actually use the batched_model_predictions to stay within
@@ -225,7 +225,7 @@ class PoseEstimator(PoseEstimationModule):
         data_TCO: PoseEstimatesType,
         cuda_timer: bool = False,
         return_debug_data: bool = False,
-    ) -> tuple[PoseEstimatesType, dict]:
+    ) -> Tuple[PoseEstimatesType, dict]:
         """Score the estimates using the coarse model.
 
         Adds the 'pose_score' field to data_TCO.infos
@@ -330,7 +330,7 @@ class PoseEstimator(PoseEstimationModule):
         detections: DetectionsType,
         cuda_timer: bool = False,
         return_debug_data: bool = False,
-    ) -> tuple[PoseEstimatesType, dict]:
+    ) -> Tuple[PoseEstimatesType, dict]:
         """Generates pose hypotheses and scores them with the coarse model.
 
         - Generates coarse hypotheses using the SO(3) grid.
@@ -497,7 +497,7 @@ class PoseEstimator(PoseEstimationModule):
         self,
         observation: ObservationTensor,
         predictions: PoseEstimatesType,
-    ) -> tuple[PoseEstimatesType, dict]:
+    ) -> Tuple[PoseEstimatesType, dict]:
         """Runs the depth refiner."""
         assert self.depth_refiner is not None, "You must specify a depth refiner"
         depth = observation.depth
@@ -526,7 +526,7 @@ class PoseEstimator(PoseEstimationModule):
         bsz_objects: Optional[int] = None,
         cuda_timer: Optional[bool] = False,
         coarse_estimates: Optional[PoseEstimatesType] = None,
-    ) -> tuple[PoseEstimatesType, dict]:
+    ) -> Tuple[PoseEstimatesType, dict]:
         """Runs the entire pose estimation pipeline.
 
         Performs the following steps

@@ -15,6 +15,7 @@ limitations under the License.
 
 
 # Standard Library
+from typing import Dict, List
 
 # Third Party
 import numpy as np
@@ -22,7 +23,7 @@ import numpy as np
 
 def make_detections_from_segmentation(
     segmentations: np.ndarray,
-) -> list[dict[int, np.ndarray]]:
+) -> List[Dict[int, np.ndarray]]:
     """segmentations: (n, h, w) int np.ndarray."""
     assert segmentations.ndim == 3
     detections = []

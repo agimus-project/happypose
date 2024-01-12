@@ -38,7 +38,7 @@ limitations under the License.
 
 # Standard Library
 import os
-from typing import Optional
+from typing import List, Optional
 
 # Third Party
 import numpy as np
@@ -84,7 +84,7 @@ def train_on_bop_pbr_datasets(
 def train_on_shapenet(
     cfg: TrainingConfig,
     ds_name: str = "shapenet_1M",
-    obj_filters: list[str] = [
+    obj_filters: List[str] = [
         "10mb_20k",
     ],
     remove_modelnet: bool = False,
@@ -164,7 +164,7 @@ def update_cfg_with_config_id(cfg: TrainingConfig, config_id: str) -> TrainingCo
     def train_on_gso_and_shapenet(
         cfg: TrainingConfig,
         shapenet_obj_ds_name: Optional[str] = "shapenet_1M",
-        shapenet_obj_filters: list[str] = ["10mb_20k"],
+        shapenet_obj_filters: List[str] = ["10mb_20k"],
         gso_obj_ds_name: Optional[str] = "gso_1M",
         gso_n_objects: int = 940,
         remove_modelnet: bool = False,

@@ -4,14 +4,15 @@ import pathlib as p
 import typing as tp
 from collections import deque
 from dataclasses import dataclass
+from typing import Dict, List
 
 
 @dataclass
 class ShapeNetSynset:
     id: str
     name: str
-    parents: list[str]
-    children: list[str]
+    parents: List[str]
+    children: List[str]
 
 
 @dataclass
@@ -26,7 +27,7 @@ def read_models(shapenet_dir):
     # TODO: This probably has issues / is poorly implemented and very slow
     taxonomy = json.load(open(shapenet_dir / "taxonomy.json"))
 
-    id_to_synset: dict[int, ShapeNetSynset] = {}
+    id_to_synset: Dict[int, ShapeNetSynset] = {}
 
     for synset in taxonomy:
         synset_id = synset["synsetId"]
@@ -55,7 +56,7 @@ def read_models(shapenet_dir):
         return names
 
     models_path = shapenet_dir.glob("**/**/models/model_normalized.obj")
-    models: list[dict[str, tp.Union[int, str]]] = []
+    models: List[Dict[str, tp.Union[int, str]]] = []
     for n, model_path in enumerate(models_path):
         source_id = model_path.parent.parent.name
         synset_id = model_path.parent.parent.parent.name

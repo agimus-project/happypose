@@ -16,7 +16,7 @@ limitations under the License.
 
 # Standard Library
 import time
-from typing import Optional
+from typing import Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -199,7 +199,7 @@ class TeaserppRefiner(DepthRefiner):
         masks: Optional[torch.tensor] = None,
         depth: Optional[torch.tensor] = None,
         K: Optional[torch.tensor] = None,
-    ) -> tuple[PoseEstimatesType, dict]:
+    ) -> Tuple[PoseEstimatesType, dict]:
         """Runs Teaserpp refiner. See superclass DepthRefiner for full documentation.
 
         To generate correspondences for Teaser++ we use the following approach.

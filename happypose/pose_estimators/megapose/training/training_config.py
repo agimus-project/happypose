@@ -15,7 +15,7 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List, Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -53,9 +53,9 @@ class TrainingConfig(omegaconf.dictconfig.DictConfig):
     """
 
     # Datasets
-    train_datasets: list[DatasetConfig] = field(default_factory=lambda: [])
+    train_datasets: List[DatasetConfig] = field(default_factory=lambda: [])
     input_resize: Resolution = (540, 720)
-    val_datasets: list[DatasetConfig] = field(default_factory=lambda: [])
+    val_datasets: List[DatasetConfig] = field(default_factory=lambda: [])
     val_epoch_interval: int = 10
     split_objects_across_gpus: bool = True
     n_max_objects: Optional[int] = None
@@ -106,8 +106,8 @@ class TrainingConfig(omegaconf.dictconfig.DictConfig):
     # Hypotheses
     hypotheses_init_method: str = "refiner_gt+noise"
     n_hypotheses: int = 1
-    init_euler_deg_std: tuple[float, float, float] = (15, 15, 15)
-    init_trans_std: tuple[float, float, float] = (0.01, 0.01, 0.05)
+    init_euler_deg_std: Tuple[float, float, float] = (15, 15, 15)
+    init_trans_std: Tuple[float, float, float] = (0.01, 0.01, 0.05)
 
     # Optimizer
     optimizer: str = "adam"

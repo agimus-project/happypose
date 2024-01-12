@@ -1,6 +1,6 @@
 # Standard Library
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 # Third Party
 import torch
@@ -157,7 +157,7 @@ def get_save_dir(cfg: EvalConfig) -> Path:
 def run_eval(
     cfg: EvalConfig,
     save_dir: Optional[Path] = None,
-) -> dict[str, Any]:
+) -> Dict[str, Any]:
     """Run eval for a single setting on a single dataset.
 
     A single setting is a (detection_type, coarse_estimation_type) such
