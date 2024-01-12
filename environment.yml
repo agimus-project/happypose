@@ -6,10 +6,10 @@ channels:
    - anaconda
    - defaults
 dependencies:
-  - nvidia::cudatoolkit==12.1
+  - pytorch-cuda==12.1
   - python=3.9
   - pip
-  - pytorch::pytorch==2.1
+  - pytorch==2.1
   - torchvision==0.16
   - geckodriver
   - firefox
