@@ -238,8 +238,8 @@ class IterableWebSceneDataset(IterableSceneDataset):
         )
 
         def load_scene_ds_obs_iterator(
-            samples: Iterator[SceneObservation],
-        ) -> Iterator[SceneObservation]:
+            samples,
+        ):
             for sample in samples:
                 yield load_scene_ds_obs_(sample)
 
@@ -250,5 +250,5 @@ class IterableWebSceneDataset(IterableSceneDataset):
             wds.shuffle(buffer_size),
         )
 
-    def __iter__(self) -> Iterator[SceneObservation]:
+    def __iter__(self):
         return iter(self.datapipeline)
