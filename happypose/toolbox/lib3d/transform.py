@@ -74,7 +74,10 @@ class Transform:
                 else:
                     rotation_np = rotation
             else:
-                raise ValueError
+                if isinstance(rotation, list):
+                    rotation_np = np.array(rotation)
+                else:
+                    raise ValueError
 
             if rotation_np.size == 4:
                 quaternion_xyzw = rotation_np.flatten().tolist()

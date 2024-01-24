@@ -422,44 +422,50 @@ def train_pose(args):
             iterator = tqdm(ds_iter_train, ncols=80)
             t = time.time()
             for n, sample in enumerate(iterator):
-                if n > 0:
-                    meters_time["data"].add(time.time() - t)
+                if n < 5:
+                    if n > 0:
+                        meters_time["data"].add(time.time() - t)
 
-                optimizer.zero_grad()
+                    optimizer.zero_grad()
 
-                t = time.time()
-                loss = h(data=sample, meters=meters_train)
-                meters_time["forward"].add(time.time() - t)
-                iterator.set_postfix(loss=loss.item())
-                meters_train["loss_total"].add(loss.item())
+                    t = time.time()
+                    loss = h(data=sample, meters=meters_train)
+                    meters_time["forward"].add(time.time() - t)
+                    iterator.set_postfix(loss=loss.item())
+                    meters_train["loss_total"].add(loss.item())
 
-                t = time.time()
-                loss.backward()
-                total_grad_norm = torch.nn.utils.clip_grad_norm_(
-                    model.parameters(),
-                    max_norm=args.clip_grad_norm,
-                    norm_type=2,
-                )
-                meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
+                    t = time.time()
+                    loss.backward()
+                    total_grad_norm = torch.nn.utils.clip_grad_norm_(
+                        model.parameters(),
+                        max_norm=args.clip_grad_norm,
+                        norm_type=2,
+                    )
+                    meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
 
-                optimizer.step()
-                meters_time["backward"].add(time.time() - t)
-                meters_time["memory"].add(
-                    torch.cuda.max_memory_allocated() / 1024.0**2,
-                )
+                    optimizer.step()
+                    meters_time["backward"].add(time.time() - t)
+                    meters_time["memory"].add(
+                        torch.cuda.max_memory_allocated() / 1024.0**2,
+                    )
 
-                if epoch < args.n_epochs_warmup:
-                    lr_scheduler_warmup.step()
-                t = time.time()
+                    if epoch < args.n_epochs_warmup:
+                        lr_scheduler_warmup.step()
+                    t = time.time()
+                else:
+                    continue
             if epoch >= args.n_epochs_warmup:
                 lr_scheduler.step()
 
         @torch.no_grad()
         def validation():
             model.eval()
-            for sample in tqdm(ds_iter_val, ncols=80):
-                loss = h(data=sample, meters=meters_val)
-                meters_val["loss_total"].add(loss.item())
+            for n, sample in enumerate(tqdm(ds_iter_val, ncols=80)):
+                if n < 5:
+                    loss = h(data=sample, meters=meters_val)
+                    meters_val["loss_total"].add(loss.item())
+                else:
+                    continue
 
         @torch.no_grad()
         def test():
