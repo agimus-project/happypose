@@ -23,7 +23,7 @@ from happypose.pose_estimators.cosypose.cosypose.config import (
     RESULTS_DIR,
 )
 from happypose.pose_estimators.cosypose.cosypose.datasets.bop import remap_bop_targets
-from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
+from happypose.toolbox.datasets.datasets_cfg import (
     make_object_dataset,
     make_scene_dataset,
 )
@@ -50,9 +50,8 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.multiview_predictor 
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor import (
     CoarseRefinePosePredictor,
 )
-from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import (
-    MeshDataBase,
-)
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+
 from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import (  # noqa: E501
     BulletBatchRenderer,
 )

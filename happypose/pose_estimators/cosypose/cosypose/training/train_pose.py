@@ -28,6 +28,10 @@ from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import 
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
     PoseEstimator,
 )
+from happypose.pose_estimators.megapose.evaluation.meters.modelnet_meters import (
+    ModelNetErrorMeter,
+)
+
 from happypose.pose_estimators.cosypose.cosypose.scripts.run_cosypose_eval import (
     get_pose_meters,
     load_pix2pose_results,
@@ -89,7 +93,7 @@ def log(config, model, log_dict, test_dict, epoch):
     logger.info(test_dict)
 
 
-def make_eval_bundle(args, model_training):
+def make_eval_bundle(args, model_training, mesh_db):
     eval_bundle = {}
     model_training.cfg = args
 
@@ -217,10 +221,9 @@ def make_eval_bundle(args, model_training):
             )
 
         # Evaluation
-        meters = get_pose_meters(scene_ds, ds_name)
-        meters = {k.split("_")[0]: v for k, v in meters.items()}
-        list(iter(pred_runner.sampler))
-        print(scene_ds.frame_index)
+        meters = {
+            "modelnet": ModelNetErrorMeter(mesh_db, sample_n_points=None),
+        }
         # scene_ds_ids = np.concatenate(
         # scene_ds.frame_index.loc[mv_group_ids, "scene_ds_ids"].values
         # )
@@ -335,16 +338,12 @@ def train_pose(args):
         n_workers=args.n_rendering_workers,
         preload_cache=False,
     )
-    mesh_db = (
-        MeshDataBase.from_object_ds(object_ds)
-        .batched(n_sym=args.n_symmetries_batch)
-        .cuda()
-        .float()
-    )
+    mesh_db = MeshDataBase.from_object_ds(object_ds)
+    mesh_db_batched = mesh_db.batched(n_sym=args.n_symmetries_batch).cuda().float()
 
-    model = create_model_pose(cfg=args, renderer=renderer, mesh_db=mesh_db).cuda()
+    model = create_model_pose(cfg=args, renderer=renderer, mesh_db=mesh_db_batched).cuda()
 
-    eval_bundle = make_eval_bundle(args, model)
+    eval_bundle = make_eval_bundle(args, model, mesh_db)
 
     if args.resume_run_id:
         resume_dir = EXP_DIR / args.resume_run_id
@@ -413,7 +412,7 @@ def train_pose(args):
             model=model,
             cfg=args,
             n_iterations=args.n_iterations,
-            mesh_db=mesh_db,
+            mesh_db=mesh_db_batched,
             input_generator=args.TCO_input_generator,
         )
 
@@ -476,9 +475,9 @@ def train_pose(args):
         if epoch % args.val_epoch_interval == 0:
             validation()
 
-        test_dict = None
-        if epoch % args.test_epoch_interval == 0:
-            test_dict = test()
+        #test_dict = None
+        #if epoch % args.test_epoch_interval == 0:
+        #    test_dict = test()
 
         log_dict = {}
         log_dict.update(
@@ -507,6 +506,6 @@ def train_pose(args):
                 model=model,
                 epoch=epoch,
                 log_dict=log_dict,
-                test_dict=test_dict,
+                test_dict=None,
             )
         dist.barrier()

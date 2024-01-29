@@ -71,7 +71,7 @@ def make_cfg(args):
     # Training
     cfg.batch_size = 16
     cfg.epoch_size = 115200
-    cfg.n_epochs = 700
+    cfg.n_epochs = 3
     cfg.n_dataloader_workers = N_WORKERS
 
     # Method
