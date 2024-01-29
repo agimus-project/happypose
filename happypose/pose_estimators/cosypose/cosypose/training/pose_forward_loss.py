@@ -63,10 +63,11 @@ def h_pose(model, mesh_db, data, meters, cfg, n_iterations=1, input_generator="f
     losses_TCO_iter = []
     for n in range(n_iterations):
         iter_outputs = outputs[f"iteration={n+1}"]
-        K_crop = iter_outputs["K_crop"]
-        TCO_input = iter_outputs["TCO_input"]
-        TCO_pred = iter_outputs["TCO_output"]
-        model_outputs = iter_outputs["model_outputs"]
+        K_crop = iter_outputs.K_crop
+        TCO_input = iter_outputs.TCO_input
+        TCO_pred = iter_outputs.TCO_output
+        model_outputs = iter_outputs.model_outputs
+
 
         if cfg.loss_disentangled:
             if cfg.n_pose_dims == 9:

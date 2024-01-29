@@ -59,6 +59,7 @@ class PosePredictorOutputCosypose:
     K_crop: torch.Tensor
     boxes_rend: torch.Tensor
     boxes_crop: torch.Tensor
+    model_outputs: torch.Tensor
 
 
 @dataclass

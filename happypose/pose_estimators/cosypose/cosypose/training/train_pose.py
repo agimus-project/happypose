@@ -97,7 +97,7 @@ def make_eval_bundle(args, model_training):
         if run_id is None:
             return None
         run_dir = EXP_DIR / run_id
-        cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.FullLoader)
+        cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.Loader)
         cfg = check_update_config(cfg)
         model = (
             create_model_pose(
@@ -422,7 +422,7 @@ def train_pose(args):
             iterator = tqdm(ds_iter_train, ncols=80)
             t = time.time()
             for n, sample in enumerate(iterator):
-                if n < 5:
+                if n < 3:
                     if n > 0:
                         meters_time["data"].add(time.time() - t)
 
@@ -453,7 +453,7 @@ def train_pose(args):
                         lr_scheduler_warmup.step()
                     t = time.time()
                 else:
-                    continue
+                    break
             if epoch >= args.n_epochs_warmup:
                 lr_scheduler.step()
 
@@ -461,11 +461,11 @@ def train_pose(args):
         def validation():
             model.eval()
             for n, sample in enumerate(tqdm(ds_iter_val, ncols=80)):
-                if n < 5:
+                if n < 3:
                     loss = h(data=sample, meters=meters_val)
                     meters_val["loss_total"].add(loss.item())
                 else:
-                    continue
+                    break
 
         @torch.no_grad()
         def test():

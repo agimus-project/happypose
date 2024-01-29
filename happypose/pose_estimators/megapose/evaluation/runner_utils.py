@@ -30,7 +30,6 @@ logger = get_logger(__name__)
 def run_pred_eval(pred_runner, pred_kwargs, eval_runner, eval_preds=None):
     all_predictions = {}
     for pred_prefix, pred_kwargs_n in pred_kwargs.items():
-        print("Prediction :", pred_prefix)
         preds = pred_runner.get_predictions(**pred_kwargs_n)
         for preds_name, preds_n in preds.items():
             all_predictions[f"{pred_prefix}/{preds_name}"] = preds_n

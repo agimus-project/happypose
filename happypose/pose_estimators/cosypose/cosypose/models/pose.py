@@ -167,6 +167,7 @@ class PosePredictor(nn.Module):
                 K_crop=K_crop,
                 boxes_rend=boxes_rend,
                 boxes_crop=boxes_crop,
+                model_outputs=model_outputs
             )
 
             TCO_input = TCO_output

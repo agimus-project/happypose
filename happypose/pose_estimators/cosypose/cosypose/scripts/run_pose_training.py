@@ -10,6 +10,9 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 logger = get_logger(__name__)
 
 
+import warnings
+warnings.filterwarnings("ignore")
+
 def make_cfg(args):
     cfg = argparse.ArgumentParser("").parse_args([])
     if args.config:
@@ -56,7 +59,7 @@ def make_cfg(args):
     cfg.n_pose_dims = 9
     cfg.n_rendering_workers = N_WORKERS
     cfg.refiner_run_id_for_test = None
-    cfg.coarse_run_id_for_test = None
+    cfg.coarse_run_id_for_test = "coarse-bop-ycbv-pbr--724183"
 
     # Optimizer
     cfg.lr = 3e-4
@@ -66,7 +69,7 @@ def make_cfg(args):
     cfg.clip_grad_norm = 0.5
 
     # Training
-    cfg.batch_size = 32
+    cfg.batch_size = 16
     cfg.epoch_size = 115200
     cfg.n_epochs = 700
     cfg.n_dataloader_workers = N_WORKERS
