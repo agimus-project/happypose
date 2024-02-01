@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
 from .augmentations import (
     CropResizeToAspectAugmentation,
@@ -125,7 +125,7 @@ class PoseDataset(torch.utils.data.Dataset):
         obj = random.sample(objects_visible, k=1)[0]
         TWO = torch.as_tensor(obj["TWO"])
         TWC = torch.as_tensor(state["camera"]["TWC"])
-        TCO = invert_T(TWC) @ TWO
+        TCO = invert_transform_matrices(TWC) @ TWO
 
         data = PoseData(
             images=np.asarray(rgb),

@@ -7,12 +7,12 @@ import seaborn as sns
 import torch
 import transforms3d
 
-from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import euler2quat
 from happypose.pose_estimators.cosypose.cosypose.lib3d.transform import Transform
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import (  # noqa: E501
     BulletSceneRenderer,
 )
+from happypose.toolbox.lib3d.rotations import euler2quat
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
 from .plotter import Plotter
 
@@ -99,8 +99,8 @@ def make_scene_renderings(
     TWWB = objects.poses[object_id_ref]
 
     cam = cameras[[0]]
-    TCWB = invert_T(cam.TWC.squeeze(0)) @ TWWB
-    TWBC = invert_T(TCWB)
+    TCWB = invert_transform_matrices(cam.TWC.squeeze(0)) @ TWWB
+    TWBC = invert_transform_matrices(TCWB)
     if TWBC[2, -1] < 0:
         quat = euler2quat([np.pi, 0, 0])
         TWWB = Transform(TWWB.numpy()) * Transform(quat, np.zeros(3))

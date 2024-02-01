@@ -13,9 +13,9 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d.symmetric_distances impor
     scatter_argmin,
     symmetric_distance_batched_fast,
 )
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.utils.timer import Timer
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
 logger = get_logger(__name__)
 
@@ -31,7 +31,7 @@ def estimate_camera_poses(TC1Oa, TC2Ob, labels_ab, TC1Og, TC2Od, labels_gd, mesh
     assert TC2Od.shape == (bsz, 4, 4)
     assert len(labels_ab) == bsz
     assert len(labels_gd) == bsz
-    TObC2 = invert_T(TC2Ob)
+    TObC2 = invert_transform_matrices(TC2Ob)
 
     meshes_ab = mesh_db.select(labels_ab)
     ids_expand, sym_ids = expand_ids_for_symmetry(labels_ab, mesh_db.n_sym_mapping)
@@ -187,7 +187,7 @@ def multiview_candidate_matching(
         view_map = cameras.infos.set_index("view_id")
         TWC1 = cameras.TWC[view_map.loc[seeds["view1"], "idx"].values]
         TWC2 = cameras.TWC[view_map.loc[seeds["view2"], "idx"].values]
-        TC1C2 = invert_T(TWC1) @ TWC2
+        TC1C2 = invert_transform_matrices(TWC1) @ TWC2
     timer_models.pause()
 
     timer_score.start()

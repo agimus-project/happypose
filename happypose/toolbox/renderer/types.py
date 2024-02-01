@@ -22,6 +22,7 @@ from typing import Callable, Optional, Tuple
 import numpy as np
 import panda3d as p3d
 import panda3d.core
+import torch
 from direct.showbase.ShowBase import ShowBase
 
 # MegaPose
@@ -40,6 +41,19 @@ Resolution = Tuple[int, int]
 TCCGL = Transform(
     np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float),
 )
+
+
+@dataclass
+class BatchRenderOutput:
+    """rgb: (bsz, 3, h, w) float, values in [0, 1]
+    normals: (bsz, 3, h, w) float, values in [0, 1]
+    depth: (bsz, 1, h, w) float, in meters.
+    """
+
+    rgbs: torch.Tensor
+    normals: Optional[torch.Tensor]
+    depths: Optional[torch.Tensor]
+
 
 
 @dataclass

@@ -1,10 +1,10 @@
 import torch
 
-from .rotations import (
+from happypose.toolbox.lib3d.rotations import (
     compute_rotation_matrix_from_ortho6d,
     compute_rotation_matrix_from_quaternions,
 )
-from .transform_ops import transform_pts
+from happypose.toolbox.lib3d.transform_ops import transform_pts
 
 
 def l1(diff):

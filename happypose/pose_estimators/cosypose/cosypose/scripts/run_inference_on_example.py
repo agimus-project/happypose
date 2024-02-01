@@ -32,10 +32,6 @@ from happypose.toolbox.utils.logging import get_logger, set_logging_level
 from happypose.toolbox.visualization.bokeh_plotter import BokehPlotter
 from happypose.toolbox.visualization.utils import make_contour_overlay
 
-# from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer
-# import BulletSceneRenderer
-
-
 ########################
 
 

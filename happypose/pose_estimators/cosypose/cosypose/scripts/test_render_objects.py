@@ -2,14 +2,16 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import (  # noqa: E501
-    BulletSceneRenderer,
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
+    make_urdf_dataset,
 )
+from happypose.toolbox.renderer.bullet_scene_renderer import BulletSceneRenderer
 
 if __name__ == "__main__":
-    # obj_ds_name = 'hb'
-    obj_ds_name = "itodd"
-    renderer = BulletSceneRenderer(obj_ds_name, gpu_renderer=True)
+    # ds_name = 'hb'
+    ds_name = "ycbv"
+    urdf_ds = make_urdf_dataset(ds_name)
+    renderer = BulletSceneRenderer(urdf_ds, gpu_renderer=False)
     TCO = torch.tensor(
         [
             [0, 1, 0, 0],

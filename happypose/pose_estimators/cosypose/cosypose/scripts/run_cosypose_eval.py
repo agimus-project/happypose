@@ -53,9 +53,6 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor impor
 from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import (
     MeshDataBase,
 )
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import (  # noqa: E501
-    BulletBatchRenderer,
-)
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
     check_update_config,
     create_model_coarse,
@@ -68,6 +65,9 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.renderer.bullet_batch_renderer import (  # noqa: E501
+    BulletBatchRenderer,
+)
 
 logger = get_logger(__name__)
 

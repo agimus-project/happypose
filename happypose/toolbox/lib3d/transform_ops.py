@@ -23,7 +23,7 @@ import torch
 import transforms3d
 
 # Local Folder
-from .rotations import compute_rotation_matrix_from_ortho6d
+from happypose.toolbox.lib3d.rotations import compute_rotation_matrix_from_ortho6d
 
 
 def transform_pts(T: torch.Tensor, pts: torch.Tensor) -> torch.Tensor:

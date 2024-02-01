@@ -3,12 +3,14 @@ import multiprocessing
 import numpy as np
 import torch
 
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
-
-from .bullet_scene_renderer import BulletSceneRenderer
+from happypose.toolbox.datasets.datasets_cfg import UrdfDataset, make_urdf_dataset
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
+from happypose.toolbox.renderer.bullet_scene_renderer import BulletSceneRenderer
+from happypose.toolbox.renderer.types import BatchRenderOutput
 
 
 def init_renderer(urdf_ds, preload=True, gpu_renderer=True):
+    urdf_ds: UrdfDataset = make_urdf_dataset(urdf_ds)
     renderer = BulletSceneRenderer(
         urdf_ds=urdf_ds,
         preload_cache=preload,
@@ -63,7 +65,7 @@ class BulletBatchRenderer:
 
     def render(self, obj_infos, TCO, K, resolution=(240, 320), render_depth=False):
         TCO = torch.as_tensor(TCO).detach()
-        TOC = invert_T(TCO).cpu().numpy()
+        TOC = invert_transform_matrices(TCO).cpu().numpy()
         K = torch.as_tensor(K).cpu().numpy()
         bsz = len(TCO)
         assert TCO.shape == (bsz, 4, 4)
@@ -123,9 +125,9 @@ class BulletBatchRenderer:
             else:
                 depths = torch.as_tensor(np.stack(depths, axis=0))
             depths = depths.float()
-            return images, depths
+            return BatchRenderOutput(images, depths)
         else:
-            return images
+            return BatchRenderOutput(images)
 
     def init_plotters(self, preload_cache, gpu_renderer):
         self.plotters = []

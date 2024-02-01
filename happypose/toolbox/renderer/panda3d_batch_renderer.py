@@ -25,10 +25,9 @@ import torch.multiprocessing
 
 # HappyPose
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
-
-# MegaPose
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
+from happypose.toolbox.renderer.types import BatchRenderOutput
 from happypose.toolbox.utils.logging import get_logger
 
 # Local Folder
@@ -55,19 +54,6 @@ class RenderOutput:
     rgb: torch.Tensor
     normals: Optional[torch.Tensor]
     depth: Optional[torch.Tensor]
-
-
-@dataclass
-class BatchRenderOutput:
-    """rgb: (bsz, 3, h, w) float, values in [0, 1]
-    normals: (bsz, 3, h, w) float, values in [0, 1]
-    depth: (bsz, 1, h, w) float, in meters.
-    """
-
-    rgbs: torch.Tensor
-    normals: Optional[torch.Tensor]
-    depths: Optional[torch.Tensor]
-
 
 @dataclass
 class SceneData:

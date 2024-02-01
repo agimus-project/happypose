@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 
 import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 from happypose.pose_estimators.cosypose.cosypose.multiview.bundle_adjustment import (
     MultiviewRefinement,
     make_view_groups,
@@ -11,6 +10,7 @@ from happypose.pose_estimators.cosypose.cosypose.multiview.ransac import (
     multiview_candidate_matching,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
 logger = get_logger(__name__)
 
@@ -42,7 +42,7 @@ class MultiviewScenePredictor:
                 }
                 data_ = tc.PandasTensorCollection(
                     infos=pd.DataFrame(infos),
-                    poses=invert_T(cam.TWC) @ obj.TWO,
+                    poses=invert_transform_matrices(cam.TWC) @ obj.TWO,
                 )
                 TCO_data.append(data_)
         return tc.concatenate(TCO_data)

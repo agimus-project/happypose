@@ -23,8 +23,8 @@ import numpy as np
 import numpy.typing as npt
 
 # Local Folder
-from .rotations import euler2quat
-from .transform import Transform
+from happypose.toolbox.lib3d.rotations import euler2quat
+from happypose.toolbox.lib3d.transform import Transform
 
 
 @dataclass
