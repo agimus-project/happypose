@@ -24,6 +24,8 @@ from .ransac import make_obj_infos
 
 logger = get_logger(__name__)
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def make_view_groups(pairs_TC1C2):
     views = pairs_TC1C2.infos.loc[:, ["view1", "view2"]].values.T
@@ -272,7 +274,8 @@ class MultiviewRefinement:
         A = J.t() @ J + lambd * self.idJ
         b = J.t() @ errors
         # Pinverse is faster on CPU.
-        h = torch.pinverse(A.cpu()).cuda() @ b
+        # h = torch.pinverse(A.cpu()).cuda() @ b
+        h = torch.pinverse(A.cpu()).to(device) @ b
         return h.flatten()
 
     def optimize_lm(

@@ -7,13 +7,15 @@ import seaborn as sns
 import torch
 import transforms3d
 
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform import Transform
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import (  # noqa: E501
+from happypose.toolbox.lib3d.rotations import euler2quat
+from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
+from happypose.toolbox.renderer.bullet_scene_renderer import (  # noqa: E501
     BulletSceneRenderer,
 )
-from happypose.toolbox.lib3d.rotations import euler2quat
-from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
-
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
+    make_urdf_dataset,
+)
 from .plotter import Plotter
 
 
@@ -74,10 +76,12 @@ def make_scene_renderings(
     use_nms3d=True,
     camera_color=(0.2, 0.2, 0.2, 1.0),
 ):
+    urdf_ds = make_urdf_dataset([urdf_ds_name, "camera"])
     renderer = BulletSceneRenderer(
-        [urdf_ds_name, "camera"],
+        urdf_ds,
         background_color=background_color,
         gui=gui,
+        gpu_renderer=False
     )
     urdf_ds = renderer.body_cache.urdf_ds
 

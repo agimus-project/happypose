@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import torch
 
 import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 from happypose.pose_estimators.cosypose.cosypose.multiview.bundle_adjustment import (
@@ -14,13 +15,15 @@ from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
 logger = get_logger(__name__)
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class MultiviewScenePredictor:
     def __init__(self, mesh_db, n_sym=64, ba_aabb=True, ba_n_points=None):
-        self.mesh_db_ransac = mesh_db.batched(n_sym=n_sym, aabb=True).cuda().float()
+        self.mesh_db_ransac = mesh_db.batched(n_sym=n_sym, aabb=True).to(device).float()
         self.mesh_db_ba = (
             mesh_db.batched(aabb=ba_aabb, resample_n_points=ba_n_points, n_sym=n_sym)
-            .cuda()
+            .to(device)
             .float()
         )
 
@@ -90,7 +93,7 @@ class MultiviewScenePredictor:
         predictions["cand_matched"] = candidates
 
         group_infos = make_view_groups(pairs_TC1C2)
-        candidates = candidates.merge_df(group_infos, on="view_id").cuda()
+        candidates = candidates.merge_df(group_infos, on="view_id").to(device)
 
         pred_objects, pred_cameras, pred_reproj = [], [], []
         pred_reproj_init = []
