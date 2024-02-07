@@ -11,7 +11,7 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from .bop import BOPDataset, remap_bop_targets
 from .bop_object_datasets import BOPObjectDataset
 from .texture_dataset import TextureDataset
-from .urdf_dataset import BOPUrdfDataset, OneUrdfDataset
+from .urdf_dataset import OneUrdfDataset, UrdfDataset
 
 logger = get_logger(__name__)
 
@@ -203,27 +203,15 @@ def make_urdf_dataset(ds_name):
         return dataset
 
     # BOP
-    if ds_name == "tless.cad":
-        ds = BOPUrdfDataset(LOCAL_DATA_DIR / "urdfs" / "tless.cad")
-    elif ds_name == "tless.reconst":
-        ds = BOPUrdfDataset(LOCAL_DATA_DIR / "urdfs" / "tless.reconst")
-    elif ds_name == "ycbv":
-        ds = BOPUrdfDataset(LOCAL_DATA_DIR / "urdfs" / "ycbv")
-    elif ds_name == "hb":
-        ds = BOPUrdfDataset(LOCAL_DATA_DIR / "urdfs" / "hb")
-    elif ds_name == "icbin":
-        ds = BOPUrdfDataset(LOCAL_DATA_DIR / "urdfs" / "icbin")
-    elif ds_name == "itodd":
-        ds = BOPUrdfDataset(LOCAL_DATA_DIR / "urdfs" / "itodd")
-    elif ds_name == "lm":
-        ds = BOPUrdfDataset(LOCAL_DATA_DIR / "urdfs" / "lm")
-    elif ds_name == "tudl":
-        ds = BOPUrdfDataset(LOCAL_DATA_DIR / "urdfs" / "tudl")
-
+    if ds_name in {"tless.cad", "tless.reconst", "ycbv", "hb", "icbin", "itodd", "lm", "tudl"}:
+        ds = UrdfDataset(LOCAL_DATA_DIR / "urdfs" / ds_name)
+        ds.index["scale"] = 0.001
+        
     # Custom scenario
     elif "custom" in ds_name:
         scenario = ds_name.split(".")[1]
-        ds = BOPUrdfDataset(LOCAL_DATA_DIR / "scenarios" / scenario / "urdfs")
+        ds = UrdfDataset(LOCAL_DATA_DIR / "scenarios" / scenario / "urdfs")
+        ds.index["scale"] = 0.001
 
     elif ds_name == "camera":
         ds = OneUrdfDataset(ASSET_DIR / "camera/model.urdf", "camera")

@@ -128,13 +128,6 @@ def rendering(predictions, example_dir):
 def save_predictions(example_dir, renderings):
     rgb_render = renderings.rgb
     rgb, _, _ = load_observation(example_dir, load_depth=False)
-    # render_prediction_wrt_camera calls BulletSceneRenderer.render_scene using only one
-    # camera at pose Identity and return only rgb values
-    # BulletSceneRenderer.render_scene: gets a "object list" (prediction like object), a
-    # list of camera infos (with Km pose, res) and renders
-    # a "camera observation" for each camera/viewpoint
-    # Actually, renders: rgb, mask, depth, near, far
-    # rgb_render = render_prediction_wrt_camera(renderer, preds, cam)
     mask = ~(rgb_render.sum(axis=-1) == 0)
     rgb_n_render = rgb.copy()
     rgb_n_render[mask] = rgb_render[mask]

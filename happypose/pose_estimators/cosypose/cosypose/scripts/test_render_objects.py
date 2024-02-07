@@ -7,6 +7,9 @@ from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
 )
 from happypose.toolbox.renderer.bullet_scene_renderer import BulletSceneRenderer
 
+SHOW_ALL_RENDERS = False
+SHOW_LAST_RENDER = True
+
 if __name__ == "__main__":
     # ds_name = 'hb'
     ds_name = "ycbv"
@@ -38,6 +41,7 @@ if __name__ == "__main__":
 
     all_images = []
     labels = renderer.urdf_ds.index["label"].tolist()
+    import matplotlib.pyplot as plt
     for _n, obj_label in tqdm(enumerate(np.random.permutation(labels))):
         obj = {
             "name": obj_label,
@@ -45,3 +49,11 @@ if __name__ == "__main__":
         }
         renders = renderer.render_scene([obj], [cam])[0]["rgb"]
         assert renders.sum() > 0, obj_label
+
+        if SHOW_ALL_RENDERS:
+            plt.imshow(renders)
+            plt.show()
+
+    if SHOW_LAST_RENDER:
+        plt.imshow(renders)
+        plt.show()
