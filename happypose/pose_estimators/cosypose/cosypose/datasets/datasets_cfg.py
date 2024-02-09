@@ -158,7 +158,7 @@ def make_scene_dataset(ds_name, n_frames=None):
     return ds
 
 
-def make_object_dataset(ds_name):
+def make_object_dataset(ds_name: str):
     ds = None
     if ds_name == "tless.cad":
         ds = BOPObjectDataset(BOP_DS_DIR / "tless/models_cad")

@@ -2,6 +2,48 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from xml.dom import minidom
 
+import numpy as np
+import trimesh
+
+from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
+
+
+def convert_rigid_body_dataset_to_urdfs(rb_ds: RigidObjectDataset, urdf_dir: Path, texture_size=(1024, 1024)):
+    """
+    Converts a RigidObjectDataset in a bullet renderer compatible directory with .obj and urdf files.
+    """
+    urdf_dir.mkdir(exist_ok=True, parents=True)
+
+    for obj in rb_ds.list_objects:
+        out_dir = urdf_dir / obj.mesh_path.with_suffix('').name
+        out_dir.mkdir(exist_ok=True)
+        obj_path = out_dir / obj.mesh_path.with_suffix('.obj').name
+        urdf_path = obj_path.with_suffix(".urdf")
+        if obj.mesh_path.suffix == '.ply':
+            if obj_path.exists():
+                obj_path.unlink()
+            trimesh_ply_to_obj(obj.mesh_path, obj_path, texture_size)
+        else: 
+            ValueError(f'{obj.mesh_path.suffix} file type not supported')
+        obj_to_urdf(obj_path, urdf_path)
+
+
+def trimesh_ply_to_obj(ply_path, obj_path, texture_size=None):
+        mesh = trimesh.load(ply_path)
+        obj_label = obj_path.with_suffix('').name
+
+        # adapt materials to match look
+        mesh.visual.material.ambient = np.array([51,51,51,255], dtype=np.uint8)
+        mesh.visual.material.diffuse = np.array([255,255,255,255], dtype=np.uint8)
+        mesh.visual.material.specular = np.array([255,255,255,255], dtype=np.uint8)
+        mesh.visual.material.name = obj_label + '_texture'
+
+        # print(mesh.visual.uv)
+        kwargs_export = {
+            'mtl_name': f'{obj_label}.mtl'
+        }
+        _ = mesh.export(obj_path, **kwargs_export)
+
 
 def obj_to_urdf(obj_path, urdf_path):
     obj_path = Path(obj_path)

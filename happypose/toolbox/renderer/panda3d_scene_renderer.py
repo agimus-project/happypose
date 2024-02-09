@@ -33,7 +33,6 @@ import torch
 from direct.showbase.ShowBase import ShowBase
 from tqdm import tqdm
 
-# MegaPose
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 
 # Local Folder

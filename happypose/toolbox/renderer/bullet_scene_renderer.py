@@ -1,30 +1,45 @@
+from typing import Union
+
 import numpy as np
 import pybullet as pb
 
-from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
-    make_urdf_dataset,
-)
+from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 # from happypose.toolbox.datasets.datasets_cfg import UrdfDataset
 from happypose.pose_estimators.cosypose.cosypose.datasets.urdf_dataset import (
     UrdfDataset,
 )
+
+# TODO: move urdf utilities to happypose toolbox
+from happypose.pose_estimators.cosypose.cosypose.libmesh.urdf_utils import (
+    convert_rigid_body_dataset_to_urdfs,
+)
 from happypose.pose_estimators.cosypose.cosypose.simulator.base_scene import BaseScene
 from happypose.pose_estimators.cosypose.cosypose.simulator.caching import BodyCache
 from happypose.pose_estimators.cosypose.cosypose.simulator.camera import Camera
+from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.lib3d.transform import Transform
 
 
 class BulletSceneRenderer(BaseScene):
     def __init__(
         self,
-        urdf_ds: UrdfDataset,
+        asset_dataset: Union[RigidObjectDataset,UrdfDataset],
         preload_cache=False,
         background_color=(0, 0, 0),
         gpu_renderer=True,
         gui=False,
     ):
-        self.urdf_ds = urdf_ds
+        if isinstance(asset_dataset, UrdfDataset):
+            self.urdf_ds = asset_dataset
+        elif isinstance(asset_dataset, RigidObjectDataset):
+            # Build urdfs files from RigidObjectDataset
+            ds_name = 'tmp'
+            urdf_dir = LOCAL_DATA_DIR / "urdfs" / ds_name
+            convert_rigid_body_dataset_to_urdfs(asset_dataset, urdf_dir)
+            self.urdf_ds = UrdfDataset(urdf_dir)
+            # TODO: BodyCache assumes unique scale for all objects (true for bop datasets)
+            self.urdf_ds.index["scale"] = asset_dataset[0].scale
         self.connect(gpu_renderer=gpu_renderer, gui=gui)
         self.body_cache = BodyCache(self.urdf_ds, self.client_id)
         if preload_cache:
