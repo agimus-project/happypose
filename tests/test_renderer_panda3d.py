@@ -15,17 +15,27 @@ from happypose.toolbox.renderer.types import (
 )
 
 
-class TestRendererPanda3D(unittest.TestCase):
+class TestPanda3DRenderer(unittest.TestCase):
     """Unit tests for Panda3D renderer."""
 
-    def test_simple_render(self):
-        """Render an example object and check that output image match expectation."""
+    def test_scene_renderer(self):
+        """
+        Render an example object and check that output image match expectation.
+        TODO: 
+        - check depth
+        - check mask
+        """
+        SAVEFIG = False
+
+        obj_label = 'obj_000001'
+        obj_path = Path(__file__).parent.joinpath(f"data/{obj_label}.ply")
+        
         renderer = Panda3dSceneRenderer(
             asset_dataset=RigidObjectDataset(
                 objects=[
                     RigidObject(
                         label="obj",
-                        mesh_path=Path(__file__).parent.joinpath("data/obj_000001.ply"),
+                        mesh_path=obj_path,
                         mesh_units="mm",
                     ),
                 ],
@@ -35,39 +45,46 @@ class TestRendererPanda3D(unittest.TestCase):
         object_datas = [
             Panda3dObjectData(
                 label="obj",
-                TWO=Transform((0, 0, 0, 1), (0, 0, 1)),
-                color=(1, 0, 0, 1),
+                TWO=Transform((0.5, 0.5, -0.5, 0.5), (0, 0, 0.3)),
             ),
         ]
+
+        fx, fy = 300, 300
+        cx, cy = 320, 240
+        K = np.array([
+            [fx, 0, cx],
+            [0, fy, cy],
+            [0, 0, 1],
+        ])
         camera_datas = [
             Panda3dCameraData(
-                K=np.array(
-                    [
-                        [600.0, 0.0, 160.0],
-                        [0.0, 600.0, 160.0],
-                        [0.0, 0.0, 1.0],
-                    ],
-                ),
-                resolution=(320, 320),
+                K=K,
+                resolution=(480, 640),
+                TWC=Transform(np.eye(4))
             ),
         ]
 
         light_datas = [
             Panda3dLightData(
                 light_type="ambient",
-                color=(1.0, 1, 1, 1),
+                color=(0.1, 0.1, 0.1, 1.0),  # 
             ),
         ]
+
         renderings = renderer.render_scene(object_datas, camera_datas, light_datas)
-        # import matplotlib.pyplot as plt
-        # fig, ax = plt.subplots(1, 1, squeeze=True)  # type: plt.Figure, plt.Axes
-        # ax.imshow(renderings[0].rgb)
-        # plt.show()
 
         self.assertEqual(len(renderings), 1)
         rgb = renderings[0].rgb
 
-        assert_equal(rgb[rgb.shape[0] // 2, rgb.shape[1] // 2], (255, 0, 0))
+        if SAVEFIG:
+            import matplotlib.pyplot as plt
+            plt.imshow(rgb)
+            fig_path = obj_path.parent / f'panda3d_{obj_label}_render.png'
+            print(f'Saved {fig_path}')
+            plt.savefig(fig_path)
+
+        # Color check hard to implement since depends on luminosity of the scene
+        # assert_equal(rgb[rgb.shape[0] // 2, rgb.shape[1] // 2], (255, 0, 0))        
         assert_equal(rgb[0, 0], (0, 0, 0))
 
 

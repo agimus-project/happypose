@@ -61,7 +61,8 @@ class Transform:
                 assert T[3,:3].sum() == 0.0 and T[3,3] == 1.0
                 self._T = pin.SE3(T)
             else:
-                raise ValueError('Transform contructor: if 1 argument, should be a Transform, pin.SE3, numpy array, or torch Tensor')
+                raise ValueError(f"""Transform contructor: if 1 argument, should be a Transform, 
+                                 pin.SE3, numpy array, or torch Tensor, not {type(arg_T)}""")
 
         elif len(args) == 2:
             rotation, translation = args

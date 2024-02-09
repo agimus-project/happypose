@@ -80,6 +80,9 @@ class Panda3dCameraData:
     node_name: str = "camera"
     positioning_function: Optional[NodeFunction] = None
 
+    def __post_init__(self):
+        self.TWC = Transform(self.TWC)
+
     def compute_view_mat(self) -> p3d.core.LMatrix4f:
         assert self.TWC is not None
         TWCGL = self.TWC * TCCGL
