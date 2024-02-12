@@ -1,4 +1,5 @@
 """Set of unit tests for testing inference example for CosyPose."""
+
 import unittest
 
 import numpy as np

@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 from dataclasses import dataclass
 from typing import List, Optional, Set, Union
