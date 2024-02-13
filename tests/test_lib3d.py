@@ -36,7 +36,7 @@ class TestTransform(unittest.TestCase):
         T1h = Transform(pin.Quaternion(R1).coeffs(), t1)
         T1h = Transform(tuple(pin.Quaternion(R1).coeffs()), t1)
         T1i = Transform(list(pin.Quaternion(R1).coeffs()), t1)
-        T1j = Transform(torch.from_numpy(pin.Quaternion(R1).coeffs()), t1)
+        T1j = Transform(torch.from_numpy(pin.Quaternion(R1).coeffs().copy()), t1)
 
         assert T1 == T1e == T1f 
         assert np.all(np.isclose(T1._T, T1g._T))  # small error due to Quaternion conversion back and forth
