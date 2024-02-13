@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
-from numpy.testing import assert_equal
+from numpy.testing import assert_array_less, assert_equal
 
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.lib3d.transform import Transform
@@ -16,13 +16,10 @@ class TestBulletRenderer(unittest.TestCase):
     def test_scene_renderer(self):
         """
         Render an example object and check that output image match expectation.
-        TODO: 
-        - check depth
-        - check mask
         """
         SAVEFIG = False
 
-        obj_label = 'obj_000002'
+        obj_label = 'obj_000001'
         obj_path = Path(__file__).parent.joinpath(f"data/{obj_label}.ply")
         
         rigid_object_dataset = RigidObjectDataset(
@@ -36,7 +33,8 @@ class TestBulletRenderer(unittest.TestCase):
         )
         renderer = BulletSceneRenderer(asset_dataset=rigid_object_dataset, gpu_renderer=False)
 
-        TWO = Transform((0.5, 0.5, -0.5, 0.5), (0, 0, 0.3))
+        z_obj = 0.3
+        TWO = Transform((0.5, 0.5, -0.5, 0.5), (0, 0, z_obj))
         object_datas = [{
             "name": obj_label,
             "TWO": TWO,
@@ -50,29 +48,40 @@ class TestBulletRenderer(unittest.TestCase):
             [0, 0, 1],
         ])
 
+        width, height = 640, 480
         camera_datas = [{
             "K": K,
-            "resolution": (640, 480),
+            "resolution": (width, height),
             "TWC": Transform(np.eye(4)),
         }]
 
-        renderings = renderer.render_scene(object_datas, camera_datas)
+        renderings = renderer.render_scene(object_datas, camera_datas,
+                                           render_depth=True, render_binary_mask=True)
 
         self.assertEqual(len(renderings), 1)
-        # rgb = renderings[0].rgb
-        rgb = renderings[0]['rgb']
+        rgb = renderings[0].rgb
+        depth = renderings[0].depth
+        binary_mask = renderings[0].binary_mask
 
         if SAVEFIG:
             import matplotlib.pyplot as plt
-            plt.figure()
+            plt.subplot(1,2,1)
             plt.imshow(rgb)
-            fig_path = obj_path.parent / f'bullet_{obj_label}_render.png'
+            plt.subplot(1,2,2)
+            plt.imshow(depth, cmap=plt.cm.gray_r)
+            fig_path = obj_path.parent / f'panda3d_{obj_label}_render.png'
             print(f'Saved {fig_path}')
             plt.savefig(fig_path)
 
-        # Color check hard to implement since depends on luminosity of the scene
-        # assert_equal(rgb[rgb.shape[0] // 2, rgb.shape[1] // 2], (255, 0, 0))
+        # ================================
         assert_equal(rgb[0, 0], (0, 0, 0))
+        assert_array_less((0, 0, 0), rgb[height // 2, width // 2])
+
+        assert depth[0, 0] == 0
+        assert depth[height // 2, width // 2] < z_obj   
+
+        assert binary_mask[0,0] == 0        
+        assert binary_mask[height // 2, width // 2] == 1        
 
 
 if __name__ == "__main__":

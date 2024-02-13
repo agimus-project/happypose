@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
-from numpy.testing import assert_equal
+from numpy.testing import assert_array_less, assert_equal
 
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.lib3d.transform import Transform
@@ -21,9 +21,6 @@ class TestPanda3DRenderer(unittest.TestCase):
     def test_scene_renderer(self):
         """
         Render an example object and check that output image match expectation.
-        TODO: 
-        - check depth
-        - check mask
         """
         SAVEFIG = False
 
@@ -41,11 +38,11 @@ class TestPanda3DRenderer(unittest.TestCase):
                 ],
             ),
         )
-
+        z_obj = 0.3
         object_datas = [
             Panda3dObjectData(
                 label="obj",
-                TWO=Transform((0.5, 0.5, -0.5, 0.5), (0, 0, 0.3)),
+                TWO=Transform((0.5, 0.5, -0.5, 0.5), (0, 0, z_obj)),
             ),
         ]
 
@@ -56,10 +53,12 @@ class TestPanda3DRenderer(unittest.TestCase):
             [0, fy, cy],
             [0, 0, 1],
         ])
+        
+        width, height = 640, 480
         camera_datas = [
             Panda3dCameraData(
                 K=K,
-                resolution=(480, 640),
+                resolution=(height, width),
                 TWC=Transform(np.eye(4))
             ),
         ]
@@ -67,25 +66,45 @@ class TestPanda3DRenderer(unittest.TestCase):
         light_datas = [
             Panda3dLightData(
                 light_type="ambient",
-                color=(0.1, 0.1, 0.1, 1.0),  # 
+                color=(1.0, 1.0, 1.0, 1.0),  # 
             ),
         ]
 
-        renderings = renderer.render_scene(object_datas, camera_datas, light_datas)
+        renderings = renderer.render_scene(object_datas, camera_datas, light_datas,
+                                           render_depth=True, render_normals=True, render_binary_mask=True)
 
         self.assertEqual(len(renderings), 1)
         rgb = renderings[0].rgb
+        depth = renderings[0].depth
+        normals = renderings[0].normals
+        binary_mask = renderings[0].binary_mask
 
         if SAVEFIG:
             import matplotlib.pyplot as plt
+            plt.subplot(1,3,1)
             plt.imshow(rgb)
+            plt.subplot(1,3,2)
+            plt.imshow(depth, cmap=plt.cm.gray_r)
+            plt.subplot(1,3,3)
+            plt.imshow(normals)
             fig_path = obj_path.parent / f'panda3d_{obj_label}_render.png'
             print(f'Saved {fig_path}')
             plt.savefig(fig_path)
 
-        # Color check hard to implement since depends on luminosity of the scene
-        # assert_equal(rgb[rgb.shape[0] // 2, rgb.shape[1] // 2], (255, 0, 0))        
+
+        # ================================
         assert_equal(rgb[0, 0], (0, 0, 0))
+        assert_array_less((0, 0, 0), rgb[height // 2, width // 2])
+
+        assert depth[0, 0] == 0
+        assert depth[height // 2, width // 2] < z_obj 
+
+        assert_equal(normals[0, 0], (0, 0, 0))
+        assert_array_less((0, 0, 0), normals[height // 2, width // 2])
+
+        assert binary_mask[0,0] == 0        
+        assert binary_mask[height // 2, width // 2] == 1        
+  
 
 
 if __name__ == "__main__":
