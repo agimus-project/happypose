@@ -8,7 +8,7 @@ from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
 )
 from happypose.pose_estimators.cosypose.cosypose.libmesh.urdf_utils import (
     obj_to_urdf,
-    trimesh_ply_to_obj,
+    ply_to_obj,
 )
 
 
@@ -21,7 +21,7 @@ def convert_bop_dataset_to_urdfs(obj_ds_name: str, urdf_dir: Path, texture_size=
         out_dir = urdf_dir / obj["label"]
         out_dir.mkdir(exist_ok=True)
         obj_path = out_dir / ply_path.with_suffix(".obj").name
-        trimesh_ply_to_obj(ply_path, obj_path, texture_size=texture_size)
+        ply_to_obj(ply_path, obj_path, texture_size=texture_size)
         obj_to_urdf(obj_path, obj_path.with_suffix(".urdf"))
 
 

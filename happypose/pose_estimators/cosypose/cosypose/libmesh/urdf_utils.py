@@ -22,27 +22,27 @@ def convert_rigid_body_dataset_to_urdfs(rb_ds: RigidObjectDataset, urdf_dir: Pat
         if obj.mesh_path.suffix == '.ply':
             if obj_path.exists():
                 obj_path.unlink()
-            trimesh_ply_to_obj(obj.mesh_path, obj_path, texture_size)
+            ply_to_obj(obj.mesh_path, obj_path, texture_size)
         else: 
             ValueError(f'{obj.mesh_path.suffix} file type not supported')
         obj_to_urdf(obj_path, urdf_path)
 
 
-def trimesh_ply_to_obj(ply_path, obj_path, texture_size=None):
-        mesh = trimesh.load(ply_path)
-        obj_label = obj_path.with_suffix('').name
+def ply_to_obj(ply_path, obj_path, texture_size=None):
+    mesh = trimesh.load(ply_path)
+    obj_label = obj_path.with_suffix('').name
 
-        # adapt materials to match look
-        mesh.visual.material.ambient = np.array([51,51,51,255], dtype=np.uint8)
-        mesh.visual.material.diffuse = np.array([255,255,255,255], dtype=np.uint8)
-        mesh.visual.material.specular = np.array([255,255,255,255], dtype=np.uint8)
-        mesh.visual.material.name = obj_label + '_texture'
+    # adapt materials according to previous example meshes
+    mesh.visual.material.ambient = np.array([51,51,51,255], dtype=np.uint8)
+    mesh.visual.material.diffuse = np.array([255,255,255,255], dtype=np.uint8)
+    mesh.visual.material.specular = np.array([255,255,255,255], dtype=np.uint8)
+    mesh.visual.material.name = obj_label + '_texture'
 
-        # print(mesh.visual.uv)
-        kwargs_export = {
-            'mtl_name': f'{obj_label}.mtl'
-        }
-        _ = mesh.export(obj_path, **kwargs_export)
+    # print(mesh.visual.uv)
+    kwargs_export = {
+        'mtl_name': f'{obj_label}.mtl'
+    }
+    _ = mesh.export(obj_path, **kwargs_export)
 
 
 def obj_to_urdf(obj_path, urdf_path):
