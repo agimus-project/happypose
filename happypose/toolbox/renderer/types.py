@@ -21,7 +21,6 @@ from typing import Callable, Optional, Tuple
 # Third Party
 import numpy as np
 import panda3d as p3d
-import panda3d.core
 import torch
 from direct.showbase.ShowBase import ShowBase
 
@@ -36,7 +35,7 @@ NodeFunction = Callable[
     [p3d.core.NodePath, p3d.core.NodePath],
     None,
 ]  # (root_node_path, object_node_path)
-Resolution = Tuple[int, int]
+Resolution = Tuple[int, int]  # width, height
 
 TCCGL = Transform(
     np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float),
