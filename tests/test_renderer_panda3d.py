@@ -3,10 +3,12 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+import torch
 from numpy.testing import assert_array_less, assert_equal
 
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
 from happypose.toolbox.renderer.types import (
     Panda3dCameraData,
@@ -18,32 +20,28 @@ from happypose.toolbox.renderer.types import (
 class TestPanda3DRenderer(unittest.TestCase):
     """Unit tests for Panda3D renderer."""
 
-    def test_scene_renderer(self):
-        """
-        Render an example object and check that output image match expectation.
-        """
-        SAVEFIG = False
 
-        obj_label = 'obj_000001'
-        obj_path = Path(__file__).parent.joinpath(f"data/{obj_label}.ply")
-        
-        renderer = Panda3dSceneRenderer(
-            asset_dataset=RigidObjectDataset(
-                objects=[
-                    RigidObject(
-                        label="obj",
-                        mesh_path=obj_path,
-                        mesh_units="mm",
-                    ),
-                ],
-            ),
+    def setUp(self) -> None:
+
+        self.obj_label = 'obj_000001'
+        self.obj_path = Path(__file__).parent.joinpath(f"data/{self.obj_label}.ply")
+        self.asset_dataset = RigidObjectDataset(
+            objects=[
+                RigidObject(
+                    label="obj",
+                    mesh_path=self.obj_path,
+                    mesh_units="mm"
+                )
+            ]
         )
-        z_obj = 0.3
-        object_datas = [
+        
+        self.z_obj = 0.3
+        self.TWO=Transform((0.5, 0.5, -0.5, 0.5), (0, 0, self.z_obj))
+        self.object_datas = [
             Panda3dObjectData(
                 label="obj",
-                TWO=Transform((0.5, 0.5, -0.5, 0.5), (0, 0, z_obj)),
-            ),
+                TWO=self.TWO
+            )
         ]
 
         fx, fy = 300, 300
@@ -54,23 +52,34 @@ class TestPanda3DRenderer(unittest.TestCase):
             [0, 0, 1],
         ])
         
-        width, height = 640, 480
-        camera_datas = [
+        self.TWC = Transform(np.eye(4))
+        self.width, self.height = 640, 480
+        self.camera_datas = [
             Panda3dCameraData(
                 K=K,
-                resolution=(height, width),
-                TWC=Transform(np.eye(4))
-            ),
+                resolution=(self.height, self.width),
+                TWC=self.TWC
+            )
         ]
 
-        light_datas = [
+        self.light_datas = [
             Panda3dLightData(
                 light_type="ambient",
-                color=(1.0, 1.0, 1.0, 1.0),  # 
+                color=(1.0, 1.0, 1.0, 1.0)
             ),
         ]
 
-        renderings = renderer.render_scene(object_datas, camera_datas, light_datas,
+    def test_scene_renderer(self):
+        """
+        Scene render an example object and check that output image match expectation.
+        """
+        SAVEFIG = False
+
+        renderer = Panda3dSceneRenderer(
+            asset_dataset=self.asset_dataset
+        )
+
+        renderings = renderer.render_scene(self.object_datas, self.camera_datas, self.light_datas,
                                            render_depth=True, render_normals=True, render_binary_mask=True)
 
         self.assertEqual(len(renderings), 1)
@@ -87,23 +96,72 @@ class TestPanda3DRenderer(unittest.TestCase):
             plt.imshow(depth, cmap=plt.cm.gray_r)
             plt.subplot(1,3,3)
             plt.imshow(normals)
-            fig_path = obj_path.parent / f'panda3d_{obj_label}_render.png'
+            fig_path = self.obj_path.parent / f'panda3d_{self.obj_label}_render.png'
             print(f'Saved {fig_path}')
             plt.savefig(fig_path)
 
+        # ================================
+        assert_equal(rgb[0, 0], (0, 0, 0))
+        assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2])
+
+        assert depth[0, 0] == 0
+        assert depth[self.height // 2, self.width // 2] < self.z_obj 
+
+        assert_equal(normals[0, 0], (0, 0, 0))
+        assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2])
+
+        assert binary_mask[0,0] == 0        
+        assert binary_mask[self.height // 2, self.width // 2] == 1        
+  
+
+    def test_batch_renderer(self):
+        """
+        Batch render an example object and check that output image match expectation.
+        """
+        SAVEFIG = False
+
+        renderer = Panda3dBatchRenderer(
+            object_dataset=self.asset_dataset,
+            n_workers=1,
+            preload_cache=True,
+            split_objects=False,
+        )
+
+        TCO = torch.from_numpy((self.TWC.inverse() * self.TWO).matrix)
+        K = torch.from_numpy(K)
+        renderings = renderer.render([self.obj_label], TCO, K, self.light_datas,
+                                    render_depth=True, render_normals=True, render_binary_mask=True)
+
+        self.assertEqual(len(renderings), 1)
+        rgb = renderings[0].rgb
+        depth = renderings[0].depth
+        normals = renderings[0].normals
+        binary_mask = renderings[0].binary_mask
+
+        if SAVEFIG:
+            import matplotlib.pyplot as plt
+            plt.subplot(1,3,1)
+            plt.imshow(rgb)
+            plt.subplot(1,3,2)
+            plt.imshow(depth, cmap=plt.cm.gray_r)
+            plt.subplot(1,3,3)
+            plt.imshow(normals)
+            fig_path = self.obj_path.parent / f'panda3d_{self.obj_label}_render.png'
+            print(f'Saved {fig_path}')
+            plt.savefig(fig_path)
 
         # ================================
         assert_equal(rgb[0, 0], (0, 0, 0))
-        assert_array_less((0, 0, 0), rgb[height // 2, width // 2])
+        assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2])
 
         assert depth[0, 0] == 0
-        assert depth[height // 2, width // 2] < z_obj 
+        assert depth[self.height // 2, self.width // 2] < self.z_obj 
 
         assert_equal(normals[0, 0], (0, 0, 0))
-        assert_array_less((0, 0, 0), normals[height // 2, width // 2])
+        assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2])
 
         assert binary_mask[0,0] == 0        
-        assert binary_mask[height // 2, width // 2] == 1        
+        assert binary_mask[self.height // 2, self.width // 2] == 1        
   
 
 
