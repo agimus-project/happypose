@@ -18,10 +18,9 @@ logger = get_logger(__name__)
 class MultiviewScenePredictor:
     def __init__(self, mesh_db, n_sym=64, ba_aabb=True, ba_n_points=None):
         self.mesh_db_ransac = mesh_db.batched(n_sym=n_sym, aabb=True).float()
-        self.mesh_db_ba = (
-            mesh_db.batched(aabb=ba_aabb, resample_n_points=ba_n_points, n_sym=n_sym)
-            .float()
-        )
+        self.mesh_db_ba = mesh_db.batched(
+            aabb=ba_aabb, resample_n_points=ba_n_points, n_sym=n_sym
+        ).float()
 
     def reproject_scene(self, objects, cameras):
         TCO_data = []
