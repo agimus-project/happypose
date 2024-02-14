@@ -172,8 +172,8 @@ class ObservationTensor:
         Args:
         ----
             rgb: [H,W,3] np.uint8
-            depth: [H,W] np.float
-            K: [3,3] np.float
+            depth: [H,W] float
+            K: [3,3] float
 
         """
         assert rgb.dtype == np.uint8

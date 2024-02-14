@@ -102,7 +102,7 @@ def score_tmaches_batch(candidates, tmatches, TC1C2, mesh_db, bsz=4096):
 def scene_level_matching(candidates, inliers):
     cand1 = inliers["inlier_matches_cand1"]
     cand2 = inliers["inlier_matches_cand2"]
-    edges = np.ones((len(cand1)), dtype=np.int)
+    edges = np.ones((len(cand1)), dtype=int)
     n_cand = len(candidates)
     graph = csr_matrix((edges, (cand1, cand2)), shape=(n_cand, n_cand))
     n_components, ids = connected_components(graph, directed=True, connection="strong")
@@ -110,7 +110,7 @@ def scene_level_matching(candidates, inliers):
     component_size = defaultdict(lambda: 0)
     for idx in ids:
         component_size[idx] += 1
-    obj_n_cand = np.empty(len(ids), dtype=np.int)
+    obj_n_cand = np.empty(len(ids), dtype=int)
     for n, idx in enumerate(ids):
         obj_n_cand[n] = component_size[idx]
 
@@ -132,7 +132,7 @@ def scene_level_matching(candidates, inliers):
 def make_obj_infos(matched_candidates):
     scene_infos = matched_candidates.infos.loc[:, ["obj_id", "score", "label"]].copy()
     gb = scene_infos.groupby("obj_id")
-    scene_infos["n_cand"] = gb["score"].transform(len).astype(np.int)
+    scene_infos["n_cand"] = gb["score"].transform(len).astype(int)
     scene_infos["score"] = gb["score"].transform(np.sum)
     scene_infos = gb.first().reset_index(drop=False)
     return scene_infos

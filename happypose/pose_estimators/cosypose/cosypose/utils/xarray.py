@@ -24,7 +24,7 @@ def xr_merge(ds1, ds2, on, how="left", dim1="dim_0", dim2="dim_0", fill_value=np
     mask = np.isfinite(idx2)
     # assert mask.sum() == ds2.dims[dim1]
     idx1 = idx1[mask]
-    idx2 = idx2[mask].astype(np.int)
+    idx2 = idx2[mask].astype(int)
 
     for k, data_var in ds2.data_vars.items():
         array = data_var.values

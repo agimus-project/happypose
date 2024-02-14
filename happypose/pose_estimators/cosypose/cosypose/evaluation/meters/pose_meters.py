@@ -361,7 +361,7 @@ class PoseErrorMeter(Meter):
             label_df = label_df.sort_values("score", ascending=False).reset_index(
                 drop=True,
             )
-            label_df["n_tp"] = np.cumsum(label_df[valid_k].values.astype(np.float))
+            label_df["n_tp"] = np.cumsum(label_df[valid_k].values.astype(float))
             label_df["prec"] = label_df["n_tp"] / (np.arange(len(label_df)) + 1)
             label_df["recall"] = label_df["n_tp"] / label_n_gt
             y_true = label_df[valid_k]
