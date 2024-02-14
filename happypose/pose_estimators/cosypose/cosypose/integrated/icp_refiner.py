@@ -28,7 +28,7 @@ def get_normal(
         mask[depth_refine == 0] = 1
         depth_refine = depth_refine.astype(np.float32)
         depth_refine = cv2.inpaint(depth_refine, mask, 2, cv2.INPAINT_NS)
-        depth_refine = depth_refine.astype(np.float)
+        depth_refine = depth_refine.astype(float)
         depth_refine = ndimage.gaussian_filter(depth_refine, 2)
 
     uv_table = np.zeros((res_y, res_x, 2), dtype=np.int16)

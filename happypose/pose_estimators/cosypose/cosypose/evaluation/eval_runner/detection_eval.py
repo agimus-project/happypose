@@ -66,7 +66,7 @@ class DetectionEvaluation:
             "view_id": np.empty(0, dtype=int),
             "scene_id": np.empty(0, dtype=int),
             "label": np.empty(0, dtype=np.object),
-            "score": np.empty(0, dtype=np.float),
+            "score": np.empty(0, dtype=float),
         }
         bboxes = torch.empty(0, 4, dtype=torch.float)
         return tc.PandasTensorCollection(infos=pd.DataFrame(infos), bboxes=bboxes)
