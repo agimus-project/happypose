@@ -181,7 +181,7 @@ def mark_inliers(cand_inputs, cand_matched):
     )
     infos["is_inlier"] = infos["is_inlier"].astype(float)
     infos.loc[~np.isfinite(infos.loc[:, "is_inlier"].astype(float)), "is_inlier"] = 0
-    infos["is_inlier"] = infos["is_inlier"].astype(np.bool)
+    infos["is_inlier"] = infos["is_inlier"].astype(bool)
     cand_inputs.infos = infos
     return cand_inputs
 
