@@ -74,8 +74,8 @@ class EvaluationRunner:
     @staticmethod
     def make_empty_predictions():
         infos = {
-            "view_id": np.empty(0, dtype=np.int),
-            "scene_id": np.empty(0, dtype=np.int),
+            "view_id": np.empty(0, dtype=int),
+            "scene_id": np.empty(0, dtype=int),
             "label": np.empty(0, dtype=np.object),
             "score": np.empty(0, dtype=np.float),
         }
