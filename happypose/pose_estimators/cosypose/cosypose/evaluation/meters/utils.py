@@ -25,7 +25,7 @@ def add_inst_num(
     group_keys=["scene_id", "view_id", "label"],
     key="pred_inst_num",
 ):
-    inst_num = np.empty(len(infos), dtype=np.int)
+    inst_num = np.empty(len(infos), dtype=int)
     for _group_name, group_ids in infos.groupby(group_keys).groups.items():
         inst_num[group_ids.values] = np.arange(len(group_ids))
     infos[key] = inst_num
