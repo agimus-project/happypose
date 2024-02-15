@@ -44,20 +44,40 @@ TCCGL = Transform(
 
 @dataclass
 class BatchRenderOutput:
-    """rgb: (bsz, 3, h, w) float, values in [0, 1]
-    normals: (bsz, 3, h, w) float, values in [0, 1]
-    depth: (bsz, 1, h, w) float, in meters.
+    """
+    rgb: (bsz, 3, h, w) torch.float32, values in [0, 1]
+    normals: (bsz, 3, h, w) torch.float32, values in [0, 1]
+    depths: (bsz, 1, h, w) torch.float32, in meters.
+    binary_masks: (bsz, 1, h, w) bool.
     """
 
     rgbs: torch.Tensor
     normals: Optional[torch.Tensor]
     depths: Optional[torch.Tensor]
+    binary_masks: Optional[torch.Tensor]
 
+
+@dataclass
+class WorkerRenderOutput:
+    """
+    data_id: int
+    rgb: (h, w, 3) uint8
+    normals: (h, w, 3) uint8
+    depth: (h, w, 1) float32
+    binary_mask: (h, w, 1) bool
+    """
+
+    data_id: int
+    rgb: torch.Tensor
+    normals: Optional[torch.Tensor]
+    depth: Optional[torch.Tensor]
+    binary_mask: Optional[torch.Tensor]
 
 
 @dataclass
 class CameraRenderingData:
-    """rgb: (h, w, 3) uint8
+    """
+    rgb: (h, w, 3) uint8
     normals: (h, w, 3) uint8
     depth: (h, w, 1) float32
     binary_mask: (h, w, 1) np.bool_.

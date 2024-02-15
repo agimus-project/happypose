@@ -79,28 +79,28 @@ class BulletSceneRenderer(BaseScene):
             cam.set_intrinsic_K(K)
             cam.set_extrinsic_T(TWC)
             cam_obs_ = cam.get_state()
-            im = cam_obs_["rgb"]
+            rgb = cam_obs_["rgb"]
             mask = cam_obs_["mask"]
 
             background_indices = np.logical_or(mask < 0, mask == 255)
 
             if self.background_color is not None:
-                im[background_indices] = self.background_color
+                rgb[background_indices] = self.background_color
 
-            rendering = CameraRenderingData(rgb=im)
+            rendering = CameraRenderingData(rgb=rgb)
 
             if render_binary_mask:
-                binary_mask = np.ones(im.shape[:2], dtype=bool) 
+                binary_mask = np.ones(rgb.shape[:2], dtype=bool)  # (h,w)
                 binary_mask[background_indices] = False
-                rendering.binary_mask = binary_mask
+                rendering.binary_mask = binary_mask[..., np.newaxis]  # (h,w,1)
 
             if render_depth:
-                depth = cam_obs_["depth"]
+                depth = cam_obs_["depth"]  # (h,w)
                 near, far = cam_obs_["near"], cam_obs_["far"]
                 z_n = 2 * depth - 1
                 z_e = 2 * near * far / (far + near - z_n * (far - near))
                 z_e[background_indices] = 0.0
-                rendering.depth = z_e
+                rendering.depth = z_e[..., np.newaxis]  # (h,w,1)
 
             cam_renderings.append(rendering)
             

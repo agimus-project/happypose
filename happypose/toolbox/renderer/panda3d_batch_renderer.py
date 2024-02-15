@@ -98,7 +98,9 @@ def worker_loop(
                 render_binary_mask=render_args.render_binary_mask,
                 copy_arrays=True,  # ensures non-negative strid
             )
-            renderings_ = renderings[0]  # TODO: why take only the first?
+            # by definition, each "scene" in batch rendering corresponds to 1 camera, 1 object 
+            # -> retrieves the first and only rendering
+            renderings_ = renderings[0]
         else:
             h, w = scene_data.camera_data.resolution
             renderings_ = CameraRenderingData(

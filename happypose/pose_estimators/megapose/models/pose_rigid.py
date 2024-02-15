@@ -422,17 +422,15 @@ class PosePredictor(nn.Module):
 
         assert isinstance(self.renderer, Panda3dBatchRenderer)
 
-        render_mask = False
-
         render_data = self.renderer.render(
             labels=labels_mv,
             TCO=TCV_O.flatten(0, 1),
             K=KV.flatten(0, 1),
-            render_mask=render_mask,
-            resolution=self.render_size,
-            render_normals=self.render_normals,
-            render_depth=self.render_depth,
             light_datas=light_datas,
+            resolution=self.render_size,
+            render_depth=self.render_depth,
+            render_binary_mask=False,
+            render_normals=self.render_normals
         )
 
         cat_list = []

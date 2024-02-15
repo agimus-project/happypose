@@ -230,7 +230,8 @@ class TestPanda3DRenderer(unittest.TestCase):
         K = K.repeat(self.Nc, 1, 1)
 
         # labels and light_datas need to have same size as TCO/K batch size
-        renderings = renderer.render(labels=self.Nc*[self.obj_label], 
+        renderings = renderer.render(
+            labels=self.Nc*[self.obj_label], 
             TCO=TCO, 
             K=K, 
             light_datas=self.Nc*[self.light_datas],
@@ -256,10 +257,12 @@ class TestPanda3DRenderer(unittest.TestCase):
         self.assertIsNone(tr_assert_allclose(renderings.depths[0], renderings.depths[1]))
         self.assertIsNone(tr_assert_allclose(renderings.binary_masks[0], renderings.binary_masks[1]))
         
-        rgb = renderings.rgbs[0].movedim(0,-1).numpy()
-        depth = renderings.depths[0].movedim(0,-1).numpy()
-        normals = renderings.normals[0].movedim(0,-1).numpy()
-        binary_mask = renderings.binary_masks[0].movedim(0,-1).numpy()
+        rgb = renderings.rgbs[0].movedim(0,-1).numpy()  # (Nc,3,h,w) -> (h,w,3)
+        normals = renderings.normals[0].movedim(0,-1).numpy()  # (Nc,1,h,w) -> (h,w,1)
+        depth = renderings.depths[0].movedim(0,-1).numpy()  # (Nc,3,h,w) -> (h,w,3)
+        binary_mask = renderings.binary_masks[0].movedim(0,-1).numpy()  # (Nc,1,h,w) -> (h,w,1)
+
+
 
         if SAVEFIG:
             import matplotlib.pyplot as plt
@@ -301,7 +304,8 @@ class TestPanda3DRenderer(unittest.TestCase):
         self.assertIsNotNone(renderings.normals)
         self.assertIsNone(renderings.binary_masks)
 
-        renderings = renderer.render(self.Nc*[self.obj_label], 
+        renderings = renderer.render(
+            self.Nc*[self.obj_label], 
             TCO, 
             K, 
             light_datas=self.Nc*[self.light_datas],
@@ -315,7 +319,8 @@ class TestPanda3DRenderer(unittest.TestCase):
         self.assertIsNone(renderings.normals)
         self.assertIsNone(renderings.binary_masks)
 
-        renderings = renderer.render(self.Nc*[self.obj_label], 
+        renderings = renderer.render(
+            self.Nc*[self.obj_label], 
             TCO, 
             K, 
             light_datas=self.Nc*[self.light_datas],
@@ -329,8 +334,8 @@ class TestPanda3DRenderer(unittest.TestCase):
         self.assertIsNotNone(renderings.normals)
         self.assertIsNone(renderings.binary_masks)
 
-
-        renderings = renderer.render(self.Nc*[self.obj_label], 
+        renderings = renderer.render(
+            self.Nc*[self.obj_label], 
             TCO, 
             K, 
             light_datas=self.Nc*[self.light_datas],

@@ -128,3 +128,7 @@ class Transform:
     def matrix(self) -> np.ndarray:
         """Returns 4x4 homogeneous matrix representations."""
         return self._T.homogeneous
+
+    @staticmethod
+    def Identity():
+        return Transform(pin.SE3.Identity())
