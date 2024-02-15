@@ -193,16 +193,15 @@ class TestPanda3DRenderer(unittest.TestCase):
         self.assertIsNone(renderings[0].normals)
         self.assertIsNone(renderings[0].binary_mask)
 
-        self.assertRaises(
-            AssertionError,
-            renderer.render_scene,
-            self.object_datas,
-            self.camera_datas,
-            self.light_datas,
-            render_depth=False,
-            render_normals=False,
-            render_binary_mask=True,
-        )
+        with self.assertRaises(AssertionError):
+            renderer.render_scene(
+                self.object_datas,
+                self.camera_datas,
+                self.light_datas,
+                render_depth=False,
+                render_normals=False,
+                render_binary_mask=True,
+            )
 
     def test_batch_renderer(self):
         """
