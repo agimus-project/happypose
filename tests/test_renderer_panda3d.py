@@ -193,19 +193,16 @@ class TestPanda3DRenderer(unittest.TestCase):
         self.assertIsNone(renderings[0].normals)
         self.assertIsNone(renderings[0].binary_mask)
 
-        # TODO: not sure how to check that assertion is raised without crashing the test
-        # try:
-        # renderings = renderer.render_scene(self.object_datas,
-        #                                    self.camera_datas,
-        #                                    self.light_datas,
-        #                                    light_datas=self.Nc*[self.light_datas],
-        #                                    resolution=(self.height, self.width),
-        #                                    render_depth=False,
-        #                                    render_normals=False,
-        #                                    render_binary_mask=True
-        #                                    )
-        # except AssertionError:
-        #     assert True
+        self.assertRaises(
+            AssertionError,
+            renderer.render_scene,
+            self.object_datas,
+            self.camera_datas,
+            self.light_datas,
+            render_depth=False,
+            render_normals=False,
+            render_binary_mask=True,
+        )
 
     def test_batch_renderer(self):
         """
@@ -367,18 +364,18 @@ class TestPanda3DRenderer(unittest.TestCase):
         self.assertIsNone(renderings.binary_masks)
 
         # TODO: not sure how to check that assertion is raised without crashing the test
-        # try:
-        #     renderings = renderer.render(self.Nc*[self.obj_label],
-        #                     TCO,
-        #                     K,
-        #                     light_datas=self.Nc*[self.light_datas],
-        #                     resolution=(self.height, self.width),
-        #                     render_depth=False,
-        #                     render_normals=False,
-        #                     render_binary_mask=True
-        #                     )
-        # except AssertionError:
-        #     assert True
+        # -> AssertionError happens in a subprocess and is not caught
+        # self.assertRaises(
+        #     AssertionError, renderer.render,
+        #     self.Nc*[self.obj_label],
+        #     TCO,
+        #     K,
+        #     light_datas=self.Nc*[self.light_datas],
+        #     resolution=(self.height, self.width),
+        #     render_depth=False,
+        #     render_normals=False,
+        #     render_binary_mask=True
+        # )
 
 
 if __name__ == "__main__":
