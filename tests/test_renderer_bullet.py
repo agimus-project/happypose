@@ -1,4 +1,4 @@
-"""Set of unit tests for Panda3D renderer."""
+"""Set of unit tests for bullet renderer."""
 import unittest
 from pathlib import Path
 
@@ -14,7 +14,7 @@ from happypose.toolbox.renderer.bullet_scene_renderer import BulletSceneRenderer
 
 
 class TestBulletRenderer(unittest.TestCase):
-    """Unit tests for Panda3D renderer."""
+    """Unit tests for bullet renderer."""
 
     def setUp(self) -> None:
 
@@ -84,11 +84,13 @@ class TestBulletRenderer(unittest.TestCase):
 
         if SAVEFIG:
             import matplotlib.pyplot as plt
-            plt.subplot(1,2,1)
+            plt.subplot(2,2,1)
             plt.imshow(rgb)
-            plt.subplot(1,2,2)
+            plt.subplot(2,2,3)
             plt.imshow(depth, cmap=plt.cm.gray_r)
-            fig_path = self.obj_path.parent / f'panda3d_{self.obj_label}_render.png'
+            plt.subplot(2,2,4)
+            plt.imshow(binary_mask, cmap=plt.cm.gray)
+            fig_path = self.obj_path.parent / f'bullet_{self.obj_label}_scene_render.png'
             print(f'Saved {fig_path}')
             plt.savefig(fig_path)
 
@@ -177,11 +179,13 @@ class TestBulletRenderer(unittest.TestCase):
 
         if SAVEFIG:
             import matplotlib.pyplot as plt
-            plt.subplot(1,2,1)
+            plt.subplot(2,2,1)
             plt.imshow(rgb)
-            plt.subplot(1,2,2)
+            plt.subplot(2,2,3)
             plt.imshow(depth, cmap=plt.cm.gray_r)
-            fig_path = self.obj_path.parent / f'panda3d_{self.obj_label}_render.png'
+            plt.subplot(2,2,4)
+            plt.imshow(binary_mask, cmap=plt.cm.gray)
+            fig_path = self.obj_path.parent / f'bullet_{self.obj_label}_batch_render.png'
             print(f'Saved {fig_path}')
             plt.savefig(fig_path)
 

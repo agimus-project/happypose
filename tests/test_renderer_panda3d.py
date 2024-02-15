@@ -121,13 +121,15 @@ class TestPanda3DRenderer(unittest.TestCase):
 
         if SAVEFIG:
             import matplotlib.pyplot as plt
-            plt.subplot(1,3,1)
+            plt.subplot(2,2,1)
             plt.imshow(rgb)
-            plt.subplot(1,3,2)
-            plt.imshow(depth, cmap=plt.cm.gray_r)
-            plt.subplot(1,3,3)
+            plt.subplot(2,2,2)
             plt.imshow(normals)
-            fig_path = self.obj_path.parent / f'panda3d_{self.obj_label}_render.png'
+            plt.subplot(2,2,3)
+            plt.imshow(depth, cmap=plt.cm.gray_r)
+            plt.subplot(2,2,4)
+            plt.imshow(binary_mask, cmap=plt.cm.gray)
+            fig_path = self.obj_path.parent / f'panda3d_{self.obj_label}_scene_render.png'
             print(f'Saved {fig_path}')
             plt.savefig(fig_path)
 
@@ -262,17 +264,17 @@ class TestPanda3DRenderer(unittest.TestCase):
         depth = renderings.depths[0].movedim(0,-1).numpy()  # (Nc,3,h,w) -> (h,w,3)
         binary_mask = renderings.binary_masks[0].movedim(0,-1).numpy()  # (Nc,1,h,w) -> (h,w,1)
 
-
-
         if SAVEFIG:
             import matplotlib.pyplot as plt
-            plt.subplot(1,3,1)
+            plt.subplot(2,2,1)
             plt.imshow(rgb)
-            plt.subplot(1,3,2)
-            plt.imshow(depth, cmap=plt.cm.gray_r)
-            plt.subplot(1,3,3)
+            plt.subplot(2,2,2)
             plt.imshow(normals)
-            fig_path = self.obj_path.parent / f'panda3d_{self.obj_label}_render.png'
+            plt.subplot(2,2,3)
+            plt.imshow(depth, cmap=plt.cm.gray_r)
+            plt.subplot(2,2,4)
+            plt.imshow(binary_mask, cmap=plt.cm.gray)
+            fig_path = self.obj_path.parent / f'panda3d_{self.obj_label}_batch_render.png'
             print(f'Saved {fig_path}')
             plt.savefig(fig_path)
 
