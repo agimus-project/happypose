@@ -329,7 +329,6 @@ class Panda3dSceneRenderer:
         copy_arrays: bool = True,
         clear: bool = True,
     ) -> List[CameraRenderingData]:
-        
         if render_binary_mask:
             assert render_depth, "Binary mask can only be rendered if depth is rendered"
 

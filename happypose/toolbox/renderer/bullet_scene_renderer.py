@@ -25,7 +25,7 @@ from happypose.toolbox.renderer.types import CameraRenderingData
 class BulletSceneRenderer(BaseScene):
     def __init__(
         self,
-        asset_dataset: Union[RigidObjectDataset,UrdfDataset],
+        asset_dataset: Union[RigidObjectDataset, UrdfDataset],
         preload_cache=False,
         background_color=(0, 0, 0),
         gpu_renderer=True,
@@ -35,14 +35,16 @@ class BulletSceneRenderer(BaseScene):
             self.urdf_ds = asset_dataset
         elif isinstance(asset_dataset, RigidObjectDataset):
             # Build urdfs files from RigidObjectDataset
-            ds_name = 'tmp'
+            ds_name = "tmp"
             urdf_dir = LOCAL_DATA_DIR / "urdfs" / ds_name
             convert_rigid_body_dataset_to_urdfs(asset_dataset, urdf_dir)
             self.urdf_ds = UrdfDataset(urdf_dir)
             # TODO: BodyCache assumes unique scale for all objects (true for bop datasets)
             self.urdf_ds.index["scale"] = asset_dataset[0].scale
         else:
-            raise TypeError(f'asset_dataset of type {type(asset_dataset)} should be either UrdfDataset or RigidObjectDataset' )
+            raise TypeError(
+                f"asset_dataset of type {type(asset_dataset)} should be either UrdfDataset or RigidObjectDataset"
+            )
         self.connect(gpu_renderer=gpu_renderer, gui=gui)
         self.body_cache = BodyCache(self.urdf_ds, self.client_id)
         if preload_cache:
@@ -64,14 +66,14 @@ class BulletSceneRenderer(BaseScene):
                 )
         return bodies
 
-    def render_images(self, 
-                      cam_infos: Dict, 
-                      render_depth: bool=False,
-                      render_binary_mask: bool=False
-                      ) -> List[CameraRenderingData]:
+    def render_images(
+        self,
+        cam_infos: Dict,
+        render_depth: bool = False,
+        render_binary_mask: bool = False,
+    ) -> List[CameraRenderingData]:
         cam_renderings = []
         for cam_info in cam_infos:
-            
             K = cam_info["K"]
             TWC = Transform(cam_info["TWC"])
             resolution = cam_info["resolution"]
@@ -103,14 +105,17 @@ class BulletSceneRenderer(BaseScene):
                 rendering.depth = z_e[..., np.newaxis]  # (h,w,1)
 
             cam_renderings.append(rendering)
-            
+
         return cam_renderings
 
-    def render_scene(self, 
-                     obj_infos: Dict, 
-                     cam_infos: Dict, 
-                     render_depth=False,
-                     render_binary_mask=False
-                     ) -> List[CameraRenderingData]:
+    def render_scene(
+        self,
+        obj_infos: Dict,
+        cam_infos: Dict,
+        render_depth=False,
+        render_binary_mask=False,
+    ) -> List[CameraRenderingData]:
         self.setup_scene(obj_infos)
-        return self.render_images(cam_infos, render_depth=render_depth, render_binary_mask=render_binary_mask)
+        return self.render_images(
+            cam_infos, render_depth=render_depth, render_binary_mask=render_binary_mask
+        )

@@ -203,10 +203,19 @@ def make_urdf_dataset(ds_name):
         return dataset
 
     # BOP
-    if ds_name in {"tless.cad", "tless.reconst", "ycbv", "hb", "icbin", "itodd", "lm", "tudl"}:
+    if ds_name in {
+        "tless.cad",
+        "tless.reconst",
+        "ycbv",
+        "hb",
+        "icbin",
+        "itodd",
+        "lm",
+        "tudl",
+    }:
         ds = UrdfDataset(LOCAL_DATA_DIR / "urdfs" / ds_name)
         ds.index["scale"] = 0.001
-        
+
     # Custom scenario
     elif "custom" in ds_name:
         scenario = ds_name.split(".")[1]

@@ -38,10 +38,11 @@ from .types import (
     Panda3dLightData,
     Panda3dObjectData,
     Resolution,
-    WorkerRenderOutput
+    WorkerRenderOutput,
 )
 
 logger = get_logger(__name__)
+
 
 @dataclass
 class SceneData:
@@ -98,7 +99,7 @@ def worker_loop(
                 render_binary_mask=render_args.render_binary_mask,
                 copy_arrays=True,  # ensures non-negative strid
             )
-            # by definition, each "scene" in batch rendering corresponds to 1 camera, 1 object 
+            # by definition, each "scene" in batch rendering corresponds to 1 camera, 1 object
             # -> retrieves the first and only rendering
             renderings_ = renderings[0]
         else:
@@ -115,7 +116,9 @@ def worker_loop(
             rgb=renderings_.rgb,
             normals=renderings_.normals if render_args.render_normals else None,
             depth=renderings_.depth if render_args.render_depth else None,
-            binary_mask=renderings_.binary_mask if render_args.render_binary_mask else None,
+            binary_mask=renderings_.binary_mask
+            if render_args.render_binary_mask
+            else None,
         )
         del render_args
         out_queue.put(output)
@@ -200,7 +203,6 @@ class Panda3dBatchRenderer:
         render_depth: bool = False,
         render_binary_mask: bool = False,
     ) -> BatchRenderOutput:
-
         scene_datas = self.make_scene_data(labels, TCO, K, light_datas, resolution)
         bsz = len(scene_datas)
 
@@ -270,7 +272,9 @@ class Panda3dBatchRenderer:
         if render_binary_mask:
             assert list_binary_masks[0] is not None
             if torch.cuda.is_available():
-                binary_masks = torch.stack(list_binary_masks).pin_memory().cuda(non_blocking=True)
+                binary_masks = (
+                    torch.stack(list_binary_masks).pin_memory().cuda(non_blocking=True)
+                )
             else:
                 binary_masks = torch.stack(list_binary_masks)
             binary_masks = binary_masks.permute(0, 3, 1, 2)

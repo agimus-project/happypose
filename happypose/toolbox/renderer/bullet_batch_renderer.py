@@ -1,5 +1,5 @@
 import multiprocessing
-from typing import Dict, List, Union
+from typing import List, Union
 
 import numpy as np
 import torch
@@ -10,7 +10,11 @@ from happypose.toolbox.renderer.bullet_scene_renderer import BulletSceneRenderer
 from happypose.toolbox.renderer.types import BatchRenderOutput, WorkerRenderOutput
 
 
-def init_renderer(asset_dataset: Union[RigidObjectDataset,UrdfDataset], preload=True, gpu_renderer=True):
+def init_renderer(
+    asset_dataset: Union[RigidObjectDataset, UrdfDataset],
+    preload=True,
+    gpu_renderer=True,
+):
     renderer = BulletSceneRenderer(
         asset_dataset=asset_dataset,
         preload_cache=preload,
@@ -33,7 +37,7 @@ def worker_loop(
         render_args = in_queue.get()
         if render_args is None:
             return
-        
+
         obj_infos = render_args["obj_infos"]
         cam_infos = render_args["cam_infos"]
         render_depth = render_args["render_depth"]
@@ -51,8 +55,14 @@ def worker_loop(
                 render_binary_mask=render_binary_mask,
             )
             rgbs = np.stack([ren.rgb for ren in renderings])
-            depth = np.stack([ren.depth for ren in renderings]) if render_depth else None
-            binary_mask = np.stack([ren.binary_mask for ren in renderings]) if render_binary_mask else None
+            depth = (
+                np.stack([ren.depth for ren in renderings]) if render_depth else None
+            )
+            binary_mask = (
+                np.stack([ren.binary_mask for ren in renderings])
+                if render_binary_mask
+                else None
+            )
         else:
             w, h = cam_infos[0]["resolution"]
             rgbs = np.zeros((1, h, w, 3), dtype=np.uint8)
@@ -70,24 +80,27 @@ def worker_loop(
 
 
 class BulletBatchRenderer:
-    def __init__(self, 
-                 asset_dataset: Union[RigidObjectDataset,UrdfDataset], 
-                 n_workers=8, 
-                 preload_cache=True, 
-                 gpu_renderer=True):
+    def __init__(
+        self,
+        asset_dataset: Union[RigidObjectDataset, UrdfDataset],
+        n_workers=8,
+        preload_cache=True,
+        gpu_renderer=True,
+    ):
         self.asset_dataset = asset_dataset
         self.n_workers = n_workers
         self.init_plotters(preload_cache, gpu_renderer)
         self.gpu_renderer = gpu_renderer
 
-    def render(self, 
-               labels: List[str], 
-               TCO: torch.Tensor, 
-               K: torch.Tensor, 
-               resolution=(240, 320), 
-               render_depth: bool=False,
-               render_binary_mask: bool=False
-               ):
+    def render(
+        self,
+        labels: List[str],
+        TCO: torch.Tensor,
+        K: torch.Tensor,
+        resolution=(240, 320),
+        render_depth: bool = False,
+        render_binary_mask: bool = False,
+    ):
         TCO = torch.as_tensor(TCO).detach()
         TOC = invert_transform_matrices(TCO).cpu().numpy()
         K = torch.as_tensor(K).cpu().numpy()
@@ -121,7 +134,7 @@ class BulletBatchRenderer:
                 self.in_queue.put(render_args)
             else:
                 renderings = self.plotters[0].render_scene(**render_args)
-                # by definition, each "scene" in batch rendering corresponds to 1 camera, 1 object 
+                # by definition, each "scene" in batch rendering corresponds to 1 camera, 1 object
                 # -> retrieves the first and only rendering
                 renderings_ = renderings[0]
 
@@ -170,11 +183,13 @@ class BulletBatchRenderer:
             else:
                 depths = torch.stack(list_depths)
             depths = depths.float().permute(0, 3, 1, 2)
-        
+
         if render_binary_mask:
             assert list_binary_masks[0] is not None
             if torch.cuda.is_available():
-                binary_masks = torch.stack(list_binary_masks).pin_memory().cuda(non_blocking=True)
+                binary_masks = (
+                    torch.stack(list_binary_masks).pin_memory().cuda(non_blocking=True)
+                )
             else:
                 binary_masks = torch.stack(list_binary_masks)
             binary_masks = binary_masks.permute(0, 3, 1, 2)

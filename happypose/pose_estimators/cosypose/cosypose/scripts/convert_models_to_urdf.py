@@ -12,7 +12,9 @@ from happypose.pose_estimators.cosypose.cosypose.libmesh.urdf_utils import (
 )
 
 
-def convert_bop_dataset_to_urdfs(obj_ds_name: str, urdf_dir: Path, texture_size=(1024, 1024)):
+def convert_bop_dataset_to_urdfs(
+    obj_ds_name: str, urdf_dir: Path, texture_size=(1024, 1024)
+):
     obj_dataset = make_object_dataset(obj_ds_name)
     urdf_dir.mkdir(exist_ok=True, parents=True)
     for n in tqdm(range(len(obj_dataset))):
@@ -31,7 +33,8 @@ def main():
     args = parser.parse_args()
 
     from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
-    urdf_dir = LOCAL_DATA_DIR / 'urdf'
+
+    urdf_dir = LOCAL_DATA_DIR / "urdf"
     convert_bop_dataset_to_urdfs(urdf_dir, args.models)
 
 

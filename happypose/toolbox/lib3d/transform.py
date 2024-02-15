@@ -53,16 +53,18 @@ class Transform:
                 self._T = arg_T
             elif isinstance(arg_T, np.ndarray):
                 assert arg_T.shape == (4, 4)
-                assert arg_T[3,:3].sum() == 0.0 and arg_T[3,3] == 1.0
+                assert arg_T[3, :3].sum() == 0.0 and arg_T[3, 3] == 1.0
                 self._T = pin.SE3(arg_T)
             elif isinstance(arg_T, torch.Tensor):
                 T = arg_T.detach().cpu().numpy().copy()
                 assert T.shape == (4, 4)
-                assert T[3,:3].sum() == 0.0 and T[3,3] == 1.0
+                assert T[3, :3].sum() == 0.0 and T[3, 3] == 1.0
                 self._T = pin.SE3(T)
             else:
-                raise ValueError(f"""Transform contructor: if 1 argument, should be a Transform, 
-                                 pin.SE3, numpy array, or torch Tensor, not {type(arg_T)}""")
+                raise ValueError(
+                    f"""Transform contructor: if 1 argument, should be a Transform,
+                                 pin.SE3, numpy array, or torch Tensor, not {type(arg_T)}"""
+                )
 
         elif len(args) == 2:
             rotation, translation = args
@@ -76,9 +78,11 @@ class Transform:
                 else:
                     rotation_np = rotation
             else:
-                raise ValueError('Transform contructor: if 2 argument, rotation should be either a pin.Quaternion, \
+                raise ValueError(
+                    "Transform contructor: if 2 argument, rotation should be either a pin.Quaternion, \
                                  a 4-d tuple|list representing xyzw quaternion, \
-                                 or a np.array|torch.Tensor (either 4d xyzw quaternion or 3x3 SO(3) matrix)')
+                                 or a np.array|torch.Tensor (either 4d xyzw quaternion or 3x3 SO(3) matrix)"
+                )
 
             if rotation_np.size == 4:
                 quaternion_xyzw = rotation_np.flatten().tolist()
