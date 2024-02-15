@@ -323,12 +323,16 @@ class Panda3dSceneRenderer:
         object_datas: List[Panda3dObjectData],
         camera_datas: List[Panda3dCameraData],
         light_datas: List[Panda3dLightData],
-        render_depth: bool = False,
-        copy_arrays: bool = True,
-        render_binary_mask: bool = False,
         render_normals: bool = False,
+        render_depth: bool = False,
+        render_binary_mask: bool = False,
+        copy_arrays: bool = True,
         clear: bool = True,
     ) -> List[CameraRenderingData]:
+        
+        if render_binary_mask:
+            assert render_depth, "Binary mask can only be rendered if depth is rendered"
+
         start = time.time()
         root_node = self._app.render.attachNewNode("world")
         object_nodes = self.setup_scene(root_node, object_datas)
@@ -352,16 +356,17 @@ class Panda3dSceneRenderer:
                 )
                 light_nodes += self.setup_lights(root_node, [light_data])
             normals_renderings = self.render_images(cameras, copy_arrays=copy_arrays)
-            for n, rendering in enumerate(renderings):
-                rendering.normals = normals_renderings[n].rgb
+            for n, rendering_n in enumerate(renderings):
+                rendering_n.normals = normals_renderings[n].rgb
 
         if render_binary_mask:
             for rendering_n in renderings:
                 assert rendering_n.depth is not None
                 h, w = rendering_n.depth.shape[:2]
-                binary_mask = np.zeros((h, w), dtype=np.bool_)
-                binary_mask[rendering_n.depth[..., 0] > 0] = 1
-                rendering.binary_mask = binary_mask
+                binary_mask = np.zeros((h, w), dtype=bool)
+                binary_mask[rendering_n.depth[..., 0] > 0] = 1  # (h,w)
+                binary_mask = binary_mask[..., np.newaxis]  # (h,w,1)
+                rendering_n.binary_mask = binary_mask
 
         render_time = time.time() - start
 
