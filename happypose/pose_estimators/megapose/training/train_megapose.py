@@ -228,7 +228,7 @@ def train_megapose(cfg: TrainingConfig) -> None:
         )
 
     renderer = Panda3dBatchRenderer(
-        object_dataset=renderer_obj_dataset,
+        asset_dataset=renderer_obj_dataset,
         n_workers=cfg.n_rendering_workers,
         preload_cache=False,
         split_objects=True,

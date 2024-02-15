@@ -126,13 +126,13 @@ def worker_loop(
 class Panda3dBatchRenderer:
     def __init__(
         self,
-        object_dataset: RigidObjectDataset,
+        asset_dataset: RigidObjectDataset,
         n_workers: int = 8,
         preload_cache: bool = True,
         split_objects: bool = False,
     ):
         assert n_workers >= 1
-        self._object_dataset = object_dataset
+        self._object_dataset = asset_dataset
         self._n_workers = n_workers
         self._split_objects = split_objects
 
@@ -218,7 +218,6 @@ class Panda3dBatchRenderer:
 
             in_queue = self._object_label_to_queue[scene_data_n.object_datas[0].label]
             in_queue.put(render_args)
-
 
         # ===============================
         # Retrieve the workers renderings

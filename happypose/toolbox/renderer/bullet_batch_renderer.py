@@ -124,13 +124,6 @@ class BulletBatchRenderer:
                 # by definition, each "scene" in batch rendering corresponds to 1 camera, 1 object 
                 # -> retrieves the first and only rendering
                 renderings_ = renderings[0]
-                # output = WorkerRenderOutput(
-                #     data_id=n,
-                #     rgb=np.stack([ren.rgb for ren in renderings]),
-                #     normals=None,
-                #     depth=np.stack([ren.depth for ren in renderings]) if render_depth else None,
-                #     binary_mask=np.stack([ren.binary_mask for ren in renderings]) if render_binary_mask else None,
-                # )
 
                 output = WorkerRenderOutput(
                     data_id=n,
@@ -141,7 +134,6 @@ class BulletBatchRenderer:
                 )
 
                 self._out_queue.put(output)
-
 
         # ===============================
         # Retrieve the workers renderings
@@ -158,7 +150,7 @@ class BulletBatchRenderer:
                 list_depths[data_id] = torch.tensor(renders.depth)
             if render_binary_mask:
                 list_binary_masks[data_id] = torch.tensor(renders.binary_mask)
-            # del renders
+            del renders
 
         assert list_rgbs[0] is not None
 

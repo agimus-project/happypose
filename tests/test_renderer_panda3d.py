@@ -218,7 +218,7 @@ class TestPanda3DRenderer(unittest.TestCase):
         SAVEFIG = False
 
         renderer = Panda3dBatchRenderer(
-            object_dataset=self.asset_dataset,
+            asset_dataset=self.asset_dataset,
             n_workers=1,
             preload_cache=True,
             split_objects=False,

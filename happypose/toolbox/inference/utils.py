@@ -123,7 +123,7 @@ def load_pose_models(
 
         if renderer_type == "panda3d" or force_panda3d_renderer:
             renderer = Panda3dBatchRenderer(
-                object_dataset=object_dataset,
+                asset_dataset=object_dataset,
                 **renderer_kwargs_,
             )
         else:
