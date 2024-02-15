@@ -15,7 +15,7 @@ class TestTransform(unittest.TestCase):
     def test_constructor(self):
         M1 = pin.SE3.Random()
         M2 = pin.SE3.Random()
-        M3 = M1*M2
+        M3 = M1 * M2
 
         # 1 arg constructor
         T1 = Transform(M1)
@@ -38,10 +38,12 @@ class TestTransform(unittest.TestCase):
         T1i = Transform(list(pin.Quaternion(R1).coeffs()), t1)
         T1j = Transform(torch.from_numpy(pin.Quaternion(R1).coeffs().copy()), t1)
 
-        assert T1 == T1e == T1f 
-        assert np.all(np.isclose(T1._T, T1g._T))  # small error due to Quaternion conversion back and forth
+        assert T1 == T1e == T1f
+        assert np.all(
+            np.isclose(T1._T, T1g._T)
+        )  # small error due to Quaternion conversion back and forth
         assert T1g == T1h == T1h == T1i == T1j
-        
+
         T2 = Transform(M2)
         T3 = Transform(M3)
         T3m = T1 * T2

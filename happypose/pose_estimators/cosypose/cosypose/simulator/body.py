@@ -17,6 +17,7 @@ def parse_pose_args(pose_args):
         raise ValueError
     return pose
 
+
 class Body:
     def __init__(self, body_id, scale=1.0, client_id=0):
         self._body_id = body_id

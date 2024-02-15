@@ -25,6 +25,7 @@ class UrdfDataset:
     def __len__(self):
         return len(self.index)
 
+
 class OneUrdfDataset:
     def __init__(self, urdf_path, label, scale=1.0):
         index = [

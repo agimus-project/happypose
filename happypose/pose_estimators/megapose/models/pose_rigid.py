@@ -430,7 +430,7 @@ class PosePredictor(nn.Module):
             resolution=self.render_size,
             render_depth=self.render_depth,
             render_binary_mask=False,
-            render_normals=self.render_normals
+            render_normals=self.render_normals,
         )
 
         cat_list = []
