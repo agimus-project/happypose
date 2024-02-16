@@ -10,7 +10,7 @@ class VisibilityWrapper(SceneDatasetWrapper):
         ids_visible = set(ids_visible[ids_visible > 0])
         visib_objects = []
         for obj in state["objects"]:
-            if obj["id_in_segm"] in ids_visible:
+            if obj.unique_id in ids_visible:
                 visib_objects.append(obj)
         state["objects"] = visib_objects
         return rgb, mask, state

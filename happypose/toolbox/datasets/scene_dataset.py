@@ -202,6 +202,30 @@ class SceneObservation:
     # dict mapping unique id to (h, w) np.bool_
     binary_masks: Optional[Dict[int, np.ndarray]] = None
 
+    def __iter__(self):
+        masks = []
+        obs = self
+        
+        rgb = obs.rgb
+        for _n, obj_data in enumerate(obs.object_datas):
+            if obs.binary_masks is not None:
+                binary_mask = torch.tensor(obs.binary_masks[obj_data.unique_id]).float()
+                masks.append(binary_mask)
+            
+            if obs.segmentation is not None:
+                binary_mask = np.zeros_like(obs.segmentation, dtype=np.bool_)
+                binary_mask[obs.segmentation == obj_data.unique_id] = 1
+                binary_mask = torch.as_tensor(binary_mask).float()
+                masks.append(binary_mask)
+            
+        obs = {
+            "objects": obs.object_datas,
+            "camera": obs.camera_data,
+            "frame_info": obs.infos
+        }
+        return iter((rgb, masks, obs))
+
+        
     @staticmethod
     def collate_fn(
         batch: List[SceneObservation],
@@ -424,6 +448,7 @@ class SceneDataset(torch.utils.data.Dataset):
         assert self.frame_index is not None
         row = self.frame_index.iloc[idx]
         infos = ObservationInfos(scene_id=row.scene_id, view_id=row.view_id)
+        print("inside scene_dataset getitem")
         return self._load_scene_observation(infos)
 
     def __len__(self) -> int:

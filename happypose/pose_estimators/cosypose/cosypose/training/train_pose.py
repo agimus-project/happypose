@@ -296,6 +296,8 @@ def train_pose(args):
 
     scene_ds_train = make_datasets(args.train_ds_names)
     scene_ds_val = make_datasets(args.val_ds_names)
+    
+    print("datasets = ", scene_ds_train.ds)
 
     ds_kwargs = {
         "resize": args.input_resize,

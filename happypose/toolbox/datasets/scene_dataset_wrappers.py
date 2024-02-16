@@ -19,6 +19,7 @@ import dataclasses
 
 # Third Party
 import numpy as np
+import pandas as pd
 
 # Local Folder
 from happypose.toolbox.datasets.scene_dataset import SceneDataset, SceneObservation

@@ -129,7 +129,7 @@ def train_detector(args):
     for k, v in args.__dict__.items():
         logger.info(f"{k}: {v}")
     logger.info(f"{'-'*80}")
-
+    print("test edbug")
     # Initialize distributed
     device = torch.cuda.current_device()
     init_distributed_mode()
@@ -169,9 +169,12 @@ def train_detector(args):
         "gray_augmentation": args.gray_augmentation,
         "label_to_category_id": label_to_category_id,
     }
+    
+    print("make datasets")
     ds_train = DetectionDataset(scene_ds_train, **ds_kwargs)
     ds_val = DetectionDataset(scene_ds_val, **ds_kwargs)
 
+    print("make dataloaders")
     train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(
         ds_train,
@@ -196,6 +199,7 @@ def train_detector(args):
     )
     ds_iter_val = MultiEpochDataLoader(ds_iter_val)
 
+    print("create model detector")
     model = create_model_detector(
         cfg=args,
         n_classes=len(args.label_to_category_id),
