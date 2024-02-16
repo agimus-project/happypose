@@ -15,13 +15,13 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import (
 from happypose.pose_estimators.cosypose.cosypose.lib3d.cropping import (
     deepim_crops_robust as deepim_crops,
 )
-from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import (
-    compute_rotation_matrix_from_ortho6d,
-    compute_rotation_matrix_from_quaternions,
-)
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.megapose.models.pose_rigid import (
     PosePredictorOutputCosypose,
+)
+from happypose.toolbox.lib3d.rotations import (
+    compute_rotation_matrix_from_ortho6d,
+    compute_rotation_matrix_from_quaternions,
 )
 from happypose.toolbox.renderer import Panda3dLightData
 

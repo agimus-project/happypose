@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import transforms3d
 
-from .rotations import compute_rotation_matrix_from_ortho6d
+from happypose.toolbox.lib3d.rotations import compute_rotation_matrix_from_ortho6d
 
 
 def transform_pts(T, pts):
@@ -21,17 +21,6 @@ def transform_pts(T, pts):
     T = T.unsqueeze(-3)
     pts_transformed = T[..., :3, :3] @ pts + T[..., :3, [-1]]
     return pts_transformed.squeeze(-1)
-
-
-def invert_T(T):
-    R = T[..., :3, :3]
-    t = T[..., :3, [-1]]
-    R_inv = R.transpose(-2, -1)
-    t_inv = -R_inv @ t
-    T_inv = T.clone()
-    T_inv[..., :3, :3] = R_inv
-    T_inv[..., :3, [-1]] = t_inv
-    return T_inv
 
 
 def add_noise(TCO, euler_deg_std=[15, 15, 15], trans_std=[0.01, 0.01, 0.05]):

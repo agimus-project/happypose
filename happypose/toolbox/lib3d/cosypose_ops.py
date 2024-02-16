@@ -17,9 +17,10 @@ limitations under the License.
 # Third Party
 import torch
 
+from happypose.toolbox.lib3d.rotations import compute_rotation_matrix_from_ortho6d
+
 # Local Folder
 from .camera_geometry import project_points
-from .rotations import compute_rotation_matrix_from_ortho6d
 from .transform_ops import invert_transform_matrices, transform_pts
 
 

@@ -21,7 +21,7 @@ from typing import Callable, Optional, Tuple
 # Third Party
 import numpy as np
 import panda3d as p3d
-import panda3d.core
+import torch
 from direct.showbase.ShowBase import ShowBase
 
 # MegaPose
@@ -35,7 +35,7 @@ NodeFunction = Callable[
     [p3d.core.NodePath, p3d.core.NodePath],
     None,
 ]  # (root_node_path, object_node_path)
-Resolution = Tuple[int, int]
+Resolution = Tuple[int, int]  # width, height
 
 TCCGL = Transform(
     np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float),
@@ -43,8 +43,41 @@ TCCGL = Transform(
 
 
 @dataclass
+class BatchRenderOutput:
+    """
+    rgb: (bsz, 3, h, w) torch.float32, values in [0, 1]
+    normals: (bsz, 3, h, w) torch.float32, values in [0, 1]
+    depths: (bsz, 1, h, w) torch.float32, in meters.
+    binary_masks: (bsz, 1, h, w) bool.
+    """
+
+    rgbs: torch.Tensor
+    normals: Optional[torch.Tensor]
+    depths: Optional[torch.Tensor]
+    binary_masks: Optional[torch.Tensor]
+
+
+@dataclass
+class WorkerRenderOutput:
+    """
+    data_id: int
+    rgb: (h, w, 3) uint8
+    normals: (h, w, 3) uint8
+    depth: (h, w, 1) float32
+    binary_mask: (h, w, 1) bool
+    """
+
+    data_id: int
+    rgb: torch.Tensor
+    normals: Optional[torch.Tensor]
+    depth: Optional[torch.Tensor]
+    binary_mask: Optional[torch.Tensor]
+
+
+@dataclass
 class CameraRenderingData:
-    """rgb: (h, w, 3) uint8
+    """
+    rgb: (h, w, 3) uint8
     normals: (h, w, 3) uint8
     depth: (h, w, 1) float32
     binary_mask: (h, w, 1) np.bool_.
@@ -65,6 +98,9 @@ class Panda3dCameraData:
     z_far: float = 10
     node_name: str = "camera"
     positioning_function: Optional[NodeFunction] = None
+
+    def __post_init__(self):
+        self.TWC = Transform(self.TWC)
 
     def compute_view_mat(self) -> p3d.core.LMatrix4f:
         assert self.TWC is not None

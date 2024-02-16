@@ -26,12 +26,6 @@ class UrdfDataset:
         return len(self.index)
 
 
-class BOPUrdfDataset(UrdfDataset):
-    def __init__(self, ds_dir):
-        super().__init__(ds_dir)
-        self.index["scale"] = 0.001
-
-
 class OneUrdfDataset:
     def __init__(self, urdf_path, label, scale=1.0):
         index = [
@@ -44,17 +38,3 @@ class OneUrdfDataset:
 
     def __getitem__(self, idx):
         return self.index.iloc[idx]
-
-
-class UrdfMultiScaleDataset(UrdfDataset):
-    def __init__(self, urdf_path, label, scales=[]):
-        index = []
-        for scale in scales:
-            index.append(
-                {
-                    "urdf_path": urdf_path,
-                    "label": label + f"scale={scale:.3f}",
-                    "scale": scale,
-                },
-            )
-        self.index = pd.DataFrame(index)

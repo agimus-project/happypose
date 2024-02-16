@@ -46,9 +46,6 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.pose_predictor impor
 from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database import (
     MeshDataBase,
 )
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_batch_renderer import (  # noqa: E501
-    BulletBatchRenderer,
-)
 
 # Detection
 from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
@@ -70,6 +67,9 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     init_distributed_mode,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.toolbox.renderer.bullet_batch_renderer import (  # noqa: E501
+    BulletBatchRenderer,
+)
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 torch.backends.cudnn.deterministic = True

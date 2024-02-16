@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
+import torch
 
 import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
 from happypose.pose_estimators.cosypose.cosypose.multiview.bundle_adjustment import (
     MultiviewRefinement,
     make_view_groups,
@@ -11,16 +11,21 @@ from happypose.pose_estimators.cosypose.cosypose.multiview.ransac import (
     multiview_candidate_matching,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
 logger = get_logger(__name__)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class MultiviewScenePredictor:
     def __init__(self, mesh_db, n_sym=64, ba_aabb=True, ba_n_points=None):
-        self.mesh_db_ransac = mesh_db.batched(n_sym=n_sym, aabb=True).float()
-        self.mesh_db_ba = mesh_db.batched(
-            aabb=ba_aabb, resample_n_points=ba_n_points, n_sym=n_sym
-        ).float()
+        self.mesh_db_ransac = mesh_db.batched(n_sym=n_sym, aabb=True).to(device).float()
+        self.mesh_db_ba = (
+            mesh_db.batched(aabb=ba_aabb, resample_n_points=ba_n_points, n_sym=n_sym)
+            .to(device)
+            .float()
+        )
 
     def reproject_scene(self, objects, cameras):
         TCO_data = []
@@ -40,7 +45,7 @@ class MultiviewScenePredictor:
                 }
                 data_ = tc.PandasTensorCollection(
                     infos=pd.DataFrame(infos),
-                    poses=invert_T(cam.TWC) @ obj.TWO,
+                    poses=invert_transform_matrices(cam.TWC) @ obj.TWO,
                 )
                 TCO_data.append(data_)
         return tc.concatenate(TCO_data)
@@ -88,7 +93,7 @@ class MultiviewScenePredictor:
         predictions["cand_matched"] = candidates
 
         group_infos = make_view_groups(pairs_TC1C2)
-        candidates = candidates.merge_df(group_infos, on="view_id").cuda()
+        candidates = candidates.merge_df(group_infos, on="view_id").to(device)
 
         pred_objects, pred_cameras, pred_reproj = [], [], []
         pred_reproj_init = []
