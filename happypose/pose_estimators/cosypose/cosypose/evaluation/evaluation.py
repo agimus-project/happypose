@@ -94,12 +94,12 @@ def load_pose_models(coarse_run_id, refiner_run_id, n_workers):
     #
 
     object_dataset = make_object_dataset("ycbv")
-    mesh_db = MeshDataBase.from_object_ds(object_dataset)
     renderer = Panda3dBatchRenderer(
         object_dataset,
         n_workers=n_workers,
         preload_cache=False,
     )
+    mesh_db = MeshDataBase.from_object_ds(object_dataset)
     mesh_db_batched = mesh_db.batched().to(device)
 
     def load_model(run_id):
