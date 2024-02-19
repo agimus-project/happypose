@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 try:
     # Third Party
     from torch.hub import load_state_dict_from_url
