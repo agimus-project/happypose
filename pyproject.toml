@@ -5,9 +5,6 @@ requires = ["poetry-core"]
 [tool.coverage.run]
 omit = ["cosypose", "megapose6d"]
 
-[tool.isort]
-profile = "black"
-
 [tool.mypy]
 exclude = ["cosypose", "megapose6d"]
 
@@ -77,10 +74,9 @@ pypi = ["opencv-contrib-python", "opencv-python", "pin"]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.9.1"
 coverage = {extras = ["toml"], version = "^7.2.5"}
 pre-commit = "^3.2.1"
-ruff = "^0.1.4"
+ruff = "^0.2.1"
 
 [tool.poetry.group.docs]
 optional = true

@@ -262,9 +262,10 @@ class PoseErrorMeter(Meter):
         errors_TCO_xyz = errors["TCO_xyz"].cpu().numpy()[matches["cand_id"].values]
         errors_TCO_norm = errors["TCO_norm"].cpu().numpy()[matches["cand_id"].values]
 
-        matches["obj_diameter"] = "match_id", [
-            self.mesh_db.infos[k.item()]["diameter_m"] for k in matches["label"]
-        ]
+        matches["obj_diameter"] = (
+            "match_id",
+            [self.mesh_db.infos[k.item()]["diameter_m"] for k in matches["label"]],
+        )
         matches["norm"] = "match_id", errors_norm
         matches["0.1d"] = "match_id", errors_norm < 0.1 * matches["obj_diameter"]
         matches["xyz"] = ("match_id", "dim3"), errors_xyz
