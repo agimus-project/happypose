@@ -26,7 +26,7 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.visualization.multiview import nms3d
 
 sys.path.append(str(BOP_TOOLKIT_DIR))
-from bop_toolkit_lib import inout  # noqa
+from bop_toolkit_lib import inout
 
 logger = get_logger(__name__)
 

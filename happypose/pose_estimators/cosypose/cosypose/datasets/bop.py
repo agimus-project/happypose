@@ -13,7 +13,7 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.lib3d.transform import Transform
 
 sys.path.append(str(BOP_TOOLKIT_DIR))
-from bop_toolkit_lib import inout  # noqa
+from bop_toolkit_lib import inout
 
 sys.path = sys.path[:-1]
 

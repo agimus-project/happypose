@@ -41,7 +41,7 @@ from happypose.toolbox.utils.logging import get_logger
 
 sys.path.append(str(BOP_TOOLKIT_DIR))
 # Third Party
-from bop_toolkit_lib import inout  # noqa
+from bop_toolkit_lib import inout
 
 sys.path = sys.path[:-1]
 

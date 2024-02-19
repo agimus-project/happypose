@@ -120,7 +120,7 @@ class BopRecordingScene(BaseScene):
         self.bodies = self.body_cache.get_bodies_by_ids(ids)
 
     def visuals_rand(self):
-        bodies = [self.background] + [self.plane]
+        bodies = [self.background, self.plane]
         if self.textures_on_objects and self.np_random.rand() > 0.9:
             bodies = self.bodies + bodies
         for body in bodies:

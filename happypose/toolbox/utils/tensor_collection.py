@@ -81,7 +81,7 @@ class TensorCollection:
 
     @property
     def device(self):
-        return list(self.tensors.values())[0].device
+        return next(iter(self.tensors.values())).device
 
     def __getstate__(self):
         return {"tensors": self.tensors}

@@ -142,4 +142,4 @@ class TrainingConfig(omegaconf.dictconfig.DictConfig):
 
     # Infos
     global_batch_size: Optional[int] = None
-    hardware: HardwareConfig = HardwareConfig()
+    hardware: HardwareConfig = HardwareConfig()  # noqa: RUF009

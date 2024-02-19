@@ -92,7 +92,7 @@ class CameraRenderingData:
 class Panda3dCameraData:
     K: np.ndarray
     resolution: Tuple[int, int]
-    TWC: Transform = Transform((0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0))
+    TWC: Transform = Transform((0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0))  # noqa: RUF009
     z_near: float = 0.1
     z_far: float = 10
     node_name: str = "camera"
@@ -153,7 +153,7 @@ class Panda3dLightData:
 @dataclass
 class Panda3dObjectData:
     label: str
-    TWO: Transform = Transform((0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0))
+    TWO: Transform = Transform((0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0))  # noqa: RUF009
     color: Optional[RgbaColor] = None
     material: Optional[p3d.core.Material] = None
     remove_mesh_material: bool = False
