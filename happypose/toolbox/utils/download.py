@@ -55,13 +55,16 @@ BOP_DATASETS = {
     "tudl": {
         "splits": ["test_all", "train_real"],
     },
+    "hope": {
+        "splits": ["test_all", "train_real"],
+    },
 }
 
 BOP_DS_NAMES = list(BOP_DATASETS.keys())
 
 
 async def main():
-    parser = argparse.ArgumentParser("CosyPose download utility")
+    parser = argparse.ArgumentParser("HappyPose download utility")
     parser.add_argument("--bop_dataset", nargs="*", choices=BOP_DS_NAMES)
     parser.add_argument("--bop_extra_files", nargs="*", choices=["ycbv", "tless"])
     parser.add_argument("--cosypose_models", nargs="*")
