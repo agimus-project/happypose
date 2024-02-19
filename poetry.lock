@@ -3258,19 +3258,20 @@ stats = ["scipy (>=1.3)", "statsmodels (>=0.10)"]
 
 [[package]]
 name = "selenium"
-version = "4.16.0"
+version = "4.18.0"
 description = ""
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "selenium-4.16.0-py3-none-any.whl", hash = "sha256:aec71f4e6ed6cb3ec25c9c1b5ed56ae31b6da0a7f17474c7566d303f84e6219f"},
-    {file = "selenium-4.16.0.tar.gz", hash = "sha256:b2e987a445306151f7be0e6dfe2aa72a479c2ac6a91b9d5ef2d6dd4e49ad0435"},
+    {file = "selenium-4.18.0-py3-none-any.whl", hash = "sha256:d0ac1ab0aa50dffad8050e7f0170395ea23bcecccf7d59b69bc430e47eeb9dac"},
+    {file = "selenium-4.18.0.tar.gz", hash = "sha256:8912e690d4e72350ca733ad28be894e87683064de3304e5f5b5b386697a6c47d"},
 ]
 
 [package.dependencies]
 certifi = ">=2021.10.8"
 trio = ">=0.17,<1.0"
 trio-websocket = ">=0.9,<1.0"
+typing_extensions = ">=4.9.0"
 urllib3 = {version = ">=1.26,<3", extras = ["socks"]}
 
 [[package]]
@@ -4067,4 +4068,4 @@ pypi = ["opencv-contrib-python", "opencv-python", "pin"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "5eda7ced2a3468a7f6a990930c3a5fb9afffdf921609db48976322c82700e54d"
+content-hash = "c14fd1d26bf6dd242b46171d1f72facecf00e4f986f472f4878e1c3e16f7ca49"
