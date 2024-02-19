@@ -115,9 +115,9 @@ def worker_loop(
             rgb=renderings_.rgb,
             normals=renderings_.normals if render_args.render_normals else None,
             depth=renderings_.depth if render_args.render_depth else None,
-            binary_mask=renderings_.binary_mask
-            if render_args.render_binary_mask
-            else None,
+            binary_mask=(
+                renderings_.binary_mask if render_args.render_binary_mask else None
+            ),
         )
         del render_args
         out_queue.put(output)
