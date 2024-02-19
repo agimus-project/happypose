@@ -1,3 +1,4 @@
+import typing
 from itertools import cycle
 
 import numpy as np
@@ -10,7 +11,7 @@ from .bokeh_utils import make_image_figure, to_rgba
 
 
 class Plotter:
-    source_map = {}
+    source_map: typing.ClassVar = {}
 
     @property
     def hex_colors(self):

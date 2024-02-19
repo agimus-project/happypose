@@ -13,9 +13,7 @@ from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
 from happypose.toolbox.lib3d.rotations import euler2quat
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
-from happypose.toolbox.renderer.bullet_scene_renderer import (  # noqa: E501
-    BulletSceneRenderer,
-)
+from happypose.toolbox.renderer.bullet_scene_renderer import BulletSceneRenderer
 
 from .plotter import Plotter
 

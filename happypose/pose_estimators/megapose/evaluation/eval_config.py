@@ -59,7 +59,7 @@ class EvalConfig:
     ds_name: str = "ycbv.bop19"
 
     # Inference
-    inference: InferenceConfig = InferenceConfig()
+    inference: InferenceConfig = InferenceConfig()  # noqa RUF009
 
     # Run management
     result_id: Optional[str] = None
@@ -75,7 +75,7 @@ class EvalConfig:
 
     # Infos
     global_batch_size: Optional[int] = None
-    hardware: HardwareConfig = HardwareConfig()
+    hardware: HardwareConfig = HardwareConfig()  # noqa RUF009
 
     # Debug
     debug: bool = False

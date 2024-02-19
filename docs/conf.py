@@ -10,7 +10,7 @@ https://www.sphinx-doc.org/en/master/usage/configuration.html
 import happypose
 
 project = happypose.__name__
-copyright = f"2023, {happypose.__author__}"  # noqa: A001
+copyright = f"2023, {happypose.__author__}"
 author = happypose.__author__
 release = happypose.__version__
 
