@@ -58,8 +58,7 @@ from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import
     check_update_config as check_update_config_pose,
 )
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
-    create_model_coarse,
-    create_model_refiner,
+    load_model_cosypose,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     get_rank,
@@ -76,6 +75,8 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
 logger = get_logger(__name__)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def load_detector(run_id):
@@ -104,30 +105,12 @@ def load_pose_models(coarse_run_id, refiner_run_id=None, n_workers=8):
     renderer = BulletBatchRenderer(object_set=cfg.urdf_ds_name, n_workers=n_workers)
     mesh_db_batched = mesh_db.batched().cuda()
 
-    def load_model(run_id):
-        if run_id is None:
-            return None
-        run_dir = EXP_DIR / run_id
-        cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.FullLoader)
-        cfg = check_update_config_pose(cfg)
-        if cfg.train_refiner:
-            model = create_model_refiner(
-                cfg,
-                renderer=renderer,
-                mesh_db=mesh_db_batched,
-            )
-        else:
-            model = create_model_coarse(cfg, renderer=renderer, mesh_db=mesh_db_batched)
-        ckpt = torch.load(run_dir / "checkpoint.pth.tar")
-        ckpt = ckpt["state_dict"]
-        model.load_state_dict(ckpt)
-        model = model.cuda().eval()
-        model.cfg = cfg
-        model.config = cfg
-        return model
-
-    coarse_model = load_model(coarse_run_id)
-    refiner_model = load_model(refiner_run_id)
+    coarse_model = load_model_cosypose(
+        EXP_DIR / coarse_run_id, renderer, mesh_db_batched, device
+    )
+    refiner_model = load_model_cosypose(
+        EXP_DIR / refiner_run_id, renderer, mesh_db_batched, device
+    )
     model = CoarseRefinePosePredictor(
         coarse_model=coarse_model,
         refiner_model=refiner_model,

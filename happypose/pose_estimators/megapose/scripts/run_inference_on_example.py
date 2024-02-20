@@ -56,7 +56,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model",
         type=str,
-        default="megapose-1.0-RGB-multi-hypothesis",
+        default="megapose-1.0-RGB",
     )
     parser.add_argument("--vis-detections", action="store_true")
     parser.add_argument("--run-inference", action="store_true")

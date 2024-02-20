@@ -1,6 +1,6 @@
 import time
 from collections import defaultdict
-from typing import Any, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -20,6 +20,7 @@ from happypose.toolbox.inference.types import (
     ObservationTensor,
     PoseEstimatesType,
 )
+from happypose.toolbox.inference.utils import filter_detections
 from happypose.toolbox.utils.tensor_collection import PandasTensorCollection
 
 logger = get_logger(__name__)
@@ -146,6 +147,7 @@ class PoseEstimator(PoseEstimationModule):
         coarse_estimates: Optional[PoseEstimatesType] = None,
         detection_th: float = 0.7,
         mask_th: float = 0.8,
+        labels_to_keep: List[str] = None,
     ) -> Tuple[PoseEstimatesType, dict]:
         timing_str = ""
         timer = SimpleTimer()
@@ -180,6 +182,10 @@ class PoseEstimator(PoseEstimationModule):
             assert detections is not None
             assert self.coarse_model is not None
             assert n_coarse_iterations > 0
+
+            if labels_to_keep is not None:
+                detections = filter_detections(detections, labels_to_keep)
+
             K = observation.K
             data_TCO_init = self.make_TCO_init(detections, K)
             coarse_preds, coarse_extra_data = self.forward_coarse_model(
