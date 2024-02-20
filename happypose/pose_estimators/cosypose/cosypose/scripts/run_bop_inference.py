@@ -22,10 +22,10 @@ from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
     make_object_dataset,
     make_scene_dataset,
 )
-from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (  # noqa: E501
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (
     MultiViewWrapper,
 )
-from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.bop_predictions import (  # noqa: E501
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.bop_predictions import (
     BopPredictionRunner,
 )
 from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import (
@@ -66,9 +66,7 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     init_distributed_mode,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-from happypose.toolbox.renderer.bullet_batch_renderer import (  # noqa: E501
-    BulletBatchRenderer,
-)
+from happypose.toolbox.renderer.bullet_batch_renderer import BulletBatchRenderer
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 torch.backends.cudnn.deterministic = True

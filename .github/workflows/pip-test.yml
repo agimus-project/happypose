@@ -17,7 +17,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -qqy libegl1-mesa libegl1-mesa-dev
 
       - name: Caching of the happypose installation and data
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: local_data
           key: data

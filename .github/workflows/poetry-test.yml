@@ -20,7 +20,7 @@ jobs:
         run: pipx install poetry
 
       - name: Caching of the happypose installation and data
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: local_data
           key: data
@@ -51,6 +51,6 @@ jobs:
       - name: Process coverage
         run: poetry run coverage xml
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

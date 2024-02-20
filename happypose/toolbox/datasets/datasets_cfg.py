@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 import json
 from typing import List, Optional, Tuple
@@ -224,7 +223,7 @@ def make_scene_dataset(
 
     # Synthetic datasets
     elif "synthetic." in ds_name:
-        from happypose.pose_estimators.cosypose.cosypose.datasets.synthetic_dataset import (  # noqa: E501
+        from happypose.pose_estimators.cosypose.cosypose.datasets.synthetic_dataset import (
             SyntheticSceneDataset,
         )
 

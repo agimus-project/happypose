@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 from pathlib import Path
 from typing import List
@@ -82,7 +81,7 @@ class TensorCollection:
 
     @property
     def device(self):
-        return list(self.tensors.values())[0].device
+        return next(iter(self.tensors.values())).device
 
     def __getstate__(self):
         return {"tensors": self.tensors}

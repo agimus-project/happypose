@@ -1,4 +1,5 @@
 """Set of unit tests for Panda3D renderer."""
+
 import unittest
 from pathlib import Path
 from typing import List

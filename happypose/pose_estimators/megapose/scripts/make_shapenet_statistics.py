@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 import io
 import json
@@ -46,17 +45,17 @@ def measure_memory(gltf_path):
         if "GeomVertexData arrays occupy" in line:
             print(line)
             l_ = line.split(" ")
-            idx = [n for n, w in enumerate(l_) if w == "occupy"][0]
+            idx = next(n for n, w in enumerate(l_) if w == "occupy")
             mems.append(float(l_[idx + 1]))
         elif "GeomPrimitive arrays occupy" in line:
             print(line)
             l_ = line.split(" ")
-            idx = [n for n, w in enumerate(l_) if w == "occupy"][0]
+            idx = next(n for n, w in enumerate(l_) if w == "occupy")
             mems.append(float(l_[idx + 1]))
         elif "texture memory required" in line:
             print(line)
             l_ = line.split(" ")
-            idx = [n for n, w in enumerate(l_) if w == "minimum"][0]
+            idx = next(n for n, w in enumerate(l_) if w == "minimum")
             mems.append(float(l_[idx + 1]))
     tot_mem_kb = sum(mems)
     stats = {
