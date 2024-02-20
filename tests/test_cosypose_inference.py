@@ -28,9 +28,9 @@ class TestCosyPoseInference(unittest.TestCase):
     def test_cosypose_pipeline(self):
         """Run detector with coarse and refiner from CosyPose."""
         expected_object_label = "hope-obj_000002"
-        mesh_file_name = "hope_000002.ply"
+        mesh_file_name = "hope-obj_000002.ply"
         data_dir = LOCAL_DATA_DIR / "examples" / "barbecue-sauce"
-        mesh_dir = data_dir / "meshes" / "barbecue-sauce"
+        mesh_dir = data_dir / "meshes"
         mesh_path = mesh_dir / mesh_file_name
         device = "cpu"
         n_workers = 1
@@ -79,6 +79,7 @@ class TestCosyPoseInference(unittest.TestCase):
             observation=observation,
             detection_th=0.8,
             run_detector=True,
+            n_refiner_iterations=3,
             labels_to_keep=[expected_object_label],
         )
 

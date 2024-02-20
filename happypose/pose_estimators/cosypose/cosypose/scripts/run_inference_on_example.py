@@ -34,18 +34,19 @@ def run_inference(
     observation: ObservationTensor,
     detections: DetectionsType,
     object_dataset: RigidObjectDataset,
-    model_name: str,
-    dataset_to_use: str = "hope",
+    dataset_to_use: str,
 ) -> None:
     # TODO: remove this wrapper from code base
     cosypose = CosyPoseWrapper(
         dataset_name=dataset_to_use, object_dataset=object_dataset, n_workers=1
     )
-    final_preds, all_preds = cosypose.pose_predictor.run_inference_pipeline(
-        observation=observation, detections=detections
+    data_TCO, extra_data = cosypose.pose_predictor.run_inference_pipeline(
+        observation=observation, detections=detections, n_refiner_iterations=3
     )
-    output = final_preds.cpu()
-    return output
+    print("Timings:")
+    print(extra_data["timing_str"])
+
+    return data_TCO.cpu()
 
 
 if __name__ == "__main__":
@@ -70,7 +71,6 @@ if __name__ == "__main__":
     # TODO: cosypose forward does not work if depth is loaded detection
     # contrary to megapose
     observation = ObservationTensor.from_numpy(rgb, depth=None, K=camera_data.K)
-    object_datas = load_object_data(example_dir / "outputs" / "object_data.json")
 
     if args.vis_detections:
         make_detections_visualization(rgb, detections, example_dir)
@@ -80,6 +80,11 @@ if __name__ == "__main__":
         save_predictions(output, example_dir)
 
     if args.vis_outputs:
+        if args.run_inference:
+            out_filename = "object_data_inf.json"
+        else:
+            out_filename = "object_data.json"
+        object_datas = load_object_data(example_dir / "outputs" / out_filename)
         make_output_visualization(
             rgb, object_dataset, object_datas, camera_data, example_dir
         )

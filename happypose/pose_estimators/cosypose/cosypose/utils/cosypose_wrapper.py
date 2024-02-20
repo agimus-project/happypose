@@ -101,10 +101,10 @@ class CosyPoseWrapper:
         mesh_db_batched = mesh_db.batched().to(device)
 
         coarse_model = load_model_cosypose(
-            EXP_DIR / coarse_run_id, renderer, mesh_db_batched
+            EXP_DIR / coarse_run_id, renderer, mesh_db_batched, device
         )
         refiner_model = load_model_cosypose(
-            EXP_DIR / refiner_run_id, renderer, mesh_db_batched
+            EXP_DIR / refiner_run_id, renderer, mesh_db_batched, device
         )
         return coarse_model, refiner_model
 

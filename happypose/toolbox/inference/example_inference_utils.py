@@ -31,19 +31,15 @@ def make_example_object_dataset(
 
     rigid_objects = []
     mesh_units = "mm"
-    object_dirs = (example_dir / "meshes").iterdir()
-    for object_dir in object_dirs:
-        label = object_dir.name
-        mesh_path = None
-        for fn in object_dir.glob("*"):
-            if fn.suffix in {".obj", ".ply"}:
-                assert not mesh_path, f"there multiple meshes in the {label} directory"
-                mesh_path = fn
-        assert mesh_path, f"couldnt find a obj or ply mesh for {label}"
-        rigid_objects.append(
-            RigidObject(label=label, mesh_path=mesh_path, mesh_units=mesh_units),
-        )
-        # TODO: fix mesh units
+    mesh_dir = example_dir / "meshes"
+    assert mesh_dir.exists(), f"Missing mesh directory {mesh_dir}"
+
+    for mesh_path in mesh_dir.iterdir():
+        if mesh_path.suffix in {".obj", ".ply"}:
+            obj_name = mesh_path.with_suffix("").name
+            rigid_objects.append(
+                RigidObject(label=obj_name, mesh_path=mesh_path, mesh_units=mesh_units),
+            )
     rigid_object_dataset = RigidObjectDataset(rigid_objects)
     return rigid_object_dataset
 
@@ -71,7 +67,7 @@ def load_observation_example(
 def load_detections(
     example_dir: Path,
 ) -> DetectionsType:
-    input_object_data = load_object_data(example_dir / "inputs/object_data.json")
+    input_object_data = load_object_data(example_dir / "object_data.json")
     detections = make_detections_from_object_data(input_object_data)
     return detections
 
@@ -109,7 +105,7 @@ def save_predictions(
         for label, pose in zip(labels, poses)
     ]
     object_data_json = json.dumps([x.to_json() for x in object_data])
-    output_fn = example_dir / "outputs" / "object_data.json"
+    output_fn = example_dir / "outputs" / "object_data_inf.json"
     output_fn.parent.mkdir(exist_ok=True)
     output_fn.write_text(object_data_json)
     logger.info(f"Wrote predictions: {output_fn}")

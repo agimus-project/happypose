@@ -21,19 +21,16 @@ class TestMegaPoseInference(unittest.TestCase):
     def test_megapose_pipeline(self):
         """Run detector from with coarse and refiner from MegaPose."""
         expected_object_label = "hope-obj_000002"
-        mesh_file_name = "hope_000002.ply"
+        mesh_file_name = "hope-obj_000002.ply"
         data_dir = LOCAL_DATA_DIR / "examples" / "barbecue-sauce"
+        mesh_dir = data_dir / "meshes"
+        mesh_path = mesh_dir / mesh_file_name
 
         rgb, depth, camera_data = load_observation_example(data_dir, load_depth=True)
         # TODO: cosypose forward does not work if depth is loaded detection contrary to megapose
         observation = ObservationTensor.from_numpy(rgb, depth=None, K=camera_data.K)
 
         detector = load_detector(run_id="detector-bop-hope-pbr--15246", device="cpu")
-
-        mesh_dir = (
-            LOCAL_DATA_DIR / "examples" / "barbecue-sauce" / "meshes" / "barbecue-sauce"
-        )
-        mesh_path = mesh_dir / mesh_file_name
 
         object_dataset = RigidObjectDataset(
             objects=[
@@ -46,8 +43,8 @@ class TestMegaPoseInference(unittest.TestCase):
         model_name = "megapose-1.0-RGB"
         model_info = NAMED_MODELS[model_name]
         pose_estimator = load_named_model(model_name, object_dataset).to("cpu")
-        # let's limit the grid, 278 is the most promising one, 477 the least one
-        pose_estimator._SO3_grid = pose_estimator._SO3_grid[[278, 477]]
+        # Uniformely sumbsample the grid to increase speed
+        pose_estimator._SO3_grid = pose_estimator._SO3_grid[::8]
         pose_estimator.detector_model = detector
 
         # Run detector and pose estimator filtering object labels
@@ -59,7 +56,7 @@ class TestMegaPoseInference(unittest.TestCase):
         )
 
         scores = data["coarse"]["data"]["logits"]
-        self.assertGreater(scores[0, 0], scores[0, 1])  # 278 is better than 477
+        self.assertGreater(scores[0, 0], scores[0, 1])
 
         self.assertEqual(len(preds), 1)
         self.assertEqual(preds.infos.label[0], expected_object_label)

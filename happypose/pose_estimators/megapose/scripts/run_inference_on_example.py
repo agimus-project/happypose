@@ -39,14 +39,19 @@ def run_inference(
 
     logger.info(f"Loading model {model_name}.")
     pose_estimator = load_named_model(model_name, object_dataset).to(device)
+    # Speed up things by subsampling coarse grid
+    pose_estimator._SO3_grid = pose_estimator._SO3_grid[::8]
+
     logger.info("Running inference.")
-    output, _ = pose_estimator.run_inference_pipeline(
+    data_TCO_final, extra_data = pose_estimator.run_inference_pipeline(
         observation,
         detections=detections,
         **model_info["inference_parameters"],
     )
+    print("Timings:")
+    print(extra_data["timing_str"])
 
-    return output
+    return data_TCO_final
 
 
 if __name__ == "__main__":
@@ -72,7 +77,6 @@ if __name__ == "__main__":
     object_dataset = make_example_object_dataset(example_dir)
     rgb, depth, camera_data = load_observation_example(example_dir, load_depth=True)
     observation = ObservationTensor.from_numpy(rgb, depth, camera_data.K)
-    object_datas = load_object_data(example_dir / "outputs" / "object_data.json")
 
     if args.vis_detections:
         make_detections_visualization(rgb, detections, example_dir)
@@ -82,6 +86,11 @@ if __name__ == "__main__":
         save_predictions(output, example_dir)
 
     if args.vis_outputs:
+        if args.run_inference:
+            out_filename = "object_data_inf.json"
+        else:
+            out_filename = "object_data.json"
+        object_datas = load_object_data(example_dir / "outputs" / out_filename)
         make_output_visualization(
             rgb, object_dataset, object_datas, camera_data, example_dir
         )
