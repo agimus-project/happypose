@@ -119,9 +119,11 @@ module load module load anaconda-py3/2023.03
 conda activate happypose
 
 cd happypose
-# python -m happypose.pose_estimators.megapose.src.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference --vis-outputs
-python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example crackers --run-inference
+# Assuming you have downloaded the example and models
+python -m happypose.pose_estimators.cosypose.cosypose.scripts.run_inference_on_example barbecue-sauce --run-inference
+# python -m happypose.pose_estimators.megapose.scripts.run_inference_on_example barbecue-sauce --run-inference
 ```
+
 
 ```bash
 # evaluation.slurm
