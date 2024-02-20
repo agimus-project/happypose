@@ -85,11 +85,19 @@ def make_detections_visualization(
     example_dir: Path,
 ) -> None:
     plotter = BokehPlotter()
+
+    # TODO: put in BokehPlotter.plot_detections
+    if hasattr(detections, "masks"):
+        for mask in detections.masks:
+            mask = mask.unsqueeze(2).tile((1, 1, 3)).numpy()
+            rgb[mask] = 122
+
     fig_rgb = plotter.plot_image(rgb)
     fig_det = plotter.plot_detections(fig_rgb, detections=detections)
     output_fn = example_dir / "visualizations" / "detections.png"
     output_fn.parent.mkdir(exist_ok=True)
     export_png(fig_det, filename=output_fn)
+
     logger.info(f"Wrote detections visualization: {output_fn}")
     return
 
@@ -111,7 +119,7 @@ def save_predictions(
     logger.info(f"Wrote predictions: {output_fn}")
 
 
-def make_output_visualization(
+def make_poses_visualization(
     rgb: np.ndarray,
     object_dataset: RigidObjectDataset,
     object_datas: List[ObjectData],
