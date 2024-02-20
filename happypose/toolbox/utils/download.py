@@ -288,11 +288,9 @@ async def main():
             )
     if args.examples:
         for example in args.examples:
-            to_dl.append(
-                (
-                    f"examples/{example}",
-                    LOCAL_DATA_DIR / "examples",
-                )
+            to_dl.append((f"examples/{example}.zip", DOWNLOAD_DIR))
+            to_unzip.append(
+                (DOWNLOAD_DIR / f"{example}.zip", LOCAL_DATA_DIR / "examples")
             )
 
     # logger.info(f"{to_dl=}")
