@@ -88,7 +88,11 @@ def load_pose_models(
     force_panda3d_renderer: bool = False,
     renderer_kwargs: Optional[Dict] = None,
     models_root: Path = EXP_DIR,
-) -> Tuple[torch.nn.Module, torch.nn.Module, BatchedMeshes,]:
+) -> Tuple[
+    torch.nn.Module,
+    torch.nn.Module,
+    BatchedMeshes,
+]:
     coarse_run_dir = models_root / coarse_run_id
     coarse_cfg: TrainingConfig = load_cfg(coarse_run_dir / "config.yaml")
     coarse_cfg = check_update_config_pose(coarse_cfg)
