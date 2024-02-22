@@ -4,6 +4,7 @@ import numpy as np
 import pinocchio as pin
 import torch
 
+# from numpy.testing import assert_equal as np.allclose
 from happypose.toolbox.lib3d.transform import Transform
 
 
@@ -19,12 +20,11 @@ class TestTransform(unittest.TestCase):
 
         # 1 arg constructor
         T1 = Transform(M1)
-        assert T1._T == M1
-
+        self.assertTrue(T1._T == M1)
         T1b = Transform(T1)
         T1c = Transform(M1.homogeneous)
         T1d = Transform(torch.from_numpy(M1.homogeneous))
-        assert T1 == T1b == T1c == T1d
+        self.assertTrue(T1 == T1b == T1c == T1d)
 
         # 2 args constructor
         R1 = M1.rotation
@@ -38,21 +38,24 @@ class TestTransform(unittest.TestCase):
         T1i = Transform(list(pin.Quaternion(R1).coeffs()), t1)
         T1j = Transform(torch.from_numpy(pin.Quaternion(R1).coeffs().copy()), t1)
 
-        assert T1 == T1e == T1f
-        assert np.all(
-            np.isclose(T1._T, T1g._T)
-        )  # small error due to Quaternion conversion back and forth
-        assert T1g == T1h == T1h == T1i == T1j
+        self.assertTrue(T1 == T1e == T1f)
+        self.assertTrue(np.allclose(T1._T, T1g._T))
+        self.assertTrue(T1g == T1h == T1h == T1i == T1j)
 
+        # Conversions
+        self.assertTrue(np.allclose(M1.homogeneous, T1.toHomogeneousMatrix()))
+        self.assertTrue(np.allclose(M1.homogeneous, T1.matrix))
+        self.assertTrue(torch.allclose(torch.from_numpy(M1.homogeneous), T1.tensor))
+
+        # Composition
         T2 = Transform(M2)
         T3 = Transform(M3)
         T3m = T1 * T2
-        assert T3 == T3m
+        self.assertTrue(T3 == T3m)
 
+        # Inverse
         T1inv = Transform(T1.inverse())
-        assert T1inv == T1.inverse()
-
-        assert np.all(np.isclose(T1.toHomogeneousMatrix(), M1.homogeneous))
+        self.assertTrue(T1inv == T1.inverse())
 
 
 if __name__ == "__main__":
