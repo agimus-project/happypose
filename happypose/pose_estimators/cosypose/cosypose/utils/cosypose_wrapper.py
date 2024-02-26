@@ -38,7 +38,7 @@ class CosyPoseWrapper:
     def __init__(
         self,
         dataset_name: str,
-        object_dataset=Union[None, RigidObjectDataset],
+        object_dataset: Union[None, RigidObjectDataset] = None,
         n_workers=8,
         gpu_renderer=False,
     ) -> None:
