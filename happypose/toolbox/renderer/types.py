@@ -160,6 +160,10 @@ class Panda3dObjectData:
     scale: float = 1
     positioning_function: Optional[NodeFunction] = None
 
+    def __post_init__(self):
+        if not isinstance(self.TWO, Transform):
+            self.TWO = Transform(self.TWO)
+
     def set_node_material_and_transparency(
         self,
         node_path: p3d.core.NodePath,
