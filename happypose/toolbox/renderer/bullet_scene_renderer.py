@@ -7,6 +7,7 @@ from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
 # from happypose.toolbox.datasets.datasets_cfg import UrdfDataset
 from happypose.pose_estimators.cosypose.cosypose.datasets.urdf_dataset import (
+    OneUrdfDataset,
     UrdfDataset,
 )
 
@@ -31,7 +32,7 @@ class BulletSceneRenderer(BaseScene):
         gpu_renderer=True,
         gui=False,
     ):
-        if isinstance(asset_dataset, UrdfDataset):
+        if isinstance(asset_dataset, (UrdfDataset, OneUrdfDataset)):
             self.urdf_ds = asset_dataset
         elif isinstance(asset_dataset, RigidObjectDataset):
             # Build urdfs files from RigidObjectDataset
@@ -43,7 +44,7 @@ class BulletSceneRenderer(BaseScene):
             self.urdf_ds.index["scale"] = asset_dataset[0].scale
         else:
             raise TypeError(
-                f"asset_dataset of type {type(asset_dataset)} should be either UrdfDataset or RigidObjectDataset"
+                f"asset_dataset of type {type(asset_dataset)} should be either OneUrdfDataset/UrdfDataset or RigidObjectDataset"
             )
         self.connect(gpu_renderer=gpu_renderer, gui=gui)
         self.body_cache = BodyCache(self.urdf_ds, self.client_id)
