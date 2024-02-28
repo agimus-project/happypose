@@ -84,6 +84,13 @@ def load_pose_models(coarse_run_id, refiner_run_id, n_workers):
     # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
     cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config_pose(cfg)
+    # object_ds = BOPObjectDataset(BOP_DS_DIR / 'tless/models_cad')
+    # object_ds = make_object_dataset(cfg.object_ds_name)
+    # mesh_db = MeshDataBase.from_object_ds(object_ds)
+    # renderer = BulletBatchRenderer(
+    # object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer
+    # )
+    #
 
     object_dataset = make_object_dataset("ycbv")
     renderer = Panda3dBatchRenderer(

@@ -1,200 +1,118 @@
 # Standard Library
 import argparse
 import os
-
-########################
-# Add cosypose to my path -> dirty
 from pathlib import Path
-from typing import Tuple, Union
 
 # Third Party
-import numpy as np
 import torch
-from bokeh.io import export_png
-from bokeh.plotting import gridplot
-from PIL import Image
 
+from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
+    PoseEstimator,
+)
+
+# CosyPose
 from happypose.pose_estimators.cosypose.cosypose.utils.cosypose_wrapper import (
     CosyPoseWrapper,
 )
 
-# MegaPose
-from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
-from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
-from happypose.toolbox.inference.types import ObservationTensor
-from happypose.toolbox.lib3d.transform import Transform
-
 # HappyPose
-from happypose.toolbox.renderer import Panda3dLightData
-from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
-from happypose.toolbox.utils.conversion import convert_scene_observation_to_panda3d
+from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
+from happypose.toolbox.inference.example_inference_utils import (
+    load_detections,
+    load_object_data,
+    load_observation_example,
+    make_detections_visualization,
+    make_example_object_dataset,
+    make_poses_visualization,
+    save_predictions,
+)
+from happypose.toolbox.inference.types import DetectionsType, ObservationTensor
+from happypose.toolbox.inference.utils import filter_detections, load_detector
 from happypose.toolbox.utils.logging import get_logger, set_logging_level
-from happypose.toolbox.visualization.bokeh_plotter import BokehPlotter
-from happypose.toolbox.visualization.utils import make_contour_overlay
-
-########################
-
 
 logger = get_logger(__name__)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def load_observation(
-    example_dir: Path,
-    load_depth: bool = False,
-) -> Tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
-    camera_data = CameraData.from_json((example_dir / "camera_data.json").read_text())
-
-    rgb = np.array(Image.open(example_dir / "image_rgb.png"), dtype=np.uint8)
-    assert rgb.shape[:2] == camera_data.resolution
-
-    depth = None
-    if load_depth:
-        depth = (
-            np.array(Image.open(example_dir / "image_depth.png"), dtype=np.float32)
-            / 1000
-        )
-        assert depth.shape[:2] == camera_data.resolution
-
-    return rgb, depth, camera_data
-
-
-def load_observation_tensor(
-    example_dir: Path,
-    load_depth: bool = False,
-) -> ObservationTensor:
-    rgb, depth, camera_data = load_observation(example_dir, load_depth)
-    observation = ObservationTensor.from_numpy(rgb, depth, camera_data.K)
-    if torch.cuda.is_available():
-        observation.cuda()
-    return observation
-
-
-def make_object_dataset(example_dir: Path) -> RigidObjectDataset:
-    rigid_objects = []
-    mesh_units = "mm"
-    object_dirs = (example_dir / "meshes").iterdir()
-    for object_dir in object_dirs:
-        label = object_dir.name
-        mesh_path = None
-        for fn in object_dir.glob("*"):
-            if fn.suffix in {".obj", ".ply"}:
-                assert not mesh_path, f"there multiple meshes in the {label} directory"
-                mesh_path = fn
-        assert mesh_path, f"couldnt find a obj or ply mesh for {label}"
-        rigid_objects.append(
-            RigidObject(label=label, mesh_path=mesh_path, mesh_units=mesh_units),
-        )
-        # TODO: fix mesh units
-    rigid_object_dataset = RigidObjectDataset(rigid_objects)
-    return rigid_object_dataset
-
-
-def rendering(predictions, example_dir):
-    object_dataset = make_object_dataset(example_dir)
-
-    obj_label = object_dataset.list_objects[0].label
-    pred = predictions.poses[0].numpy()
-
-    # rendering
-    camera_data = CameraData.from_json((example_dir / "camera_data.json").read_text())
-    camera_data.TWC = Transform(np.eye(4))
-    renderer = Panda3dSceneRenderer(object_dataset)
-    # Data necessary for image rendering
-    object_datas = [ObjectData(label=obj_label, TWO=Transform(pred))]
-    camera_data, object_datas = convert_scene_observation_to_panda3d(
-        camera_data,
-        object_datas,
+def setup_pose_estimator(dataset_to_use: str, object_dataset: RigidObjectDataset):
+    # TODO: remove this wrapper from code base
+    cosypose = CosyPoseWrapper(
+        dataset_name=dataset_to_use, object_dataset=object_dataset, n_workers=1
     )
-    light_datas = [
-        Panda3dLightData(
-            light_type="ambient",
-            color=((0.6, 0.6, 0.6, 1)),
-        ),
-    ]
-    renderings = renderer.render_scene(
-        object_datas,
-        [camera_data],
-        light_datas,
-        render_depth=False,
-        render_binary_mask=False,
-        render_normals=False,
-        copy_arrays=True,
-    )[0]
-    return renderings
 
-
-def save_predictions(example_dir, renderings):
-    rgb_render = renderings.rgb
-    rgb, _, _ = load_observation(example_dir, load_depth=False)
-    mask = ~(rgb_render.sum(axis=-1) == 0)
-    rgb_n_render = rgb.copy()
-    rgb_n_render[mask] = rgb_render[mask]
-
-    # make the image background a bit fairer than the render
-    rgb_overlay = np.zeros_like(rgb_render)
-    rgb_overlay[~mask] = rgb[~mask] * 0.6 + 255 * 0.4
-    rgb_overlay[mask] = rgb_render[mask] * 0.8 + 255 * 0.2
-    plotter = BokehPlotter()
-
-    fig_rgb = plotter.plot_image(rgb)
-
-    fig_mesh_overlay = plotter.plot_overlay(rgb, renderings.rgb)
-    contour_overlay = make_contour_overlay(
-        rgb,
-        renderings.rgb,
-        dilate_iterations=1,
-        color=(0, 255, 0),
-    )["img"]
-    fig_contour_overlay = plotter.plot_image(contour_overlay)
-    fig_all = gridplot(
-        [[fig_rgb, fig_contour_overlay, fig_mesh_overlay]],
-        toolbar_location=None,
-    )
-    vis_dir = example_dir / "visualizations"
-    vis_dir.mkdir(exist_ok=True)
-    export_png(fig_mesh_overlay, filename=vis_dir / "mesh_overlay.png")
-    export_png(fig_contour_overlay, filename=vis_dir / "contour_overlay.png")
-    export_png(fig_all, filename=vis_dir / "all_results.png")
+    return cosypose.pose_predictor
 
 
 def run_inference(
-    example_dir: Path,
-    model_name: str,
-    dataset_to_use: str,
+    pose_estimator: PoseEstimator,
+    observation: ObservationTensor,
+    detections: DetectionsType,
 ) -> None:
-    observation = load_observation_tensor(example_dir)
-    # TODO: remove this wrapper from code base
-    CosyPose = CosyPoseWrapper(dataset_name=dataset_to_use, n_workers=8)
-    predictions = CosyPose.inference(observation)
-    renderings = rendering(predictions, example_dir)
-    save_predictions(example_dir, renderings)
+    observation.to(device)
+
+    data_TCO, extra_data = pose_estimator.run_inference_pipeline(
+        observation=observation, detections=detections, n_refiner_iterations=3
+    )
+    print("Timings:")
+    print(extra_data["timing_str"])
+
+    return data_TCO.cpu()
 
 
 if __name__ == "__main__":
     set_logging_level("info")
     parser = argparse.ArgumentParser()
     parser.add_argument("example_name")
-    # parser.add_argument(
-    # "--model", type=str, default="megapose-1.0-RGB-multi-hypothesis"
-    # )
-    parser.add_argument("--dataset", type=str, default="ycbv")
-    # parser.add_argument("--vis-detections", action="store_true")
-    parser.add_argument("--run-inference", action="store_true", default=True)
-    # parser.add_argument("--vis-outputs", action="store_true")
+    parser.add_argument("--dataset", type=str, default="hope")
+    parser.add_argument("--run-detections", action="store_true")
+    parser.add_argument("--run-inference", action="store_true")
+    parser.add_argument("--vis-detections", action="store_true")
+    parser.add_argument("--vis-poses", action="store_true")
     args = parser.parse_args()
 
     data_dir = os.getenv("HAPPYPOSE_DATA_DIR")
-    assert data_dir
+    assert data_dir, "Set HAPPYPOSE_DATA_DIR env variable"
     example_dir = Path(data_dir) / "examples" / args.example_name
-    dataset_to_use = args.dataset  # tless or ycbv
+    assert (
+        example_dir.exists()
+    ), "Example {args.example_name} not available, follow download instructions"
+    dataset_to_use = args.dataset  # hope/tless/ycbv
 
-    # if args.vis_detections:
-    #    make_detections_visualization(example_dir)
+    # Load data
+    detections = load_detections(example_dir).to(device)
+    object_dataset = make_example_object_dataset(example_dir)
+    rgb, depth, camera_data = load_observation_example(example_dir, load_depth=True)
+    # TODO: cosypose forward does not work if depth is loaded detection
+    # contrary to megapose
+    observation = ObservationTensor.from_numpy(rgb, depth=None, K=camera_data.K)
+
+    # Load models
+    pose_estimator = setup_pose_estimator(args.dataset, object_dataset)
+
+    if args.run_detections:
+        # TODO: hardcoded detector
+        detector = load_detector(run_id="detector-bop-hope-pbr--15246", device=device)
+        # Masks are not used for pose prediction, but are computed by Mask-RCNN anyway
+        detections = detector.get_detections(observation, output_masks=True)
+        available_labels = [obj.label for obj in object_dataset.list_objects]
+        detections = filter_detections(detections, available_labels)
+    else:
+        detections = load_detections(example_dir).to(device)
 
     if args.run_inference:
-        run_inference(example_dir, None, dataset_to_use)
+        output = run_inference(pose_estimator, observation, detections)
+        save_predictions(output, example_dir)
 
-    # if args.vis_outputs:
-    #    make_output_visualization(example_dir)
+    if args.vis_detections:
+        make_detections_visualization(rgb, detections, example_dir)
+
+    if args.vis_poses:
+        if args.run_inference:
+            out_filename = "object_data_inf.json"
+        else:
+            out_filename = "object_data.json"
+        object_datas = load_object_data(example_dir / "outputs" / out_filename)
+        make_poses_visualization(
+            rgb, object_dataset, object_datas, camera_data, example_dir
+        )

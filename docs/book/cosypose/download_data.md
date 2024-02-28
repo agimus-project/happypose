@@ -47,17 +47,23 @@ Notes:
 ## Models for minimal version
 
 ```sh
- #ycbv
-  python -m happypose.toolbox.utils.download --cosypose_models \
-            detector-bop-ycbv-pbr--970850 \
-            coarse-bop-ycbv-pbr--724183 \
-            refiner-bop-ycbv-pbr--604090
+# hope
+python -m happypose.toolbox.utils.download --cosypose_models \
+          detector-bop-hope-pbr--15246 \
+          coarse-bop-hope-pbr--225203 \
+          refiner-bop-hope-pbr--955392
 
- #tless
-  python -m happypose.toolbox.utils.download --cosypose_models \
-            detector-bop-tless-pbr--873074 \
-            coarse-bop-tless-pbr--506801 \
-            refiner-bop-tless-pbr--233420
+# ycbv
+python -m happypose.toolbox.utils.download --cosypose_models \
+          detector-bop-ycbv-pbr--970850 \
+          coarse-bop-ycbv-pbr--724183 \
+          refiner-bop-ycbv-pbr--604090
+
+# tless
+python -m happypose.toolbox.utils.download --cosypose_models \
+          detector-bop-tless-pbr--873074 \
+          coarse-bop-tless-pbr--506801 \
+          refiner-bop-tless-pbr--233420
 ```
 
 ## Pre-trained models for single-view estimator

@@ -25,7 +25,6 @@ import yaml
 from omegaconf import OmegaConf
 
 # MegaPose
-import happypose.pose_estimators.megapose
 import happypose.toolbox.utils.tensor_collection as tc
 from happypose.pose_estimators.megapose.config import EXP_DIR
 from happypose.pose_estimators.megapose.inference.detector import Detector
@@ -48,7 +47,7 @@ from happypose.pose_estimators.megapose.training.training_config import Training
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.datasets.scene_dataset import CameraData, ObjectData
 from happypose.toolbox.inference.types import DetectionsType, PoseEstimatesType
-from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.lib3d.rigid_mesh_database import BatchedMeshes, MeshDataBase
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.toolbox.utils.logging import get_logger
 from happypose.toolbox.utils.models_compat import change_keys_of_older_models
@@ -59,13 +58,13 @@ logger = get_logger(__name__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def load_detector(run_id: str) -> torch.nn.Module:
+def load_detector(run_id: str, device="cpu") -> torch.nn.Module:
     run_dir = EXP_DIR / run_id
     cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config_detector(cfg)
     label_to_category_id = cfg.label_to_category_id
     model = create_model_detector(cfg, len(label_to_category_id))
-    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=torch.device("cpu"))
+    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=torch.device(device))
     ckpt = ckpt["state_dict"]
     model.load_state_dict(ckpt)
     model = model.to(device).eval()
@@ -92,7 +91,7 @@ def load_pose_models(
 ) -> Tuple[
     torch.nn.Module,
     torch.nn.Module,
-    happypose.toolbox.lib3d.rigid_mesh_database.BatchedMeshes,
+    BatchedMeshes,
 ]:
     coarse_run_dir = models_root / coarse_run_id
     coarse_cfg: TrainingConfig = load_cfg(coarse_run_dir / "config.yaml")

@@ -110,9 +110,15 @@ class ObservationTensor:
     K: Optional[torch.Tensor] = None  # [B,3,3]
 
     def cuda(self) -> ObservationTensor:
-        self.images = self.images.cuda()
+        return self.to("cuda")
+
+    def cpu(self) -> ObservationTensor:
+        return self.to("cpu")
+
+    def to(self, device):
+        self.images = self.images.to(device)
         if self.K is not None:
-            self.K = self.K.cuda()
+            self.K = self.K.to(device)
         return self
 
     @property

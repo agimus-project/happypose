@@ -152,7 +152,7 @@ def make_scene_renderings(
             {"K": K, "TWC": TWC, "resolution": (w, h)},
         )
     renders = renderer.render_scene(list_objects, list_cameras)
-    images = np.stack([render["rgb"] for render in renders])
+    images = np.stack([render.rgb for render in renders])
     if gui:
         time.sleep(100)
     renderer.disconnect()
@@ -201,7 +201,7 @@ def render_predictions_wrt_camera(renderer, preds_with_colors, camera):
             "TWO": preds_with_colors.poses[n].cpu().numpy(),
         }
         list_objects.append(obj)
-    rgb_rendered = renderer.render_scene(list_objects, [camera])[0]["rgb"]
+    rgb_rendered = renderer.render_scene(list_objects, [camera])[0].rgb
     return rgb_rendered
 
 
@@ -212,7 +212,7 @@ def render_gt(renderer, objects, camera, colormap_rgb):
         obj["color"] = colormap_rgb[obj["label"]]
         obj["TWO"] = np.linalg.inv(TWC) @ obj["TWO"]
     camera["TWC"] = np.eye(4)
-    rgb_rendered = renderer.render_scene(objects, [camera])[0]["rgb"]
+    rgb_rendered = renderer.render_scene(objects, [camera])[0].rgb
     return rgb_rendered
 
 

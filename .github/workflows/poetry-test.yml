@@ -39,11 +39,11 @@ jobs:
           poetry run python -m happypose.toolbox.utils.download \
             --megapose_models \
             --examples \
-              crackers_example \
+              barbecue-sauce \
             --cosypose_models  \
-              detector-bop-ycbv-pbr--970850 \
-              coarse-bop-ycbv-pbr--724183 \
-              refiner-bop-ycbv-pbr--604090
+              detector-bop-hope-pbr--15246 \
+              coarse-bop-hope-pbr--225203 \
+              refiner-bop-hope-pbr--955392
 
       - name: Run tests
         run: poetry run coverage run --source=happypose -m unittest

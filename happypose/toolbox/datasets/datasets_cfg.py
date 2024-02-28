@@ -249,7 +249,12 @@ def make_scene_dataset(
 def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     # BOP original models
 
-    if ds_name == "tless.cad":
+    if ds_name == "tless":
+        ds: RigidObjectDataset = BOPObjectDataset(
+            BOP_DS_DIR / "tless/models_cad",
+            label_format="tless-{label}",
+        )
+    elif ds_name == "tless.cad":
         ds: RigidObjectDataset = BOPObjectDataset(
             BOP_DS_DIR / "tless/models_cad",
             label_format="tless-{label}",

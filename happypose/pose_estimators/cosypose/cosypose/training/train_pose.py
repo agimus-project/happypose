@@ -33,6 +33,9 @@ from happypose.pose_estimators.cosypose.cosypose.scripts.run_cosypose_eval impor
     load_pix2pose_results,
     load_posecnn_results,
 )
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
+    load_model_cosypose,
+)
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     get_rank,
     get_world_size,
@@ -55,10 +58,12 @@ from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
 from .pose_forward_loss import h_pose
-from .pose_models_cfg import check_update_config, create_model_pose
+from .pose_models_cfg import check_update_config, create_pose_model_cosypose
 
 cudnn.benchmark = True
 logger = get_logger(__name__)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def log(config, model, log_dict, test_dict, epoch):
@@ -93,33 +98,22 @@ def make_eval_bundle(args, model_training):
     eval_bundle = {}
     model_training.cfg = args
 
-    def load_model(run_id):
-        if run_id is None:
-            return None
-        run_dir = EXP_DIR / run_id
-        cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.FullLoader)
-        cfg = check_update_config(cfg)
-        model = (
-            create_model_pose(
-                cfg,
-                renderer=model_training.renderer,
-                mesh_db=model_training.mesh_db,
-            )
-            .cuda()
-            .eval()
-        )
-        ckpt = torch.load(run_dir / "checkpoint.pth.tar")["state_dict"]
-        model.load_state_dict(ckpt)
-        model.eval()
-        model.cfg = cfg
-        return model
-
     if args.train_refiner:
         refiner_model = model_training
-        coarse_model = load_model(args.coarse_run_id_for_test)
+        coarse_model = load_model_cosypose(
+            EXP_DIR / args.coarse_run_id_for_test,
+            model_training.renderer,
+            model_training.mesh_db,
+            device,
+        )
     elif args.train_coarse:
         coarse_model = model_training
-        refiner_model = load_model(args.refiner_run_id_for_test)
+        refiner_model = load_model_cosypose(
+            EXP_DIR / args.refiner_run_id_for_test,
+            model_training.renderer,
+            model_training.mesh_db,
+            device,
+        )
     else:
         raise ValueError
 
@@ -342,7 +336,9 @@ def train_pose(args):
         .float()
     )
 
-    model = create_model_pose(cfg=args, renderer=renderer, mesh_db=mesh_db).cuda()
+    model = create_pose_model_cosypose(
+        cfg=args, renderer=renderer, mesh_db=mesh_db
+    ).cuda()
 
     eval_bundle = make_eval_bundle(args, model)
 

@@ -83,6 +83,10 @@ class Detector(DetectorModule):
             one_instance_per_class: If True, keep only the highest scoring
                 detection within each class.
 
+        Returns:
+        ---
+            detections: DetectionType=PandasTensorCollection containing bboxes tensor.
+            bboxes format: xmin, ymin, xmax, ymax
 
         """
         # [B,3,H,W]
@@ -125,28 +129,28 @@ class Detector(DetectorModule):
                 dtype=torch.bool,
             ).to(device)
 
-        outputs = tc.PandasTensorCollection(
+        detections = tc.PandasTensorCollection(
             infos=pd.DataFrame(infos),
             bboxes=bboxes,
         )
         if output_masks:
-            outputs.register_tensor("masks", masks)
+            detections.register_tensor("masks", masks)
         if detection_th is not None:
-            keep = np.where(outputs.infos["score"] > detection_th)[0]
-            outputs = outputs[keep]
+            keep = np.where(detections.infos["score"] > detection_th)[0]
+            detections = detections[keep]
 
         # Keep only the top-detection for each class label
         if one_instance_per_class:
-            outputs = happypose.toolbox.inference.utils.filter_detections(
-                outputs,
+            detections = happypose.toolbox.inference.utils.filter_detections(
+                detections,
                 one_instance_per_class=True,
             )
 
         # Add instance_id column to dataframe
         # Each detection is now associated with an `instance_id` that
         # identifies multiple instances of the same object
-        outputs = happypose.toolbox.inference.utils.add_instance_id(outputs)
-        return outputs
+        detections = happypose.toolbox.inference.utils.add_instance_id(detections)
+        return detections
 
     def __call__(self, *args: Any, **kwargs: Any) -> DetectionsType:
         return self.get_detections(*args, **kwargs)

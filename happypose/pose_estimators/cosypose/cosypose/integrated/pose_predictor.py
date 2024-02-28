@@ -18,6 +18,7 @@ logger = get_logger(__name__)
 
 
 class CoarseRefinePosePredictor(PoseEstimationModule):
+    # TODO: deprecate in favor of PosePredictor
     def __init__(self, coarse_model=None, refiner_model=None, bsz_objects=64):
         super().__init__()
         self.coarse_model = coarse_model

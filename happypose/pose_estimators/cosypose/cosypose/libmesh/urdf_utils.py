@@ -30,15 +30,17 @@ def convert_rigid_body_dataset_to_urdfs(
         obj_to_urdf(obj_path, urdf_path)
 
 
-def ply_to_obj(ply_path, obj_path, texture_size=None):
+def ply_to_obj(ply_path: Path, obj_path: Path, texture_size=None):
+    assert obj_path.suffix == ".obj"
     mesh = trimesh.load(ply_path)
     obj_label = obj_path.with_suffix("").name
 
     # adapt materials according to previous example meshes
-    mesh.visual.material.ambient = np.array([51, 51, 51, 255], dtype=np.uint8)
-    mesh.visual.material.diffuse = np.array([255, 255, 255, 255], dtype=np.uint8)
-    mesh.visual.material.specular = np.array([255, 255, 255, 255], dtype=np.uint8)
-    mesh.visual.material.name = obj_label + "_texture"
+    if mesh.visual.defined:
+        mesh.visual.material.ambient = np.array([51, 51, 51, 255], dtype=np.uint8)
+        mesh.visual.material.diffuse = np.array([255, 255, 255, 255], dtype=np.uint8)
+        mesh.visual.material.specular = np.array([255, 255, 255, 255], dtype=np.uint8)
+        mesh.visual.material.name = obj_label + "_texture"
 
     # print(mesh.visual.uv)
     kwargs_export = {"mtl_name": f"{obj_label}.mtl"}
