@@ -95,8 +95,8 @@ class BatchedMeshes(TensorCollection):
         try:
             ids = [self.label_to_id[label] for label in labels]
         except KeyError as e:
-            print(e)
             print("self.label_to_id.keys(): ", list(self.label_to_id.keys()))
+            raise e
         return Meshes(
             infos=[self.infos[label] for label in labels],
             labels=self.labels[ids],
