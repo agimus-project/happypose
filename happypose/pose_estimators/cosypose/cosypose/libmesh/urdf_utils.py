@@ -1,33 +1,62 @@
+import json
+import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from xml.dom import minidom
 
 import numpy as np
 import trimesh
+from tqdm import tqdm
 
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 
 
 def convert_rigid_body_dataset_to_urdfs(
-    rb_ds: RigidObjectDataset, urdf_dir: Path, texture_size=(1024, 1024)
+    rb_ds: RigidObjectDataset,
+    urdf_dir: Path,
+    texture_size=(1024, 1024),
+    override=True,
+    label2objname_file_name: str = "objname2label.json",
 ):
     """
-    Converts a RigidObjectDataset in a bullet renderer compatible directory with .obj and urdf files.
+    Converts a RigidObjectDataset into a directory of urdf files with structure:
+
+    urdf_dir/<label2objname_file_name>.json
+    urdf_dir/obj_000001/obj_000001.mtl
+                        obj_000001.obj
+                        obj_000001_texture.png
+                        obj_000001.urdf
+    urdf_dir/obj_000002/obj_000002.mtl
+                        obj_000002.obj
+                        obj_000002_texture.png
+                        obj_000002.urdf
+
+    <label2objname_file_name>.json: stores a map between object file names (e.g. obj_000002) and
+    object labels used in happypose (e.g. the detector may output "ycbv-obj_000002")
     """
+    if override and urdf_dir.exists():
+        shutil.rmtree(urdf_dir, ignore_errors=True)
     urdf_dir.mkdir(exist_ok=True, parents=True)
 
-    for obj in rb_ds.list_objects:
-        out_dir = urdf_dir / obj.mesh_path.with_suffix("").name
-        out_dir.mkdir(exist_ok=True)
-        obj_path = out_dir / obj.mesh_path.with_suffix(".obj").name
-        urdf_path = obj_path.with_suffix(".urdf")
+    objname2label = {}
+    for obj in tqdm(rb_ds.list_objects):
+        objname = obj.mesh_path.with_suffix("").name  # e.g. "obj_000002"
+        objname2label[objname] = obj.label  # e.g. obj_000002 -> ycbv-obj_000002
+        # Create object folder
+        obj_urdf_dir = urdf_dir / objname
+        obj_urdf_dir.mkdir(exist_ok=True)  # urdf_dir/obj_000002/ created
+        # Convert mesh from ply to obj
+        obj_path = (obj_urdf_dir / objname).with_suffix(".obj")
         if obj.mesh_path.suffix == ".ply":
-            if obj_path.exists():
-                obj_path.unlink()
             ply_to_obj(obj.mesh_path, obj_path, texture_size)
         else:
             ValueError(f"{obj.mesh_path.suffix} file type not supported")
+        # Create a .urdf file associated to the .obj file
+        urdf_path = obj_path.with_suffix(".urdf")
         obj_to_urdf(obj_path, urdf_path)
+
+    with open(urdf_dir / label2objname_file_name, "w") as fp:
+        json.dump(objname2label, fp)
 
 
 def ply_to_obj(ply_path: Path, obj_path: Path, texture_size=None):

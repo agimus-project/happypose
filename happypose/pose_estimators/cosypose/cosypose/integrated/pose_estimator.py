@@ -147,7 +147,7 @@ class PoseEstimator(PoseEstimationModule):
         coarse_estimates: Optional[PoseEstimatesType] = None,
         detection_th: float = 0.7,
         mask_th: float = 0.8,
-        labels_to_keep: List[str] = None,
+        labels_to_keep: Optional[List[str]] = None,
     ) -> Tuple[PoseEstimatesType, dict]:
         timing_str = ""
         timer = SimpleTimer()

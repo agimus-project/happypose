@@ -18,9 +18,7 @@ class TestBulletRenderer(unittest.TestCase):
     """Unit tests for bullet renderer."""
 
     def setUp(self) -> None:
-        self.obj_label = (
-            "obj_000001"  # TODO: current limitation: label must be equal to object name
-        )
+        self.obj_label = "my_favorite_object_label"
         self.obj_path = Path(__file__).parent.joinpath("data/obj_000001.ply")
         self.rigid_object_dataset = RigidObjectDataset(
             objects=[

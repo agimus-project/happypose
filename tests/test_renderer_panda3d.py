@@ -26,7 +26,7 @@ class TestPanda3DRenderer(unittest.TestCase):
     """Unit tests for Panda3D renderer."""
 
     def setUp(self) -> None:
-        self.obj_label = "obj"
+        self.obj_label = "my_favorite_object_label"
         self.obj_path = Path(__file__).parent.joinpath("data/obj_000001.ply")
         self.asset_dataset = RigidObjectDataset(
             objects=[
