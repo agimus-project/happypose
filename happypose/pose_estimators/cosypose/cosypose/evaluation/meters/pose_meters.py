@@ -6,11 +6,8 @@ import xarray as xr
 from sklearn.metrics import average_precision_score
 from torch.utils.data import DataLoader, TensorDataset
 
-from happypose.pose_estimators.cosypose.cosypose.lib3d.distances import (
-    dists_add,
-    dists_add_symmetric,
-)
-from happypose.pose_estimators.cosypose.cosypose.utils.xarray import xr_merge
+from happypose.toolbox.lib3d.distances import dists_add, dists_add_symmetric
+from happypose.toolbox.utils.xarray import xr_merge
 
 from .base import Meter
 from .utils import (
