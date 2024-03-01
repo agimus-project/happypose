@@ -14,7 +14,10 @@ from happypose.toolbox.lib3d.rotations import (
 
 # from numpy.testing import assert_equal as np.allclose
 from happypose.toolbox.lib3d.transform import Transform
-from happypose.toolbox.lib3d.transform_ops import transform_pts
+from happypose.toolbox.lib3d.transform_ops import (
+    invert_transform_matrices,
+    transform_pts,
+)
 
 
 class TestTransform(unittest.TestCase):
@@ -138,6 +141,13 @@ class TestTransformOps(unittest.TestCase):
             for j in range(self.n_T):
                 pts_trans_arr[0, j, i] = self.Tpin_lst[j] * self.pts[0, i].numpy()
         self.assertTrue(np.allclose(pts_trans_ts.numpy(), pts_trans_arr, atol=1e-6))
+
+    def test_invert_transform_matrices(self):
+        T_ts_inv = invert_transform_matrices(self.T_ts)
+        T_arr_inv = np.zeros((self.n_T, 4, 4))
+        for i in range(self.n_T):
+            T_arr_inv[i] = self.Tpin_lst[i].inverse().homogeneous
+        self.assertTrue(np.allclose(T_ts_inv.numpy(), T_arr_inv, atol=1e-6))
 
 
 class TestsDistances(unittest.TestCase):
