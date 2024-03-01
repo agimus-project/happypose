@@ -14,6 +14,7 @@ from happypose.toolbox.lib3d.rotations import (
 
 # from numpy.testing import assert_equal as np.allclose
 from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform_ops import transform_pts
 
 
 class TestTransform(unittest.TestCase):
@@ -116,6 +117,32 @@ class TestRotations(unittest.TestCase):
         R_ts = compute_rotation_matrix_from_quaternions(self.quats_ts)
         R = pin.Quaternion(self.quats_arr_norm[1]).toRotationMatrix()
         self.assertTrue(np.allclose(R_ts.numpy()[1], R, atol=1e-6))
+
+
+class TestTransformOps(unittest.TestCase):
+    n_pts = 10
+    n_T = 5
+
+    def setUp(self) -> None:
+        self.pts = torch.rand(1, self.n_pts, 3)  # (1,n_pts,3)
+        self.Tpin_lst = [pin.SE3.Random() for _ in range(self.n_T)]
+        self.T_ts = torch.stack(
+            [torch.Tensor(Tpin.homogeneous) for Tpin in self.Tpin_lst]
+        )  # (n_T,4,4)
+        self.T_ts = self.T_ts.unsqueeze(0)  # (1,n_T,4,4)
+
+    def test_transform_pts(self):
+        pts_trans_ts = transform_pts(self.T_ts, self.pts)
+        pts_trans_arr = np.zeros((1, self.n_T, self.n_pts, 3))
+        for i in range(self.n_pts):
+            for j in range(self.n_T):
+                pts_trans_arr[0, j, i] = self.Tpin_lst[j] * self.pts[0, i].numpy()
+        self.assertTrue(np.allclose(pts_trans_ts.numpy(), pts_trans_arr, atol=1e-6))
+
+
+class TestsDistances(unittest.TestCase):
+    # TODO
+    pass
 
 
 if __name__ == "__main__":

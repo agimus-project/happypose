@@ -28,7 +28,7 @@ from happypose.toolbox.lib3d.rotations import compute_rotation_matrix_from_ortho
 def transform_pts(T: torch.Tensor, pts: torch.Tensor) -> torch.Tensor:
     """Args:
     ----
-        T (torch.Tensor): (bsz, 4, 4) or (bsz, dim2, 4, 4)
+        T (torch.Tensor): (bsz, 4, 4) or (bsz, n_trans, 4, 4)
         pts (torch.Tensor): (bsz, n_pts, 3).
 
     Raises
