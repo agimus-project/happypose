@@ -56,7 +56,7 @@ BOP_DATASETS = {
         "splits": ["test_all", "train_real"],
     },
     "hope": {
-        "splits": ["test_all", "train_real"],
+        "splits": ["test_all"],
     },
 }
 
