@@ -526,7 +526,7 @@ class PoseEstimator(PoseEstimationModule):
         bsz_objects: Optional[int] = None,
         cuda_timer: Optional[bool] = False,
         coarse_estimates: Optional[PoseEstimatesType] = None,
-        labels_to_keep: List[str] = None,
+        labels_to_keep: Optional[List[str]] = None,
     ) -> Tuple[PoseEstimatesType, dict]:
         """Runs the entire pose estimation pipeline.
 

@@ -4,8 +4,20 @@ import numpy as np
 import pinocchio as pin
 import torch
 
+from happypose.toolbox.lib3d.rotations import (
+    angle_axis_to_rotation_matrix,
+    compute_rotation_matrix_from_quaternions,
+    euler2quat,
+    quat2mat,
+    quaternion_to_angle_axis,
+)
+
 # from numpy.testing import assert_equal as np.allclose
 from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform_ops import (
+    invert_transform_matrices,
+    transform_pts,
+)
 
 
 class TestTransform(unittest.TestCase):
@@ -56,6 +68,91 @@ class TestTransform(unittest.TestCase):
         # Inverse
         T1inv = Transform(T1.inverse())
         self.assertTrue(T1inv == T1.inverse())
+
+
+class TestRotations(unittest.TestCase):
+
+    """
+    Compare results with their equivalent pinocchio implementation.
+    """
+
+    N = 4
+
+    def setUp(self) -> None:
+        self.quats_ts = torch.rand(self.N, 4)
+        self.quats_ts_norm = self.quats_ts / torch.norm(
+            self.quats_ts, p=2, dim=-1, keepdim=True
+        )
+        self.quats_arr = self.quats_ts.numpy()
+        self.quats_arr_norm = self.quats_ts_norm.numpy()
+
+    def test_euler2quat(self):
+        rpy = np.random.random(3)
+        q_xyzw = euler2quat(rpy, axes="sxyz")
+        q_pin_xyzw = pin.Quaternion(pin.rpy.rpyToMatrix(rpy)).coeffs()
+        self.assertTrue(np.allclose(q_xyzw, q_pin_xyzw))
+
+    def test_angle_axis_to_rotation_matrix(self):
+        aa_ts = torch.rand(self.N, 3)
+        R_ts = angle_axis_to_rotation_matrix(aa_ts)
+        R = pin.exp3(aa_ts.numpy()[1])
+        # Rotation matrices are actually transformations with zero translation
+        self.assertTrue(R_ts.shape == (self.N, 4, 4))
+        self.assertTrue(np.allclose(R_ts[1, :3, :3].numpy(), R, atol=1e-6))
+
+    def test_quaternion_to_angle_axis(self):
+        # quaternion_to_angle_axis assumes a wxyz quaternion order convention
+        quats_ts_norm = torch.hstack(
+            [self.quats_ts_norm[:, -1:], self.quats_ts_norm[:, :3]]
+        )
+        aa_ts = quaternion_to_angle_axis(quats_ts_norm)
+        aa = pin.log3(pin.Quaternion(self.quats_arr_norm[1]).toRotationMatrix())
+        self.assertTrue(np.allclose(aa_ts.numpy()[1], aa, atol=1e-6))
+
+    def test_quat2mat(self):
+        # quat2mat assumes a wxyz quaternion order convention
+        R_ts = quat2mat(self.quats_ts)
+        R = pin.Quaternion(self.quats_arr_norm[1]).toRotationMatrix()
+        self.assertTrue(np.allclose(R_ts[1, :3, :3].numpy(), R, atol=1e-6))
+
+    def test_compute_rotation_matrix_from_quaternions(self):
+        # quaternion_to_angle_axis assumes a xyzw quaternion order convention
+        R_ts = compute_rotation_matrix_from_quaternions(self.quats_ts)
+        R = pin.Quaternion(self.quats_arr_norm[1]).toRotationMatrix()
+        self.assertTrue(np.allclose(R_ts.numpy()[1], R, atol=1e-6))
+
+
+class TestTransformOps(unittest.TestCase):
+    n_pts = 10
+    n_T = 5
+
+    def setUp(self) -> None:
+        self.pts = torch.rand(1, self.n_pts, 3)  # (1,n_pts,3)
+        self.Tpin_lst = [pin.SE3.Random() for _ in range(self.n_T)]
+        self.T_ts = torch.stack(
+            [torch.Tensor(Tpin.homogeneous) for Tpin in self.Tpin_lst]
+        )  # (n_T,4,4)
+        self.T_ts = self.T_ts.unsqueeze(0)  # (1,n_T,4,4)
+
+    def test_transform_pts(self):
+        pts_trans_ts = transform_pts(self.T_ts, self.pts)
+        pts_trans_arr = np.zeros((1, self.n_T, self.n_pts, 3))
+        for i in range(self.n_pts):
+            for j in range(self.n_T):
+                pts_trans_arr[0, j, i] = self.Tpin_lst[j] * self.pts[0, i].numpy()
+        self.assertTrue(np.allclose(pts_trans_ts.numpy(), pts_trans_arr, atol=1e-6))
+
+    def test_invert_transform_matrices(self):
+        T_ts_inv = invert_transform_matrices(self.T_ts)
+        T_arr_inv = np.zeros((self.n_T, 4, 4))
+        for i in range(self.n_T):
+            T_arr_inv[i] = self.Tpin_lst[i].inverse().homogeneous
+        self.assertTrue(np.allclose(T_ts_inv.numpy(), T_arr_inv, atol=1e-6))
+
+
+class TestsDistances(unittest.TestCase):
+    # TODO
+    pass
 
 
 if __name__ == "__main__":

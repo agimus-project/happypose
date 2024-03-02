@@ -37,8 +37,17 @@ def compute_rotation_matrix_from_ortho6d(poses):
 
 
 def euler2quat(xyz, axes="sxyz"):
-    """euler: sxyz
-    quaternion: xyzw.
+    """
+    Convert euler angle array into unit quaternion array.
+
+    Args:
+    ----
+        xzy (array|list): euler angles 1-D array (size 3)
+        axes (str): euler angle convention
+
+    Returns:
+    -------
+        array: size 1 array with convention xyzw.
     """
     wxyz = transforms3d.euler.euler2quat(*xyz, axes=axes)
     xyzw = [*wxyz[1:], wxyz[0]]
@@ -184,7 +193,28 @@ def quaternion_to_angle_axis(quaternion: torch.Tensor) -> torch.Tensor:
     return angle_axis
 
 
-def quat2mat(quat):
+def quat2mat(quat: torch.Tensor) -> torch.Tensor:
+    """
+    Convert wxyz quaternion tensor into a tensor of rotation matrices.
+
+    Args:
+    ----
+        quat (Tensor): tensor of 4d vector of quaternion rotations in wxyz order.
+
+    Returns:
+    -------
+        Tensor: tensor of 4x4 rotation matrices.
+
+    Shape:
+        - Input: :math:`(N, 4)`
+        - Output: :math:`(N, 4, 4)`
+
+    Example:
+    -------
+        >>> input = torch.rand(2, 4)  # Nx4
+        >>> output = tgm.angle_axis_to_rotation_matrix(input)  # Nx4x4
+    """
+
     q_xyzw = quat
     q_wxyz = quat.clone()
     q_wxyz[..., 0] = q_xyzw[..., -1]
