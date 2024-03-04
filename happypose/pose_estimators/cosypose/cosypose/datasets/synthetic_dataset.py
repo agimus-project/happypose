@@ -10,6 +10,14 @@ import torch.multiprocessing
 import yaml
 
 from happypose.toolbox.datasets.datasets_cfg import make_urdf_dataset
+from happypose.toolbox.datasets.scene_dataset import (
+    CameraData,
+    ObjectData,
+    ObservationInfos,
+    SceneDataset,
+    SceneObservation,
+)
+from happypose.toolbox.lib3d.transform import Transform
 
 from .utils import make_detections_from_segmentation
 
@@ -18,6 +26,7 @@ torch.multiprocessing.set_sharing_strategy("file_system")
 
 class SyntheticSceneDataset:
     def __init__(self, ds_dir, train=True):
+        print("inside synth dataset")
         self.ds_dir = Path(ds_dir)
         assert self.ds_dir.exists()
 
@@ -68,12 +77,43 @@ class SyntheticSceneDataset:
             0
         ]
         mask_uniqs = set(np.unique(mask[mask > 0]))
+        object_datas = []
         for obj in objects:
             if obj["id_in_segm"] in mask_uniqs:
                 obj["bbox"] = dets_gt[obj["id_in_segm"]].numpy()
+                obj_data = ObjectData(
+                    label= obj['name'],
+                    TWO=Transform(obj['TWO']),
+                    unique_id=obj['body_id'],
+                    bbox_modal=obj['bbox']
+                )
+            else:
+                obj_data = ObjectData(
+                    label= obj['name'],
+                    TWO=Transform(obj['TWO']),
+                    unique_id=obj['body_id']
+                )
+            object_datas.append(obj_data)
+            
         state = {
             "camera": cam,
             "objects": objects,
             "frame_info": self.frame_index.iloc[idx].to_dict(),
         }
-        return rgb, mask, state
+        image_infos = ObservationInfos(
+            scene_id=self.frame_index.iloc[idx].to_dict()['scene_id'],
+            view_id=self.frame_index.iloc[idx].to_dict()['view_id'])
+        
+        cam = CameraData(
+            K=cam["K"],
+            resolution=cam["resolution"],
+            TWC=Transform(cam["TWC"]))
+        
+        observation = SceneObservation(
+            rgb=rgb.numpy().astype(np.uint8),
+            segmentation=mask.numpy().astype(np.uint32),
+            camera_data=cam,
+            infos=image_infos,
+            object_datas=object_datas,
+        )
+        return observation

@@ -146,8 +146,6 @@ class BatchedMeshes(TensorCollection):
         return {label: obj["n_sym"] for label, obj in self.infos.items()}
 
     def select(self, labels):
-        print("label to id =", self.label_to_id)
-        print("labels = ", labels)
         ids = [self.label_to_id[label] for label in labels]
         return Meshes(
             infos=[self.infos[label] for label in labels],

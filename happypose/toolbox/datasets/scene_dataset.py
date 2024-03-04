@@ -448,7 +448,6 @@ class SceneDataset(torch.utils.data.Dataset):
         assert self.frame_index is not None
         row = self.frame_index.iloc[idx]
         infos = ObservationInfos(scene_id=row.scene_id, view_id=row.view_id)
-        print("inside scene_dataset getitem")
         return self._load_scene_observation(infos)
 
     def __len__(self) -> int:

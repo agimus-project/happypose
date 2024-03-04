@@ -13,9 +13,8 @@ from torchnet.meter import AverageValueMeter
 from tqdm import tqdm
 
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
-from happypose.pose_estimators.cosypose.cosypose.datasets.pose_dataset import (
-    PoseDataset,
-)
+from happypose.toolbox.datasets.pose_dataset import PoseDataset
+
 from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler
 from happypose.pose_estimators.cosypose.cosypose.evaluation.prediction_runner import (
     PredictionRunner,
@@ -60,6 +59,17 @@ from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRender
 
 from .pose_forward_loss import h_pose
 from .pose_models_cfg import check_update_config, create_model_pose
+
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableMultiSceneDataset,
+    RandomIterableSceneDataset,
+)
+from happypose.toolbox.utils.resources import (
+    get_cuda_memory,
+    get_gpu_memory,
+    get_total_memory,
+)
+
 
 cudnn.benchmark = True
 logger = get_logger(__name__)
@@ -279,6 +289,8 @@ def train_pose(args):
     device = torch.cuda.current_device()
     init_distributed_mode()
     world_size = get_world_size()
+    this_rank_epoch_size = args.epoch_size // get_world_size()
+    this_rank_n_batch_per_epoch = this_rank_epoch_size // args.batch_size
     args.n_gpus = world_size
     args.global_batch_size = world_size * args.batch_size
     logger.info(f"Connection established with {world_size} gpus.")
@@ -286,52 +298,51 @@ def train_pose(args):
     # Make train/val datasets
     def make_datasets(dataset_names):
         datasets = []
+        deterministic = False
         for ds_name, n_repeat in dataset_names:
             assert "test" not in ds_name
+            print("ds_name = ", ds_name)
             ds = make_scene_dataset(ds_name)
+            iterator = RandomIterableSceneDataset(ds, deterministic=deterministic)
             logger.info(f"Loaded {ds_name} with {len(ds)} images.")
             for _ in range(n_repeat):
-                datasets.append(ds)
-        return ConcatDataset(datasets)
+                datasets.append(iterator)
+        return IterableMultiSceneDataset(datasets)
 
     scene_ds_train = make_datasets(args.train_ds_names)
     scene_ds_val = make_datasets(args.val_ds_names)
     
-    print("datasets = ", scene_ds_train.ds)
-
     ds_kwargs = {
         "resize": args.input_resize,
-        "rgb_augmentation": args.rgb_augmentation,
-        "background_augmentation": args.background_augmentation,
+        "apply_rgb_augmentation": args.rgb_augmentation,
+        "apply_background_augmentation": args.background_augmentation,
         "min_area": args.min_area,
-        "gray_augmentation": args.gray_augmentation,
+        "apply_depth_augmentation":False
     }
     ds_train = PoseDataset(scene_ds_train, **ds_kwargs)
     ds_val = PoseDataset(scene_ds_val, **ds_kwargs)
 
-    train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
+    #train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(
         ds_train,
-        sampler=train_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=ds_train.collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_train = MultiEpochDataLoader(ds_iter_train)
+    ds_iter_train = iter(ds_iter_train)
 
-    val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
+    #val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
     ds_iter_val = DataLoader(
         ds_val,
-        sampler=val_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=ds_val.collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_val = MultiEpochDataLoader(ds_iter_val)
+    ds_iter_val = iter(ds_iter_val)
 
     # Make model
     object_ds = make_object_dataset(args.object_ds_name)
@@ -422,7 +433,7 @@ def train_pose(args):
             model.train()
             iterator = tqdm(ds_iter_train, ncols=80)
             t = time.time()
-            for n, sample in enumerate(iterator):
+            for n, data in enumerate(iterator):
                 if n < 3:
                     if n > 0:
                         meters_time["data"].add(time.time() - t)
@@ -430,7 +441,7 @@ def train_pose(args):
                     optimizer.zero_grad()
 
                     t = time.time()
-                    loss = h(data=sample, meters=meters_train)
+                    loss = h(data=data, meters=meters_train)
                     meters_time["forward"].add(time.time() - t)
                     iterator.set_postfix(loss=loss.item())
                     meters_train["loss_total"].add(loss.item())
@@ -474,6 +485,7 @@ def train_pose(args):
             return run_eval(eval_bundle, epoch=epoch)
 
         train_epoch()
+        print("end train, stepping in to valida")
         if epoch % args.val_epoch_interval == 0:
             validation()
 
@@ -481,26 +493,33 @@ def train_pose(args):
         #if epoch % args.test_epoch_interval == 0:
         #    test_dict = test()
 
+        print("updating dic")
         log_dict = {}
         log_dict.update(
             {
                 "grad_norm": meters_train["grad_norm"].mean,
                 "grad_norm_std": meters_train["grad_norm"].std,
                 "learning_rate": optimizer.param_groups[0]["lr"],
-                "time_forward": meters_time["forward"].mean,
-                "time_backward": meters_time["backward"].mean,
-                "time_data": meters_time["data"].mean,
-                "gpu_memory": meters_time["memory"].mean,
+                "time_forward": meters_train["time_forward"].mean,
+                "time_backward": meters_train["time_backward"].mean,
+                "time_data": meters_train["time_data"].mean,
+                "cuda_memory": get_cuda_memory(),
+                "gpu_memory": get_gpu_memory(),
+                "cpu_memory": get_total_memory(),
                 "time": time.time(),
-                "n_iterations": (epoch + 1) * len(ds_iter_train),
-                "n_datas": (epoch + 1) * args.global_batch_size * len(ds_iter_train),
+                "n_iterations": epoch * args.epoch_size // args.batch_size,
+                "n_datas": epoch * this_rank_n_batch_per_epoch * args.batch_size,
             },
         )
 
+    
+
+        print("meters")
         for string, meters in zip(("train", "val"), (meters_train, meters_val)):
             for k in dict(meters).keys():
                 log_dict[f"{string}_{k}"] = meters[k].mean
 
+        print("reduce dict")
         log_dict = reduce_dict(log_dict)
         if get_rank() == 0:
             log(
@@ -510,4 +529,5 @@ def train_pose(args):
                 log_dict=log_dict,
                 test_dict=None,
             )
+        print("waiting on barrier")
         dist.barrier()

@@ -208,7 +208,6 @@ class BOPDataset(SceneDataset):
 
         self.split = split
         self.base_dir = ds_dir / split
-        print("Inside Bop Dataset")
         logger.info("Loading/making index and annotations...")
         if allow_cache:
             save_file_index = self.ds_dir / f"index_{split}.feather"
@@ -368,7 +367,6 @@ class BOPDataset(SceneDataset):
                 depth_path = depth_path.with_suffix(".tif")
             depth = np.array(inout.load_depth(depth_path))
             depth *= cam_annotation["depth_scale"] / 1000
-        print("return observation BOP dataset")
         observation = SceneObservation(
             rgb=rgb,
             depth=depth,

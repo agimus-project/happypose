@@ -18,12 +18,12 @@ def cast(obj):
 
 
 def h_pose(model, mesh_db, data, meters, cfg, n_iterations=1, input_generator="fixed"):
-    batch_size, _, h, w = data.images.shape
+    batch_size, _, h, w = data.rgbs.shape
 
-    images = cast(data.images).float() / 255.0
+    images = cast(data.rgbs).float() / 255.0
     K = cast(data.K).float()
     TCO_gt = cast(data.TCO).float()
-    labels = np.array([obj["name"] for obj in data.objects])
+    labels = np.array([obj.label for obj in data.object_datas])
     bboxes = cast(data.bboxes).float()
 
     meshes = mesh_db.select(labels)

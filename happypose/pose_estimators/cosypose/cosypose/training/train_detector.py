@@ -18,6 +18,7 @@ from tqdm import tqdm
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import (
     DetectionDataset,
+    collate_fn
 )
 from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler
 from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
@@ -38,6 +39,20 @@ from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader imp
     MultiEpochDataLoader,
 )
 from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset
+
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableMultiSceneDataset,
+    IterableSceneDataset,
+    RandomIterableSceneDataset,
+    SceneDataset,
+)
+
+from happypose.toolbox.utils.resources import (
+    get_cuda_memory,
+    get_gpu_memory,
+    get_total_memory,
+)
+
 
 from .detector_models_cfg import check_update_config, create_model_detector
 from .maskrcnn_forward_loss import h_maskrcnn
@@ -134,22 +149,31 @@ def train_detector(args):
     device = torch.cuda.current_device()
     init_distributed_mode()
     world_size = get_world_size()
+    this_rank_epoch_size = args.epoch_size // get_world_size()
+    this_rank_n_batch_per_epoch = this_rank_epoch_size // args.batch_size
     args.n_gpus = world_size
     args.global_batch_size = world_size * args.batch_size
     logger.info(f"Connection established with {world_size} gpus.")
+    
 
     # Make train/val datasets
     def make_datasets(dataset_names):
         datasets = []
         all_labels = set()
+        deterministic = False
         for ds_name, n_repeat in dataset_names:
             assert "test" not in ds_name
             ds = make_scene_dataset(ds_name)
+            iterator = RandomIterableSceneDataset(ds, deterministic=deterministic)
             logger.info(f"Loaded {ds_name} with {len(ds)} images.")
+            pre_label = ds_name.split(".")[0]
+            for idx, label in enumerate(ds.all_labels):
+                ds.all_labels[idx] = "{pre_label}-{label}".format(pre_label=pre_label, label=label)     
             all_labels = all_labels.union(set(ds.all_labels))
+           
             for _ in range(n_repeat):
-                datasets.append(ds)
-        return ConcatDataset(datasets), all_labels
+                datasets.append(iterator)
+        return IterableMultiSceneDataset(datasets), all_labels
 
     scene_ds_train, train_labels = make_datasets(args.train_ds_names)
     scene_ds_val, _ = make_datasets(args.val_ds_names)
@@ -175,29 +199,27 @@ def train_detector(args):
     ds_val = DetectionDataset(scene_ds_val, **ds_kwargs)
 
     print("make dataloaders")
-    train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
+    #train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(
         ds_train,
-        sampler=train_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_train = MultiEpochDataLoader(ds_iter_train)
+    ds_iter_train = iter(ds_iter_train)
 
-    val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
+    #val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
     ds_iter_val = DataLoader(
         ds_val,
-        sampler=val_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_val = MultiEpochDataLoader(ds_iter_val)
+    ds_iter_val = iter(ds_iter_val)
 
     print("create model detector")
     model = create_model_detector(
@@ -293,53 +315,59 @@ def train_detector(args):
             iterator = tqdm(ds_iter_train, ncols=80)
             t = time.time()
             for n, sample in enumerate(iterator):
-                if n > 0:
-                    meters_time["data"].add(time.time() - t)
+                if n < 100:
+                    if n > 0:
+                        meters_time["data"].add(time.time() - t)
 
-                optimizer.zero_grad()
+                    optimizer.zero_grad()
 
-                t = time.time()
-                loss = h(data=sample, meters=meters_train)
-                meters_time["forward"].add(time.time() - t)
-                iterator.set_postfix(loss=loss.item())
-                meters_train["loss_total"].add(loss.item())
+                    t = time.time()
+                    loss = h(data=sample, meters=meters_train)
+                    meters_time["forward"].add(time.time() - t)
+                    iterator.set_postfix(loss=loss.item())
+                    meters_train["loss_total"].add(loss.item())
 
-                t = time.time()
-                loss.backward()
-                total_grad_norm = torch.nn.utils.clip_grad_norm_(
-                    model.parameters(),
-                    max_norm=np.inf,
-                    norm_type=2,
-                )
-                meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
+                    t = time.time()
+                    loss.backward()
+                    total_grad_norm = torch.nn.utils.clip_grad_norm_(
+                        model.parameters(),
+                        max_norm=np.inf,
+                        norm_type=2,
+                    )
+                    meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
 
-                optimizer.step()
-                meters_time["backward"].add(time.time() - t)
-                meters_time["memory"].add(
-                    torch.cuda.max_memory_allocated() / 1024.0**2,
-                )
+                    optimizer.step()
+                    meters_time["backward"].add(time.time() - t)
+                    meters_time["memory"].add(
+                        torch.cuda.max_memory_allocated() / 1024.0**2,
+                    )
 
-                if epoch < args.n_epochs_warmup:
-                    lr_scheduler_warmup.step()
-                t = time.time()
+                    if epoch < args.n_epochs_warmup:
+                        lr_scheduler_warmup.step()
+                    t = time.time()
+                else:
+                    break
             if epoch >= args.n_epochs_warmup:
                 lr_scheduler.step()
 
         @torch.no_grad()
         def validation():
             model.train()
-            for sample in tqdm(ds_iter_val, ncols=80):
-                loss = h(data=sample, meters=meters_val)
-                meters_val["loss_total"].add(loss.item())
+            for n, sample in enumerate(tqdm(ds_iter_val, ncols=80)):
+                if n < 3:
+                    loss = h(data=sample, meters=meters_val)
+                    meters_val["loss_total"].add(loss.item())
+                else:
+                    break
 
         train_epoch()
         if epoch % args.val_epoch_interval == 0:
             validation()
 
-        test_dict = None
-        if epoch % args.test_epoch_interval == 0:
-            model.eval()
-            test_dict = run_eval(args, model, epoch)
+        #test_dict = None
+        #if epoch % args.test_epoch_interval == 0:
+        #    model.eval()
+        #    test_dict = run_eval(args, model, epoch)
 
         log_dict = {}
         log_dict.update(
@@ -347,15 +375,18 @@ def train_detector(args):
                 "grad_norm": meters_train["grad_norm"].mean,
                 "grad_norm_std": meters_train["grad_norm"].std,
                 "learning_rate": optimizer.param_groups[0]["lr"],
-                "time_forward": meters_time["forward"].mean,
-                "time_backward": meters_time["backward"].mean,
-                "time_data": meters_time["data"].mean,
-                "gpu_memory": meters_time["memory"].mean,
+                "time_forward": meters_train["time_forward"].mean,
+                "time_backward": meters_train["time_backward"].mean,
+                "time_data": meters_train["time_data"].mean,
+                "cuda_memory": get_cuda_memory(),
+                "gpu_memory": get_gpu_memory(),
+                "cpu_memory": get_total_memory(),
                 "time": time.time(),
-                "n_iterations": (epoch + 1) * len(ds_iter_train),
-                "n_datas": (epoch + 1) * args.global_batch_size * len(ds_iter_train),
+                "n_iterations": epoch * args.epoch_size // args.batch_size,
+                "n_datas": epoch * this_rank_n_batch_per_epoch * args.batch_size,
             },
         )
+
 
         for string, meters in zip(("train", "val"), (meters_train, meters_val)):
             for k in dict(meters).keys():
@@ -368,6 +399,6 @@ def train_detector(args):
                 model=model,
                 epoch=epoch,
                 log_dict=log_dict,
-                test_dict=test_dict,
+                test_dict=None,
             )
         dist.barrier()
