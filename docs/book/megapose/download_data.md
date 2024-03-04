@@ -17,14 +17,26 @@ python -m happypose.toolbox.utils.download --megapose_models
 # Download pre-trained detection models
 Megapose can use pretrained detectors from CosyPose, which can be downloaded to `$HAPPYPOSE_DATA_DIR/experiments`:
 
-python -m happypose.toolbox.utils.download --cosypose_model detector-bop-hb-pbr--497808
-python -m happypose.toolbox.utils.download --cosypose_model detector-bop-hope-pbr--15246
-python -m happypose.toolbox.utils.download --cosypose_model detector-bop-icbin-pbr--947409
-python -m happypose.toolbox.utils.download --cosypose_model detector-bop-itodd-pbr--509908
-python -m happypose.toolbox.utils.download --cosypose_model detector-bop-lmo-pbr--517542
-python -m happypose.toolbox.utils.download --cosypose_model detector-bop-tless-pbr--873074
-python -m happypose.toolbox.utils.download --cosypose_model detector-bop-tudl-pbr--728047
-python -m happypose.toolbox.utils.download --cosypose_model detector-bop-ycbv-pbr--970850
+```sh
+# hope
+python -m happypose.toolbox.utils.download --cosypose_models \
+          detector-bop-hope-pbr--15246 \
+          coarse-bop-hope-pbr--225203 \
+          refiner-bop-hope-pbr--955392
+
+# ycbv
+
+python -m happypose.toolbox.utils.download --cosypose_models \
+          detector-bop-ycbv-pbr--970850 \
+          coarse-bop-ycbv-pbr--724183 \
+          refiner-bop-ycbv-pbr--604090
+
+# tless
+python -m happypose.toolbox.utils.download --cosypose_models \
+          detector-bop-tless-pbr--873074 \
+          coarse-bop-tless-pbr--506801 \
+          refiner-bop-tless-pbr--233420
+```
 
 # Dataset
 

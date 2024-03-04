@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -172,8 +173,8 @@ class ObservationTensor:
         Args:
         ----
             rgb: [H,W,3] np.uint8
-            depth: [H,W] np.float
-            K: [3,3] np.float
+            depth: [H,W] float
+            K: [3,3] float
 
         """
         assert rgb.dtype == np.uint8

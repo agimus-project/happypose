@@ -120,7 +120,7 @@ class BopRecordingScene(BaseScene):
         self.bodies = self.body_cache.get_bodies_by_ids(ids)
 
     def visuals_rand(self):
-        bodies = [self.background] + [self.plane]
+        bodies = [self.background, self.plane]
         if self.textures_on_objects and self.np_random.rand() > 0.9:
             bodies = self.bodies + bodies
         for body in bodies:
@@ -151,7 +151,7 @@ class BopRecordingScene(BaseScene):
 
     def sample_camera(self):
         assert self.focal_interval.shape == (2, 2)
-        K = np.zeros((3, 3), dtype=np.float)
+        K = np.zeros((3, 3), dtype=float)
         fxfy = self.np_random.uniform(*self.focal_interval)
         W, H = max(self.resolution), min(self.resolution)
         K[0, 0] = fxfy[0]

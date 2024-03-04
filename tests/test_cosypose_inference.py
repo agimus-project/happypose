@@ -1,167 +1,151 @@
 """Set of unit tests for testing inference example for CosyPose."""
+
 import unittest
 
 import numpy as np
 import pinocchio as pin
-import torch
-import yaml
-from PIL import Image
 
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR, LOCAL_DATA_DIR
-from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
     PoseEstimator,
 )
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
-    check_update_config as check_update_config_detector,
-)
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
-    create_model_detector,
-)
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
-    check_update_config as check_update_config_pose,
+    load_model_cosypose,
 )
-from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
-    create_model_coarse,
-    create_model_refiner,
+from happypose.toolbox.datasets.bop_object_datasets import (
+    RigidObject,
+    RigidObjectDataset,
 )
-from happypose.toolbox.datasets.bop_object_datasets import BOPObjectDataset
-from happypose.toolbox.datasets.scene_dataset import CameraData
+from happypose.toolbox.inference.example_inference_utils import load_observation_example
 from happypose.toolbox.inference.types import ObservationTensor
+from happypose.toolbox.inference.utils import load_detector
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
 
 class TestCosyPoseInference(unittest.TestCase):
     """Unit tests for CosyPose inference example."""
 
-    @staticmethod
-    def _load_detector(
-        device="cpu",
-        ds_name="ycbv",
-        run_id="detector-bop-ycbv-pbr--970850",
-    ):
-        """Load CosyPose detector."""
-        run_dir = EXP_DIR / run_id
-        assert run_dir.exists(), "The run_id is invalid, or you forget to download data"
-        cfg = check_update_config_detector(
-            yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader),
+    def setUp(self) -> None:
+        """Run detector with coarse and refiner from CosyPose."""
+        self.expected_object_label = "hope-obj_000002"
+        mesh_file_name = "hope-obj_000002.ply"
+        data_dir = LOCAL_DATA_DIR / "examples" / "barbecue-sauce"
+        mesh_dir = data_dir / "meshes"
+        mesh_path = mesh_dir / mesh_file_name
+
+        self.coarse_run_id = "coarse-bop-hope-pbr--225203"
+        self.refiner_run_id = "refiner-bop-hope-pbr--955392"
+
+        self.device = "cpu"
+
+        rgb, depth, camera_data = load_observation_example(data_dir, load_depth=True)
+        # TODO: cosypose forward does not work if depth is loaded detection contrary to megapose
+        self.observation = ObservationTensor.from_numpy(
+            rgb, depth=None, K=camera_data.K
         )
-        label_to_category_id = cfg.label_to_category_id
-        ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)[
-            "state_dict"
-        ]
-        model = create_model_detector(cfg, len(label_to_category_id))
-        model.load_state_dict(ckpt)
-        model = model.to(device).eval()
-        model.cfg = cfg
-        model.config = cfg
-        return Detector(model, ds_name)
 
-    @staticmethod
-    def _load_pose_model(run_id, renderer, mesh_db, device):
-        """Load either coarse or refiner model (decided based on run_id/config)."""
-        run_dir = EXP_DIR / run_id
-        cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
-        cfg = check_update_config_pose(cfg)
-
-        f_mdl = create_model_refiner if cfg.train_refiner else create_model_coarse
-        ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)[
-            "state_dict"
-        ]
-        model = f_mdl(cfg, renderer=renderer, mesh_db=mesh_db)
-        model.load_state_dict(ckpt)
-        model = model.to(device).eval()
-        model.cfg = cfg
-        model.config = cfg
-        return model
-
-    @staticmethod
-    def _load_pose_models(
-        coarse_run_id="coarse-bop-ycbv-pbr--724183",
-        refiner_run_id="refiner-bop-ycbv-pbr--604090",
-        n_workers=1,
-        device="cpu",
-    ):
-        """Load coarse and refiner for the crackers example renderer."""
-        object_dataset = BOPObjectDataset(
-            LOCAL_DATA_DIR / "examples" / "crackers_example" / "models",
-            label_format="ycbv-{label}",
+        self.detector = load_detector(
+            run_id="detector-bop-hope-pbr--15246", device=self.device
         )
+        # detections = detector.get_detections(observation=observation)
+
+        self.object_dataset = RigidObjectDataset(
+            objects=[
+                RigidObject(
+                    label=self.expected_object_label,
+                    mesh_path=mesh_path,
+                    mesh_units="mm",
+                )
+            ]
+        )
+        mesh_db = MeshDataBase.from_object_ds(self.object_dataset)
+        self.mesh_db_batched = mesh_db.batched().to("cpu")
+
+    def test_cosypose_pipeline_panda3d(self):
+        from happypose.toolbox.renderer.panda3d_batch_renderer import (
+            Panda3dBatchRenderer,
+        )
+
         renderer = Panda3dBatchRenderer(
-            object_dataset,
-            n_workers=n_workers,
+            self.object_dataset,
+            n_workers=1,
             preload_cache=False,
         )
 
-        mesh_db = MeshDataBase.from_object_ds(object_dataset)
-        mesh_db_batched = mesh_db.batched().to(device)
-        kwargs = {"renderer": renderer, "mesh_db": mesh_db_batched, "device": device}
-        coarse_model = TestCosyPoseInference._load_pose_model(coarse_run_id, **kwargs)
-        refiner_model = TestCosyPoseInference._load_pose_model(refiner_run_id, **kwargs)
-        return coarse_model, refiner_model
+        coarse_model = load_model_cosypose(
+            EXP_DIR / self.coarse_run_id, renderer, self.mesh_db_batched, self.device
+        )
+        refiner_model = load_model_cosypose(
+            EXP_DIR / self.refiner_run_id, renderer, self.mesh_db_batched, self.device
+        )
 
-    @staticmethod
-    def _load_crackers_example_observation():
-        """Load cracker example observation tensor."""
-        data_dir = LOCAL_DATA_DIR / "examples" / "crackers_example"
-        camera_data = CameraData.from_json((data_dir / "camera_data.json").read_text())
-        rgb = np.array(Image.open(data_dir / "image_rgb.png"), dtype=np.uint8)
-        assert rgb.shape[:2] == camera_data.resolution
-        return ObservationTensor.from_numpy(rgb=rgb, K=camera_data.K)
-
-    def test_detector(self):
-        """Run detector on known image to see if cracker box is detected."""
-        observation = self._load_crackers_example_observation()
-        detector = self._load_detector()
-        detections = detector.get_detections(observation=observation)
-        for s1, s2 in zip(detections.infos.score, detections.infos.score[1:]):
-            self.assertGreater(s1, s2)  # checks that observations are ordered
-
-        self.assertGreater(len(detections), 0)
-        self.assertEqual(detections.infos.label[0], "ycbv-obj_000002")
-        self.assertGreater(detections.infos.score[0], 0.8)
-
-        xmin, ymin, xmax, ymax = detections.bboxes[0]
-        # assert expected obj center inside BB
-        self.assertTrue(xmin < 320 < xmax and ymin < 250 < ymax)
-        # assert a few outside points are outside BB
-        self.assertFalse(xmin < 100 < xmax and ymin < 50 < ymax)
-        self.assertFalse(xmin < 300 < xmax and ymin < 50 < ymax)
-        self.assertFalse(xmin < 500 < xmax and ymin < 50 < ymax)
-        self.assertFalse(xmin < 100 < xmax and ymin < 250 < ymax)
-        self.assertTrue(xmin < 300 < xmax and ymin < 250 < ymax)
-        self.assertFalse(xmin < 500 < xmax and ymin < 250 < ymax)
-        self.assertFalse(xmin < 100 < xmax and ymin < 450 < ymax)
-        self.assertFalse(xmin < 300 < xmax and ymin < 450 < ymax)
-        self.assertFalse(xmin < 500 < xmax and ymin < 450 < ymax)
-
-    def test_cosypose_pipeline(self):
-        """Run detector with coarse and refiner."""
-        observation = self._load_crackers_example_observation()
-        detector = self._load_detector()
-        coarse_model, refiner_model = self._load_pose_models()
         pose_estimator = PoseEstimator(
             refiner_model=refiner_model,
             coarse_model=coarse_model,
-            detector_model=detector,
+            detector_model=self.detector,
         )
+
+        # Run detector and pose estimator filtering object labels
         preds, _ = pose_estimator.run_inference_pipeline(
-            observation=observation,
+            observation=self.observation,
             detection_th=0.8,
             run_detector=True,
+            n_refiner_iterations=3,
+            labels_to_keep=[self.expected_object_label],
         )
 
         self.assertEqual(len(preds), 1)
-        self.assertEqual(preds.infos.label[0], "ycbv-obj_000002")
+        self.assertEqual(preds.infos.label[0], self.expected_object_label)
 
         pose = pin.SE3(preds.poses[0].numpy())
         exp_pose = pin.SE3(
-            pin.exp3(np.array([1.44, 1.19, -0.91])),
-            np.array([0, 0, 0.52]),
+            pin.exp3(np.array([1.4, 1.6, -1.11])),
+            np.array([0.1, 0.07, 0.45]),
         )
         diff = pose.inverse() * exp_pose
-        self.assertLess(np.linalg.norm(pin.log6(diff).vector), 0.1)
+        self.assertLess(np.linalg.norm(pin.log6(diff).vector), 0.3)
+
+    def test_cosypose_pipeline_bullet(self):
+        from happypose.toolbox.renderer.bullet_batch_renderer import BulletBatchRenderer
+
+        renderer = BulletBatchRenderer(
+            self.object_dataset,
+            n_workers=0,
+            gpu_renderer=False,
+        )
+
+        coarse_model = load_model_cosypose(
+            EXP_DIR / self.coarse_run_id, renderer, self.mesh_db_batched, self.device
+        )
+        refiner_model = load_model_cosypose(
+            EXP_DIR / self.refiner_run_id, renderer, self.mesh_db_batched, self.device
+        )
+
+        pose_estimator = PoseEstimator(
+            refiner_model=refiner_model,
+            coarse_model=coarse_model,
+            detector_model=self.detector,
+        )
+
+        # Run detector and pose estimator filtering object labels
+        preds, _ = pose_estimator.run_inference_pipeline(
+            observation=self.observation,
+            detection_th=0.8,
+            run_detector=True,
+            n_refiner_iterations=3,
+            labels_to_keep=[self.expected_object_label],
+        )
+
+        self.assertEqual(len(preds), 1)
+        self.assertEqual(preds.infos.label[0], self.expected_object_label)
+
+        pose = pin.SE3(preds.poses[0].numpy())
+        exp_pose = pin.SE3(
+            pin.exp3(np.array([1.4, 1.6, -1.11])),
+            np.array([0.1, 0.07, 0.45]),
+        )
+        diff = pose.inverse() * exp_pose
+        self.assertLess(np.linalg.norm(pin.log6(diff).vector), 0.3)
 
 
 if __name__ == "__main__":

@@ -423,17 +423,15 @@ class PosePredictor(nn.Module):
 
         assert isinstance(self.renderer, Panda3dBatchRenderer)
 
-        render_mask = False
-
         render_data = self.renderer.render(
             labels=labels_mv,
             TCO=TCV_O.flatten(0, 1),
             K=KV.flatten(0, 1),
-            render_mask=render_mask,
-            resolution=self.render_size,
-            render_normals=self.render_normals,
-            render_depth=self.render_depth,
             light_datas=light_datas,
+            resolution=self.render_size,
+            render_depth=self.render_depth,
+            render_binary_mask=False,
+            render_normals=self.render_normals,
         )
 
         cat_list = []
@@ -740,13 +738,6 @@ class PosePredictor(nn.Module):
 
         """
 
-        ### DEBUG
-        def has_nans(tensor):
-            return bool(tensor.isnan().any())
-
-        def has_infs(tensor):
-            return bool(tensor.isinf().any())
-
         assert (
             self.predict_rendered_views_logits
         ), "Method only valid if coarse classification model"
@@ -760,18 +751,7 @@ class PosePredictor(nn.Module):
         assert K.shape == (bsz, 3, 3)
         assert len(labels) == bsz
 
-        if has_nans(images):
-            print("images has NANS")
-        if has_nans(K):
-            print("K has NANS")
-        if has_nans(TCO_input):
-            print("TCO_input has NANS")
-        if has_infs(TCO_input):
-            print("TCO_input has INFS")
-
         TCO_input = normalize_T(TCO_input).detach()
-        if has_nans(TCO_input):
-            print("TCO_input has NANS")
         tCR = TCO_input[..., :3, -1]
         images_crop, K_crop, boxes_rend, boxes_crop = self.crop_inputs(
             images,
@@ -780,11 +760,6 @@ class PosePredictor(nn.Module):
             tCR,
             labels,
         )
-
-        if has_nans(images_crop):
-            print("images_crop has NANS")
-        if has_nans(K_crop):
-            print("K_crop has NANS")
 
         # [B,1,4,4], hack to use the multi-view function
         TCO_V_input = TCO_input.unsqueeze(1)
@@ -798,14 +773,8 @@ class PosePredictor(nn.Module):
         )
         render_time = time.time() - render_start
 
-        if has_nans(renders):
-            print("renders before norm has NANS")
         images_crop, renders = self.normalize_images(images_crop, renders, tCR)
-        if has_nans(renders):
-            print("renders after norm has NANS")
         x = torch.cat((images_crop, renders), dim=1)
-        if has_nans(x):
-            print("x has NANS")
 
         out = self.forward_coarse_tensor(x, cuda_timer=cuda_timer)
 

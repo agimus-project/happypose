@@ -15,14 +15,16 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d.symmetric_distances impor
 )
 from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import (
     compute_transform_from_pose9d,
-    invert_T,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.utils.timer import Timer
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
 from .ransac import make_obj_infos
 
 logger = get_logger(__name__)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def make_view_groups(pairs_TC1C2):
@@ -93,7 +95,7 @@ class MultiviewRefinement:
         )
 
         self.v2v1_TC2C1_map = {
-            (self.view_to_id[v2], self.view_to_id[v1]): invert_T(TC1C2)
+            (self.view_to_id[v2], self.view_to_id[v1]): invert_transform_matrices(TC1C2)
             for (v1, v2, TC1C2) in zip(
                 pairs_TC1C2.infos["view1"],
                 pairs_TC1C2.infos["view2"],
@@ -272,7 +274,8 @@ class MultiviewRefinement:
         A = J.t() @ J + lambd * self.idJ
         b = J.t() @ errors
         # Pinverse is faster on CPU.
-        h = torch.pinverse(A.cpu()).cuda() @ b
+        # h = torch.pinverse(A.cpu()).cuda() @ b
+        h = torch.pinverse(A.cpu()).to(device) @ b
         return h.flatten()
 
     def optimize_lm(
@@ -352,7 +355,7 @@ class MultiviewRefinement:
         dists = []
         for n in range(n_init):
             TWO, TWC = self.sample_initial_TWO_TWC(n)
-            TCW = invert_T(TWC)
+            TCW = invert_transform_matrices(TWC)
             TWO_9d, TCW_9d = self.extract_pose9d(TWO), self.extract_pose9d(TCW)
             dists_, _ = self.align_TCO_cand(TWO_9d, TCW_9d)
             TWO_9d_init.append(TWO_9d)
@@ -364,7 +367,7 @@ class MultiviewRefinement:
     def make_scene_infos(self, TWO_9d, TCW_9d):
         TWO = compute_transform_from_pose9d(TWO_9d)
         TCW = compute_transform_from_pose9d(TCW_9d)
-        TWC = invert_T(TCW)
+        TWC = invert_transform_matrices(TCW)
         objects = tc.PandasTensorCollection(
             infos=self.obj_infos,
             TWO=TWO,

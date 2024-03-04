@@ -1,3 +1,8 @@
+from pathlib import Path
+
+import torch
+import yaml
+
 # Backbones
 from happypose.pose_estimators.cosypose.cosypose.models.efficientnet import EfficientNet
 from happypose.pose_estimators.cosypose.cosypose.models.flownet import (
@@ -11,6 +16,7 @@ from happypose.pose_estimators.cosypose.cosypose.models.wide_resnet import (
     WideResNet34,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.toolbox.lib3d.rigid_mesh_database import BatchedMeshes
 
 logger = get_logger(__name__)
 
@@ -21,7 +27,7 @@ def check_update_config(config):
     return config
 
 
-def create_model_pose(cfg, renderer, mesh_db):
+def create_pose_model_cosypose(cfg, renderer, mesh_db):
     n_inputs = 6
     backbone_str = cfg.backbone_str
     if backbone_str == "efficientnet-b3":
@@ -53,9 +59,16 @@ def create_model_pose(cfg, renderer, mesh_db):
     return model
 
 
-def create_model_refiner(cfg, renderer, mesh_db):
-    return create_model_pose(cfg, renderer, mesh_db)
-
-
-def create_model_coarse(cfg, renderer, mesh_db):
-    return create_model_pose(cfg, renderer, mesh_db)
+def load_model_cosypose(
+    run_dir: Path, renderer, mesh_db_batched: BatchedMeshes, device
+):
+    cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
+    cfg = check_update_config(cfg)
+    model = create_pose_model_cosypose(cfg, renderer=renderer, mesh_db=mesh_db_batched)
+    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)
+    ckpt = ckpt["state_dict"]
+    model.load_state_dict(ckpt)
+    model = model.to(device).eval()
+    model.cfg = cfg
+    model.config = cfg
+    return model

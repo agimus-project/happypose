@@ -4,7 +4,7 @@ import pandas as pd
 import torch
 
 import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
 
 
 def parse_obs_data(obs):
@@ -28,7 +28,7 @@ def parse_obs_data(obs):
             data[k] = torch.stack([torch.as_tensor(x).float() for x in v])
 
     data["infos"] = pd.DataFrame(data["infos"])
-    TCO = invert_T(TWC).unsqueeze(0) @ data["TWO"]
+    TCO = invert_transform_matrices(TWC).unsqueeze(0) @ data["TWO"]
 
     data = tc.PandasTensorCollection(
         infos=data["infos"],

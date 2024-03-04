@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 from typing import Tuple
 
@@ -23,13 +22,13 @@ import torch
 import transforms3d
 
 # Local Folder
-from .rotations import compute_rotation_matrix_from_ortho6d
+from happypose.toolbox.lib3d.rotations import compute_rotation_matrix_from_ortho6d
 
 
 def transform_pts(T: torch.Tensor, pts: torch.Tensor) -> torch.Tensor:
     """Args:
     ----
-        T (torch.Tensor): (bsz, 4, 4) or (bsz, dim2, 4, 4)
+        T (torch.Tensor): (bsz, 4, 4) or (bsz, n_trans, 4, 4)
         pts (torch.Tensor): (bsz, n_pts, 3).
 
     Raises

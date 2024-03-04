@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 import json
 from typing import List, Optional, Tuple
@@ -224,7 +223,7 @@ def make_scene_dataset(
 
     # Synthetic datasets
     elif "synthetic." in ds_name:
-        from happypose.pose_estimators.cosypose.cosypose.datasets.synthetic_dataset import (  # noqa: E501
+        from happypose.pose_estimators.cosypose.cosypose.datasets.synthetic_dataset import (
             SyntheticSceneDataset,
         )
 
@@ -249,7 +248,12 @@ def make_scene_dataset(
 def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     # BOP original models
 
-    if ds_name == "tless.cad":
+    if ds_name == "tless":
+        ds: RigidObjectDataset = BOPObjectDataset(
+            BOP_DS_DIR / "tless/models_cad",
+            label_format="tless-{label}",
+        )
+    elif ds_name == "tless.cad":
         ds: RigidObjectDataset = BOPObjectDataset(
             BOP_DS_DIR / "tless/models_cad",
             label_format="tless-{label}",

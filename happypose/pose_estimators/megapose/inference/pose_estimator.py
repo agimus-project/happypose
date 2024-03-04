@@ -18,7 +18,7 @@ from __future__ import annotations
 # Standard Library
 import time
 from collections import defaultdict
-from typing import Any, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -37,6 +37,7 @@ from happypose.toolbox.inference.types import (
     ObservationTensor,
     PoseEstimatesType,
 )
+from happypose.toolbox.inference.utils import add_instance_id, filter_detections
 from happypose.toolbox.lib3d.cosypose_ops import TCO_init_from_boxes_autodepth_with_R
 from happypose.toolbox.utils import transform_utils
 from happypose.toolbox.utils.logging import get_logger
@@ -520,12 +521,12 @@ class PoseEstimator(PoseEstimationModule):
         n_refiner_iterations: int = 5,
         n_pose_hypotheses: int = 1,
         keep_all_refiner_outputs: bool = False,
-        detection_filter_kwargs: Optional[dict] = None,
         run_depth_refiner: bool = False,
         bsz_images: Optional[int] = None,
         bsz_objects: Optional[int] = None,
         cuda_timer: Optional[bool] = False,
         coarse_estimates: Optional[PoseEstimatesType] = None,
+        labels_to_keep: Optional[List[str]] = None,
     ) -> Tuple[PoseEstimatesType, dict]:
         """Runs the entire pose estimation pipeline.
 
@@ -567,19 +568,20 @@ class PoseEstimator(PoseEstimationModule):
                 elapsed = time.time() - start_time
                 timing_str += f"detection={elapsed:.2f}, "
 
-            # Ensure that detections has the instance_id column
             assert detections is not None
+            # Filter detections
+            if labels_to_keep is not None:
+                detections = filter_detections(
+                    detections,
+                    labels_to_keep,
+                )
+
             assert (
                 len(detections) > 0
             ), "TOFIX: currently, dealing with absence of detections is not supported"
-            detections = happypose.toolbox.inference.utils.add_instance_id(detections)
 
-            # Filter detections
-            if detection_filter_kwargs is not None:
-                detections = happypose.toolbox.inference.utils.filter_detections(
-                    detections,
-                    **detection_filter_kwargs,
-                )
+            # Ensure that detections has the instance_id column
+            detections = add_instance_id(detections)
 
             # Run the coarse estimator using detections
             data_TCO_coarse, coarse_extra_data = self.forward_coarse_model(

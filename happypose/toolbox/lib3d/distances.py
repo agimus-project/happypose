@@ -13,11 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Third Party
 import torch
 
-# MegaPose
+# Happypose
 from happypose.toolbox.lib3d.transform_ops import transform_pts
 
 

@@ -32,8 +32,7 @@ from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import
     check_update_config as check_update_config_pose,
 )
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
-    create_model_coarse,
-    create_model_refiner,
+    load_model_cosypose,
 )
 from happypose.pose_estimators.megapose.evaluation.eval_config import EvalConfig
 from happypose.pose_estimators.megapose.evaluation.evaluation_runner import (
@@ -85,46 +84,22 @@ def load_pose_models(coarse_run_id, refiner_run_id, n_workers):
     # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
     cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config_pose(cfg)
-    # object_ds = BOPObjectDataset(BOP_DS_DIR / 'tless/models_cad')
-    # object_ds = make_object_dataset(cfg.object_ds_name)
-    # mesh_db = MeshDataBase.from_object_ds(object_ds)
-    # renderer = BulletBatchRenderer(
-    # object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer
-    # )
-    #
 
     object_dataset = make_object_dataset("ycbv")
-    mesh_db = MeshDataBase.from_object_ds(object_dataset)
     renderer = Panda3dBatchRenderer(
         object_dataset,
         n_workers=n_workers,
         preload_cache=False,
     )
+    mesh_db = MeshDataBase.from_object_ds(object_dataset)
     mesh_db_batched = mesh_db.batched().to(device)
 
-    def load_model(run_id):
-        run_dir = EXP_DIR / run_id
-        # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
-        cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
-        cfg = check_update_config_pose(cfg)
-        if cfg.train_refiner:
-            model = create_model_refiner(
-                cfg,
-                renderer=renderer,
-                mesh_db=mesh_db_batched,
-            )
-        else:
-            model = create_model_coarse(cfg, renderer=renderer, mesh_db=mesh_db_batched)
-        ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)
-        ckpt = ckpt["state_dict"]
-        model.load_state_dict(ckpt)
-        model = model.to(device).eval()
-        model.cfg = cfg
-        model.config = cfg
-        return model
-
-    coarse_model = load_model(coarse_run_id)
-    refiner_model = load_model(refiner_run_id)
+    coarse_model = load_model_cosypose(
+        EXP_DIR / coarse_run_id, renderer, mesh_db_batched, device
+    )
+    refiner_model = load_model_cosypose(
+        EXP_DIR / refiner_run_id, renderer, mesh_db_batched, device
+    )
     return coarse_model, refiner_model, mesh_db
 
 

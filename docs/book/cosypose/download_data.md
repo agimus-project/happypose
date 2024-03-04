@@ -34,8 +34,8 @@ Notes:
 - The URDF files were obtained using these commands (requires `meshlab` to be installed):
 
   ```sh
-  python -m happypose.pose_estimators.cosypose.cosypose.scripts.convert_models_to_urdf --models=ycbv
-  python -m happypose.pose_estimators.cosypose.cosypose.scripts.convert_models_to_urdf --models=tless.cad
+  python -m happypose.pose_estimators.cosypose.cosypose.scripts.convert_bop_ds_to_urdf --ds_name=ycbv
+  python -m happypose.pose_estimators.cosypose.cosypose.scripts.convert_bop_ds_to_urdf --ds_name=tless.cad
   ```
 
 - Compatibility models were obtained using the following script:
@@ -47,17 +47,23 @@ Notes:
 ## Models for minimal version
 
 ```sh
- #ycbv
-  python -m happypose.toolbox.utils.download --cosypose_models \
-            detector-bop-ycbv-pbr--970850 \
-            coarse-bop-ycbv-pbr--724183 \
-            refiner-bop-ycbv-pbr--604090
+# hope
+python -m happypose.toolbox.utils.download --cosypose_models \
+          detector-bop-hope-pbr--15246 \
+          coarse-bop-hope-pbr--225203 \
+          refiner-bop-hope-pbr--955392
 
- #tless
-  python -m happypose.toolbox.utils.download --cosypose_models \
-            detector-bop-tless-pbr--873074 \
-            coarse-bop-tless-pbr--506801 \
-            refiner-bop-tless-pbr--233420
+# ycbv
+python -m happypose.toolbox.utils.download --cosypose_models \
+          detector-bop-ycbv-pbr--970850 \
+          coarse-bop-ycbv-pbr--724183 \
+          refiner-bop-ycbv-pbr--604090
+
+# tless
+python -m happypose.toolbox.utils.download --cosypose_models \
+          detector-bop-tless-pbr--873074 \
+          coarse-bop-tless-pbr--506801 \
+          refiner-bop-tless-pbr--233420
 ```
 
 ## Pre-trained models for single-view estimator

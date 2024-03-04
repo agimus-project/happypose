@@ -55,13 +55,16 @@ BOP_DATASETS = {
     "tudl": {
         "splits": ["test_all", "train_real"],
     },
+    "hope": {
+        "splits": ["test_all"],
+    },
 }
 
 BOP_DS_NAMES = list(BOP_DATASETS.keys())
 
 
 async def main():
-    parser = argparse.ArgumentParser("CosyPose download utility")
+    parser = argparse.ArgumentParser("HappyPose download utility")
     parser.add_argument("--bop_dataset", nargs="*", choices=BOP_DS_NAMES)
     parser.add_argument("--bop_extra_files", nargs="*", choices=["ycbv", "tless"])
     parser.add_argument("--cosypose_models", nargs="*")
@@ -288,11 +291,9 @@ async def main():
             )
     if args.examples:
         for example in args.examples:
-            to_dl.append(
-                (
-                    f"examples/{example}",
-                    LOCAL_DATA_DIR / "examples",
-                )
+            to_dl.append((f"examples/{example}.zip", DOWNLOAD_DIR))
+            to_unzip.append(
+                (DOWNLOAD_DIR / f"{example}.zip", LOCAL_DATA_DIR / "examples")
             )
 
     # logger.info(f"{to_dl=}")

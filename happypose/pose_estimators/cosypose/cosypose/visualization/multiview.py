@@ -7,12 +7,13 @@ import seaborn as sns
 import torch
 import transforms3d
 
-from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import euler2quat
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform import Transform
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform_ops import invert_T
-from happypose.pose_estimators.cosypose.cosypose.rendering.bullet_scene_renderer import (  # noqa: E501
-    BulletSceneRenderer,
+from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
+    make_urdf_dataset,
 )
+from happypose.toolbox.lib3d.rotations import euler2quat
+from happypose.toolbox.lib3d.transform import Transform
+from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
+from happypose.toolbox.renderer.bullet_scene_renderer import BulletSceneRenderer
 
 from .plotter import Plotter
 
@@ -74,10 +75,9 @@ def make_scene_renderings(
     use_nms3d=True,
     camera_color=(0.2, 0.2, 0.2, 1.0),
 ):
+    urdf_ds = make_urdf_dataset([urdf_ds_name, "camera"])
     renderer = BulletSceneRenderer(
-        [urdf_ds_name, "camera"],
-        background_color=background_color,
-        gui=gui,
+        urdf_ds, background_color=background_color, gui=gui, gpu_renderer=False
     )
     urdf_ds = renderer.body_cache.urdf_ds
 
@@ -99,8 +99,8 @@ def make_scene_renderings(
     TWWB = objects.poses[object_id_ref]
 
     cam = cameras[[0]]
-    TCWB = invert_T(cam.TWC.squeeze(0)) @ TWWB
-    TWBC = invert_T(TCWB)
+    TCWB = invert_transform_matrices(cam.TWC.squeeze(0)) @ TWWB
+    TWBC = invert_transform_matrices(TCWB)
     if TWBC[2, -1] < 0:
         quat = euler2quat([np.pi, 0, 0])
         TWWB = Transform(TWWB.numpy()) * Transform(quat, np.zeros(3))
@@ -152,7 +152,7 @@ def make_scene_renderings(
             {"K": K, "TWC": TWC, "resolution": (w, h)},
         )
     renders = renderer.render_scene(list_objects, list_cameras)
-    images = np.stack([render["rgb"] for render in renders])
+    images = np.stack([render.rgb for render in renders])
     if gui:
         time.sleep(100)
     renderer.disconnect()
@@ -179,9 +179,9 @@ def mark_inliers(cand_inputs, cand_matched):
         on=["scene_id", "view_id", "label", "cand_id"],
         how="left",
     )
-    infos["is_inlier"] = infos["is_inlier"].astype(np.float)
-    infos.loc[~np.isfinite(infos.loc[:, "is_inlier"].astype(np.float)), "is_inlier"] = 0
-    infos["is_inlier"] = infos["is_inlier"].astype(np.bool)
+    infos["is_inlier"] = infos["is_inlier"].astype(float)
+    infos.loc[~np.isfinite(infos.loc[:, "is_inlier"].astype(float)), "is_inlier"] = 0
+    infos["is_inlier"] = infos["is_inlier"].astype(bool)
     cand_inputs.infos = infos
     return cand_inputs
 
@@ -201,7 +201,7 @@ def render_predictions_wrt_camera(renderer, preds_with_colors, camera):
             "TWO": preds_with_colors.poses[n].cpu().numpy(),
         }
         list_objects.append(obj)
-    rgb_rendered = renderer.render_scene(list_objects, [camera])[0]["rgb"]
+    rgb_rendered = renderer.render_scene(list_objects, [camera])[0].rgb
     return rgb_rendered
 
 
@@ -212,7 +212,7 @@ def render_gt(renderer, objects, camera, colormap_rgb):
         obj["color"] = colormap_rgb[obj["label"]]
         obj["TWO"] = np.linalg.inv(TWC) @ obj["TWO"]
     camera["TWC"] = np.eye(4)
-    rgb_rendered = renderer.render_scene(objects, [camera])[0]["rgb"]
+    rgb_rendered = renderer.render_scene(objects, [camera])[0].rgb
     return rgb_rendered
 
 

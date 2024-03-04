@@ -3,7 +3,7 @@ import numpy as np
 from happypose.pose_estimators.cosypose.cosypose.datasets.augmentations import (
     CropResizeToAspectAugmentation,
 )
-from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.augmentation_wrapper import (  # noqa: E501
+from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.augmentation_wrapper import (
     AugmentationWrapper,
 )
 

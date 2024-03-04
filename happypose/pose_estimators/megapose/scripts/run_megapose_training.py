@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # SPDX-FileCopyrightText: Copyright (c) <year> NVIDIA CORPORATION & AFFILIATES.
 # All rights reserved.
 # SPDX-License-Identifier: MIT

@@ -5,9 +5,6 @@ requires = ["poetry-core"]
 [tool.coverage.run]
 omit = ["cosypose", "megapose6d"]
 
-[tool.isort]
-profile = "black"
-
 [tool.mypy]
 exclude = ["cosypose", "megapose6d"]
 
@@ -40,7 +37,7 @@ opencv-contrib-python = {optional = true, version = "^4.8.0.76"}
 opencv-python = {optional = true, version = "^4.8.0.76"}
 panda3d = "=1.10.13"
 pin = {optional = true, version = "^2.6.20"}
-plyfile = "^1.0.1"
+plyfile = "^1.0.3"
 pybind11 = "^2.10.4"
 pybullet = "^3.2.5"
 pypng = "^0.20220715.0"
@@ -77,10 +74,9 @@ pypi = ["opencv-contrib-python", "opencv-python", "pin"]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.9.1"
 coverage = {extras = ["toml"], version = "^7.2.5"}
 pre-commit = "^3.2.1"
-ruff = "^0.1.4"
+ruff = "^0.2.1"
 
 [tool.poetry.group.docs]
 optional = true
@@ -102,9 +98,12 @@ priority = "primary"
 changelog = "https://github.com/agimus-project/happypose/blob/main/CHANGELOG.md"
 
 [tool.ruff]
+extend-exclude = ["deps"]
+target-version = "py38"
+
+[tool.ruff.lint]
 extend-ignore = ["D203", "D213"]
-# extend-select = ["A", "B", "C", "COM", "D", "EM", "EXE", "G", "N", "PTH", "RET", "RUF", "UP", "W", "YTT"]
-target-version = "py39"
+extend-select = ["I", "RUF", "W"]
 
 [tool.tomlsort]
 all = true
