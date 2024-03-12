@@ -1,4 +1,5 @@
 """Set of unit tests for testing inference example for CosyPose."""
+
 import unittest
 
 from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR

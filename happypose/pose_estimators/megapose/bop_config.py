@@ -15,7 +15,6 @@ limitations under the License.
 
 # Cosypose models
 
-
 BOP_CONFIG = {}
 BOP_CONFIG["hb"] = {
     "input_resize": (640, 480),

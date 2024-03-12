@@ -11,7 +11,6 @@
 - Deprecate this class when possible
 """
 
-
 from typing import Union
 
 import torch
