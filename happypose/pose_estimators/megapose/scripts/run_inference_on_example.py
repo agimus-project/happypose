@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # Load data
     object_dataset = make_example_object_dataset(example_dir)
     rgb, depth, camera_data = load_observation_example(example_dir, load_depth=True)
-    observation = ObservationTensor.from_numpy(rgb, depth, camera_data.K)
+    observation = ObservationTensor.from_numpy(rgb, depth, camera_data.K).to(device)
 
     # Load models
     pose_estimator, model_info = setup_pose_estimator(args.model, object_dataset)

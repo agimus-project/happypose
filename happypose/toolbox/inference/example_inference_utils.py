@@ -86,6 +86,7 @@ def make_detections_visualization(
 ) -> None:
     plotter = BokehPlotter()
 
+    detections = detections.cpu()
     # TODO: put in BokehPlotter.plot_detections
     if hasattr(detections, "masks"):
         for mask in detections.masks:
