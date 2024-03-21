@@ -5,10 +5,13 @@ from pathlib import Path
 from typing import List
 
 import numpy as np
+import pytest
 import torch
 from numpy.testing import assert_array_less as np_assert_array_less
 from numpy.testing import assert_equal as np_assert_equal
 from torch.testing import assert_allclose as tr_assert_allclose
+
+from .config.test_config import DEVICE
 
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.lib3d.transform import Transform
@@ -21,10 +24,14 @@ from happypose.toolbox.renderer.types import (
     Panda3dObjectData,
 )
 
+import os
 
-class TestPanda3DRenderer(unittest.TestCase):
+os.environ["CUDA_VISIBLE_DEVICES"] = "0" 
+
+class TestPanda3DBatchRenderer():
     """Unit tests for Panda3D renderer."""
-
+    
+    @pytest.fixture(autouse=True)
     def setUp(self) -> None:
         self.obj_label = "my_favorite_object_label"
         self.obj_path = Path(__file__).parent.joinpath("data/obj_000001.ply")
@@ -64,11 +71,13 @@ class TestPanda3DRenderer(unittest.TestCase):
         self.light_datas = Nb_lights * [
             Panda3dLightData(light_type="ambient", color=(1.0, 1.0, 1.0, 1.0))
         ]
-
-    def test_scene_renderer(self):
-        """
-        Scene render an example object and check that output image match expectation.
-        """
+    """
+    @pytest.mark.order(1)
+    @pytest.mark.parametrize('device', DEVICE)
+    def test_scene_renderer(self, device):
+    """
+        #Scene render an example object and check that output image match expectation.
+    """
         SAVEFIG = False
 
         renderer = Panda3dSceneRenderer(asset_dataset=self.asset_dataset)
@@ -82,31 +91,28 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_binary_mask=True,
         )
 
-        self.assertEqual(len(renderings), self.Nc)
+        assert len(renderings) == self.Nc
+
         # render from 2 identical cams are equals
-        self.assertIsNone(tr_assert_allclose(renderings[0].rgb, renderings[1].rgb))
-        self.assertIsNone(
-            tr_assert_allclose(renderings[0].normals, renderings[1].normals)
-        )
-        self.assertIsNone(tr_assert_allclose(renderings[0].depth, renderings[1].depth))
-        self.assertIsNone(
-            tr_assert_allclose(renderings[0].binary_mask, renderings[1].binary_mask)
-        )
+        assert tr_assert_allclose(renderings[0].rgb, renderings[1].rgb) is None
+        assert tr_assert_allclose(renderings[0].normals, renderings[1].normals) is None
+        assert tr_assert_allclose(renderings[0].depth, renderings[1].depth) is None
+        assert tr_assert_allclose(renderings[0].binary_mask, renderings[1].binary_mask) is None
 
         rgb = renderings[0].rgb
         normals = renderings[0].normals
         depth = renderings[0].depth
         binary_mask = renderings[0].binary_mask
 
-        self.assertEqual(rgb.shape, (self.height, self.width, 3))
-        self.assertEqual(normals.shape, (self.height, self.width, 3))
-        self.assertEqual(depth.shape, (self.height, self.width, 1))
-        self.assertEqual(binary_mask.shape, (self.height, self.width, 1))
+        assert rgb.shape == (self.height, self.width, 3)
+        assert normals.shape == (self.height, self.width, 3)
+        assert depth.shape == (self.height, self.width, 1)
+        assert binary_mask.shape == (self.height, self.width, 1)
 
-        self.assertEqual(rgb.dtype, np.dtype(np.uint8))
-        self.assertEqual(normals.dtype, np.dtype(np.uint8))
-        self.assertEqual(depth.dtype, np.dtype(np.float32))
-        self.assertEqual(binary_mask.dtype, np.dtype(bool))
+        assert rgb.dtype == np.dtype(np.uint8)
+        assert normals.dtype == np.dtype(np.uint8)
+        assert depth.dtype == np.dtype(np.float32)
+        assert binary_mask.dtype == np.dtype(bool)
 
         if SAVEFIG:
             import matplotlib.pyplot as plt
@@ -126,18 +132,15 @@ class TestPanda3DRenderer(unittest.TestCase):
             plt.savefig(fig_path)
 
         # ================================
-        self.assertIsNone(np_assert_equal(rgb[0, 0], (0, 0, 0)))
-        self.assertIsNone(
-            np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2])
-        )
-        self.assertEqual(depth[0, 0], 0)
-        self.assertLess(depth[self.height // 2, self.width // 2], self.z_obj)
-        self.assertIsNone(np_assert_equal(normals[0, 0], (0, 0, 0)))
-        self.assertIsNone(
-            np_assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2])
-        )
-        self.assertEqual(binary_mask[0, 0], 0)
-        self.assertEqual(binary_mask[self.height // 2, self.width // 2], 1)
+        assert np_assert_equal(rgb[0, 0], (0, 0, 0)) is None
+        assert np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2]) is None
+        
+        assert depth[0, 0] == 0
+        assert depth[self.height // 2, self.width // 2] < self.z_obj
+        assert np_assert_equal(normals[0, 0], (0, 0, 0)) is None
+        assert np_assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2]) is None
+        assert binary_mask[0, 0] == 0
+        assert binary_mask[self.height // 2, self.width // 2] == 1
 
         # ==================
         # Partial renderings
@@ -150,10 +153,10 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_normals=True,
             render_binary_mask=False,
         )
-        self.assertIsNotNone(renderings[0].rgb)
-        self.assertIsNotNone(renderings[0].depth)
-        self.assertIsNotNone(renderings[0].normals)
-        self.assertIsNone(renderings[0].binary_mask)
+        assert renderings[0].rgb is not None
+        assert renderings[0].depth is not None
+        assert renderings[0].normals is not None
+        assert renderings[0].binary_mask is None
 
         renderings = renderer.render_scene(
             self.object_datas,
@@ -163,10 +166,10 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_normals=False,
             render_binary_mask=False,
         )
-        self.assertIsNotNone(renderings[0].rgb)
-        self.assertIsNotNone(renderings[0].depth)
-        self.assertIsNone(renderings[0].normals)
-        self.assertIsNone(renderings[0].binary_mask)
+        assert renderings[0].rgb is not None
+        assert renderings[0].depth is not None
+        assert renderings[0].normals is None
+        assert renderings[0].binary_mask is None
 
         renderings = renderer.render_scene(
             self.object_datas,
@@ -176,10 +179,10 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_normals=True,
             render_binary_mask=False,
         )
-        self.assertIsNotNone(renderings[0].rgb)
-        self.assertIsNone(renderings[0].depth)
-        self.assertIsNotNone(renderings[0].normals)
-        self.assertIsNone(renderings[0].binary_mask)
+        assert renderings[0].rgb is not None
+        assert renderings[0].depth is None
+        assert renderings[0].normals is not None
+        assert renderings[0].binary_mask is None
 
         renderings = renderer.render_scene(
             self.object_datas,
@@ -189,12 +192,12 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_normals=False,
             render_binary_mask=False,
         )
-        self.assertIsNotNone(renderings[0].rgb)
-        self.assertIsNone(renderings[0].depth)
-        self.assertIsNone(renderings[0].normals)
-        self.assertIsNone(renderings[0].binary_mask)
+        assert renderings[0].rgb is not None
+        assert renderings[0].depth is None
+        assert renderings[0].normals is None
+        assert renderings[0].binary_mask is None
 
-        with self.assertRaises(AssertionError):
+        with pytest.raises(AssertionError):
             renderer.render_scene(
                 self.object_datas,
                 self.camera_datas,
@@ -203,16 +206,18 @@ class TestPanda3DRenderer(unittest.TestCase):
                 render_normals=False,
                 render_binary_mask=True,
             )
-
-    def test_batch_renderer(self):
+    """
+    @pytest.mark.order(2)
+    @pytest.mark.parametrize('device', DEVICE)
+    def test_batch_renderer(self, device):
         """
         Batch render an example object and check that output image match expectation.
         """
         SAVEFIG = False
-
+        
         renderer = Panda3dBatchRenderer(
             asset_dataset=self.asset_dataset,
-            n_workers=1,
+            n_workers=4,
             preload_cache=True,
             split_objects=False,
         )
@@ -223,7 +228,7 @@ class TestPanda3DRenderer(unittest.TestCase):
         K = K.unsqueeze(0)
         TCO = TCO.repeat(self.Nc, 1, 1)
         K = K.repeat(self.Nc, 1, 1)
-
+        
         # labels and light_datas need to have same size as TCO/K batch size
         renderings = renderer.render(
             labels=self.Nc * [self.obj_label],
@@ -235,40 +240,40 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_depth=True,
             render_binary_mask=True,
         )
+        
+        
+        assert renderings.rgbs.shape == (self.Nc, 3, self.height, self.width)
+        assert renderings.depths.shape == (self.Nc, 1, self.height, self.width)
+        assert renderings.normals.shape == (self.Nc, 3, self.height, self.width)
+        assert renderings.binary_masks.shape == (self.Nc, 1, self.height, self.width)
 
-        self.assertEqual(renderings.rgbs.shape, (self.Nc, 3, self.height, self.width))
-        self.assertEqual(renderings.depths.shape, (self.Nc, 1, self.height, self.width))
-        self.assertEqual(
-            renderings.normals.shape, (self.Nc, 3, self.height, self.width)
-        )
-        self.assertEqual(
-            renderings.binary_masks.shape, (self.Nc, 1, self.height, self.width)
-        )
-
-        self.assertEqual(renderings.rgbs.dtype, torch.float32)
-        self.assertEqual(renderings.depths.dtype, torch.float32)
-        self.assertEqual(renderings.normals.dtype, torch.float32)
-        self.assertEqual(renderings.binary_masks.dtype, torch.bool)
+        assert renderings.rgbs.dtype == torch.float32
+        assert renderings.depths.dtype == torch.float32
+        assert renderings.normals.dtype == torch.float32
+        assert renderings.binary_masks.dtype == torch.bool
 
         # Renders from 2 identical cams are equals
-        self.assertIsNone(tr_assert_allclose(renderings.rgbs[0], renderings.rgbs[1]))
-        self.assertIsNone(
-            tr_assert_allclose(renderings.normals[0], renderings.normals[1])
-        )
-        self.assertIsNone(
-            tr_assert_allclose(renderings.depths[0], renderings.depths[1])
-        )
-        self.assertIsNone(
-            tr_assert_allclose(renderings.binary_masks[0], renderings.binary_masks[1])
-        )
-
-        rgb = renderings.rgbs[0].movedim(0, -1).numpy()  # (Nc,3,h,w) -> (h,w,3)
-        normals = renderings.normals[0].movedim(0, -1).numpy()  # (Nc,1,h,w) -> (h,w,1)
-        depth = renderings.depths[0].movedim(0, -1).numpy()  # (Nc,3,h,w) -> (h,w,3)
-        binary_mask = (
-            renderings.binary_masks[0].movedim(0, -1).numpy()
-        )  # (Nc,1,h,w) -> (h,w,1)
-
+        assert tr_assert_allclose(renderings.rgbs[0], renderings.rgbs[1]) is None
+        assert tr_assert_allclose(renderings.normals[0], renderings.normals[1]) is None
+        assert tr_assert_allclose(renderings.depths[0], renderings.depths[1]) is None
+        assert tr_assert_allclose(renderings.binary_masks[0], renderings.binary_masks[1]) is None
+        
+        if device == "cpu":
+            rgb = renderings.rgbs[0].movedim(0, -1).numpy()  # (Nc,3,h,w) -> (h,w,3)
+            normals = renderings.normals[0].movedim(0, -1).numpy()  # (Nc,1,h,w) -> (h,w,1)
+            depth = renderings.depths[0].movedim(0, -1).numpy()  # (Nc,3,h,w) -> (h,w,3)
+            binary_mask = (
+                renderings.binary_masks[0].movedim(0, -1).numpy()
+            )  # (Nc,1,h,w) -> (h,w,1)
+            
+        else:
+            rgb = renderings.rgbs[0].movedim(0, -1).cpu().numpy()  # (Nc,3,h,w) -> (h,w,3)
+            normals = renderings.normals[0].movedim(0, -1).cpu().numpy()  # (Nc,1,h,w) -> (h,w,1)
+            depth = renderings.depths[0].movedim(0, -1).cpu().numpy()  # (Nc,3,h,w) -> (h,w,3)
+            binary_mask = (
+                renderings.binary_masks[0].movedim(0, -1).cpu().numpy()
+            )  # (Nc,1,h,w) -> (h,w,1)
+            
         if SAVEFIG:
             import matplotlib.pyplot as plt
 
@@ -287,18 +292,15 @@ class TestPanda3DRenderer(unittest.TestCase):
             plt.savefig(fig_path)
 
         # ================================
-        self.assertIsNone(np_assert_equal(rgb[0, 0], (0, 0, 0)))
-        self.assertIsNone(
-            np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2])
-        )
-        self.assertEqual(depth[0, 0], 0)
-        self.assertLess(depth[self.height // 2, self.width // 2], self.z_obj)
-        self.assertIsNone(np_assert_equal(normals[0, 0], (0, 0, 0)))
-        self.assertIsNone(
-            np_assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2])
-        )
-        self.assertEqual(binary_mask[0, 0], 0)
-        self.assertEqual(binary_mask[self.height // 2, self.width // 2], 1)
+        assert np_assert_equal(rgb[0, 0], (0, 0, 0)) is None
+        assert np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2]) is None
+        assert depth[0, 0] == 0
+        assert depth[self.height // 2, self.width // 2] < self.z_obj
+        assert np_assert_equal(normals[0, 0], (0, 0, 0)) is None
+        assert np_assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2]) is None
+        assert binary_mask[0, 0] == 0
+        assert binary_mask[self.height // 2, self.width // 2] == 1
+
 
         # ==================
         # Partial renderings
@@ -313,10 +315,10 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_normals=True,
             render_binary_mask=False,
         )
-        self.assertIsNotNone(renderings.rgbs)
-        self.assertIsNotNone(renderings.depths)
-        self.assertIsNotNone(renderings.normals)
-        self.assertIsNone(renderings.binary_masks)
+        assert renderings.rgbs is not None
+        assert renderings.depths is not None
+        assert renderings.normals is not None
+        assert renderings.binary_masks is None
 
         renderings = renderer.render(
             self.Nc * [self.obj_label],
@@ -328,10 +330,10 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_normals=False,
             render_binary_mask=False,
         )
-        self.assertIsNotNone(renderings.rgbs)
-        self.assertIsNotNone(renderings.depths)
-        self.assertIsNone(renderings.normals)
-        self.assertIsNone(renderings.binary_masks)
+        assert renderings.rgbs is not None
+        assert renderings.depths is not None
+        assert renderings.normals is None
+        assert renderings.binary_masks is None
 
         renderings = renderer.render(
             self.Nc * [self.obj_label],
@@ -343,10 +345,10 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_normals=True,
             render_binary_mask=False,
         )
-        self.assertIsNotNone(renderings.rgbs)
-        self.assertIsNone(renderings.depths)
-        self.assertIsNotNone(renderings.normals)
-        self.assertIsNone(renderings.binary_masks)
+        assert renderings.rgbs is not None
+        assert renderings.depths is None
+        assert renderings.normals is not None
+        assert renderings.binary_masks is None
 
         renderings = renderer.render(
             self.Nc * [self.obj_label],
@@ -358,10 +360,10 @@ class TestPanda3DRenderer(unittest.TestCase):
             render_normals=False,
             render_binary_mask=False,
         )
-        self.assertIsNotNone(renderings.rgbs)
-        self.assertIsNone(renderings.depths)
-        self.assertIsNone(renderings.normals)
-        self.assertIsNone(renderings.binary_masks)
+        assert renderings.rgbs is not None
+        assert renderings.depths is None
+        assert renderings.normals is None
+        assert renderings.binary_masks is None
 
         # TODO: not sure how to check that assertion is raised without crashing the test
         # -> AssertionError happens in a subprocess and is not caught
@@ -376,7 +378,3 @@ class TestPanda3DRenderer(unittest.TestCase):
         #     render_normals=False,
         #     render_binary_mask=True
         # )
-
-
-if __name__ == "__main__":
-    unittest.main()
