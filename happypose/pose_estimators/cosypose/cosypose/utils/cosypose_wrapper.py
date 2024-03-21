@@ -11,7 +11,6 @@
 - Deprecate this class when possible
 """
 
-
 from typing import Union
 
 import torch
@@ -86,7 +85,7 @@ class CosyPoseWrapper:
         else:
             msg = f"Not prepared for {dataset_name} dataset"
             raise ValueError(msg)
-        detector = load_detector(detector_run_id)
+        detector = load_detector(detector_run_id, device)
         coarse_model, refiner_model = self.load_pose_models(
             coarse_run_id, refiner_run_id, n_workers, renderer_type
         )

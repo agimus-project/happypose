@@ -1,4 +1,5 @@
 """Set of unit tests for bullet renderer."""
+
 import unittest
 from pathlib import Path
 

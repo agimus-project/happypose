@@ -71,7 +71,6 @@ class TestTransform(unittest.TestCase):
 
 
 class TestRotations(unittest.TestCase):
-
     """
     Compare results with their equivalent pinocchio implementation.
     """
