@@ -13,6 +13,7 @@ logger = get_logger(__name__)
 # TODO : Fix warnings
 warnings.filterwarnings("ignore")
 
+
 def make_cfg(args):
     cfg = argparse.ArgumentParser("").parse_args([])
     if args.config:
