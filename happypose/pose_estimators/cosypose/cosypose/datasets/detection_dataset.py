@@ -28,50 +28,6 @@ from happypose.toolbox.datasets.scene_dataset import (
 from happypose.toolbox.datasets.scene_dataset_wrappers import remove_invisible_objects
 
 
-# TODO : Double check on types and add format documentation
-@dataclass
-class DetectionData:
-    """rgb: (h, w, 3) uint8
-    depth: (bsz, h, w) float32
-    bbox: (4, ) int
-    K: (3, 3) float32
-    TCO: (4, 4) float32.
-    """
-
-    rgb: np.array
-    bboxes: np.array
-    labels: np.array
-    masks: np.array
-    area: np.array
-    iscrowd: np.array
-
-
-@dataclass
-class BatchDetectionData:
-    """rgbs: (bsz, 3, h, w) uint8
-    depths: (bsz, h, w) float32
-    bboxes: (bsz, 4) int
-    TCO: (bsz, 4, 4) float32
-    K: (bsz, 3, 3) float32.
-    """
-
-    rgbs: torch.Tensor
-    bboxes: torch.Tensor
-    labels: torch.Tensor
-    masks: torch.Tensor
-    area: torch.Tensor
-    iscrowd: torch.Tensor
-
-    def pin_memory(self) -> "BatchDetectionData":
-        self.rgbs = self.rgbs.pin_memory()
-        self.bboxes = self.bboxes.pin_memory()
-        self.TCO = self.TCO.pin_memory()
-        self.K = self.K.pin_memory()
-        if self.depths is not None:
-            self.depths = self.depths.pin_memory()
-        return self
-
-
 class DetectionDataset(torch.utils.data.IterableDataset):
     def __init__(
         self,
