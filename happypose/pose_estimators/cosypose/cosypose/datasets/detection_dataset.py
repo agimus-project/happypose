@@ -5,7 +5,6 @@ import numpy as np
 import torch
 
 from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
-
 from happypose.toolbox.datasets.augmentations import (
     CropResizeToAspectTransform,
     PillowBlur,
@@ -15,18 +14,11 @@ from happypose.toolbox.datasets.augmentations import (
     PillowSharpness,
     VOCBackgroundAugmentation,
 )
-
-# HappyPose
-from happypose.toolbox.datasets.scene_dataset import (
-    IterableSceneDataset,
-    SceneDataset,
-    SceneObservation,
-)
-
 from happypose.toolbox.datasets.augmentations import (
     SceneObservationAugmentation as SceneObsAug,
 )
 
+# HappyPose
 # HappyPose
 from happypose.toolbox.datasets.scene_dataset import (
     IterableSceneDataset,
@@ -216,9 +208,9 @@ class DetectionDataset(torch.utils.data.IterableDataset):
         target["image_id"] = image_id
         target["area"] = area
         target["iscrowd"] = iscrowd
-        
+
         return rgb, target
-    
+
     def __getitem__(self, index: int):
         assert isinstance(self.scene_ds, SceneDataset)
         obs = self.scene_ds[index]
