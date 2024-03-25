@@ -238,7 +238,6 @@ class BOPDataset(SceneDataset):
         )
         models_infos = json.loads((ds_dir / "models" / "models_info.json").read_text())
         self.all_labels = [f"obj_{int(obj_id):06d}" for obj_id in models_infos.keys()]
-        
 
     def _load_scene_observation(
         self,

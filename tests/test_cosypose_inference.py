@@ -19,9 +19,11 @@ from happypose.toolbox.inference.example_inference_utils import load_observation
 from happypose.toolbox.inference.types import ObservationTensor
 from happypose.toolbox.inference.utils import load_detector
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+
 from .config.test_config import DEVICE
 
-class TestCosyPoseInference():
+
+class TestCosyPoseInference:
     """Unit tests for CosyPose inference example."""
 
     @pytest.fixture(autouse=True)
@@ -37,11 +39,13 @@ class TestCosyPoseInference():
         self.refiner_run_id = "refiner-bop-hope-pbr--955392"
         # TODO : this should be corrected and probably use pytest.parametrize as other tests
         # however, stacking decorators seems to not work as intended.
-        self.device = 'cpu'
+        self.device = "cpu"
 
         rgb, depth, camera_data = load_observation_example(data_dir, load_depth=True)
         # TODO: cosypose forward does not work if depth is loaded detection contrary to megapose
-        self.observation = ObservationTensor.from_numpy(rgb, depth=None, K=camera_data.K).cpu()
+        self.observation = ObservationTensor.from_numpy(
+            rgb, depth=None, K=camera_data.K
+        ).cpu()
 
         self.detector = load_detector(
             run_id="detector-bop-hope-pbr--15246", device=self.device
@@ -58,17 +62,17 @@ class TestCosyPoseInference():
             ]
         )
         mesh_db = MeshDataBase.from_object_ds(self.object_dataset)
-        self.mesh_db_batched = mesh_db.batched().to('cpu')
+        self.mesh_db_batched = mesh_db.batched().to("cpu")
 
-    @pytest.mark.parametrize('device', DEVICE)
+    @pytest.mark.parametrize("device", DEVICE)
     @pytest.mark.order(3)
     def test_cosypose_pipeline_panda3d(self, device):
         from happypose.toolbox.renderer.panda3d_batch_renderer import (
             Panda3dBatchRenderer,
         )
-        
+
         # This is a trick that should be replaced, see comment line 38
-        if device == 'cpu':
+        if device == "cpu":
             self.device = device
             self.observation = self.observation.cpu()
             self.detector.to(device)
@@ -111,24 +115,24 @@ class TestCosyPoseInference():
         assert len(preds) == 1
         assert preds.infos.label[0] == self.expected_object_label
 
-        if device == "cpu": 
+        if device == "cpu":
             pose = pin.SE3(preds.poses[0].numpy())
         else:
             pose = pin.SE3(preds.poses[0].cpu().numpy())
-        
+
         exp_pose = pin.SE3(
             pin.exp3(np.array([1.4, 1.6, -1.11])),
             np.array([0.1, 0.07, 0.45]),
         )
         diff = pose.inverse() * exp_pose
         assert np.linalg.norm(pin.log6(diff).vector) < 0.3
-        
-    @pytest.mark.parametrize('device', DEVICE)
+
+    @pytest.mark.parametrize("device", DEVICE)
     def test_cosypose_pipeline_bullet(self, device):
         from happypose.toolbox.renderer.bullet_batch_renderer import BulletBatchRenderer
         # This is a trick that should be replaced, see comment line 38
-        
-        if device == 'cpu':
+
+        if device == "cpu":
             self.device = device
             self.observation = self.observation.cpu()
             self.detector.to(device)
@@ -175,11 +179,11 @@ class TestCosyPoseInference():
         assert len(preds) == 1
         assert preds.infos.label[0] == self.expected_object_label
 
-        if device == "cpu": 
+        if device == "cpu":
             pose = pin.SE3(preds.poses[0].numpy())
         else:
             pose = pin.SE3(preds.poses[0].cpu().numpy())
-            
+
         exp_pose = pin.SE3(
             pin.exp3(np.array([1.4, 1.6, -1.11])),
             np.array([0.1, 0.07, 0.45]),

@@ -1,24 +1,23 @@
 """Set of unit tests for bullet renderer."""
 
-import unittest
 from pathlib import Path
 
-import pytest
 import numpy as np
+import pytest
 import torch
 from numpy.testing import assert_array_less as np_assert_array_less
 from numpy.testing import assert_equal as np_assert_equal
 from torch.testing import assert_allclose as tr_assert_allclose
-
-from .config.test_config import DEVICE
 
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.renderer.bullet_batch_renderer import BulletBatchRenderer
 from happypose.toolbox.renderer.bullet_scene_renderer import BulletSceneRenderer
 
+from .config.test_config import DEVICE
 
-class TestBulletRenderer():
+
+class TestBulletRenderer:
     """Unit tests for bullet renderer."""
 
     @pytest.fixture(autouse=True)
@@ -63,7 +62,7 @@ class TestBulletRenderer():
             }
         ]
 
-    @pytest.mark.parametrize('device', DEVICE)
+    @pytest.mark.parametrize("device", DEVICE)
     def test_scene_renderer(self, device):
         """
         Render an example object and check that output image match expectation.
@@ -95,7 +94,7 @@ class TestBulletRenderer():
         assert rgb.shape == (self.height, self.width, 3)
         assert depth.shape == (self.height, self.width, 1)
         assert binary_mask.shape == (self.height, self.width, 1)
-        
+
         assert rgb.dtype == np.dtype(np.uint8)
         assert depth.dtype == np.dtype(np.float32)
         assert binary_mask.dtype == np.dtype(bool)
@@ -117,7 +116,10 @@ class TestBulletRenderer():
 
         # ================================
         assert np_assert_equal(rgb[0, 0], (0, 0, 0)) is None
-        assert np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2]) is None
+        assert (
+            np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2])
+            is None
+        )
         assert depth[0, 0] == 0
         assert depth[self.height // 2, self.width // 2] < self.z_obj
         assert binary_mask[0, 0] == 0
@@ -156,7 +158,7 @@ class TestBulletRenderer():
         assert renderings[0].depth is None
         assert renderings[0].binary_mask is not None
 
-    @pytest.mark.parametrize('device', DEVICE)
+    @pytest.mark.parametrize("device", DEVICE)
     def test_batch_renderer(self, device):
         """
         Render an example object and check that output image match expectation.
@@ -194,7 +196,7 @@ class TestBulletRenderer():
         )
 
         assert renderings.normals is None  # normals not supported
-        
+
         assert renderings.rgbs.shape == (self.Nc, 3, self.height, self.width)
         assert renderings.depths.shape == (self.Nc, 1, self.height, self.width)
         assert renderings.binary_masks.shape == (self.Nc, 1, self.height, self.width)
@@ -206,17 +208,24 @@ class TestBulletRenderer():
         # Renders from 2 identical cams are equals
         assert tr_assert_allclose(renderings.rgbs[0], renderings.rgbs[1]) is None
         assert tr_assert_allclose(renderings.depths[0], renderings.depths[1]) is None
-        assert tr_assert_allclose(renderings.binary_masks[0], renderings.binary_masks[1]) is None
-        
-        if device=="cpu":
+        assert (
+            tr_assert_allclose(renderings.binary_masks[0], renderings.binary_masks[1])
+            is None
+        )
+
+        if device == "cpu":
             rgb = renderings.rgbs[0].movedim(0, -1).numpy()  # (Nc,3,h,w) -> (h,w,3)
             depth = renderings.depths[0].movedim(0, -1).numpy()  # (Nc,1,h,w) -> (h,w,1)
             binary_mask = (
                 renderings.binary_masks[0].movedim(0, -1).numpy()
             )  # (Nc,1,h,w) -> (h,w,1)
         else:
-            rgb = renderings.rgbs[0].movedim(0, -1).cpu().numpy()  # (Nc,3,h,w) -> (h,w,3)
-            depth = renderings.depths[0].movedim(0, -1).cpu().numpy()  # (Nc,1,h,w) -> (h,w,1)
+            rgb = (
+                renderings.rgbs[0].movedim(0, -1).cpu().numpy()
+            )  # (Nc,3,h,w) -> (h,w,3)
+            depth = (
+                renderings.depths[0].movedim(0, -1).cpu().numpy()
+            )  # (Nc,1,h,w) -> (h,w,1)
             binary_mask = (
                 renderings.binary_masks[0].movedim(0, -1).cpu().numpy()
             )  # (Nc,1,h,w) -> (h,w,1)
@@ -238,12 +247,14 @@ class TestBulletRenderer():
 
         # ================================
         assert np_assert_equal(rgb[0, 0], (0, 0, 0)) is None
-        assert np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2]) is None
+        assert (
+            np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2])
+            is None
+        )
         assert depth[0, 0] == 0
         assert depth[self.height // 2, self.width // 2] < self.z_obj
         assert binary_mask[0, 0] == 0
         assert binary_mask[self.height // 2, self.width // 2] == 1
-
 
         # ==================
         # Partial renderings

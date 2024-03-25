@@ -10,7 +10,7 @@ import torch.distributed as dist
 import yaml
 from torch.backends import cudnn
 from torch.hub import load_state_dict_from_url
-from torch.utils.data import ConcatDataset, DataLoader
+from torch.utils.data import DataLoader
 from torchnet.meter import AverageValueMeter
 from torchvision.models.detection.mask_rcnn import model_urls
 from tqdm import tqdm
@@ -18,9 +18,8 @@ from tqdm import tqdm
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import (
     DetectionDataset,
-    collate_fn
+    collate_fn,
 )
-from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler
 from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 
 # Evaluation
@@ -35,24 +34,16 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     sync_model,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader import (
-    MultiEpochDataLoader,
-)
 from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset
-
 from happypose.toolbox.datasets.scene_dataset import (
     IterableMultiSceneDataset,
-    IterableSceneDataset,
     RandomIterableSceneDataset,
-    SceneDataset,
 )
-
 from happypose.toolbox.utils.resources import (
     get_cuda_memory,
     get_gpu_memory,
     get_total_memory,
 )
-
 
 from .detector_models_cfg import check_update_config, create_model_detector
 from .maskrcnn_forward_loss import h_maskrcnn
@@ -154,7 +145,6 @@ def train_detector(args):
     args.n_gpus = world_size
     args.global_batch_size = world_size * args.batch_size
     logger.info(f"Connection established with {world_size} gpus.")
-    
 
     # Make train/val datasets
     def make_datasets(dataset_names):
@@ -168,9 +158,11 @@ def train_detector(args):
             logger.info(f"Loaded {ds_name} with {len(ds)} images.")
             pre_label = ds_name.split(".")[0]
             for idx, label in enumerate(ds.all_labels):
-                ds.all_labels[idx] = "{pre_label}-{label}".format(pre_label=pre_label, label=label)     
+                ds.all_labels[idx] = "{pre_label}-{label}".format(
+                    pre_label=pre_label, label=label
+                )
             all_labels = all_labels.union(set(ds.all_labels))
-           
+
             for _ in range(n_repeat):
                 datasets.append(iterator)
         return IterableMultiSceneDataset(datasets), all_labels
@@ -193,13 +185,13 @@ def train_detector(args):
         "gray_augmentation": args.gray_augmentation,
         "label_to_category_id": label_to_category_id,
     }
-    
+
     print("make datasets")
     ds_train = DetectionDataset(scene_ds_train, **ds_kwargs)
     ds_val = DetectionDataset(scene_ds_val, **ds_kwargs)
 
     print("make dataloaders")
-    #train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
+    # train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(
         ds_train,
         batch_size=args.batch_size,
@@ -210,7 +202,7 @@ def train_detector(args):
     )
     ds_iter_train = iter(ds_iter_train)
 
-    #val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
+    # val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
     ds_iter_val = DataLoader(
         ds_val,
         batch_size=args.batch_size,
@@ -334,7 +326,9 @@ def train_detector(args):
                         max_norm=np.inf,
                         norm_type=2,
                     )
-                    meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
+                    meters_train["grad_norm"].add(
+                        torch.as_tensor(total_grad_norm).item()
+                    )
 
                     optimizer.step()
                     meters_time["backward"].add(time.time() - t)
@@ -364,8 +358,8 @@ def train_detector(args):
         if epoch % args.val_epoch_interval == 0:
             validation()
 
-        #test_dict = None
-        #if epoch % args.test_epoch_interval == 0:
+        # test_dict = None
+        # if epoch % args.test_epoch_interval == 0:
         #    model.eval()
         #    test_dict = run_eval(args, model, epoch)
 
@@ -386,7 +380,6 @@ def train_detector(args):
                 "n_datas": epoch * this_rank_n_batch_per_epoch * args.batch_size,
             },
         )
-
 
         for string, meters in zip(("train", "val"), (meters_train, meters_val)):
             for k in dict(meters).keys():

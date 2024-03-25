@@ -11,7 +11,9 @@ logger = get_logger(__name__)
 
 
 import warnings
+
 warnings.filterwarnings("ignore")
+
 
 def make_cfg(args):
     cfg = argparse.ArgumentParser("").parse_args([])

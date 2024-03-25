@@ -8,14 +8,11 @@ import torch
 import torch.distributed as dist
 import yaml
 from torch.backends import cudnn
-from torch.utils.data import ConcatDataset, DataLoader
+from torch.utils.data import DataLoader
 from torchnet.meter import AverageValueMeter
 from tqdm import tqdm
 
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
-from happypose.toolbox.datasets.pose_dataset import PoseDataset
-
-from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler
 from happypose.pose_estimators.cosypose.cosypose.evaluation.prediction_runner import (
     PredictionRunner,
 )
@@ -27,12 +24,7 @@ from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import 
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
     PoseEstimator,
 )
-from happypose.pose_estimators.megapose.evaluation.meters.modelnet_meters import (
-    ModelNetErrorMeter,
-)
-
 from happypose.pose_estimators.cosypose.cosypose.scripts.run_cosypose_eval import (
-    get_pose_meters,
     load_pix2pose_results,
     load_posecnn_results,
 )
@@ -47,32 +39,31 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     sync_model,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader import (
-    MultiEpochDataLoader,
-)
 from happypose.pose_estimators.megapose.evaluation.evaluation_runner import (
     EvaluationRunner,
+)
+from happypose.pose_estimators.megapose.evaluation.meters.modelnet_meters import (
+    ModelNetErrorMeter,
 )
 from happypose.toolbox.datasets.datasets_cfg import (
     make_object_dataset,
     make_scene_dataset,
 )
-from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-
-from .pose_forward_loss import h_pose
-from .pose_models_cfg import check_update_config, create_pose_model_cosypose
-
+from happypose.toolbox.datasets.pose_dataset import PoseDataset
 from happypose.toolbox.datasets.scene_dataset import (
     IterableMultiSceneDataset,
     RandomIterableSceneDataset,
 )
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.toolbox.utils.resources import (
     get_cuda_memory,
     get_gpu_memory,
     get_total_memory,
 )
 
+from .pose_forward_loss import h_pose
+from .pose_models_cfg import check_update_config, create_pose_model_cosypose
 
 cudnn.benchmark = True
 logger = get_logger(__name__)
@@ -305,18 +296,18 @@ def train_pose(args):
 
     scene_ds_train = make_datasets(args.train_ds_names)
     scene_ds_val = make_datasets(args.val_ds_names)
-    
+
     ds_kwargs = {
         "resize": args.input_resize,
         "apply_rgb_augmentation": args.rgb_augmentation,
         "apply_background_augmentation": args.background_augmentation,
         "min_area": args.min_area,
-        "apply_depth_augmentation":False
+        "apply_depth_augmentation": False,
     }
     ds_train = PoseDataset(scene_ds_train, **ds_kwargs)
     ds_val = PoseDataset(scene_ds_val, **ds_kwargs)
 
-    #train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
+    # train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(
         ds_train,
         batch_size=args.batch_size,
@@ -327,7 +318,7 @@ def train_pose(args):
     )
     ds_iter_train = iter(ds_iter_train)
 
-    #val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
+    # val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
     ds_iter_val = DataLoader(
         ds_val,
         batch_size=args.batch_size,
@@ -449,7 +440,9 @@ def train_pose(args):
                         max_norm=args.clip_grad_norm,
                         norm_type=2,
                     )
-                    meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
+                    meters_train["grad_norm"].add(
+                        torch.as_tensor(total_grad_norm).item()
+                    )
 
                     optimizer.step()
                     meters_time["backward"].add(time.time() - t)
@@ -485,8 +478,8 @@ def train_pose(args):
         if epoch % args.val_epoch_interval == 0:
             validation()
 
-        #test_dict = None
-        #if epoch % args.test_epoch_interval == 0:
+        # test_dict = None
+        # if epoch % args.test_epoch_interval == 0:
         #    test_dict = test()
 
         print("updating dic")
@@ -507,8 +500,6 @@ def train_pose(args):
                 "n_datas": epoch * this_rank_n_batch_per_epoch * args.batch_size,
             },
         )
-
-    
 
         print("meters")
         for string, meters in zip(("train", "val"), (meters_train, meters_val)):

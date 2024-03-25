@@ -41,6 +41,7 @@ plyfile = "^1.0.3"
 pybind11 = "^2.10.4"
 pybullet = "^3.2.5"
 pypng = "^0.20220715.0"
+pytest = "^8.1.1"
 python = ">=3.9,<3.11"
 pyyaml = "^6.0.1"
 roma = "^1.4.0"
@@ -62,7 +63,6 @@ tqdm = "^4.66.1"
 transforms3d = "^0.4.1"
 trimesh = "^3.23.5"
 webdataset = "^0.2.57"
-pytest = "^8.1.1"
 
 [tool.poetry.extras]
 cpu = ["torch", "torchvision"]

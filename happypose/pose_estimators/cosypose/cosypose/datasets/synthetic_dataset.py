@@ -14,7 +14,6 @@ from happypose.toolbox.datasets.scene_dataset import (
     CameraData,
     ObjectData,
     ObservationInfos,
-    SceneDataset,
     SceneObservation,
 )
 from happypose.toolbox.lib3d.transform import Transform
@@ -82,33 +81,33 @@ class SyntheticSceneDataset:
             if obj["id_in_segm"] in mask_uniqs:
                 obj["bbox"] = dets_gt[obj["id_in_segm"]].numpy()
                 obj_data = ObjectData(
-                    label= obj['name'],
-                    TWO=Transform(obj['TWO']),
-                    unique_id=obj['body_id'],
-                    bbox_modal=obj['bbox']
+                    label=obj["name"],
+                    TWO=Transform(obj["TWO"]),
+                    unique_id=obj["body_id"],
+                    bbox_modal=obj["bbox"],
                 )
             else:
                 obj_data = ObjectData(
-                    label= obj['name'],
-                    TWO=Transform(obj['TWO']),
-                    unique_id=obj['body_id']
+                    label=obj["name"],
+                    TWO=Transform(obj["TWO"]),
+                    unique_id=obj["body_id"],
                 )
             object_datas.append(obj_data)
-            
+
         state = {
             "camera": cam,
             "objects": objects,
             "frame_info": self.frame_index.iloc[idx].to_dict(),
         }
         image_infos = ObservationInfos(
-            scene_id=self.frame_index.iloc[idx].to_dict()['scene_id'],
-            view_id=self.frame_index.iloc[idx].to_dict()['view_id'])
-        
+            scene_id=self.frame_index.iloc[idx].to_dict()["scene_id"],
+            view_id=self.frame_index.iloc[idx].to_dict()["view_id"],
+        )
+
         cam = CameraData(
-            K=cam["K"],
-            resolution=cam["resolution"],
-            TWC=Transform(cam["TWC"]))
-        
+            K=cam["K"], resolution=cam["resolution"], TWC=Transform(cam["TWC"])
+        )
+
         observation = SceneObservation(
             rgb=rgb.numpy().astype(np.uint8),
             segmentation=mask.numpy().astype(np.uint32),

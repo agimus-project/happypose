@@ -1,6 +1,5 @@
 import random
 from dataclasses import dataclass
-from typing import List, Optional
 
 import numpy as np
 import torch
@@ -28,7 +27,14 @@ from happypose.toolbox.datasets.augmentations import (
     SceneObservationAugmentation as SceneObsAug,
 )
 
+# HappyPose
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableSceneDataset,
+    SceneDataset,
+    SceneObservation,
+)
 from happypose.toolbox.datasets.scene_dataset_wrappers import remove_invisible_objects
+
 
 def collate_fn(batch):
     rgbs, targets = zip(*batch)
@@ -61,7 +67,8 @@ def collate_fn(batch):
     # Return the batch data as a dictionary
     return {"rgbs": rgbs, "targets": target}
 
-#TODO : Double check on types and add format documentation
+
+# TODO : Double check on types and add format documentation
 @dataclass
 class DetectionData:
     """rgb: (h, w, 3) uint8
@@ -104,6 +111,7 @@ class BatchDetectionData:
             self.depths = self.depths.pin_memory()
         return self
 
+
 class DetectionDataset(torch.utils.data.IterableDataset):
     def __init__(
         self,
@@ -137,27 +145,26 @@ class DetectionDataset(torch.utils.data.IterableDataset):
                     SceneObsAug(PillowSharpness(factor_interval=(0.0, 50.0)), p=0.3),
                     SceneObsAug(PillowContrast(factor_interval=(0.2, 50.0)), p=0.3),
                     SceneObsAug(PillowBrightness(factor_interval=(0.1, 6.0)), p=0.5),
-                    SceneObsAug(PillowColor(factor_interval=(0.0, 20.0)), p=0.3),]
+                    SceneObsAug(PillowColor(factor_interval=(0.0, 20.0)), p=0.3),
+                ]
             )
-
         ]
 
         self.label_to_category_id = label_to_category_id
         self.min_area = min_area
 
     def make_data_from_obs(self, obs: SceneObservation, idx):
-        
         obs = remove_invisible_objects(obs)
 
         obs = self.resize_augmentation(obs)
 
         for aug in self.background_augmentations:
             obs = aug(obs)
-            
+
         if self.rgb_augmentations and random.random() < 0.8:
             for aug in self.rgb_augmentations:
                 obs = aug(obs)
-        
+
         assert obs.object_datas is not None
         assert obs.rgb is not None
         assert obs.camera_data is not None
@@ -177,13 +184,13 @@ class DetectionDataset(torch.utils.data.IterableDataset):
             if obs.binary_masks is not None:
                 binary_mask = torch.tensor(obs.binary_masks[obj_data.unique_id]).float()
                 masks.append(binary_mask)
-                
+
             if obs.segmentation is not None:
                 binary_mask = np.zeros_like(obs.segmentation, dtype=np.bool_)
                 binary_mask[obs.segmentation == obj_data.unique_id] = 1
                 binary_mask = torch.as_tensor(binary_mask).float()
                 masks.append(binary_mask)
-                
+
         masks = np.array(masks)
         masks = masks == obj_ids[:, None, None]
 
@@ -216,8 +223,8 @@ class DetectionDataset(torch.utils.data.IterableDataset):
         assert isinstance(self.scene_ds, SceneDataset)
         obs = self.scene_ds[index]
         return self.make_data_from_obs(obs, index)
-    
-      # def find_valid_data(self, iterator: Iterator[SceneObservation]) -> PoseData:
+
+    # def find_valid_data(self, iterator: Iterator[SceneObservation]) -> PoseData:
     def find_valid_data(self, iterator):
         n_attempts = 0
         for idx, obs in enumerate(iterator):
@@ -228,7 +235,7 @@ class DetectionDataset(torch.utils.data.IterableDataset):
             if n_attempts > 200:
                 msg = "Cannot find valid image in the dataset"
                 raise ValueError(msg)
-        
+
     def __iter__(self):
         assert isinstance(self.scene_ds, IterableSceneDataset)
         iterator = iter(self.scene_ds)
