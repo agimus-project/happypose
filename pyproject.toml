@@ -62,6 +62,7 @@ tqdm = "^4.66.1"
 transforms3d = "^0.4.1"
 trimesh = "^3.23.5"
 webdataset = "^0.2.57"
+pytest = "^8.1.1"
 
 [tool.poetry.extras]
 cpu = ["torch", "torchvision"]
