@@ -25,7 +25,6 @@ torch.multiprocessing.set_sharing_strategy("file_system")
 
 class SyntheticSceneDataset:
     def __init__(self, ds_dir, train=True):
-        print("inside synth dataset")
         self.ds_dir = Path(ds_dir)
         assert self.ds_dir.exists()
 

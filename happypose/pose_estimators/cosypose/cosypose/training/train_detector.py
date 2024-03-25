@@ -135,7 +135,6 @@ def train_detector(args):
     for k, v in args.__dict__.items():
         logger.info(f"{k}: {v}")
     logger.info(f"{'-'*80}")
-    print("test edbug")
     # Initialize distributed
     device = torch.cuda.current_device()
     init_distributed_mode()
@@ -186,11 +185,9 @@ def train_detector(args):
         "label_to_category_id": label_to_category_id,
     }
 
-    print("make datasets")
     ds_train = DetectionDataset(scene_ds_train, **ds_kwargs)
     ds_val = DetectionDataset(scene_ds_val, **ds_kwargs)
 
-    print("make dataloaders")
     # train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(
         ds_train,
@@ -307,40 +304,37 @@ def train_detector(args):
             iterator = tqdm(ds_iter_train, ncols=80)
             t = time.time()
             for n, sample in enumerate(iterator):
-                if n < 100:
-                    if n > 0:
-                        meters_time["data"].add(time.time() - t)
+                if n > 0:
+                    meters_time["data"].add(time.time() - t)
 
-                    optimizer.zero_grad()
+                optimizer.zero_grad()
 
-                    t = time.time()
-                    loss = h(data=sample, meters=meters_train)
-                    meters_time["forward"].add(time.time() - t)
-                    iterator.set_postfix(loss=loss.item())
-                    meters_train["loss_total"].add(loss.item())
+                t = time.time()
+                loss = h(data=sample, meters=meters_train)
+                meters_time["forward"].add(time.time() - t)
+                iterator.set_postfix(loss=loss.item())
+                meters_train["loss_total"].add(loss.item())
 
-                    t = time.time()
-                    loss.backward()
-                    total_grad_norm = torch.nn.utils.clip_grad_norm_(
-                        model.parameters(),
-                        max_norm=np.inf,
-                        norm_type=2,
-                    )
-                    meters_train["grad_norm"].add(
-                        torch.as_tensor(total_grad_norm).item()
-                    )
+                t = time.time()
+                loss.backward()
+                total_grad_norm = torch.nn.utils.clip_grad_norm_(
+                    model.parameters(),
+                    max_norm=np.inf,
+                    norm_type=2,
+                )
+                meters_train["grad_norm"].add(
+                    torch.as_tensor(total_grad_norm).item()
+                )
 
-                    optimizer.step()
-                    meters_time["backward"].add(time.time() - t)
-                    meters_time["memory"].add(
-                        torch.cuda.max_memory_allocated() / 1024.0**2,
-                    )
+                optimizer.step()
+                meters_time["backward"].add(time.time() - t)
+                meters_time["memory"].add(
+                    torch.cuda.max_memory_allocated() / 1024.0**2,
+                )
 
-                    if epoch < args.n_epochs_warmup:
-                        lr_scheduler_warmup.step()
-                    t = time.time()
-                else:
-                    break
+                if epoch < args.n_epochs_warmup:
+                    lr_scheduler_warmup.step()
+                t = time.time()
             if epoch >= args.n_epochs_warmup:
                 lr_scheduler.step()
 
@@ -348,11 +342,8 @@ def train_detector(args):
         def validation():
             model.train()
             for n, sample in enumerate(tqdm(ds_iter_val, ncols=80)):
-                if n < 3:
-                    loss = h(data=sample, meters=meters_val)
-                    meters_val["loss_total"].add(loss.item())
-                else:
-                    break
+                loss = h(data=sample, meters=meters_val)
+                meters_val["loss_total"].add(loss.item())
 
         train_epoch()
         if epoch % args.val_epoch_interval == 0:
