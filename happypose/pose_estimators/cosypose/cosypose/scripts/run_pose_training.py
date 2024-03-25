@@ -1,5 +1,6 @@
 import argparse
 import os
+import warnings
 
 import numpy as np
 from colorama import Fore, Style
@@ -9,11 +10,8 @@ from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-
-import warnings
-
+# TODO : Fix warnings
 warnings.filterwarnings("ignore")
-
 
 def make_cfg(args):
     cfg = argparse.ArgumentParser("").parse_args([])

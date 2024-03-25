@@ -93,11 +93,6 @@ class SyntheticSceneDataset:
                 )
             object_datas.append(obj_data)
 
-        state = {
-            "camera": cam,
-            "objects": objects,
-            "frame_info": self.frame_index.iloc[idx].to_dict(),
-        }
         image_infos = ObservationInfos(
             scene_id=self.frame_index.iloc[idx].to_dict()["scene_id"],
             view_id=self.frame_index.iloc[idx].to_dict()["view_id"],

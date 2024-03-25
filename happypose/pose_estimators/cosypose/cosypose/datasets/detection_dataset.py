@@ -28,38 +28,6 @@ from happypose.toolbox.datasets.scene_dataset import (
 from happypose.toolbox.datasets.scene_dataset_wrappers import remove_invisible_objects
 
 
-def collate_fn(batch):
-    rgbs, targets = zip(*batch)
-    # Stack the rgbs and convert to a tensor
-    rgbs = torch.stack(rgbs, dim=0)
-
-    # Initialize the target dictionary
-    target = {
-        "boxes": [],
-        "labels": [],
-        "masks": [],
-        "image_id": [],
-        "area": [],
-        "iscrowd": [],
-    }
-
-    # Concatenate the target data for each image in the batch
-    for t in targets:
-        target["boxes"].append(t["boxes"])
-        target["labels"].append(t["labels"])
-        target["masks"].append(t["masks"])
-        target["image_id"].append(t["image_id"])
-        target["area"].append(t["area"])
-        target["iscrowd"].append(t["iscrowd"])
-
-    # Stack the target data and convert to tensors
-    for key in target.keys():
-        target[key] = torch.cat(target[key], dim=0)
-
-    # Return the batch data as a dictionary
-    return {"rgbs": rgbs, "targets": target}
-
-
 # TODO : Double check on types and add format documentation
 @dataclass
 class DetectionData:

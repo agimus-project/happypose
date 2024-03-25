@@ -17,8 +17,7 @@ from tqdm import tqdm
 
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import (
-    DetectionDataset,
-    collate_fn,
+    DetectionDataset
 )
 from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 
@@ -51,10 +50,8 @@ from .maskrcnn_forward_loss import h_maskrcnn
 cudnn.benchmark = True
 logger = get_logger(__name__)
 
-
 def collate_fn(batch):
     return tuple(zip(*batch))
-
 
 def make_eval_configs(args, model_training, epoch):
     model = model_training.module
@@ -335,6 +332,7 @@ def train_detector(args):
                 if epoch < args.n_epochs_warmup:
                     lr_scheduler_warmup.step()
                 t = time.time()
+
             if epoch >= args.n_epochs_warmup:
                 lr_scheduler.step()
 
@@ -344,6 +342,7 @@ def train_detector(args):
             for n, sample in enumerate(tqdm(ds_iter_val, ncols=80)):
                 loss = h(data=sample, meters=meters_val)
                 meters_val["loss_total"].add(loss.item())
+
 
         train_epoch()
         if epoch % args.val_epoch_interval == 0:
