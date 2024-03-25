@@ -322,9 +322,7 @@ def train_detector(args):
                     max_norm=np.inf,
                     norm_type=2,
                 )
-                meters_train["grad_norm"].add(
-                    torch.as_tensor(total_grad_norm).item()
-                )
+                meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
 
                 optimizer.step()
                 meters_time["backward"].add(time.time() - t)
