@@ -1,6 +1,6 @@
 # Inference
 
-Here are provided the minimal commands you have to run in order to run the inference of CosyPose on the barbecu-sauce example. You need to set up the environment variable `$HAPPYPOSE_DATA_DIR` as explained in the README.
+Here are provided the minimal commands you have to run in order to run the inference of CosyPose on the barbecue-sauce example. You need to set up the environment variable `$HAPPYPOSE_DATA_DIR` as explained in the README.
 
  ## 1. Download pre-trained pose estimation models
 
