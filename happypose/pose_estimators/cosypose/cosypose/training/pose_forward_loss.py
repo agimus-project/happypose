@@ -68,7 +68,6 @@ def h_pose(model, mesh_db, data, meters, cfg, n_iterations=1, input_generator="f
         TCO_pred = iter_outputs.TCO_output
         model_outputs = iter_outputs.model_outputs
 
-
         if cfg.loss_disentangled:
             if cfg.n_pose_dims == 9:
                 loss_fn = loss_refiner_CO_disentangled

@@ -1,21 +1,17 @@
 """Set of unit tests for Panda3D renderer."""
 
-import unittest
+import os
 from pathlib import Path
 from typing import List
 
 import numpy as np
 import pytest
-import torch
 from numpy.testing import assert_array_less as np_assert_array_less
 from numpy.testing import assert_equal as np_assert_equal
 from torch.testing import assert_allclose as tr_assert_allclose
 
-from .config.test_config import DEVICE
-
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.lib3d.transform import Transform
-from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
 from happypose.toolbox.renderer.types import (
     CameraRenderingData,
@@ -24,13 +20,14 @@ from happypose.toolbox.renderer.types import (
     Panda3dObjectData,
 )
 
-import os
+from .config.test_config import DEVICE
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0" 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-class TestPanda3DBatchRenderer():
+
+class TestPanda3DBatchRenderer:
     """Unit tests for Panda3D renderer."""
-    
+
     @pytest.fixture(autouse=True)
     def setUp(self) -> None:
         self.obj_label = "my_favorite_object_label"
@@ -71,9 +68,9 @@ class TestPanda3DBatchRenderer():
         self.light_datas = Nb_lights * [
             Panda3dLightData(light_type="ambient", color=(1.0, 1.0, 1.0, 1.0))
         ]
-    
+
     @pytest.mark.order(4)
-    @pytest.mark.parametrize('device', DEVICE)
+    @pytest.mark.parametrize("device", DEVICE)
     def test_scene_renderer(self, device):
         """
         Scene render an example object and check that output image match expectation.
@@ -97,7 +94,10 @@ class TestPanda3DBatchRenderer():
         assert tr_assert_allclose(renderings[0].rgb, renderings[1].rgb) is None
         assert tr_assert_allclose(renderings[0].normals, renderings[1].normals) is None
         assert tr_assert_allclose(renderings[0].depth, renderings[1].depth) is None
-        assert tr_assert_allclose(renderings[0].binary_mask, renderings[1].binary_mask) is None
+        assert (
+            tr_assert_allclose(renderings[0].binary_mask, renderings[1].binary_mask)
+            is None
+        )
 
         rgb = renderings[0].rgb
         normals = renderings[0].normals
@@ -133,12 +133,18 @@ class TestPanda3DBatchRenderer():
 
         # ================================
         assert np_assert_equal(rgb[0, 0], (0, 0, 0)) is None
-        assert np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2]) is None
-        
+        assert (
+            np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2])
+            is None
+        )
+
         assert depth[0, 0] == 0
         assert depth[self.height // 2, self.width // 2] < self.z_obj
         assert np_assert_equal(normals[0, 0], (0, 0, 0)) is None
-        assert np_assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2]) is None
+        assert (
+            np_assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2])
+            is None
+        )
         assert binary_mask[0, 0] == 0
         assert binary_mask[self.height // 2, self.width // 2] == 1
 

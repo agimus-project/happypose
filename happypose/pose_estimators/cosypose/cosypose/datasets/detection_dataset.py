@@ -1,6 +1,5 @@
 import random
 from dataclasses import dataclass
-from typing import List, Optional
 
 import numpy as np
 import torch
@@ -29,20 +28,18 @@ from happypose.toolbox.datasets.augmentations import (
     PillowSharpness,
     VOCBackgroundAugmentation,
 )
-
-# HappyPose
-from happypose.toolbox.datasets.scene_dataset import (
-    IterableSceneDataset,
-    ObjectData,
-    SceneDataset,
-    SceneObservation,
-)
-
 from happypose.toolbox.datasets.augmentations import (
     SceneObservationAugmentation as SceneObsAug,
 )
 
+# HappyPose
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableSceneDataset,
+    SceneDataset,
+    SceneObservation,
+)
 from happypose.toolbox.datasets.scene_dataset_wrappers import remove_invisible_objects
+
 # from happypose.toolbox.datasets.scene_dataset_wrappers import VisibilityWrapper
 """
 from .augmentations import (
@@ -57,6 +54,7 @@ from .augmentations import (
 )
 from .wrappers.visibility_wrapper import VisibilityWrapper
 """
+
 
 def collate_fn(batch):
     print("inside collate fn")
@@ -92,7 +90,8 @@ def collate_fn(batch):
     # Return the batch data as a dictionary
     return {"rgbs": rgbs, "targets": target}
 
-#TODO : Double check on types and add format documentation
+
+# TODO : Double check on types and add format documentation
 @dataclass
 class DetectionData:
     """rgb: (h, w, 3) uint8
@@ -135,6 +134,7 @@ class BatchDetectionData:
             self.depths = self.depths.pin_memory()
         return self
 
+
 class DetectionDataset(torch.utils.data.IterableDataset):
     def __init__(
         self,
@@ -168,13 +168,14 @@ class DetectionDataset(torch.utils.data.IterableDataset):
                     SceneObsAug(PillowSharpness(factor_interval=(0.0, 50.0)), p=0.3),
                     SceneObsAug(PillowContrast(factor_interval=(0.2, 50.0)), p=0.3),
                     SceneObsAug(PillowBrightness(factor_interval=(0.1, 6.0)), p=0.5),
-                    SceneObsAug(PillowColor(factor_interval=(0.0, 20.0)), p=0.3),]
+                    SceneObsAug(PillowColor(factor_interval=(0.0, 20.0)), p=0.3),
+                ]
             )
-
         ]
 
         self.label_to_category_id = label_to_category_id
         self.min_area = min_area
+
     """
     def collate_fn(self, list_data: List[DetectionData]) -> BatchDetectionData:
         batch_data = BatchDetectionData(
@@ -194,19 +195,19 @@ class DetectionDataset(torch.utils.data.IterableDataset):
 
         return batch_data
     """
+
     def make_data_from_obs(self, obs: SceneObservation, idx):
-        
         obs = remove_invisible_objects(obs)
 
         obs = self.resize_augmentation(obs)
 
         for aug in self.background_augmentations:
             obs = aug(obs)
-            
+
         if self.rgb_augmentations and random.random() < 0.8:
             for aug in self.rgb_augmentations:
                 obs = aug(obs)
-        
+
         assert obs.object_datas is not None
         assert obs.rgb is not None
         assert obs.camera_data is not None
@@ -226,13 +227,13 @@ class DetectionDataset(torch.utils.data.IterableDataset):
             if obs.binary_masks is not None:
                 binary_mask = torch.tensor(obs.binary_masks[obj_data.unique_id]).float()
                 masks.append(binary_mask)
-                
+
             if obs.segmentation is not None:
                 binary_mask = np.zeros_like(obs.segmentation, dtype=np.bool_)
                 binary_mask[obs.segmentation == obj_data.unique_id] = 1
                 binary_mask = torch.as_tensor(binary_mask).float()
                 masks.append(binary_mask)
-                
+
         masks = np.array(masks)
         masks = masks == obj_ids[:, None, None]
 
@@ -258,17 +259,15 @@ class DetectionDataset(torch.utils.data.IterableDataset):
         target["image_id"] = image_id
         target["area"] = area
         target["iscrowd"] = iscrowd
-        
-        return rgb, target
-    
 
-    
+        return rgb, target
+
     def __getitem__(self, index: int):
         assert isinstance(self.scene_ds, SceneDataset)
         obs = self.scene_ds[index]
         return self.make_data_from_obs(obs, index)
-    
-      # def find_valid_data(self, iterator: Iterator[SceneObservation]) -> PoseData:
+
+    # def find_valid_data(self, iterator: Iterator[SceneObservation]) -> PoseData:
     def find_valid_data(self, iterator):
         n_attempts = 0
         for idx, obs in enumerate(iterator):
@@ -279,17 +278,13 @@ class DetectionDataset(torch.utils.data.IterableDataset):
             if n_attempts > 200:
                 msg = "Cannot find valid image in the dataset"
                 raise ValueError(msg)
-        
+
     def __iter__(self):
         assert isinstance(self.scene_ds, IterableSceneDataset)
         iterator = iter(self.scene_ds)
         while True:
             yield self.find_valid_data(iterator)
-            
-            
-    
-    
-    
+
     def __init___old(
         self,
         scene_ds,
@@ -322,10 +317,7 @@ class DetectionDataset(torch.utils.data.IterableDataset):
         self.label_to_category_id = label_to_category_id
         self.min_area = min_area
 
-    
-
     def get_data_old(self, idx):
-        
         print("I am in get_data")
         rgb, mask, state = self.scene_ds[idx]
 
@@ -393,4 +385,3 @@ class DetectionDataset(torch.utils.data.IterableDataset):
                 try_index = random.randint(0, len(self.scene_ds) - 1)
                 n_attempts += 1
         return im, target
-    

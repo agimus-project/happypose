@@ -1,8 +1,7 @@
 """Set of unit tests for Panda3D renderer."""
 
-import unittest
+import os
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import pytest
@@ -11,26 +10,23 @@ from numpy.testing import assert_array_less as np_assert_array_less
 from numpy.testing import assert_equal as np_assert_equal
 from torch.testing import assert_allclose as tr_assert_allclose
 
-from .config.test_config import DEVICE
-
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from happypose.toolbox.renderer.panda3d_scene_renderer import Panda3dSceneRenderer
 from happypose.toolbox.renderer.types import (
-    CameraRenderingData,
     Panda3dCameraData,
     Panda3dLightData,
     Panda3dObjectData,
 )
 
-import os
+from .config.test_config import DEVICE
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0" 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-class TestPanda3DBatchRenderer():
+
+class TestPanda3DBatchRenderer:
     """Unit tests for Panda3D renderer."""
-    
+
     @pytest.fixture(autouse=True)
     def setUp(self) -> None:
         self.obj_label = "my_favorite_object_label"
@@ -71,12 +67,13 @@ class TestPanda3DBatchRenderer():
         self.light_datas = Nb_lights * [
             Panda3dLightData(light_type="ambient", color=(1.0, 1.0, 1.0, 1.0))
         ]
+
     """
     @pytest.mark.order(1)
     @pytest.mark.parametrize('device', DEVICE)
     def test_scene_renderer(self, device):
     """
-        #Scene render an example object and check that output image match expectation.
+    # Scene render an example object and check that output image match expectation.
     """
         SAVEFIG = False
 
@@ -134,7 +131,7 @@ class TestPanda3DBatchRenderer():
         # ================================
         assert np_assert_equal(rgb[0, 0], (0, 0, 0)) is None
         assert np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2]) is None
-        
+
         assert depth[0, 0] == 0
         assert depth[self.height // 2, self.width // 2] < self.z_obj
         assert np_assert_equal(normals[0, 0], (0, 0, 0)) is None
@@ -207,14 +204,15 @@ class TestPanda3DBatchRenderer():
                 render_binary_mask=True,
             )
     """
+
     @pytest.mark.order(2)
-    @pytest.mark.parametrize('device', DEVICE)
+    @pytest.mark.parametrize("device", DEVICE)
     def test_batch_renderer(self, device):
         """
         Batch render an example object and check that output image match expectation.
         """
         SAVEFIG = False
-        
+
         renderer = Panda3dBatchRenderer(
             asset_dataset=self.asset_dataset,
             n_workers=4,
@@ -228,7 +226,7 @@ class TestPanda3DBatchRenderer():
         K = K.unsqueeze(0)
         TCO = TCO.repeat(self.Nc, 1, 1)
         K = K.repeat(self.Nc, 1, 1)
-        
+
         # labels and light_datas need to have same size as TCO/K batch size
         renderings = renderer.render(
             labels=self.Nc * [self.obj_label],
@@ -240,8 +238,7 @@ class TestPanda3DBatchRenderer():
             render_depth=True,
             render_binary_mask=True,
         )
-        
-        
+
         assert renderings.rgbs.shape == (self.Nc, 3, self.height, self.width)
         assert renderings.depths.shape == (self.Nc, 1, self.height, self.width)
         assert renderings.normals.shape == (self.Nc, 3, self.height, self.width)
@@ -256,24 +253,35 @@ class TestPanda3DBatchRenderer():
         assert tr_assert_allclose(renderings.rgbs[0], renderings.rgbs[1]) is None
         assert tr_assert_allclose(renderings.normals[0], renderings.normals[1]) is None
         assert tr_assert_allclose(renderings.depths[0], renderings.depths[1]) is None
-        assert tr_assert_allclose(renderings.binary_masks[0], renderings.binary_masks[1]) is None
-        
+        assert (
+            tr_assert_allclose(renderings.binary_masks[0], renderings.binary_masks[1])
+            is None
+        )
+
         if device == "cpu":
             rgb = renderings.rgbs[0].movedim(0, -1).numpy()  # (Nc,3,h,w) -> (h,w,3)
-            normals = renderings.normals[0].movedim(0, -1).numpy()  # (Nc,1,h,w) -> (h,w,1)
+            normals = (
+                renderings.normals[0].movedim(0, -1).numpy()
+            )  # (Nc,1,h,w) -> (h,w,1)
             depth = renderings.depths[0].movedim(0, -1).numpy()  # (Nc,3,h,w) -> (h,w,3)
             binary_mask = (
                 renderings.binary_masks[0].movedim(0, -1).numpy()
             )  # (Nc,1,h,w) -> (h,w,1)
-            
+
         else:
-            rgb = renderings.rgbs[0].movedim(0, -1).cpu().numpy()  # (Nc,3,h,w) -> (h,w,3)
-            normals = renderings.normals[0].movedim(0, -1).cpu().numpy()  # (Nc,1,h,w) -> (h,w,1)
-            depth = renderings.depths[0].movedim(0, -1).cpu().numpy()  # (Nc,3,h,w) -> (h,w,3)
+            rgb = (
+                renderings.rgbs[0].movedim(0, -1).cpu().numpy()
+            )  # (Nc,3,h,w) -> (h,w,3)
+            normals = (
+                renderings.normals[0].movedim(0, -1).cpu().numpy()
+            )  # (Nc,1,h,w) -> (h,w,1)
+            depth = (
+                renderings.depths[0].movedim(0, -1).cpu().numpy()
+            )  # (Nc,3,h,w) -> (h,w,3)
             binary_mask = (
                 renderings.binary_masks[0].movedim(0, -1).cpu().numpy()
             )  # (Nc,1,h,w) -> (h,w,1)
-            
+
         if SAVEFIG:
             import matplotlib.pyplot as plt
 
@@ -293,14 +301,19 @@ class TestPanda3DBatchRenderer():
 
         # ================================
         assert np_assert_equal(rgb[0, 0], (0, 0, 0)) is None
-        assert np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2]) is None
+        assert (
+            np_assert_array_less((0, 0, 0), rgb[self.height // 2, self.width // 2])
+            is None
+        )
         assert depth[0, 0] == 0
         assert depth[self.height // 2, self.width // 2] < self.z_obj
         assert np_assert_equal(normals[0, 0], (0, 0, 0)) is None
-        assert np_assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2]) is None
+        assert (
+            np_assert_array_less((0, 0, 0), normals[self.height // 2, self.width // 2])
+            is None
+        )
         assert binary_mask[0, 0] == 0
         assert binary_mask[self.height // 2, self.width // 2] == 1
-
 
         # ==================
         # Partial renderings

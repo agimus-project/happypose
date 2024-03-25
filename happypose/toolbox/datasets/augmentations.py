@@ -26,8 +26,7 @@ import numpy as np
 import PIL
 import torch
 from PIL import ImageEnhance, ImageFilter
-from torchvision.datasets import ImageFolder, VOCSegmentation
-
+from torchvision.datasets import VOCSegmentation
 
 # HappyPose
 from happypose.toolbox.datasets.scene_dataset import Resolution, SceneObservation

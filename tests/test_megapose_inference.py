@@ -13,14 +13,15 @@ from happypose.toolbox.inference.example_inference_utils import load_observation
 from happypose.toolbox.inference.types import ObservationTensor
 from happypose.toolbox.inference.utils import load_detector
 from happypose.toolbox.utils.load_model import NAMED_MODELS, load_named_model
+
 from .config.test_config import DEVICE
 
 
 class TestMegaPoseInference:
     """Unit tests for MegaPose inference example."""
-    
+
     @pytest.mark.order(1)
-    @pytest.mark.parametrize('device', DEVICE)
+    @pytest.mark.parametrize("device", DEVICE)
     def test_megapose_pipeline(self, device):
         """Run detector from with coarse and refiner from MegaPose."""
 
@@ -33,10 +34,14 @@ class TestMegaPoseInference:
         rgb, depth, camera_data = load_observation_example(data_dir, load_depth=True)
         # TODO: cosypose forward does not work if depth is loaded detection contrary to megapose
         if device == "cpu":
-            observation = ObservationTensor.from_numpy(rgb, depth=None, K=camera_data.K).cpu()
+            observation = ObservationTensor.from_numpy(
+                rgb, depth=None, K=camera_data.K
+            ).cpu()
         else:
-            observation = ObservationTensor.from_numpy(rgb, depth=None, K=camera_data.K).cuda()
-            
+            observation = ObservationTensor.from_numpy(
+                rgb, depth=None, K=camera_data.K
+            ).cuda()
+
         detector = load_detector(run_id="detector-bop-hope-pbr--15246", device=device)
         object_dataset = RigidObjectDataset(
             objects=[
@@ -67,11 +72,11 @@ class TestMegaPoseInference:
         assert len(preds) == 1
         assert preds.infos.label[0] == expected_object_label
 
-        if device == "cpu": 
+        if device == "cpu":
             pose = pin.SE3(preds.poses[0].numpy())
         else:
             pose = pin.SE3(preds.poses[0].cpu().numpy())
-        
+
         exp_pose = pin.SE3(
             pin.exp3(np.array([1.4, 1.6, -1.11])),
             np.array([0.1, 0.07, 0.45]),
