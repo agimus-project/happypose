@@ -35,7 +35,7 @@ omegaconf = "^2.3.0"
 open3d = "^0.17.0"
 opencv-contrib-python = {optional = true, version = "^4.8.0.76"}
 opencv-python = {optional = true, version = "^4.8.0.76"}
-panda3d = "=1.10.13"
+panda3d = "=1.10.14"
 pin = {optional = true, version = "^2.6.20"}
 plyfile = "^1.0.3"
 pybind11 = "^2.10.4"
