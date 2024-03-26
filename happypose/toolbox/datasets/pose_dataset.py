@@ -130,7 +130,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
             self.background_augmentations += [
                 (
                     SceneObsAug(
-                        VOCBackgroundAugmentation(LOCAL_DATA_DIR / "VOC2012"),
+                        VOCBackgroundAugmentation(LOCAL_DATA_DIR),
                         p=0.3,
                     )
                 ),

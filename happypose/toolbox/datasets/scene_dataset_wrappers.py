@@ -57,9 +57,7 @@ def remove_invisible_objects(obs: SceneObservation) -> SceneObservation:
     assert obs.segmentation is not None
     assert obs.object_datas is not None
     ids_in_segm = np.unique(obs.segmentation)
-    print("segm", ids_in_segm)
     ids_visible = set(ids_in_segm[ids_in_segm > 0])
-    print("visib", ids_visible)
     visib_object_datas = [
         object_data
         for object_data in obs.object_datas

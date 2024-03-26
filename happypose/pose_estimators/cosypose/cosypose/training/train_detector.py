@@ -10,7 +10,7 @@ import torch.distributed as dist
 import yaml
 from torch.backends import cudnn
 from torch.hub import load_state_dict_from_url
-from torch.utils.data import ConcatDataset, DataLoader
+from torch.utils.data import DataLoader
 from torchnet.meter import AverageValueMeter
 from torchvision.models.detection.mask_rcnn import model_urls
 from tqdm import tqdm
@@ -19,7 +19,6 @@ from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import (
     DetectionDataset,
 )
-from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler
 from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 
 # Evaluation
@@ -34,10 +33,16 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     sync_model,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader import (
-    MultiEpochDataLoader,
-)
 from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableMultiSceneDataset,
+    RandomIterableSceneDataset,
+)
+from happypose.toolbox.utils.resources import (
+    get_cuda_memory,
+    get_gpu_memory,
+    get_total_memory,
+)
 
 from .detector_models_cfg import check_update_config, create_model_detector
 from .maskrcnn_forward_loss import h_maskrcnn
@@ -129,11 +134,12 @@ def train_detector(args):
     for k, v in args.__dict__.items():
         logger.info(f"{k}: {v}")
     logger.info(f"{'-'*80}")
-
     # Initialize distributed
     device = torch.cuda.current_device()
     init_distributed_mode()
     world_size = get_world_size()
+    this_rank_epoch_size = args.epoch_size // get_world_size()
+    this_rank_n_batch_per_epoch = this_rank_epoch_size // args.batch_size
     args.n_gpus = world_size
     args.global_batch_size = world_size * args.batch_size
     logger.info(f"Connection established with {world_size} gpus.")
@@ -142,14 +148,22 @@ def train_detector(args):
     def make_datasets(dataset_names):
         datasets = []
         all_labels = set()
+        deterministic = False
         for ds_name, n_repeat in dataset_names:
             assert "test" not in ds_name
             ds = make_scene_dataset(ds_name)
+            iterator = RandomIterableSceneDataset(ds, deterministic=deterministic)
             logger.info(f"Loaded {ds_name} with {len(ds)} images.")
+            pre_label = ds_name.split(".")[0]
+            for idx, label in enumerate(ds.all_labels):
+                ds.all_labels[idx] = "{pre_label}-{label}".format(
+                    pre_label=pre_label, label=label
+                )
             all_labels = all_labels.union(set(ds.all_labels))
+
             for _ in range(n_repeat):
-                datasets.append(ds)
-        return ConcatDataset(datasets), all_labels
+                datasets.append(iterator)
+        return IterableMultiSceneDataset(datasets), all_labels
 
     scene_ds_train, train_labels = make_datasets(args.train_ds_names)
     scene_ds_val, _ = make_datasets(args.val_ds_names)
@@ -169,33 +183,33 @@ def train_detector(args):
         "gray_augmentation": args.gray_augmentation,
         "label_to_category_id": label_to_category_id,
     }
+
     ds_train = DetectionDataset(scene_ds_train, **ds_kwargs)
     ds_val = DetectionDataset(scene_ds_val, **ds_kwargs)
 
-    train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
+    # train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(
         ds_train,
-        sampler=train_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_train = MultiEpochDataLoader(ds_iter_train)
+    ds_iter_train = iter(ds_iter_train)
 
-    val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
+    # val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
     ds_iter_val = DataLoader(
         ds_val,
-        sampler=val_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_val = MultiEpochDataLoader(ds_iter_val)
+    ds_iter_val = iter(ds_iter_val)
 
+    print("create model detector")
     model = create_model_detector(
         cfg=args,
         n_classes=len(args.label_to_category_id),
@@ -318,13 +332,14 @@ def train_detector(args):
                 if epoch < args.n_epochs_warmup:
                     lr_scheduler_warmup.step()
                 t = time.time()
+
             if epoch >= args.n_epochs_warmup:
                 lr_scheduler.step()
 
         @torch.no_grad()
         def validation():
             model.train()
-            for sample in tqdm(ds_iter_val, ncols=80):
+            for n, sample in enumerate(tqdm(ds_iter_val, ncols=80)):
                 loss = h(data=sample, meters=meters_val)
                 meters_val["loss_total"].add(loss.item())
 
@@ -332,10 +347,10 @@ def train_detector(args):
         if epoch % args.val_epoch_interval == 0:
             validation()
 
-        test_dict = None
-        if epoch % args.test_epoch_interval == 0:
-            model.eval()
-            test_dict = run_eval(args, model, epoch)
+        # test_dict = None
+        # if epoch % args.test_epoch_interval == 0:
+        #    model.eval()
+        #    test_dict = run_eval(args, model, epoch)
 
         log_dict = {}
         log_dict.update(
@@ -343,13 +358,15 @@ def train_detector(args):
                 "grad_norm": meters_train["grad_norm"].mean,
                 "grad_norm_std": meters_train["grad_norm"].std,
                 "learning_rate": optimizer.param_groups[0]["lr"],
-                "time_forward": meters_time["forward"].mean,
-                "time_backward": meters_time["backward"].mean,
-                "time_data": meters_time["data"].mean,
-                "gpu_memory": meters_time["memory"].mean,
+                "time_forward": meters_train["time_forward"].mean,
+                "time_backward": meters_train["time_backward"].mean,
+                "time_data": meters_train["time_data"].mean,
+                "cuda_memory": get_cuda_memory(),
+                "gpu_memory": get_gpu_memory(),
+                "cpu_memory": get_total_memory(),
                 "time": time.time(),
-                "n_iterations": (epoch + 1) * len(ds_iter_train),
-                "n_datas": (epoch + 1) * args.global_batch_size * len(ds_iter_train),
+                "n_iterations": epoch * args.epoch_size // args.batch_size,
+                "n_datas": epoch * this_rank_n_batch_per_epoch * args.batch_size,
             },
         )
 
@@ -364,6 +381,6 @@ def train_detector(args):
                 model=model,
                 epoch=epoch,
                 log_dict=log_dict,
-                test_dict=test_dict,
+                test_dict=None,
             )
         dist.barrier()

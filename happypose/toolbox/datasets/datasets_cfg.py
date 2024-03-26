@@ -230,7 +230,6 @@ def make_scene_dataset(
         assert ".train" in ds_name or ".val" in ds_name
         is_train = "train" in ds_name.split(".")[-1]
         ds_name = ds_name.split(".")[1]
-        print("ds_name synthetic =", ds_name)
         ds = SyntheticSceneDataset(
             ds_dir=LOCAL_DATA_DIR / "synt_datasets" / ds_name,
             train=is_train,

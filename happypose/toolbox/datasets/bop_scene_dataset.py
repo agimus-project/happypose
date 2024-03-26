@@ -207,7 +207,6 @@ class BOPDataset(SceneDataset):
 
         self.split = split
         self.base_dir = ds_dir / split
-
         logger.info("Loading/making index and annotations...")
         if allow_cache:
             save_file_index = self.ds_dir / f"index_{split}.feather"
@@ -229,7 +228,6 @@ class BOPDataset(SceneDataset):
                 split,
                 make_per_view_annotations=per_view_annotations,
             )
-
         self.use_raw_object_id = use_raw_object_id
         self.label_format = label_format
 
@@ -238,6 +236,8 @@ class BOPDataset(SceneDataset):
             load_depth=load_depth,
             load_segmentation=True,
         )
+        models_infos = json.loads((ds_dir / "models" / "models_info.json").read_text())
+        self.all_labels = [f"obj_{int(obj_id):06d}" for obj_id in models_infos.keys()]
 
     def _load_scene_observation(
         self,
@@ -365,7 +365,6 @@ class BOPDataset(SceneDataset):
                 depth_path = depth_path.with_suffix(".tif")
             depth = np.array(inout.load_depth(depth_path))
             depth *= cam_annotation["depth_scale"] / 1000
-
         observation = SceneObservation(
             rgb=rgb,
             depth=depth,

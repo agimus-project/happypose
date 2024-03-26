@@ -26,7 +26,7 @@ import numpy as np
 import PIL
 import torch
 from PIL import ImageEnhance, ImageFilter
-from torchvision.datasets import ImageFolder
+from torchvision.datasets import VOCSegmentation
 
 # HappyPose
 from happypose.toolbox.datasets.scene_dataset import Resolution, SceneObservation
@@ -439,7 +439,12 @@ class ReplaceBackgroundTransform(SceneObservationTransform):
 
 class VOCBackgroundAugmentation(ReplaceBackgroundTransform):
     def __init__(self, voc_root: Path):
-        image_dataset = ImageFolder(voc_root)
+        image_dataset = VOCSegmentation(
+            root=voc_root,
+            year="2012",
+            image_set="trainval",
+            download=False,
+        )
         super().__init__(image_dataset)
 
     def get_bg_image(self, idx: int) -> np.ndarray:

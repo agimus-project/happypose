@@ -22,10 +22,6 @@ from happypose.pose_estimators.cosypose.cosypose.config import (
     RESULTS_DIR,
 )
 from happypose.pose_estimators.cosypose.cosypose.datasets.bop import remap_bop_targets
-from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
-    make_object_dataset,
-    make_scene_dataset,
-)
 from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import ListSampler
 from happypose.pose_estimators.cosypose.cosypose.datasets.wrappers.multiview_wrapper import (
     MultiViewWrapper,
@@ -61,6 +57,10 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     init_distributed_mode,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.toolbox.datasets.datasets_cfg import (
+    make_object_dataset,
+    make_scene_dataset,
+)
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.renderer.bullet_batch_renderer import BulletBatchRenderer
 

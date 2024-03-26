@@ -94,18 +94,18 @@ class PredictionRunner:
 
 
         """
-        if self.inference_cfg.detection_type == "gt":
+        if self.inference_cfg["detection_type"] == "gt":
             detections = gt_detections
             run_detector = False
-        elif self.inference_cfg.detection_type == "detector":
+        elif self.inference_cfg["detection_type"] == "detector":
             detections = None
             run_detector = True
         else:
-            msg = f"Unknown detection type {self.inference_cfg.detection_type}"
+            msg = f"Unknown detection type {self.inference_cfg['detection_type']}"
             raise ValueError(msg)
 
         coarse_estimates = None
-        if self.inference_cfg.coarse_estimation_type == "external":
+        if self.inference_cfg["coarse_estimation_type"] == "external":
             # TODO (ylabbe): This is hacky, clean this for modelnet eval.
             coarse_estimates = initial_estimates
             coarse_estimates = happypose.toolbox.inference.utils.add_instance_id(
@@ -136,7 +136,7 @@ class PredictionRunner:
         all_preds = {}
         data_TCO_refiner = extra_data["refiner"]["preds"]
 
-        k_0 = f"refiner/iteration={self.inference_cfg.n_refiner_iterations}"
+        k_0 = f"refiner/iteration={self.inference_cfg['n_refiner_iterations']}"
         all_preds = {
             "final": preds,
             k_0: data_TCO_refiner,
@@ -144,7 +144,7 @@ class PredictionRunner:
             "coarse": extra_data["coarse"]["preds"],
         }
 
-        if self.inference_cfg.run_depth_refiner:
+        if self.inference_cfg["run_depth_refiner"]:
             all_preds["depth_refiner"] = extra_data["depth_refiner"]["preds"]
 
         # Remove any mask tensors
@@ -173,43 +173,46 @@ class PredictionRunner:
         """
         predictions_list = defaultdict(list)
         for n, data in enumerate(tqdm(self.dataloader)):
-            # data is a dict
-            rgb = data["rgb"]
-            depth = None
-            K = data["cameras"].K
-            gt_detections = data["gt_detections"].cuda()
+            if n < 3:
+                # data is a dict
+                rgb = data["rgb"]
+                depth = None
+                K = data["cameras"].K
+                gt_detections = data["gt_detections"].cuda()
 
-            initial_data = None
-            if data["initial_data"]:
-                initial_data = data["initial_data"].cuda()
+                initial_data = None
+                if data["initial_data"]:
+                    initial_data = data["initial_data"].cuda()
 
-            obs_tensor = ObservationTensor.from_torch_batched(rgb, depth, K)
-            obs_tensor = obs_tensor.cuda()
+                obs_tensor = ObservationTensor.from_torch_batched(rgb, depth, K)
+                obs_tensor = obs_tensor.cuda()
 
-            # GPU warmup for timing
-            if n == 0:
+                # GPU warmup for timing
+                if n == 0:
+                    with torch.no_grad():
+                        self.run_inference_pipeline(
+                            pose_estimator,
+                            obs_tensor,
+                            gt_detections,
+                            initial_estimates=initial_data,
+                        )
+
+                cuda_timer = CudaTimer()
+                cuda_timer.start()
                 with torch.no_grad():
-                    self.run_inference_pipeline(
+                    all_preds = self.run_inference_pipeline(
                         pose_estimator,
                         obs_tensor,
                         gt_detections,
                         initial_estimates=initial_data,
                     )
+                cuda_timer.end()
+                cuda_timer.elapsed()
 
-            cuda_timer = CudaTimer()
-            cuda_timer.start()
-            with torch.no_grad():
-                all_preds = self.run_inference_pipeline(
-                    pose_estimator,
-                    obs_tensor,
-                    gt_detections,
-                    initial_estimates=initial_data,
-                )
-            cuda_timer.end()
-            cuda_timer.elapsed()
-
-            for k, v in all_preds.items():
-                predictions_list[k].append(v)
+                for k, v in all_preds.items():
+                    predictions_list[k].append(v)
+            else:
+                break
 
         # Concatenate the lists of PandasTensorCollections
         predictions = {}

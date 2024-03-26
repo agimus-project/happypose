@@ -143,7 +143,6 @@ class BackgroundAugmentation:
 
 class VOCBackgroundAugmentation(BackgroundAugmentation):
     def __init__(self, voc_root, p=0.3):
-        print("voc_root =", voc_root)
         image_dataset = VOCSegmentation(
             root=voc_root,
             year="2012",
