@@ -8,6 +8,8 @@ import yaml
 from joblib import Memory
 
 import happypose
+import bop_toolkit_lib
+
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 
@@ -25,8 +27,8 @@ DASK_LOGS_DIR = LOCAL_DATA_DIR / "dasklogs"
 SYNT_DS_DIR = LOCAL_DATA_DIR / "synt_datasets"
 BOP_DS_DIR = LOCAL_DATA_DIR / "bop_datasets"
 
-BOP_TOOLKIT_DIR = PROJECT_DIR / "deps" / "bop_toolkit_cosypose"
-BOP_CHALLENGE_TOOLKIT_DIR = PROJECT_DIR / "deps" / "bop_toolkit_challenge"
+BOP_TOOLKIT_DIR = Path(bop_toolkit_lib.__file__).parent.parent
+BOP_TOOLKIT_SCRIPTS = BOP_TOOLKIT_DIR / 'scripts'
 
 EXP_DIR = LOCAL_DATA_DIR / "experiments"
 RESULTS_DIR = LOCAL_DATA_DIR / "results"

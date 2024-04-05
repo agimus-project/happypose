@@ -1,7 +1,7 @@
-import argparse
 import os
+import argparse
 import subprocess
-import sys
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -9,17 +9,17 @@ from tqdm import tqdm
 
 from happypose.pose_estimators.cosypose.cosypose.config import (
     BOP_TOOLKIT_DIR,
+    BOP_TOOLKIT_SCRIPTS,
     LOCAL_DATA_DIR,
     MEMORY,
-    PROJECT_DIR,
+    # PROJECT_DIR,
     RESULTS_DIR,
 )
 
-SISO_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_siso.py"
-VIVO_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_vivo.py"
-
-sys.path.append(BOP_TOOLKIT_DIR.as_posix())
 from bop_toolkit_lib import inout  # noqa
+
+SISO_SCRIPT_PATH = BOP_TOOLKIT_SCRIPTS / "eval_siso.py"
+VIVO_SCRIPT_PATH = BOP_TOOLKIT_SCRIPTS / "eval_vivo.py"
 
 
 def main():
@@ -77,8 +77,8 @@ def run_evaluation(filename, is_vivo):
     else:
         script_path = SISO_SCRIPT_PATH
     myenv = os.environ.copy()
-    myenv["PYTHONPATH"] = BOP_TOOLKIT_DIR.as_posix()
-    myenv["COSYPOSE_DIR"] = PROJECT_DIR.as_posix()
+    # myenv["PYTHONPATH"] = BOP_TOOLKIT_DIR.as_posix()
+    # myenv["COSYPOSE_DIR"] = PROJECT_DIR.as_posix()
     print(script_path)
     subprocess.call(
         [

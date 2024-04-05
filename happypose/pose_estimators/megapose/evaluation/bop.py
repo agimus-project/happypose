@@ -32,6 +32,7 @@ from tqdm import tqdm
 # MegaPose
 from happypose.pose_estimators.megapose.config import (
     BOP_TOOLKIT_DIR,
+    BOP_TOOLKIT_SCRIPTS,
     LOCAL_DATA_DIR,
     PROJECT_DIR,
 )
@@ -47,9 +48,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Note we are actually using the bop_toolkit_lib that is directly conda installed
 # inside the docker image. This is just to access the scripts.
-POSE_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_pose.py"
-DETECTION_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop22_coco.py"
-DUMMY_EVAL_SCRIPT_PATH = BOP_TOOLKIT_DIR / "scripts/eval_bop19_dummy.py"
+POSE_EVAL_SCRIPT_PATH = BOP_TOOLKIT_SCRIPTS / "eval_bop19_pose.py"
+DETECTION_EVAL_SCRIPT_PATH = BOP_TOOLKIT_SCRIPTS / "eval_bop22_coco.py"
+DUMMY_EVAL_SCRIPT_PATH = BOP_TOOLKIT_SCRIPTS / "eval_bop19_dummy.py"
 
 
 # Third Party
@@ -167,10 +168,6 @@ def get_best_coarse_predictions(coarse_preds: PandasTensorCollection):
 
 def _run_bop_evaluation(filename, eval_dir, eval_detection=False, dummy=False):
     myenv = os.environ.copy()
-    myenv["PYTHONPATH"] = BOP_TOOLKIT_DIR.as_posix()
-    ld_library_path = os.environ["LD_LIBRARY_PATH"]
-    conda_prefix = os.environ["CONDA_PREFIX"]
-    myenv["LD_LIBRARY_PATH"] = f"{conda_prefix}/lib:{ld_library_path}"
     myenv["BOP_DATASETS_PATH"] = str(LOCAL_DATA_DIR / "bop_datasets")
     myenv["BOP_RESULTS_PATH"] = str(eval_dir)
     myenv["BOP_EVAL_PATH"] = str(eval_dir)
