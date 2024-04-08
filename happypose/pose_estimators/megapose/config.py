@@ -24,7 +24,6 @@ from joblib import Memory
 
 # MegaPose
 import happypose
-import bop_toolkit_lib
 
 PROJECT_ROOT = Path(happypose.__file__).parent.parent
 PROJECT_DIR = PROJECT_ROOT
@@ -36,8 +35,9 @@ NB_DATA_DIR = LOCAL_DATA_DIR / "notebook_data"
 SHAPENET_DIR = LOCAL_DATA_DIR / "shapenetcorev2"
 WDS_DS_DIR = LOCAL_DATA_DIR / "webdatasets"
 
-BOP_TOOLKIT_DIR = Path(bop_toolkit_lib.__file__).parent.parent
-BOP_TOOLKIT_SCRIPTS = BOP_TOOLKIT_DIR / 'scripts'
+# BOP eval scripts names
+BOP_POSE_EVAL_SCRIPT_NAME = "eval_bop19_pose.py"
+BOP_DETECTION_EVAL_SCRIPT_NAME = "eval_bop22_coco.py"
 
 BLENDER_PBR_DS_DIR = LOCAL_DATA_DIR / "blender_pbr_datasets"
 CC_TEXTURE_FOLDER = str(LOCAL_DATA_DIR / "cctextures")
