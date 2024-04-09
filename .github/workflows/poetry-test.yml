@@ -46,11 +46,13 @@ jobs:
               refiner-bop-hope-pbr--955392
 
       - name: Run tests
-        run: poetry run coverage run --source=happypose -m unittest
+        run: |
+          poetry run coverage run --source=happypose -m unittest
+          poetry run coverage run --source=happypose -m pytest
 
       - name: Process coverage
         run: poetry run coverage xml
 
-      - uses: codecov/codecov-action@v4
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      #- uses: codecov/codecov-action@v4
+        #env:
+          #CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
