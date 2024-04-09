@@ -1,6 +1,5 @@
 import json
 import pickle
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -12,7 +11,6 @@ from PIL import Image
 from happypose.pose_estimators.cosypose.cosypose.config import MEMORY
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.lib3d.transform import Transform
-
 
 logger = get_logger(__name__)
 

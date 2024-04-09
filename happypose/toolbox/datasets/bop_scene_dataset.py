@@ -16,7 +16,6 @@ limitations under the License.
 # Standard Library
 import json
 import pickle
-import sys
 from pathlib import Path
 
 # Third Party
@@ -41,7 +40,6 @@ from happypose.toolbox.datasets.scene_dataset import (
 )
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.utils.logging import get_logger
-
 
 logger = get_logger(__name__)
 
