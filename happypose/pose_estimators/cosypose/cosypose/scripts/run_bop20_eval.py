@@ -1,14 +1,15 @@
 import argparse
 import shutil
 import subprocess
-from pathlib import Path
 
 import torch
+from bop_toolkit_lib import inout
 from tqdm import tqdm
 
-from happypose.pose_estimators.cosypose.cosypose.config import PROJECT_DIR, RESULTS_DIR, BOP_POSE_EVAL_SCRIPT_NAME
-
-from bop_toolkit_lib import inout  # noqa
+from happypose.pose_estimators.cosypose.cosypose.config import (
+    BOP_POSE_EVAL_SCRIPT_NAME,
+    RESULTS_DIR,
+)
 
 
 def main():

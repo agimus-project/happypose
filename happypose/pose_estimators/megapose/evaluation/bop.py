@@ -31,10 +31,10 @@ from tqdm import tqdm
 
 # MegaPose
 from happypose.pose_estimators.megapose.config import (
+    BOP_DETECTION_EVAL_SCRIPT_NAME,
+    BOP_POSE_EVAL_SCRIPT_NAME,
     LOCAL_DATA_DIR,
     PROJECT_DIR,
-    BOP_POSE_EVAL_SCRIPT_NAME,
-    BOP_DETECTION_EVAL_SCRIPT_NAME,
 )
 from happypose.pose_estimators.megapose.evaluation.eval_config import BOPEvalConfig
 from happypose.toolbox.datasets.scene_dataset import ObjectData

@@ -198,12 +198,16 @@ def run_eval(
 
     if cfg.inference.run_depth_refiner:
         if cfg.inference.depth_refiner == "icp":
-            from happypose.pose_estimators.megapose.inference.icp_refiner import ICPRefiner
+            from happypose.pose_estimators.megapose.inference.icp_refiner import (
+                ICPRefiner,
+            )
+
             ICPRefiner(mesh_db, renderer)
         elif cfg.inference.depth_refiner == "teaserpp":
             from happypose.pose_estimators.megapose.inference.teaserpp_refiner import (
                 TeaserppRefiner,
             )
+
             TeaserppRefiner(mesh_db, renderer)
         else:
             pass

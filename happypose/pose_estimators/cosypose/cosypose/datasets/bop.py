@@ -6,13 +6,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+from bop_toolkit_lib import inout
 from PIL import Image
 
 from happypose.pose_estimators.cosypose.cosypose.config import MEMORY
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.lib3d.transform import Transform
-
-from bop_toolkit_lib import inout
 
 sys.path = sys.path[:-1]
 
