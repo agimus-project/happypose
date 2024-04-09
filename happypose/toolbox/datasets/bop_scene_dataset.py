@@ -42,8 +42,6 @@ from happypose.toolbox.datasets.scene_dataset import (
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.utils.logging import get_logger
 
-sys.path = sys.path[:-1]
-
 
 logger = get_logger(__name__)
 

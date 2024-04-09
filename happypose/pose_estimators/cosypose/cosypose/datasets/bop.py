@@ -13,8 +13,6 @@ from happypose.pose_estimators.cosypose.cosypose.config import MEMORY
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.lib3d.transform import Transform
 
-sys.path = sys.path[:-1]
-
 
 logger = get_logger(__name__)
 
