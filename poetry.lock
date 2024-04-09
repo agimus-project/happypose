@@ -4058,7 +4058,6 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 
 [extras]
 cpu = ["torch", "torch", "torchvision", "torchvision"]
-evaluation = ["bop_toolkit_lib"]
 gpu = ["torch", "torch", "torchvision", "torchvision"]
 multiview = ["cosypose"]
 pypi = ["opencv-contrib-python", "opencv-python", "pin"]
