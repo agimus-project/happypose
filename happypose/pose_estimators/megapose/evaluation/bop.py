@@ -49,7 +49,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Third Party
 from bop_toolkit_lib import inout  # noqa
 
-
 def main():
     parser = argparse.ArgumentParser("Bop evaluation")
     parser.add_argument("--results_path", default="", type=str)
@@ -162,13 +161,6 @@ def get_best_coarse_predictions(coarse_preds: PandasTensorCollection):
 
 def _run_bop_evaluation(filename, eval_dir, eval_detection=False, dummy=False):
     myenv = os.environ.copy()
-<<<<<<< HEAD
-    myenv["PYTHONPATH"] = BOP_TOOLKIT_DIR.as_posix()
-    ld_library_path = os.environ.get("LD_LIBRARY_PATH", "")
-    conda_prefix = os.environ["CONDA_PREFIX"]
-    myenv["LD_LIBRARY_PATH"] = f"{conda_prefix}/lib:{ld_library_path}"
-=======
->>>>>>> 5ef8f0fde939b3b5d4b1a0ceacb2d4002a00c653
     myenv["BOP_DATASETS_PATH"] = str(LOCAL_DATA_DIR / "bop_datasets")
     myenv["BOP_RESULTS_PATH"] = str(eval_dir)
     myenv["BOP_EVAL_PATH"] = str(eval_dir)
