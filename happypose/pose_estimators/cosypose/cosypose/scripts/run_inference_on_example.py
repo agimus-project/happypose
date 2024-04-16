@@ -82,7 +82,7 @@ if __name__ == "__main__":
     # Load data
     detections = load_detections(example_dir).to(device)
     object_dataset = make_example_object_dataset(example_dir)
-    rgb, depth, camera_data = load_observation_example(example_dir, load_depth=True)
+    rgb, depth, camera_data = load_observation_example(example_dir, load_depth=False)
     # TODO: cosypose forward does not work if depth is loaded detection
     # contrary to megapose
     observation = ObservationTensor.from_numpy(rgb, depth=None, K=camera_data.K).to(
