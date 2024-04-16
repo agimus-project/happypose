@@ -9,7 +9,6 @@ from joblib import Memory
 
 import happypose
 
-
 torch.multiprocessing.set_sharing_strategy("file_system")
 
 hostname = socket.gethostname()
