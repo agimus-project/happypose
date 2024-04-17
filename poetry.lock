@@ -491,12 +491,6 @@ files = [
     {file = "cmeel_console_bridge-1.0.2.2-2-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:23cb0e37678a75778ba63444e598c41b4a694dab46037966357e81374bf4d182"},
     {file = "cmeel_console_bridge-1.0.2.2-2-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:5933c56b6d5f4c1d1642c8088ad2c01d31bd6ec6fa8c0d2cd1683791e8242f9a"},
     {file = "cmeel_console_bridge-1.0.2.2-2-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:375eb20ff3eb0bc7d7002e7a5b04cfdbb17ec9ed29b28e66bfe1644e9588a99c"},
-    {file = "cmeel_console_bridge-1.0.2.2-3-py3-none-macosx_12_0_arm64.whl", hash = "sha256:b9a6e0e18221f18b9ac1855bd281277a3de7b85875b44e72dac1fe9ff0ae0924"},
-    {file = "cmeel_console_bridge-1.0.2.2-3-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:b68c2c02821133f9c9c11401c3c68aec145eb400bab493f1a0ffd26ef59f8bbf"},
-    {file = "cmeel_console_bridge-1.0.2.2-3-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:cf21a07c86d30a77485a5db4d6629ea12b55f8733227a26f911b5f1cb1294ba9"},
-    {file = "cmeel_console_bridge-1.0.2.2-3-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:773b5ced1e9e2caacfb402a8abc5d6377dfdd56fd26d0e046da5724f26acfe40"},
-    {file = "cmeel_console_bridge-1.0.2.2-3-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:ba511d07bae34e07cc11146501b0e0cab23573c905888e1fe3f8688963a947be"},
-    {file = "cmeel_console_bridge-1.0.2.2.tar.gz", hash = "sha256:7d472606e0535c61583cf23fc654149a8ab7cf5278502dce80cbacb8a7a0f395"},
 ]
 
 [package.dependencies]
@@ -523,12 +517,6 @@ files = [
     {file = "cmeel_octomap-1.9.8.2-2-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:175aa7e03c0d0e7beaa4fe4f7ea7c89e55165ddf7668c470687f369889c7481c"},
     {file = "cmeel_octomap-1.9.8.2-2-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:18886ebeb30e3355efef4321bee31f8eab93dfb4745aaf2ccd0e7effeab117cb"},
     {file = "cmeel_octomap-1.9.8.2-2-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:b5f986f3c6b18306769f441d7f1667023ac847bd79f90cab549596313b2bf780"},
-    {file = "cmeel_octomap-1.9.8.2-3-py3-none-macosx_12_0_arm64.whl", hash = "sha256:f702f288d38393535f4680d7065bc518acc8fb8517f3f5eb875e4039ca36d632"},
-    {file = "cmeel_octomap-1.9.8.2-3-py3-none-macosx_12_0_x86_64.whl", hash = "sha256:fef4af62fe3bcd386218e65017a7d30a755c2dc944d1e6f791ede73358bf8664"},
-    {file = "cmeel_octomap-1.9.8.2-3-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:c0e083632db2a7133a8ed80da3db897339f43a92b397642fd7818f607cbf8d42"},
-    {file = "cmeel_octomap-1.9.8.2-3-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:eebda85fd38f3f79030d7748483be765233148309fed7af9a1e523f184f4e98d"},
-    {file = "cmeel_octomap-1.9.8.2-3-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:aa8810c4b8b2a0828de2ca2e3f983665ecdb6497c63a66721af5cad39d515f79"},
-    {file = "cmeel_octomap-1.9.8.2.tar.gz", hash = "sha256:c569b276dc5c078c8f539f7736ccd02bfa84c8a4785c74e8543ade9920f0f93b"},
 ]
 
 [package.dependencies]
@@ -2775,7 +2763,6 @@ files = [
     {file = "PyYAML-6.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:bf07ee2fef7014951eeb99f56f39c9bb4af143d8aa3c21b1677805985307da34"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:855fb52b0dc35af121542a76b9a84f8d1cd886ea97c84703eaa6d88e37a2ad28"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:40df9b996c2b73138957fe23a16a4f0ba614f4c0efce1e9406a184b6d07fa3a9"},
-    {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a08c6f0fe150303c1c6b71ebcd7213c2858041a7e01975da3a99aed1e7a378ef"},
     {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6c22bec3fbe2524cde73d7ada88f6566758a8f7227bfbf93a408a9d86bcc12a0"},
     {file = "PyYAML-6.0.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:8d4e9c88387b0f5c7d5f281e55304de64cf7f9c0021a3525bd3b1c542da3b0e4"},
     {file = "PyYAML-6.0.1-cp312-cp312-win32.whl", hash = "sha256:d483d2cdf104e7c9fa60c544d92981f12ad66a457afae824d146093b8c294c54"},
@@ -4031,6 +4018,30 @@ files = [
 h11 = ">=0.9.0,<1"
 
 [[package]]
+name = "xarray"
+version = "2024.3.0"
+description = "N-D labeled arrays and datasets in Python"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "xarray-2024.3.0-py3-none-any.whl", hash = "sha256:ca2bc4da2bf2e7879e15862a7a7c3fc76ad19f6a08931d030220cef39a29118d"},
+    {file = "xarray-2024.3.0.tar.gz", hash = "sha256:5c1db19efdde61db7faedad8fc944f4e29698fb6fbd578d352668b63598bd1d8"},
+]
+
+[package.dependencies]
+numpy = ">=1.23"
+packaging = ">=22"
+pandas = ">=1.5"
+
+[package.extras]
+accel = ["bottleneck", "flox", "numbagg", "opt-einsum", "scipy"]
+complete = ["xarray[accel,dev,io,parallel,viz]"]
+dev = ["hypothesis", "pre-commit", "pytest", "pytest-cov", "pytest-env", "pytest-timeout", "pytest-xdist", "ruff", "xarray[complete]"]
+io = ["cftime", "fsspec", "h5netcdf", "netCDF4", "pooch", "pydap", "scipy", "zarr"]
+parallel = ["dask[complete]"]
+viz = ["matplotlib", "nc-time-axis", "seaborn"]
+
+[[package]]
 name = "xyzservices"
 version = "2023.10.1"
 description = "Source of XYZ tiles providers"
@@ -4066,4 +4077,4 @@ pypi = ["opencv-contrib-python", "opencv-python", "pin"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "75b7dcdf818f4307a44472cd639f6bc6dd94dbcecd234379e037a46dcdd8f581"
+content-hash = "4d4a65e4aec6bd1cb7285388af731229ee42312036cacd6222ef353400d4803f"
