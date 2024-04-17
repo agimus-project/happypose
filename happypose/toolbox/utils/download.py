@@ -423,8 +423,13 @@ class DownloadClient:
             try:
                 await asyncio.sleep(random.uniform(0, 3))
                 head = await self.client.head(download_path)
-            except (httpx.PoolTimeout, httpx.ReadTimeout, httpx.ConnectTimeout):
-                logger.error(f"Failed {download_path} with HEAD timeout")
+            except (
+                httpx.PoolTimeout,
+                httpx.ReadTimeout,
+                httpx.ConnectTimeout,
+                httpx.RemoteProtocolError,
+            ) as e:
+                logger.error(f"Failed {download_path} with {e}")
                 return
             if "content-length" in head.headers:
                 if local_size == int(head.headers["content-length"]):
