@@ -362,7 +362,20 @@ class DownloadClient:
                 break
         else:
             err = f"Can't find mirror for {download_path}."
-            raise ValueError(err)
+            logger.warning(f"{err} -- retrying soon...")
+            await asyncio.sleep(random.uniform(5, 10))
+            for mirror in self.mirrors:
+                dl = mirror + download_path
+                try:
+                    await asyncio.sleep(random.uniform(0, 3))
+                    head = await self.client.head(dl)
+                except (httpx.PoolTimeout, httpx.ReadTimeout, httpx.ConnectTimeout):
+                    continue
+                if head.is_success or head.is_redirect:
+                    download_path = dl
+                    break
+            else:
+                raise ValueError(err)
         if (
             not download_path.endswith("/")
             and not httpx.head(download_path).is_redirect
