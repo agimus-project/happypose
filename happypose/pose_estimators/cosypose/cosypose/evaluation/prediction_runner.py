@@ -122,6 +122,7 @@ class PredictionRunner:
             data_TCO_init=None,
             n_coarse_iterations=1,
             n_refiner_iterations=4,
+            detection_th=0.0
         )
         time.time() - t
 
