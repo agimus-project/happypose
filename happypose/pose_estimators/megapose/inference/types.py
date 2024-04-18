@@ -88,7 +88,7 @@ def assert_detections_valid(detections: DetectionsType) -> None:
 @dataclass
 class InferenceConfig:
     # TODO: move detection_type outside of here
-    detection_type: str = "detector"  # ['detector', 'gt']
+    detection_type: str = "detector"  # ['detector', 'gt', 'exte']
     coarse_estimation_type: str = "SO3_grid"
     SO3_grid_size: int = 576
     n_refiner_iterations: int = 5

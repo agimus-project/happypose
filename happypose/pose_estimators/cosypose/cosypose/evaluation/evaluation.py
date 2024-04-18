@@ -16,18 +16,11 @@ from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 from happypose.pose_estimators.cosypose.cosypose.evaluation.prediction_runner import (
     PredictionRunner,
 )
-from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
     PoseEstimator,
 )
 
 # Detection
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
-    check_update_config as check_update_config_detector,
-)
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
-    create_model_detector,
-)
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
     check_update_config as check_update_config_pose,
 )
@@ -45,8 +38,8 @@ from happypose.pose_estimators.megapose.evaluation.runner_utils import format_re
 
 # Pose estimator
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
+from happypose.toolbox.inference import load_detector
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 from happypose.toolbox.utils.distributed import get_rank, get_tmp_dir
 from happypose.toolbox.utils.logging import get_logger
 
@@ -58,35 +51,50 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 logger = get_logger(__name__)
 
 
-def load_detector(run_id, ds_name):
-    run_dir = EXP_DIR / run_id
-    # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
-    cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
-    cfg = check_update_config_detector(cfg)
-    label_to_category_id = cfg.label_to_category_id
-    model = create_model_detector(cfg, len(label_to_category_id))
-    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)
-    ckpt = ckpt["state_dict"]
-    model.load_state_dict(ckpt)
-    model = model.to(device).eval()
-    model.cfg = cfg
-    model.config = cfg
-    model = Detector(model, ds_name)
-    return model
+# def load_detector(run_id, ds_name):
+#     run_dir = EXP_DIR / run_id
+#     # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
+#     cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
+#     cfg = check_update_config_detector(cfg)
+#     label_to_category_id = cfg.label_to_category_id
+#     model = create_model_detector(cfg, len(label_to_category_id))
+#     ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)
+#     ckpt = ckpt["state_dict"]
+#     model.load_state_dict(ckpt)
+#     model = model.to(device).eval()
+#     model.cfg = cfg
+#     model.config = cfg
+#     model = Detector(model, ds_name)
+#     return model
 
 
-def load_pose_models(coarse_run_id, refiner_run_id, n_workers):
+def load_pose_models(coarse_run_id, refiner_run_id, n_workers, renderer_type="panda3d"):
     run_dir = EXP_DIR / coarse_run_id
-    # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
     cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config_pose(cfg)
 
     object_dataset = make_object_dataset("ycbv")
-    renderer = Panda3dBatchRenderer(
-        object_dataset,
-        n_workers=n_workers,
-        preload_cache=False,
-    )
+    if renderer_type == "panda3d":
+        from happypose.toolbox.renderer.panda3d_batch_renderer import (
+            Panda3dBatchRenderer,
+        )
+
+        renderer = Panda3dBatchRenderer(
+            object_dataset,
+            n_workers=n_workers,
+            preload_cache=True,
+        )
+    elif renderer_type == "bullet":
+        from happypose.toolbox.renderer.bullet_batch_renderer import BulletBatchRenderer
+
+        renderer = BulletBatchRenderer(
+            object_dataset,
+            n_workers=n_workers,
+            preload_cache=True,
+        )
+    else:
+        raise ValueError(f"Renderer {renderer_type} not supported")
+
     mesh_db = MeshDataBase.from_object_ds(object_dataset)
     mesh_db_batched = mesh_db.batched().to(device)
 
@@ -173,7 +181,8 @@ def run_eval(
     # Load detector model
     if cfg.inference.detection_type == "detector":
         assert cfg.detector_run_id is not None
-        detector_model = load_detector(cfg.detector_run_id, cfg.ds_name)
+        # detector_model = load_detector(cfg.detector_run_id, cfg.ds_name)
+        detector_model = load_detector(cfg.detector_run_id)
     elif cfg.inference.detection_type == "gt":
         detector_model = None
     else:

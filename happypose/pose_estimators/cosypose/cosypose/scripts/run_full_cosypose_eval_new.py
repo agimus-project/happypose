@@ -67,13 +67,11 @@ MODELNET_TEST_DATASETS = [
 def create_eval_cfg(
     cfg: EvalConfig,
     detection_type: str,
-    coarse_estimation_type: str,
     ds_name: str,
 ) -> Tuple[str, EvalConfig]:
     cfg = copy.deepcopy(cfg)
 
     cfg.inference.detection_type = detection_type
-    cfg.inference.coarse_estimation_type = coarse_estimation_type
     cfg.ds_name = ds_name
 
     if detection_type == "detector":
@@ -88,7 +86,7 @@ def create_eval_cfg(
         msg = f"Unknown detector type {cfg.detector_type}"
         raise ValueError(msg)
 
-    name = generate_save_key(detection_type, coarse_estimation_type)
+    name = generate_save_key(detection_type, "cosycoarse")
 
     return name, cfg
 
@@ -109,11 +107,10 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
     for ds_name in cfg.ds_names:
         # create the EvalConfig objects that we will call `run_eval` on
         eval_configs: Dict[str, EvalConfig] = {}
-        for detection_type, coarse_estimation_type in cfg.detection_coarse_types:
+        for detection_type in cfg.detection_coarse_types:
             name, cfg_ = create_eval_cfg(
                 cfg,
                 detection_type,
-                coarse_estimation_type,
                 ds_name,
             )
             eval_configs[name] = cfg_
