@@ -5,10 +5,9 @@ import pybullet as pb
 
 from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR
 
-# from happypose.toolbox.datasets.datasets_cfg import UrdfDataset
 from happypose.pose_estimators.cosypose.cosypose.datasets.urdf_dataset import (
-    OneUrdfDataset,
     UrdfDataset,
+    OneUrdfDataset,
 )
 
 # TODO: move urdf utilities to happypose toolbox
