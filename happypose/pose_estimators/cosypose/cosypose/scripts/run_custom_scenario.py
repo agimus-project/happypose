@@ -1,16 +1,15 @@
 import argparse
 import json
 import logging
-import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
+from bop_toolkit_lib import inout
 
 import happypose.pose_estimators.cosypose.cosypose.utils.tensor_collection as tc
 from happypose.pose_estimators.cosypose.cosypose.config import (
-    BOP_TOOLKIT_DIR,
     LOCAL_DATA_DIR,
 )
 from happypose.pose_estimators.cosypose.cosypose.datasets.bop_object_datasets import (
@@ -24,9 +23,6 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d.rigid_mesh_database impor
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.cosypose.cosypose.visualization.multiview import nms3d
-
-sys.path.append(str(BOP_TOOLKIT_DIR))
-from bop_toolkit_lib import inout
 
 logger = get_logger(__name__)
 

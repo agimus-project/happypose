@@ -1,22 +1,16 @@
 import json
 import pickle
-import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
+from bop_toolkit_lib import inout
 from PIL import Image
 
-from happypose.pose_estimators.cosypose.cosypose.config import BOP_TOOLKIT_DIR, MEMORY
+from happypose.pose_estimators.cosypose.cosypose.config import MEMORY
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.lib3d.transform import Transform
-
-sys.path.append(str(BOP_TOOLKIT_DIR))
-from bop_toolkit_lib import inout
-
-sys.path = sys.path[:-1]
-
 
 logger = get_logger(__name__)
 

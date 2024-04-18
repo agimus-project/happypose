@@ -173,46 +173,43 @@ class PredictionRunner:
         """
         predictions_list = defaultdict(list)
         for n, data in enumerate(tqdm(self.dataloader)):
-            if n < 3:
-                # data is a dict
-                rgb = data["rgb"]
-                depth = None
-                K = data["cameras"].K
-                gt_detections = data["gt_detections"].cuda()
+            # data is a dict
+            rgb = data["rgb"]
+            depth = None
+            K = data["cameras"].K
+            gt_detections = data["gt_detections"].cuda()
 
-                initial_data = None
-                if data["initial_data"]:
-                    initial_data = data["initial_data"].cuda()
+            initial_data = None
+            if data["initial_data"]:
+                initial_data = data["initial_data"].cuda()
 
-                obs_tensor = ObservationTensor.from_torch_batched(rgb, depth, K)
-                obs_tensor = obs_tensor.cuda()
+            obs_tensor = ObservationTensor.from_torch_batched(rgb, depth, K)
+            obs_tensor = obs_tensor.cuda()
 
-                # GPU warmup for timing
-                if n == 0:
-                    with torch.no_grad():
-                        self.run_inference_pipeline(
-                            pose_estimator,
-                            obs_tensor,
-                            gt_detections,
-                            initial_estimates=initial_data,
-                        )
-
-                cuda_timer = CudaTimer()
-                cuda_timer.start()
+            # GPU warmup for timing
+            if n == 0:
                 with torch.no_grad():
-                    all_preds = self.run_inference_pipeline(
+                    self.run_inference_pipeline(
                         pose_estimator,
                         obs_tensor,
                         gt_detections,
                         initial_estimates=initial_data,
                     )
-                cuda_timer.end()
-                cuda_timer.elapsed()
 
-                for k, v in all_preds.items():
-                    predictions_list[k].append(v)
-            else:
-                break
+            cuda_timer = CudaTimer()
+            cuda_timer.start()
+            with torch.no_grad():
+                all_preds = self.run_inference_pipeline(
+                    pose_estimator,
+                    obs_tensor,
+                    gt_detections,
+                    initial_estimates=initial_data,
+                )
+            cuda_timer.end()
+            cuda_timer.elapsed()
+
+            for k, v in all_preds.items():
+                predictions_list[k].append(v)
 
         # Concatenate the lists of PandasTensorCollections
         predictions = {}
