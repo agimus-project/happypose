@@ -2,7 +2,6 @@ import argparse
 import os
 
 import numpy as np
-from colorama import Fore, Style
 
 from happypose.pose_estimators.cosypose.cosypose.training.train_detector import (
     train_detector,
@@ -23,13 +22,13 @@ if __name__ == "__main__":
     cfg = argparse.ArgumentParser("").parse_args([])
     if args.config:
         logger.info(
-            f"{Fore.GREEN}Training with config: {args.config} {Style.RESET_ALL}",
+            f"Training with config: {args.config}",
         )
 
     cfg.resume_run_id = None
     if len(args.resume) > 0:
         cfg.resume_run_id = args.resume
-        logger.info(f"{Fore.RED}Resuming {cfg.resume_run_id} {Style.RESET_ALL}")
+        logger.info(f"Resuming {cfg.resume_run_id}")
 
     N_CPUS = int(os.environ.get("N_CPUS", 10))
     N_GPUS = int(os.environ.get("N_PROCS", 1))

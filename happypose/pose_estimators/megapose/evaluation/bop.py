@@ -184,7 +184,6 @@ def _run_bop_evaluation(filename, eval_dir, eval_detection=False, dummy=False):
 
 def run_evaluation(cfg: BOPEvalConfig) -> None:
     """Runs the bop evaluation for the given setting."""
-    print(cfg)
     results_path = Path(cfg.results_path)
     eval_dir = Path(cfg.eval_dir)
 
