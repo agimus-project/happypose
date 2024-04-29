@@ -60,7 +60,7 @@ def run_inference(
     return data_TCO.cpu()
 
 
-if __name__ == "__main__":
+def main():
     set_logging_level("info")
     parser = argparse.ArgumentParser()
     parser.add_argument("example_name")
@@ -77,12 +77,12 @@ if __name__ == "__main__":
     assert (
         example_dir.exists()
     ), "Example {args.example_name} not available, follow download instructions"
-    dataset_to_use = args.dataset  # hope/tless/ycbv
+    # dataset_to_use = args.dataset  # hope/tless/ycbv
 
     # Load data
     detections = load_detections(example_dir).to(device)
     object_dataset = make_example_object_dataset(example_dir)
-    rgb, depth, camera_data = load_observation_example(example_dir, load_depth=True)
+    rgb, depth, camera_data = load_observation_example(example_dir, load_depth=False)
     # TODO: cosypose forward does not work if depth is loaded detection
     # contrary to megapose
     observation = ObservationTensor.from_numpy(rgb, depth=None, K=camera_data.K).to(
@@ -118,3 +118,7 @@ if __name__ == "__main__":
         make_poses_visualization(
             rgb, object_dataset, object_datas, camera_data, example_dir
         )
+
+
+if __name__ == "__main__":
+    main()

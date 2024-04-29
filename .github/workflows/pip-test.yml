@@ -45,4 +45,6 @@ jobs:
               refiner-bop-hope-pbr--955392
 
       - name: Run tests
-        run: python -m unittest
+        run: |
+          python -m unittest
+          pytest
