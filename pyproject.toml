@@ -24,6 +24,7 @@ version = "0.1.0"
 addict = "^2.4.0"
 beautifulsoup4 = "^4.12.2"
 bokeh = "^3.2.2"
+bop_toolkit_lib = {git = "https://github.com/agimus-project/bop_toolkit"}
 cmeel-teaser-plusplus = {optional = true, version = "^2.0"}
 cosypose = {optional = true, path = "happypose/pose_estimators/cosypose"}
 httpx = "^0.25.0"
