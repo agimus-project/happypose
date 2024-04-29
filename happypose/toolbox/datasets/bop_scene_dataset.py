@@ -16,17 +16,19 @@ limitations under the License.
 # Standard Library
 import json
 import pickle
-import sys
 from pathlib import Path
 
 # Third Party
 import numpy as np
 import pandas as pd
+
+# Third Party
+from bop_toolkit_lib import inout
 from PIL import Image
 from tqdm import tqdm
 
 # MegaPose
-from happypose.pose_estimators.megapose.config import BOP_TOOLKIT_DIR, MEMORY
+from happypose.pose_estimators.megapose.config import MEMORY
 
 # Local Folder
 from happypose.toolbox.datasets.scene_dataset import (
@@ -38,13 +40,6 @@ from happypose.toolbox.datasets.scene_dataset import (
 )
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.utils.logging import get_logger
-
-sys.path.append(str(BOP_TOOLKIT_DIR))
-# Third Party
-from bop_toolkit_lib import inout
-
-sys.path = sys.path[:-1]
-
 
 logger = get_logger(__name__)
 

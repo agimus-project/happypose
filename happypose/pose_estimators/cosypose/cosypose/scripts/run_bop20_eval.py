@@ -1,23 +1,15 @@
 import argparse
-import os
 import shutil
 import subprocess
-import sys
-from pathlib import Path
 
 import torch
+from bop_toolkit_lib import inout
 from tqdm import tqdm
 
-from happypose.pose_estimators.cosypose.cosypose.config import PROJECT_DIR, RESULTS_DIR
-
-TOOLKIT_DIR = Path(PROJECT_DIR / "deps" / "bop_toolkit_challenge")
-EVAL_SCRIPT_PATH = TOOLKIT_DIR / "scripts/eval_bop19.py"
-DUMMY_EVAL_SCRIPT_PATH = TOOLKIT_DIR / "scripts/eval_bop19_dummy.py"
-
-sys.path.append(TOOLKIT_DIR.as_posix())
-from bop_toolkit_lib import inout  # noqa
-
-# from bop_toolkit_lib.config import results_path as BOP_RESULTS_PATH
+from happypose.pose_estimators.cosypose.cosypose.config import (
+    BOP_POSE_EVAL_SCRIPT_NAME,
+    RESULTS_DIR,
+)
 
 
 def main():
@@ -47,7 +39,7 @@ def run_evaluation(args):
         )
 
     if not args.convert_only:
-        run_bop_evaluation(csv_path, dummy=args.dummy)
+        run_bop_evaluation(csv_path)
     return csv_path
 
 
@@ -82,25 +74,15 @@ def convert_results(results_path, out_csv_path, method):
     return out_csv_path
 
 
-def run_bop_evaluation(filename, dummy=False):
-    myenv = os.environ.copy()
-    myenv["PYTHONPATH"] = TOOLKIT_DIR.as_posix()
-    myenv["COSYPOSE_DIR"] = PROJECT_DIR.as_posix()
-    if dummy:
-        script_path = DUMMY_EVAL_SCRIPT_PATH
-    else:
-        script_path = EVAL_SCRIPT_PATH
+def run_bop_evaluation(filename):
     subprocess.call(
         [
-            "python",
-            script_path.as_posix(),
+            BOP_POSE_EVAL_SCRIPT_NAME,
             "--renderer_type",
             "python",
             "--result_filenames",
             filename,
         ],
-        env=myenv,
-        cwd=TOOLKIT_DIR.as_posix(),
     )
 
 
