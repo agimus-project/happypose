@@ -24,7 +24,7 @@ version = "0.1.0"
 addict = "^2.4.0"
 beautifulsoup4 = "^4.12.2"
 bokeh = "^3.2.2"
-bop_toolkit_lib = {git = "https://github.com/agimus-project/bop_toolkit"}
+cmeel-teaser-plusplus = {optional = true, version = "^2.0"}
 cosypose = {optional = true, path = "happypose/pose_estimators/cosypose"}
 httpx = "^0.25.0"
 imageio = "^2.31.4"
@@ -63,9 +63,11 @@ tqdm = "^4.66.1"
 transforms3d = "^0.4.1"
 trimesh = "^3.23.5"
 webdataset = "^0.2.57"
+xarray = "^2024.3.0"
 
 [tool.poetry.extras]
 cpu = ["torch", "torchvision"]
+evaluation = ["cmeel-teaser-plusplus"]
 gpu = ["torch", "torchvision"]
 multiview = ["cosypose"]
 pypi = ["opencv-contrib-python", "opencv-python", "pin"]
