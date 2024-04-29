@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 import time
 from collections import defaultdict
@@ -95,18 +94,18 @@ class PredictionRunner:
 
 
         """
-        if self.inference_cfg.detection_type == "gt":
+        if self.inference_cfg["detection_type"] == "gt":
             detections = gt_detections
             run_detector = False
-        elif self.inference_cfg.detection_type == "detector":
+        elif self.inference_cfg["detection_type"] == "detector":
             detections = None
             run_detector = True
         else:
-            msg = f"Unknown detection type {self.inference_cfg.detection_type}"
+            msg = f"Unknown detection type {self.inference_cfg['detection_type']}"
             raise ValueError(msg)
 
         coarse_estimates = None
-        if self.inference_cfg.coarse_estimation_type == "external":
+        if self.inference_cfg["coarse_estimation_type"] == "external":
             # TODO (ylabbe): This is hacky, clean this for modelnet eval.
             coarse_estimates = initial_estimates
             coarse_estimates = happypose.toolbox.inference.utils.add_instance_id(
@@ -137,7 +136,7 @@ class PredictionRunner:
         all_preds = {}
         data_TCO_refiner = extra_data["refiner"]["preds"]
 
-        k_0 = f"refiner/iteration={self.inference_cfg.n_refiner_iterations}"
+        k_0 = f"refiner/iteration={self.inference_cfg['n_refiner_iterations']}"
         all_preds = {
             "final": preds,
             k_0: data_TCO_refiner,
@@ -145,7 +144,7 @@ class PredictionRunner:
             "coarse": extra_data["coarse"]["preds"],
         }
 
-        if self.inference_cfg.run_depth_refiner:
+        if self.inference_cfg["run_depth_refiner"]:
             all_preds["depth_refiner"] = extra_data["depth_refiner"]["preds"]
 
         # Remove any mask tensors

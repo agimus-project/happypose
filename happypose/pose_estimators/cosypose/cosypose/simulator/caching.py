@@ -15,8 +15,10 @@ class BodyCache:
         self.away_transform = (0, 0, 1000), (0, 0, 0, 1)
 
     def _load_body(self, label):
-        ds_idx = np.where(self.urdf_ds.index["label"] == label)[0].item()
-        object_infos = self.urdf_ds[ds_idx].to_dict()
+        ds_idx = np.where(self.urdf_ds.index["label"] == label)[0]
+        if len(ds_idx) == 0:
+            raise ValueError(f'Label {label} not in {self.urdf_ds.index["label"]}')
+        object_infos = self.urdf_ds[ds_idx.item()].to_dict()
         body = Body.load(
             object_infos["urdf_path"],
             scale=object_infos["scale"],

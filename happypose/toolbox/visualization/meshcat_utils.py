@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Third Party
 import meshcat
 import meshcat.geometry as g
@@ -88,7 +87,7 @@ def visualize_mesh(vis, mesh, transform=None, color=None, texture_png=None):
             color_hex = rgb2hex(tuple(color))
             material = meshcat.geometry.MeshPhongMaterial(color=color_hex)
         else:  # color is np.ndarray, e.g. [1,0,0]
-            if not np.issubdtype(color.dtype, np.int):
+            if not np.issubdtype(color.dtype, int):
                 color = (color * 255).astype(np.int32)
             color_hex = rgb2hex(tuple(color))
             material = meshcat.geometry.MeshPhongMaterial(color=color_hex)
@@ -112,7 +111,7 @@ def visualize_scene(vis, object_dict, randomize_color=True):
                 color = data["color"]
 
                 # if it's not an integer, convert it to [0,255]
-                if not np.issubdtype(color.dtype, np.int):
+                if not np.issubdtype(color.dtype, int):
                     color = (color * 255).astype(np.int32)
             else:
                 color = np.random.randint(low=0, high=256, size=3)

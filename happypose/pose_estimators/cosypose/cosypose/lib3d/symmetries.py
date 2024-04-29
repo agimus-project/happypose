@@ -1,7 +1,7 @@
 import numpy as np
 
-from .rotations import euler2quat
-from .transform import Transform
+from happypose.toolbox.lib3d.rotations import euler2quat
+from happypose.toolbox.lib3d.transform import Transform
 
 
 def make_bop_symmetries(dict_symmetries, n_symmetries_continuous=8, scale=0.001):

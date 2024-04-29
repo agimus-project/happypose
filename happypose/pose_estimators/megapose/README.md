@@ -275,7 +275,7 @@ This file contains a list of objects with their estimated poses . For each objec
 Finally, you can visualize the results using:
 
 ```
-python -m megapose.scripts.run_inference_on_example barbecue-sauce --vis-outputs
+python -m megapose.scripts.run_inference_on_example barbecue-sauce --vis-poses
 ```
 which write several visualization files:
 

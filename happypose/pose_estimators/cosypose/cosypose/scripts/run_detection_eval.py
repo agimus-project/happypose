@@ -14,13 +14,13 @@ from happypose.pose_estimators.cosypose.cosypose.datasets.bop import remap_bop_t
 from happypose.pose_estimators.cosypose.cosypose.datasets.datasets_cfg import (
     make_scene_dataset,
 )
-from happypose.pose_estimators.cosypose.cosypose.evaluation.eval_runner.detection_eval import (  # noqa: E501
+from happypose.pose_estimators.cosypose.cosypose.evaluation.eval_runner.detection_eval import (
     DetectionEvaluation,
 )
-from happypose.pose_estimators.cosypose.cosypose.evaluation.meters.detection_meters import (  # noqa: E501
+from happypose.pose_estimators.cosypose.cosypose.evaluation.meters.detection_meters import (
     DetectionMeter,
 )
-from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.detections import (  # noqa: E501
+from happypose.pose_estimators.cosypose.cosypose.evaluation.pred_runner.detections import (
     DetectionRunner,
 )
 from happypose.pose_estimators.cosypose.cosypose.evaluation.runner_utils import (

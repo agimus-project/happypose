@@ -2,10 +2,20 @@ from pathlib import Path
 
 import pybullet as pb
 
-from happypose.pose_estimators.cosypose.cosypose.lib3d.transform import parse_pose_args
 from happypose.toolbox.lib3d.transform import Transform
 
 from .client import BulletClient
+
+
+def parse_pose_args(pose_args):
+    if isinstance(pose_args, Transform):
+        pose = pose_args
+    elif len(pose_args) == 2:
+        pos, orn = pose_args
+        pose = Transform(orn, pos)
+    else:
+        raise ValueError
+    return pose
 
 
 class Body:

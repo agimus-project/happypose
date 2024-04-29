@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 
 # Third Party
@@ -76,7 +75,7 @@ def make_rgb_texture_normal_map(size: int = 32) -> p3d.core.Texture:
             for z in range(size):
                 color = (np.array([x, y, z]) * 255 / size).astype(np.uint8)
                 im[x, y, z] = color.astype(np.uint8)
-    tex.setRamImage(im.tostring())
+    tex.setRamImage(im.tobytes())
     return tex
 
 

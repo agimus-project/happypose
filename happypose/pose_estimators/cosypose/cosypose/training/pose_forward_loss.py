@@ -18,12 +18,12 @@ def cast(obj):
 
 
 def h_pose(model, mesh_db, data, meters, cfg, n_iterations=1, input_generator="fixed"):
-    batch_size, _, h, w = data.images.shape
+    batch_size, _, h, w = data.rgbs.shape
 
-    images = cast(data.images).float() / 255.0
+    images = cast(data.rgbs).float() / 255.0
     K = cast(data.K).float()
     TCO_gt = cast(data.TCO).float()
-    labels = np.array([obj["name"] for obj in data.objects])
+    labels = np.array([obj.label for obj in data.object_datas])
     bboxes = cast(data.bboxes).float()
 
     meshes = mesh_db.select(labels)
@@ -63,10 +63,10 @@ def h_pose(model, mesh_db, data, meters, cfg, n_iterations=1, input_generator="f
     losses_TCO_iter = []
     for n in range(n_iterations):
         iter_outputs = outputs[f"iteration={n+1}"]
-        K_crop = iter_outputs["K_crop"]
-        TCO_input = iter_outputs["TCO_input"]
-        TCO_pred = iter_outputs["TCO_output"]
-        model_outputs = iter_outputs["model_outputs"]
+        K_crop = iter_outputs.K_crop
+        TCO_input = iter_outputs.TCO_input
+        TCO_pred = iter_outputs.TCO_output
+        model_outputs = iter_outputs.model_outputs
 
         if cfg.loss_disentangled:
             if cfg.n_pose_dims == 9:

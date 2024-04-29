@@ -32,8 +32,7 @@ from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import
     check_update_config as check_update_config_pose,
 )
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
-    create_model_coarse,
-    create_model_refiner,
+    load_model_cosypose,
 )
 from happypose.pose_estimators.megapose.evaluation.eval_config import EvalConfig
 from happypose.pose_estimators.megapose.evaluation.evaluation_runner import (
@@ -43,12 +42,8 @@ from happypose.pose_estimators.megapose.evaluation.meters.modelnet_meters import
     ModelNetErrorMeter,
 )
 from happypose.pose_estimators.megapose.evaluation.runner_utils import format_results
-from happypose.pose_estimators.megapose.inference.icp_refiner import ICPRefiner
 
 # Pose estimator
-from happypose.pose_estimators.megapose.inference.teaserpp_refiner import (
-    TeaserppRefiner,
-)
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
@@ -85,46 +80,22 @@ def load_pose_models(coarse_run_id, refiner_run_id, n_workers):
     # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
     cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config_pose(cfg)
-    # object_ds = BOPObjectDataset(BOP_DS_DIR / 'tless/models_cad')
-    # object_ds = make_object_dataset(cfg.object_ds_name)
-    # mesh_db = MeshDataBase.from_object_ds(object_ds)
-    # renderer = BulletBatchRenderer(
-    # object_set=cfg.urdf_ds_name, n_workers=n_workers, gpu_renderer=gpu_renderer
-    # )
-    #
 
     object_dataset = make_object_dataset("ycbv")
-    mesh_db = MeshDataBase.from_object_ds(object_dataset)
     renderer = Panda3dBatchRenderer(
         object_dataset,
         n_workers=n_workers,
         preload_cache=False,
     )
+    mesh_db = MeshDataBase.from_object_ds(object_dataset)
     mesh_db_batched = mesh_db.batched().to(device)
 
-    def load_model(run_id):
-        run_dir = EXP_DIR / run_id
-        # cfg = yaml.load((run_dir / 'config.yaml').read_text(), Loader=yaml.FullLoader)
-        cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
-        cfg = check_update_config_pose(cfg)
-        if cfg.train_refiner:
-            model = create_model_refiner(
-                cfg,
-                renderer=renderer,
-                mesh_db=mesh_db_batched,
-            )
-        else:
-            model = create_model_coarse(cfg, renderer=renderer, mesh_db=mesh_db_batched)
-        ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)
-        ckpt = ckpt["state_dict"]
-        model.load_state_dict(ckpt)
-        model = model.to(device).eval()
-        model.cfg = cfg
-        model.config = cfg
-        return model
-
-    coarse_model = load_model(coarse_run_id)
-    refiner_model = load_model(refiner_run_id)
+    coarse_model = load_model_cosypose(
+        EXP_DIR / coarse_run_id, renderer, mesh_db_batched, device
+    )
+    refiner_model = load_model_cosypose(
+        EXP_DIR / refiner_run_id, renderer, mesh_db_batched, device
+    )
     return coarse_model, refiner_model, mesh_db
 
 
@@ -214,22 +185,7 @@ def run_eval(
     # See https://stackoverflow.com/a/53287330
     assert cfg.coarse_run_id is not None
     assert cfg.refiner_run_id is not None
-    # TODO (emaitre): This fuction seems to take the wrong parameters. Trying to fix
-    # this.
-    """
-    (
-        coarse_model,
-        refiner_model,
-        mesh_db,
-    ) = happypose.toolbox.inference.utils.load_pose_models(
-        coarse_run_id=cfg.coarse_run_id,
-        refiner_run_id=cfg.refiner_run_id,
-        n_workers=cfg.n_rendering_workers,
-        obj_ds_name=obj_ds_name,
-        urdf_ds_name=urdf_ds_name,
-        force_panda3d_renderer=True,
-    )
-    """
+
     object_ds = make_object_dataset(obj_ds_name)
 
     coarse_model, refiner_model, mesh_db = load_pose_models(
@@ -242,8 +198,16 @@ def run_eval(
 
     if cfg.inference.run_depth_refiner:
         if cfg.inference.depth_refiner == "icp":
+            from happypose.pose_estimators.megapose.inference.icp_refiner import (
+                ICPRefiner,
+            )
+
             ICPRefiner(mesh_db, renderer)
         elif cfg.inference.depth_refiner == "teaserpp":
+            from happypose.pose_estimators.megapose.inference.teaserpp_refiner import (
+                TeaserppRefiner,
+            )
+
             TeaserppRefiner(mesh_db, renderer)
         else:
             pass

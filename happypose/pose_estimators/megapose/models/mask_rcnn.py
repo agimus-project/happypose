@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Third Party
 from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
 from torchvision.models.detection.mask_rcnn import MaskRCNN

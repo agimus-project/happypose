@@ -92,7 +92,11 @@ class BatchedMeshes(TensorCollection):
         return {label: obj["n_sym"] for label, obj in self.infos.items()}
 
     def select(self, labels):
-        ids = [self.label_to_id[label] for label in labels]
+        try:
+            ids = [self.label_to_id[label] for label in labels]
+        except KeyError as e:
+            print("self.label_to_id.keys(): ", list(self.label_to_id.keys()))
+            raise e
         return Meshes(
             infos=[self.infos[label] for label in labels],
             labels=self.labels[ids],

@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Third Party
 import numpy as np
 import torch
@@ -54,7 +53,7 @@ def _get_views_TCO_pos_sphere(TCO, tCR, cam_positions_wrt_cam0):
     ref = NodePath("reference_point")
     ref.reparentTo(root)
     tWR = TOC[:3, :3] @ tCR.reshape((3, 1)) + TOC[:3, [-1]]
-    ref.setPos(*tWR[:3])
+    ref.setPos(*tWR[:3].flatten())
 
     radius = np.linalg.norm(np.array(tCR)[:3])
     cam_positions_wrt_cam0 = cam_positions_wrt_cam0 * radius

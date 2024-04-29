@@ -13,21 +13,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 import json
 import pickle
-import sys
 from pathlib import Path
 
 # Third Party
 import numpy as np
 import pandas as pd
+
+# Third Party
+from bop_toolkit_lib import inout
 from PIL import Image
 from tqdm import tqdm
 
 # MegaPose
-from happypose.pose_estimators.megapose.config import BOP_TOOLKIT_DIR, MEMORY
+from happypose.pose_estimators.megapose.config import MEMORY
 
 # Local Folder
 from happypose.toolbox.datasets.scene_dataset import (
@@ -39,13 +40,6 @@ from happypose.toolbox.datasets.scene_dataset import (
 )
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.utils.logging import get_logger
-
-sys.path.append(str(BOP_TOOLKIT_DIR))
-# Third Party
-from bop_toolkit_lib import inout  # noqa
-
-sys.path = sys.path[:-1]
-
 
 logger = get_logger(__name__)
 
@@ -208,7 +202,6 @@ class BOPDataset(SceneDataset):
 
         self.split = split
         self.base_dir = ds_dir / split
-
         logger.info("Loading/making index and annotations...")
         if allow_cache:
             save_file_index = self.ds_dir / f"index_{split}.feather"
@@ -230,7 +223,6 @@ class BOPDataset(SceneDataset):
                 split,
                 make_per_view_annotations=per_view_annotations,
             )
-
         self.use_raw_object_id = use_raw_object_id
         self.label_format = label_format
 
@@ -239,6 +231,8 @@ class BOPDataset(SceneDataset):
             load_depth=load_depth,
             load_segmentation=True,
         )
+        models_infos = json.loads((ds_dir / "models" / "models_info.json").read_text())
+        self.all_labels = [f"obj_{int(obj_id):06d}" for obj_id in models_infos.keys()]
 
     def _load_scene_observation(
         self,
@@ -366,7 +360,6 @@ class BOPDataset(SceneDataset):
                 depth_path = depth_path.with_suffix(".tif")
             depth = np.array(inout.load_depth(depth_path))
             depth *= cam_annotation["depth_scale"] / 1000
-
         observation = SceneObservation(
             rgb=rgb,
             depth=depth,

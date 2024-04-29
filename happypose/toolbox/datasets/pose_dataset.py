@@ -13,10 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 import random
 import time
+import typing
 from dataclasses import dataclass
 from typing import List, Optional, Set, Union
 
@@ -41,11 +41,11 @@ from happypose.toolbox.datasets.augmentations import (
     PillowColor,
     PillowContrast,
     PillowSharpness,
+    VOCBackgroundAugmentation,
 )
 from happypose.toolbox.datasets.augmentations import (
     SceneObservationAugmentation as SceneObsAug,
 )
-from happypose.toolbox.datasets.augmentations import VOCBackgroundAugmentation
 
 # HappyPose
 from happypose.toolbox.datasets.scene_dataset import (
@@ -106,8 +106,8 @@ class NoObjectError(Exception):
 
 
 class PoseDataset(torch.utils.data.IterableDataset):
-    RGB_DIMS = [0, 1, 2]
-    DEPTH_DIMS = [3]
+    RGB_DIMS: typing.ClassVar = [0, 1, 2]
+    DEPTH_DIMS: typing.ClassVar = [3]
 
     def __init__(
         self,
@@ -130,7 +130,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
             self.background_augmentations += [
                 (
                     SceneObsAug(
-                        VOCBackgroundAugmentation(LOCAL_DATA_DIR / "VOC2012"),
+                        VOCBackgroundAugmentation(LOCAL_DATA_DIR),
                         p=0.3,
                     )
                 ),
@@ -239,7 +239,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
 
         has_depth = [d.depth is not None for d in list_data]
         if all(has_depth):
-            batch_data.depths = torch.from_numpy(np.stack([d.depth for d in list_data]))  # type: ignore # noqa
+            batch_data.depths = torch.from_numpy(np.stack([d.depth for d in list_data]))  # type: ignore
         return batch_data
 
     def make_data_from_obs(self, obs: SceneObservation) -> Union[PoseData, None]:

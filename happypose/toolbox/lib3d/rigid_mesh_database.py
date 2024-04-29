@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 from copy import deepcopy
 from typing import List
@@ -82,7 +81,7 @@ class MeshDataBase:
         obj_list = [object_ds[n] for n in range(len(object_ds))]
         return MeshDataBase(obj_list)
 
-    def batched(self, aabb=False, resample_n_points=None, n_sym=64):
+    def batched(self, aabb=False, resample_n_points=None, n_sym=64) -> "BatchedMeshes":
         if aabb:
             assert resample_n_points is None
 

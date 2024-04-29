@@ -17,7 +17,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -qqy libegl1-mesa libegl1-mesa-dev
 
       - name: Caching of the happypose installation and data
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: local_data
           key: data
@@ -30,7 +30,7 @@ jobs:
         run: pip install -U pip
 
       - name: Install happypose
-        run: pip install ".[cpu,evaluation,pypi]" --extra-index-url https://download.pytorch.org/whl/cpu
+        run: pip install ".[cpu,pypi]" --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Download pre-trained models required for tests
         run: |
@@ -38,11 +38,13 @@ jobs:
           python -m happypose.toolbox.utils.download \
             --megapose_models \
             --examples \
-              crackers_example \
+              barbecue-sauce \
             --cosypose_models  \
-              detector-bop-ycbv-pbr--970850 \
-              coarse-bop-ycbv-pbr--724183 \
-              refiner-bop-ycbv-pbr--604090
+              detector-bop-hope-pbr--15246 \
+              coarse-bop-hope-pbr--225203 \
+              refiner-bop-hope-pbr--955392
 
       - name: Run tests
-        run: python -m unittest
+        run: |
+          python -m unittest
+          pytest

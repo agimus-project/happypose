@@ -13,10 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 from dataclasses import dataclass
-from typing import List, Optional, Set, Union
+from typing import List, Set, Union
 
 # Third Party
 import numpy as np
@@ -25,10 +24,9 @@ import torch.multiprocessing
 
 # HappyPose
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
-
-# MegaPose
 from happypose.toolbox.lib3d.transform import Transform
 from happypose.toolbox.lib3d.transform_ops import invert_transform_matrices
+from happypose.toolbox.renderer.types import BatchRenderOutput
 from happypose.toolbox.utils.logging import get_logger
 
 # Local Folder
@@ -39,34 +37,10 @@ from .types import (
     Panda3dLightData,
     Panda3dObjectData,
     Resolution,
+    WorkerRenderOutput,
 )
 
 logger = get_logger(__name__)
-
-
-@dataclass
-class RenderOutput:
-    """rgb: (h, w, 3) uint8
-    normals: (h, w, 3) uint8
-    depth: (h, w, 1) float32.
-    """
-
-    data_id: int
-    rgb: torch.Tensor
-    normals: Optional[torch.Tensor]
-    depth: Optional[torch.Tensor]
-
-
-@dataclass
-class BatchRenderOutput:
-    """rgb: (bsz, 3, h, w) float, values in [0, 1]
-    normals: (bsz, 3, h, w) float, values in [0, 1]
-    depth: (bsz, 1, h, w) float, in meters.
-    """
-
-    rgbs: torch.Tensor
-    normals: Optional[torch.Tensor]
-    depths: Optional[torch.Tensor]
 
 
 @dataclass
@@ -81,6 +55,7 @@ class RenderArguments:
     data_id: int
     render_normals: bool
     render_depth: bool
+    render_binary_mask: bool
     scene_data: SceneData
 
 
@@ -120,8 +95,11 @@ def worker_loop(
                 light_datas=scene_data.light_datas,
                 render_normals=render_args.render_normals,
                 render_depth=render_args.render_depth,
+                render_binary_mask=render_args.render_binary_mask,
                 copy_arrays=True,  # ensures non-negative strid
             )
+            # by definition, each "scene" in batch rendering corresponds to 1 camera, 1 object
+            # -> retrieves the first and only rendering
             renderings_ = renderings[0]
         else:
             h, w = scene_data.camera_data.resolution
@@ -129,13 +107,17 @@ def worker_loop(
                 rgb=np.zeros((h, w, 3), dtype=np.uint8),
                 normals=np.zeros((h, w, 1), dtype=np.uint8),
                 depth=np.zeros((h, w, 1), dtype=np.float32),
+                binary_mask=np.zeros((h, w, 1), dtype=bool),
             )
 
-        output = RenderOutput(
+        output = WorkerRenderOutput(
             data_id=render_args.data_id,
             rgb=renderings_.rgb,
             normals=renderings_.normals if render_args.render_normals else None,
             depth=renderings_.depth if render_args.render_depth else None,
+            binary_mask=renderings_.binary_mask
+            if render_args.render_binary_mask
+            else None,
         )
         del render_args
         out_queue.put(output)
@@ -146,13 +128,13 @@ def worker_loop(
 class Panda3dBatchRenderer:
     def __init__(
         self,
-        object_dataset: RigidObjectDataset,
+        asset_dataset: RigidObjectDataset,
         n_workers: int = 8,
         preload_cache: bool = True,
         split_objects: bool = False,
     ):
         assert n_workers >= 1
-        self._object_dataset = object_dataset
+        self._object_dataset = asset_dataset
         self._n_workers = n_workers
         self._split_objects = split_objects
 
@@ -184,6 +166,7 @@ class Panda3dBatchRenderer:
         bsz = TCO.shape[0]
         assert TCO.shape == (bsz, 4, 4)
         assert K.shape == (bsz, 3, 3)
+        assert bsz == len(labels), "Need same number of labels as TCO/K batch size"
 
         TCO = TCO.detach()
         TOC = invert_transform_matrices(TCO).cpu().numpy().astype(np.float32)
@@ -215,59 +198,59 @@ class Panda3dBatchRenderer:
         K: torch.Tensor,
         light_datas: List[List[Panda3dLightData]],
         resolution: Resolution,
-        render_depth: bool = False,
-        render_mask: bool = False,
         render_normals: bool = False,
+        render_depth: bool = False,
+        render_binary_mask: bool = False,
     ) -> BatchRenderOutput:
-        if render_mask:
-            raise NotImplementedError
-
         scene_datas = self.make_scene_data(labels, TCO, K, light_datas, resolution)
         bsz = len(scene_datas)
 
+        # ==================================
+        # Send batches of renders to workers
+        # ==================================
         for n, scene_data_n in enumerate(scene_datas):
             render_args = RenderArguments(
                 data_id=n,
                 scene_data=scene_data_n,
-                render_depth=render_depth,
                 render_normals=render_normals,
+                render_depth=render_depth,
+                render_binary_mask=render_binary_mask,
             )
 
             in_queue = self._object_label_to_queue[scene_data_n.object_datas[0].label]
             in_queue.put(render_args)
 
+        # ===============================
+        # Retrieve the workers renderings
+        # ===============================
         list_rgbs = [None for _ in np.arange(bsz)]
-        list_depths = [None for _ in np.arange(bsz)]
         list_normals = [None for _ in np.arange(bsz)]
+        list_depths = [None for _ in np.arange(bsz)]
+        list_binary_masks = [None for _ in np.arange(bsz)]
 
         for n in np.arange(bsz):
-            renders = self._out_queue.get()
+            renders: WorkerRenderOutput = self._out_queue.get()
             data_id = renders.data_id
             list_rgbs[data_id] = torch.tensor(renders.rgb)
-            if render_depth:
-                list_depths[data_id] = torch.tensor(renders.depth)
             if render_normals:
                 list_normals[data_id] = torch.tensor(renders.normals)
+            if render_depth:
+                list_depths[data_id] = torch.tensor(renders.depth)
+            if render_binary_mask:
+                list_binary_masks[data_id] = torch.tensor(renders.binary_mask)
             del renders
 
         assert list_rgbs[0] is not None
+
         if torch.cuda.is_available():
             rgbs = torch.stack(list_rgbs).pin_memory().cuda(non_blocking=True)
         else:
             rgbs = torch.stack(list_rgbs)
-
         rgbs = rgbs.float().permute(0, 3, 1, 2) / 255
 
-        if render_depth:
-            assert list_depths[0] is not None
-            if torch.cuda.is_available():
-                depths = torch.stack(list_depths).pin_memory().cuda(non_blocking=True)
-            else:
-                depths = torch.stack(list_depths)
-
-            depths = depths.float().permute(0, 3, 1, 2)
-        else:
-            depths = None
+        normals = None
+        depths = None
+        binary_masks = None
 
         if render_normals:
             assert list_normals[0] is not None
@@ -276,13 +259,30 @@ class Panda3dBatchRenderer:
             else:
                 normals = torch.stack(list_normals)
             normals = normals.float().permute(0, 3, 1, 2) / 255
-        else:
-            normals = None
+
+        if render_depth:
+            assert list_depths[0] is not None
+            if torch.cuda.is_available():
+                depths = torch.stack(list_depths).pin_memory().cuda(non_blocking=True)
+            else:
+                depths = torch.stack(list_depths)
+            depths = depths.float().permute(0, 3, 1, 2)
+
+        if render_binary_mask:
+            assert list_binary_masks[0] is not None
+            if torch.cuda.is_available():
+                binary_masks = (
+                    torch.stack(list_binary_masks).pin_memory().cuda(non_blocking=True)
+                )
+            else:
+                binary_masks = torch.stack(list_binary_masks)
+            binary_masks = binary_masks.permute(0, 3, 1, 2)
 
         return BatchRenderOutput(
             rgbs=rgbs,
-            depths=depths,
             normals=normals,
+            depths=depths,
+            binary_masks=binary_masks,
         )
 
     def _init_renderers(self, preload_cache: bool) -> None:
@@ -313,7 +313,7 @@ class Panda3dBatchRenderer:
 
         for n in range(self._n_workers):
             if preload_cache:
-                preload_labels = set(object_labels_split[n].tolist())
+                preload_labels = set(list(object_labels_split[n]))
             else:
                 preload_labels = set()
             renderer_process = torch.multiprocessing.Process(

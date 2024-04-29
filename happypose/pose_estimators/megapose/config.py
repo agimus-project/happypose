@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 import os
 import sys
@@ -36,7 +35,10 @@ NB_DATA_DIR = LOCAL_DATA_DIR / "notebook_data"
 SHAPENET_DIR = LOCAL_DATA_DIR / "shapenetcorev2"
 WDS_DS_DIR = LOCAL_DATA_DIR / "webdatasets"
 
-BOP_TOOLKIT_DIR = PROJECT_ROOT / "deps" / "bop_toolkit_challenge"
+# BOP eval scripts names
+BOP_POSE_EVAL_SCRIPT_NAME = "eval_bop19_pose.py"
+BOP_DETECTION_EVAL_SCRIPT_NAME = "eval_bop22_coco.py"
+
 BLENDER_PBR_DS_DIR = LOCAL_DATA_DIR / "blender_pbr_datasets"
 CC_TEXTURE_FOLDER = str(LOCAL_DATA_DIR / "cctextures")
 

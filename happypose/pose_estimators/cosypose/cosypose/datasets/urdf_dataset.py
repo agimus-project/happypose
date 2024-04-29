@@ -1,18 +1,29 @@
+import json
 from pathlib import Path
 
 import pandas as pd
 
 
 class UrdfDataset:
-    def __init__(self, ds_dir):
-        ds_dir = Path(ds_dir)
+    def __init__(self, urdf_ds_dir, label_filename="objname2label.json"):
+        urdf_ds_dir = Path(urdf_ds_dir)
+        label_path = urdf_ds_dir / label_filename
+        if label_path.exists():
+            with label_path.open() as fp:
+                objname2label = json.load(fp)
+        else:
+            objname2label = None
         index = []
-        for urdf_dir in Path(ds_dir).iterdir():
-            urdf_paths = list(urdf_dir.glob("*.urdf"))
+        for obj_dir in urdf_ds_dir.iterdir():
+            urdf_paths = list(obj_dir.glob("*.urdf"))
             if len(urdf_paths) == 1:
                 urdf_path = urdf_paths[0]
+                if objname2label is None:
+                    label = obj_dir.name
+                else:
+                    label = objname2label[obj_dir.name]
                 infos = {
-                    "label": urdf_dir.name,
+                    "label": label,
                     "urdf_path": urdf_path.as_posix(),
                     "scale": 1.0,
                 }
@@ -24,12 +35,6 @@ class UrdfDataset:
 
     def __len__(self):
         return len(self.index)
-
-
-class BOPUrdfDataset(UrdfDataset):
-    def __init__(self, ds_dir):
-        super().__init__(ds_dir)
-        self.index["scale"] = 0.001
 
 
 class OneUrdfDataset:
@@ -44,17 +49,3 @@ class OneUrdfDataset:
 
     def __getitem__(self, idx):
         return self.index.iloc[idx]
-
-
-class UrdfMultiScaleDataset(UrdfDataset):
-    def __init__(self, urdf_path, label, scales=[]):
-        index = []
-        for scale in scales:
-            index.append(
-                {
-                    "urdf_path": urdf_path,
-                    "label": label + f"scale={scale:.3f}",
-                    "scale": scale,
-                },
-            )
-        self.index = pd.DataFrame(index)

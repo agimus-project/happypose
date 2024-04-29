@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 from collections import OrderedDict
 
@@ -74,10 +73,10 @@ class EvaluationRunner:
     @staticmethod
     def make_empty_predictions():
         infos = {
-            "view_id": np.empty(0, dtype=np.int),
-            "scene_id": np.empty(0, dtype=np.int),
+            "view_id": np.empty(0, dtype=int),
+            "scene_id": np.empty(0, dtype=int),
             "label": np.empty(0, dtype=np.object),
-            "score": np.empty(0, dtype=np.float),
+            "score": np.empty(0, dtype=float),
         }
         poses = torch.empty(0, 4, 4, dtype=torch.float)
         return tc.PandasTensorCollection(infos=pd.DataFrame(infos), poses=poses)

@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 from dataclasses import dataclass
 from typing import List, Optional
@@ -60,7 +59,7 @@ class EvalConfig:
     ds_name: str = "ycbv.bop19"
 
     # Inference
-    inference: InferenceConfig = InferenceConfig()
+    inference: InferenceConfig = InferenceConfig()  # noqa RUF009
 
     # Run management
     result_id: Optional[str] = None
@@ -76,7 +75,7 @@ class EvalConfig:
 
     # Infos
     global_batch_size: Optional[int] = None
-    hardware: HardwareConfig = HardwareConfig()
+    hardware: HardwareConfig = HardwareConfig()  # noqa RUF009
 
     # Debug
     debug: bool = False

@@ -1,19 +1,22 @@
 import json
 from pathlib import Path
+from typing import Union
 
 
 class BOPObjectDataset:
-    def __init__(self, ds_dir):
+    def __init__(self, ds_dir, label_format: Union[None, str] = None):
         ds_dir = Path(ds_dir)
         infos_file = ds_dir / "models_info.json"
         infos = json.loads(infos_file.read_text())
         objects = []
         for obj_id, bop_info in infos.items():
             obj_id = int(obj_id)
-            obj_label = f"obj_{obj_id:06d}"
-            mesh_path = (ds_dir / obj_label).with_suffix(".ply").as_posix()
+            label = f"obj_{obj_id:06d}"
+            mesh_path = (ds_dir / label).with_suffix(".ply").as_posix()
+            if label_format is not None:
+                label = label_format.format(label=label)
             obj = {
-                "label": obj_label,
+                "label": label,
                 "category": None,
                 "mesh_path": mesh_path,
                 "mesh_units": "mm",

@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # Standard Library
 import functools
 import os
@@ -228,7 +227,7 @@ def train_megapose(cfg: TrainingConfig) -> None:
         )
 
     renderer = Panda3dBatchRenderer(
-        object_dataset=renderer_obj_dataset,
+        asset_dataset=renderer_obj_dataset,
         n_workers=cfg.n_rendering_workers,
         preload_cache=False,
         split_objects=True,

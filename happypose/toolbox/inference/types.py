@@ -110,9 +110,15 @@ class ObservationTensor:
     K: Optional[torch.Tensor] = None  # [B,3,3]
 
     def cuda(self) -> ObservationTensor:
-        self.images = self.images.cuda()
+        return self.to("cuda")
+
+    def cpu(self) -> ObservationTensor:
+        return self.to("cpu")
+
+    def to(self, device):
+        self.images = self.images.to(device)
         if self.K is not None:
-            self.K = self.K.cuda()
+            self.K = self.K.to(device)
         return self
 
     @property
@@ -172,8 +178,8 @@ class ObservationTensor:
         Args:
         ----
             rgb: [H,W,3] np.uint8
-            depth: [H,W] np.float
-            K: [3,3] np.float
+            depth: [H,W] float
+            K: [3,3] float
 
         """
         assert rgb.dtype == np.uint8

@@ -8,15 +8,11 @@ import torch
 import torch.distributed as dist
 import yaml
 from torch.backends import cudnn
-from torch.utils.data import ConcatDataset, DataLoader
+from torch.utils.data import DataLoader
 from torchnet.meter import AverageValueMeter
 from tqdm import tqdm
 
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
-from happypose.pose_estimators.cosypose.cosypose.datasets.pose_dataset import (
-    PoseDataset,
-)
-from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler
 from happypose.pose_estimators.cosypose.cosypose.evaluation.prediction_runner import (
     PredictionRunner,
 )
@@ -29,9 +25,11 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator impor
     PoseEstimator,
 )
 from happypose.pose_estimators.cosypose.cosypose.scripts.run_cosypose_eval import (
-    get_pose_meters,
     load_pix2pose_results,
     load_posecnn_results,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
+    load_model_cosypose,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     get_rank,
@@ -41,24 +39,36 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     sync_model,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader import (
-    MultiEpochDataLoader,
-)
 from happypose.pose_estimators.megapose.evaluation.evaluation_runner import (
     EvaluationRunner,
+)
+from happypose.pose_estimators.megapose.evaluation.meters.modelnet_meters import (
+    ModelNetErrorMeter,
 )
 from happypose.toolbox.datasets.datasets_cfg import (
     make_object_dataset,
     make_scene_dataset,
 )
+from happypose.toolbox.datasets.pose_dataset import PoseDataset
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableMultiSceneDataset,
+    RandomIterableSceneDataset,
+)
 from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.toolbox.utils.resources import (
+    get_cuda_memory,
+    get_gpu_memory,
+    get_total_memory,
+)
 
 from .pose_forward_loss import h_pose
-from .pose_models_cfg import check_update_config, create_model_pose
+from .pose_models_cfg import check_update_config, create_pose_model_cosypose
 
 cudnn.benchmark = True
 logger = get_logger(__name__)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def log(config, model, log_dict, test_dict, epoch):
@@ -89,37 +99,26 @@ def log(config, model, log_dict, test_dict, epoch):
     logger.info(test_dict)
 
 
-def make_eval_bundle(args, model_training):
+def make_eval_bundle(args, model_training, mesh_db):
     eval_bundle = {}
     model_training.cfg = args
 
-    def load_model(run_id):
-        if run_id is None:
-            return None
-        run_dir = EXP_DIR / run_id
-        cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.FullLoader)
-        cfg = check_update_config(cfg)
-        model = (
-            create_model_pose(
-                cfg,
-                renderer=model_training.renderer,
-                mesh_db=model_training.mesh_db,
-            )
-            .cuda()
-            .eval()
-        )
-        ckpt = torch.load(run_dir / "checkpoint.pth.tar")["state_dict"]
-        model.load_state_dict(ckpt)
-        model.eval()
-        model.cfg = cfg
-        return model
-
     if args.train_refiner:
         refiner_model = model_training
-        coarse_model = load_model(args.coarse_run_id_for_test)
+        coarse_model = load_model_cosypose(
+            EXP_DIR / args.coarse_run_id_for_test,
+            model_training.renderer,
+            model_training.mesh_db,
+            device,
+        )
     elif args.train_coarse:
         coarse_model = model_training
-        refiner_model = load_model(args.refiner_run_id_for_test)
+        refiner_model = load_model_cosypose(
+            EXP_DIR / args.refiner_run_id_for_test,
+            model_training.renderer,
+            model_training.mesh_db,
+            device,
+        )
     else:
         raise ValueError
 
@@ -217,10 +216,9 @@ def make_eval_bundle(args, model_training):
             )
 
         # Evaluation
-        meters = get_pose_meters(scene_ds, ds_name)
-        meters = {k.split("_")[0]: v for k, v in meters.items()}
-        list(iter(pred_runner.sampler))
-        print(scene_ds.frame_index)
+        meters = {
+            "modelnet": ModelNetErrorMeter(mesh_db, sample_n_points=None),
+        }
         # scene_ds_ids = np.concatenate(
         # scene_ds.frame_index.loc[mv_group_ids, "scene_ds_ids"].values
         # )
@@ -276,6 +274,8 @@ def train_pose(args):
     device = torch.cuda.current_device()
     init_distributed_mode()
     world_size = get_world_size()
+    this_rank_epoch_size = args.epoch_size // get_world_size()
+    this_rank_n_batch_per_epoch = this_rank_epoch_size // args.batch_size
     args.n_gpus = world_size
     args.global_batch_size = world_size * args.batch_size
     logger.info(f"Connection established with {world_size} gpus.")
@@ -283,50 +283,51 @@ def train_pose(args):
     # Make train/val datasets
     def make_datasets(dataset_names):
         datasets = []
+        deterministic = False
         for ds_name, n_repeat in dataset_names:
             assert "test" not in ds_name
+            print("ds_name = ", ds_name)
             ds = make_scene_dataset(ds_name)
+            iterator = RandomIterableSceneDataset(ds, deterministic=deterministic)
             logger.info(f"Loaded {ds_name} with {len(ds)} images.")
             for _ in range(n_repeat):
-                datasets.append(ds)
-        return ConcatDataset(datasets)
+                datasets.append(iterator)
+        return IterableMultiSceneDataset(datasets)
 
     scene_ds_train = make_datasets(args.train_ds_names)
     scene_ds_val = make_datasets(args.val_ds_names)
 
     ds_kwargs = {
         "resize": args.input_resize,
-        "rgb_augmentation": args.rgb_augmentation,
-        "background_augmentation": args.background_augmentation,
+        "apply_rgb_augmentation": args.rgb_augmentation,
+        "apply_background_augmentation": args.background_augmentation,
         "min_area": args.min_area,
-        "gray_augmentation": args.gray_augmentation,
+        "apply_depth_augmentation": False,
     }
     ds_train = PoseDataset(scene_ds_train, **ds_kwargs)
     ds_val = PoseDataset(scene_ds_val, **ds_kwargs)
 
-    train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
+    # train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(
         ds_train,
-        sampler=train_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=ds_train.collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_train = MultiEpochDataLoader(ds_iter_train)
+    ds_iter_train = iter(ds_iter_train)
 
-    val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
+    # val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
     ds_iter_val = DataLoader(
         ds_val,
-        sampler=val_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=ds_val.collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_val = MultiEpochDataLoader(ds_iter_val)
+    ds_iter_val = iter(ds_iter_val)
 
     # Make model
     object_ds = make_object_dataset(args.object_ds_name)
@@ -335,16 +336,14 @@ def train_pose(args):
         n_workers=args.n_rendering_workers,
         preload_cache=False,
     )
-    mesh_db = (
-        MeshDataBase.from_object_ds(object_ds)
-        .batched(n_sym=args.n_symmetries_batch)
-        .cuda()
-        .float()
-    )
+    mesh_db = MeshDataBase.from_object_ds(object_ds)
+    mesh_db_batched = mesh_db.batched(n_sym=args.n_symmetries_batch).cuda().float()
 
-    model = create_model_pose(cfg=args, renderer=renderer, mesh_db=mesh_db).cuda()
+    model = create_pose_model_cosypose(
+        cfg=args, renderer=renderer, mesh_db=mesh_db_batched
+    ).cuda()
 
-    eval_bundle = make_eval_bundle(args, model)
+    eval_bundle = make_eval_bundle(args, model, mesh_db)
 
     if args.resume_run_id:
         resume_dir = EXP_DIR / args.resume_run_id
@@ -413,7 +412,7 @@ def train_pose(args):
             model=model,
             cfg=args,
             n_iterations=args.n_iterations,
-            mesh_db=mesh_db,
+            mesh_db=mesh_db_batched,
             input_generator=args.TCO_input_generator,
         )
 
@@ -421,45 +420,53 @@ def train_pose(args):
             model.train()
             iterator = tqdm(ds_iter_train, ncols=80)
             t = time.time()
-            for n, sample in enumerate(iterator):
-                if n > 0:
-                    meters_time["data"].add(time.time() - t)
+            for n, data in enumerate(iterator):
+                if n < 3:
+                    if n > 0:
+                        meters_time["data"].add(time.time() - t)
 
-                optimizer.zero_grad()
+                    optimizer.zero_grad()
 
-                t = time.time()
-                loss = h(data=sample, meters=meters_train)
-                meters_time["forward"].add(time.time() - t)
-                iterator.set_postfix(loss=loss.item())
-                meters_train["loss_total"].add(loss.item())
+                    t = time.time()
+                    loss = h(data=data, meters=meters_train)
+                    meters_time["forward"].add(time.time() - t)
+                    iterator.set_postfix(loss=loss.item())
+                    meters_train["loss_total"].add(loss.item())
 
-                t = time.time()
-                loss.backward()
-                total_grad_norm = torch.nn.utils.clip_grad_norm_(
-                    model.parameters(),
-                    max_norm=args.clip_grad_norm,
-                    norm_type=2,
-                )
-                meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
+                    t = time.time()
+                    loss.backward()
+                    total_grad_norm = torch.nn.utils.clip_grad_norm_(
+                        model.parameters(),
+                        max_norm=args.clip_grad_norm,
+                        norm_type=2,
+                    )
+                    meters_train["grad_norm"].add(
+                        torch.as_tensor(total_grad_norm).item()
+                    )
 
-                optimizer.step()
-                meters_time["backward"].add(time.time() - t)
-                meters_time["memory"].add(
-                    torch.cuda.max_memory_allocated() / 1024.0**2,
-                )
+                    optimizer.step()
+                    meters_time["backward"].add(time.time() - t)
+                    meters_time["memory"].add(
+                        torch.cuda.max_memory_allocated() / 1024.0**2,
+                    )
 
-                if epoch < args.n_epochs_warmup:
-                    lr_scheduler_warmup.step()
-                t = time.time()
+                    if epoch < args.n_epochs_warmup:
+                        lr_scheduler_warmup.step()
+                    t = time.time()
+                else:
+                    break
             if epoch >= args.n_epochs_warmup:
                 lr_scheduler.step()
 
         @torch.no_grad()
         def validation():
             model.eval()
-            for sample in tqdm(ds_iter_val, ncols=80):
-                loss = h(data=sample, meters=meters_val)
-                meters_val["loss_total"].add(loss.item())
+            for n, sample in enumerate(tqdm(ds_iter_val, ncols=80)):
+                if n < 3:
+                    loss = h(data=sample, meters=meters_val)
+                    meters_val["loss_total"].add(loss.item())
+                else:
+                    break
 
         @torch.no_grad()
         def test():
@@ -467,33 +474,39 @@ def train_pose(args):
             return run_eval(eval_bundle, epoch=epoch)
 
         train_epoch()
+        print("end train, stepping in to valida")
         if epoch % args.val_epoch_interval == 0:
             validation()
 
-        test_dict = None
-        if epoch % args.test_epoch_interval == 0:
-            test_dict = test()
+        # test_dict = None
+        # if epoch % args.test_epoch_interval == 0:
+        #    test_dict = test()
 
+        print("updating dic")
         log_dict = {}
         log_dict.update(
             {
                 "grad_norm": meters_train["grad_norm"].mean,
                 "grad_norm_std": meters_train["grad_norm"].std,
                 "learning_rate": optimizer.param_groups[0]["lr"],
-                "time_forward": meters_time["forward"].mean,
-                "time_backward": meters_time["backward"].mean,
-                "time_data": meters_time["data"].mean,
-                "gpu_memory": meters_time["memory"].mean,
+                "time_forward": meters_train["time_forward"].mean,
+                "time_backward": meters_train["time_backward"].mean,
+                "time_data": meters_train["time_data"].mean,
+                "cuda_memory": get_cuda_memory(),
+                "gpu_memory": get_gpu_memory(),
+                "cpu_memory": get_total_memory(),
                 "time": time.time(),
-                "n_iterations": (epoch + 1) * len(ds_iter_train),
-                "n_datas": (epoch + 1) * args.global_batch_size * len(ds_iter_train),
+                "n_iterations": epoch * args.epoch_size // args.batch_size,
+                "n_datas": epoch * this_rank_n_batch_per_epoch * args.batch_size,
             },
         )
 
+        print("meters")
         for string, meters in zip(("train", "val"), (meters_train, meters_val)):
             for k in dict(meters).keys():
                 log_dict[f"{string}_{k}"] = meters[k].mean
 
+        print("reduce dict")
         log_dict = reduce_dict(log_dict)
         if get_rank() == 0:
             log(
@@ -501,6 +514,7 @@ def train_pose(args):
                 model=model,
                 epoch=epoch,
                 log_dict=log_dict,
-                test_dict=test_dict,
+                test_dict=None,
             )
+        print("waiting on barrier")
         dist.barrier()

@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-
 # MegaPose
 from happypose.pose_estimators.megapose.models.mask_rcnn import DetectorMaskRCNN
 from happypose.toolbox.utils.logging import get_logger

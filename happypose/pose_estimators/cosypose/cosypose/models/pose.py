@@ -15,15 +15,17 @@ from happypose.pose_estimators.cosypose.cosypose.lib3d.cosypose_ops import (
 from happypose.pose_estimators.cosypose.cosypose.lib3d.cropping import (
     deepim_crops_robust as deepim_crops,
 )
-from happypose.pose_estimators.cosypose.cosypose.lib3d.rotations import (
-    compute_rotation_matrix_from_ortho6d,
-    compute_rotation_matrix_from_quaternions,
-)
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.pose_estimators.megapose.models.pose_rigid import (
     PosePredictorOutputCosypose,
 )
+from happypose.toolbox.lib3d.rotations import (
+    compute_rotation_matrix_from_ortho6d,
+    compute_rotation_matrix_from_quaternions,
+)
 from happypose.toolbox.renderer import Panda3dLightData
+from happypose.toolbox.renderer.bullet_batch_renderer import BulletBatchRenderer
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
 logger = get_logger(__name__)
 
@@ -128,21 +130,32 @@ class PosePredictor(nn.Module):
                 labels,
             )
 
-            ambient_light = Panda3dLightData(
-                light_type="ambient",
-                color=(1.0, 1.0, 1.0, 1.0),
-            )
-            light_datas = [[ambient_light] for _ in range(len(labels))]
+            if isinstance(self.renderer, Panda3dBatchRenderer):
+                ambient_light = Panda3dLightData(
+                    light_type="ambient",
+                    color=(1.0, 1.0, 1.0, 1.0),
+                )
+                light_datas = [[ambient_light] for _ in range(len(labels))]
 
-            renders = self.renderer.render(
-                labels=labels,
-                TCO=TCO_input,
-                K=K_crop,
-                resolution=self.render_size,
-                light_datas=light_datas,
-            )
-            renders = renders.rgbs
-            x = torch.cat((images_crop, renders), dim=1)
+                renders = self.renderer.render(
+                    labels=labels,
+                    TCO=TCO_input,
+                    K=K_crop,
+                    resolution=self.render_size,
+                    light_datas=light_datas,
+                )
+            elif isinstance(self.renderer, BulletBatchRenderer):
+                renders = self.renderer.render(
+                    labels=labels,
+                    TCO=TCO_input,
+                    K=K_crop,
+                    resolution=self.render_size,
+                )
+            else:
+                raise ValueError(
+                    f"Renderer of type {type(self.renderer)} not supported"
+                )
+            x = torch.cat((images_crop, renders.rgbs), dim=1)
 
             model_outputs = self.net_forward(x)
 
@@ -158,7 +171,7 @@ class PosePredictor(nn.Module):
             }
 
             outputs[f"iteration={n+1}"] = PosePredictorOutputCosypose(
-                renders=renders,
+                renders=renders.rgbs,
                 images_crop=images_crop,
                 TCO_input=TCO_input,
                 TCO_output=TCO_output,
@@ -167,6 +180,7 @@ class PosePredictor(nn.Module):
                 K_crop=K_crop,
                 boxes_rend=boxes_rend,
                 boxes_crop=boxes_crop,
+                model_outputs=model_outputs,
             )
 
             TCO_input = TCO_output
@@ -176,7 +190,7 @@ class PosePredictor(nn.Module):
                 self.tmp_debug.update(
                     images=images,
                     images_crop=images_crop,
-                    renders=renders,
+                    renders=renders.rgbs,
                 )
                 path = DEBUG_DATA_DIR / f"debug_iter={n+1}.pth.tar"
                 logger.info(f"Wrote debug data: {path}")
