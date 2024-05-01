@@ -33,7 +33,7 @@ ipython = "^8.12.2"
 joblib = "^1.3.2"
 meshcat = "^0.3.2"
 omegaconf = "^2.3.0"
-open3d = "^0.17.0"
+open3d = "^0.18.0"
 opencv-contrib-python = {optional = true, version = "^4.8.0.76"}
 opencv-python = {optional = true, version = "^4.8.0.76"}
 panda3d = "=1.10.13"
