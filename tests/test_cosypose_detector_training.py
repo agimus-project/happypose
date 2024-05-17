@@ -138,7 +138,6 @@ from torch.backends import cudnn
 from torch.hub import load_state_dict_from_url
 from torch.utils.data import DataLoader
 from torchnet.meter import AverageValueMeter
-from torchvision.models.detection.mask_rcnn import model_urls
 from tqdm import tqdm
 
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
@@ -294,7 +293,7 @@ def train_detector(args):
         logger.info(f"Using pretrained model from {pretrain_path}.")
         model.load_state_dict(torch.load(pretrain_path)["state_dict"])
     elif args.pretrain_coco:
-        state_dict = load_state_dict_from_url(model_urls["maskrcnn_resnet50_fpn_coco"])
+        state_dict = load_state_dict_from_url('https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth')
 
         def keep(k):
             return "box_predictor" not in k and "mask_predictor" not in k
