@@ -60,7 +60,7 @@ torchvision = [
   {markers = "extra=='cpu'", optional = true, source = "torch_cpu", version = "0.14.1+cpu"},
   {markers = "extra=='gpu'", optional = true, version = "0.14.1"}
 ]
-tqdm = "^4.66.1"
+tqdm = "^4.66.4"
 transforms3d = "^0.4.1"
 trimesh = "^3.23.5"
 webdataset = "^0.2.57"
