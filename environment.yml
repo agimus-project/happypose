@@ -17,4 +17,5 @@ dependencies:
   - opencv
   - pinocchio
   - torchtnt
-  - torchnet
+  - pip:
+    - torchnet
