@@ -59,6 +59,7 @@ torch = [
   {markers = "extra=='cpu'", optional = true, source = "torch_cpu", version = "2.1"},
   {markers = "extra=='gpu'", optional = true, version = "2.1"}
 ]
+torchnet = {optional = true, version = "^0.0.4"}
 torchtnt = {optional = true, version = "^0.2.4"}
 torchvision = [
   {markers = "extra=='cpu'", optional = true, source = "torch_cpu", version = "0.16"},
