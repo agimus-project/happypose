@@ -12,7 +12,7 @@ class DetectorMaskRCNN(MaskRCNN):
         anchor_sizes=((32,), (64,), (128,), (256,), (512,)),
     ):
         assert backbone_str == "resnet50-fpn"
-        backbone = resnet_fpn_backbone("resnet50", pretrained=False)
+        backbone = resnet_fpn_backbone(backbone_name="resnet50", weights=None)
 
         aspect_ratios = ((0.5, 1.0, 2.0),) * len(anchor_sizes)
         rpn_anchor_generator = AnchorGenerator(anchor_sizes, aspect_ratios)

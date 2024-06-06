@@ -178,7 +178,7 @@ def add_instance_id(
 
     df = inputs.infos
     df = df.groupby(["batch_im_id", "label"], group_keys=False).apply(
-        lambda df: create_instance_id(df),
+        lambda df: create_instance_id(df), include_groups=True
     )
     inputs.infos = df
     return inputs

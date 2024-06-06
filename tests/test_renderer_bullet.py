@@ -7,7 +7,7 @@ import pytest
 import torch
 from numpy.testing import assert_array_less as np_assert_array_less
 from numpy.testing import assert_equal as np_assert_equal
-from torch.testing import assert_allclose as tr_assert_allclose
+from torch.testing import assert_close as tr_assert_close
 
 from happypose.toolbox.datasets.object_dataset import RigidObject, RigidObjectDataset
 from happypose.toolbox.lib3d.transform import Transform
@@ -206,10 +206,10 @@ class TestBulletRenderer:
         assert renderings.binary_masks.dtype == torch.bool
 
         # Renders from 2 identical cams are equals
-        assert tr_assert_allclose(renderings.rgbs[0], renderings.rgbs[1]) is None
-        assert tr_assert_allclose(renderings.depths[0], renderings.depths[1]) is None
+        assert tr_assert_close(renderings.rgbs[0], renderings.rgbs[1]) is None
+        assert tr_assert_close(renderings.depths[0], renderings.depths[1]) is None
         assert (
-            tr_assert_allclose(renderings.binary_masks[0], renderings.binary_masks[1])
+            tr_assert_close(renderings.binary_masks[0], renderings.binary_masks[1])
             is None
         )
 

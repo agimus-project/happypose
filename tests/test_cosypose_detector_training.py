@@ -350,7 +350,8 @@ def train_detector(args):
         gamma=0.1,
     )
     lr_scheduler.last_epoch = start_epoch - 1
-    lr_scheduler.step()
+    # This led to a warning in newer version of Py
+    # lr_scheduler.step()
 
     for epoch in range(start_epoch, end_epoch):
         meters_train = defaultdict(AverageValueMeter)
