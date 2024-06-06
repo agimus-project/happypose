@@ -75,7 +75,7 @@ cpu = ["torch", "torchvision"]
 evaluation = ["cmeel-teaser-plusplus"]
 gpu = ["torch", "torchvision"]
 multiview = ["cosypose"]
-pypi = ["opencv-contrib-python", "opencv-python", "pin"]
+pypi = ["opencv-contrib-python", "opencv-python", "pin", "torchtnt"]
 
 [tool.poetry.group.dev]
 optional = true
