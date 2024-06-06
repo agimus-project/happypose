@@ -16,3 +16,4 @@ dependencies:
   - firefox
   - opencv
   - pinocchio
+  - torchtnt
