@@ -71,6 +71,7 @@ async def main():
     parser.add_argument("--megapose_models", action="store_true")
     parser.add_argument("--urdf_models", nargs="*")
     parser.add_argument("--ycbv_compat_models", action="store_true")
+    parser.add_argument("--ycbv_tests", action="store_true")
     parser.add_argument("--texture_dataset", action="store_true")
     parser.add_argument("--result_id", nargs="*")
     parser.add_argument("--bop_result_id", nargs="*")
@@ -166,6 +167,12 @@ async def main():
                 BOP_DS_DIR / "ycbv",
             ),
         ]
+
+    if args.ycbv_tests:
+        to_dl.append(("ycbv-debug.zip", DOWNLOAD_DIR))
+        to_unzip.append(
+            (DOWNLOAD_DIR / "ycbv-debug.zip", LOCAL_DATA_DIR / "results")
+        )
 
     if args.cosypose_models:
         for model in args.cosypose_models:
