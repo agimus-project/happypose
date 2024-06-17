@@ -48,7 +48,7 @@ jobs:
       - name: Run tests
         run: |
           poetry run coverage run --source=happypose -m unittest
-          poetry run coverage run --source=happypose -m pytest tests
+          poetry run coverage run --source=happypose -m pytest tests -v
 
       - name: Process coverage
         run: poetry run coverage xml

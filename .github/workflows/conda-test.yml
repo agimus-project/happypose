@@ -69,4 +69,4 @@ jobs:
       - name: Run tests
         run: |
           python -m unittest
-          pytest tests
+          pytest tests -v
