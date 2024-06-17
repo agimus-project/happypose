@@ -1,0 +1,9 @@
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+# torch version numbers are required, so that we can add that +cu121 part for uv,
+# ref. https://github.com/astral-sh/uv/blob/main/PIP_COMPATIBILITY.md#local-version-identifiers
+torch==2.3.0+cu121 
+torchvision==0.18.0+cu121 
+torchaudio==2.3.0+cu121 
+
+-r base.in
