@@ -110,7 +110,7 @@ class TestCosyPoseEvaluation():
         assert self.cfg['n_rendering_workers'] == 8, "Error: n_rendering_workers is not correct"
         assert self.cfg['n_frames'] == None, "Error: n_frames is not correct"
         assert self.cfg['batch_size'] == 1, "Error: batch_size is not correct"
-        assert self.cfg['save_dir'] == '/mnt/data/data_happypose/results/ycbv-debug', "Error: save_dir is not correct"
+        assert self.cfg['save_dir'] == f'{LOCAL_DATA_DIR}/results/ycbv-debug', "Error: save_dir is not correct"
         assert self.cfg['bsz_images'] == 256, "Error: bsz_images is not correct"
         assert self.cfg['bsz_objects'] == 16, "Error: bsz_objects is not correct"
         assert self.cfg['skip_inference'] == True, "Error: skip_inference is not correct"
