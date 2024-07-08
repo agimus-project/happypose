@@ -2,7 +2,6 @@
 
 [![Conda](https://github.com/agimus-project/happypose/actions/workflows/conda-test.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/conda-test.yml)
 [![Pip](https://github.com/agimus-project/happypose/actions/workflows/pip-test.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/pip-test.yml)
-[![Poetry](https://github.com/agimus-project/happypose/actions/workflows/poetry-test.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/poetry-test.yml)
 [![Book](https://github.com/agimus-project/happypose/actions/workflows/book.yml/badge.svg)](https://github.com/agimus-project/happypose/actions/workflows/book.yml)
 
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/agimus-project/happypose/main.svg)](https://results.pre-commit.ci/latest/github/agimus-project/happypose/main)
@@ -16,7 +15,7 @@ Toolbox and trackers for object pose-estimation. Based on the work [CosyPose](ht
 
 ## Installation
 
-To install happypose, you can use pip or poetry.
+To install happypose, you can use pip.
 
 We strongly suggest to install it in either a
 [venv](https://docs.python.org/fr/3/library/venv.html) or a
@@ -29,7 +28,7 @@ git clone --branch dev --recurse-submodules https://github.com/agimus-project/ha
 cd happypose
 conda env create -f environment.yml
 conda activate happypose
-pip install .
+pip install -r requirements/YOUR_DEVICE.lock  # you *must* choose between cpu / cu121
 ```
 
 ### Example with venv
@@ -39,15 +38,8 @@ git clone --branch dev --recurse-submodules https://github.com/agimus-project/ha
 cd happypose
 python -m venv .venv
 source .venv/bin/activate
-pip install .[pypi,cpu] --extra-index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements/YOUR_DEVICE.lock  # you *must* choose between cpu / cu121
 ```
-
-### Install extras:
-
-- `cpu`: required to get pytorch CPU from PyPI (don't use this for GPU or with conda)
-- `gpu`: required to get pytorch GPU from PyPI (don't use this for CPU or with conda)
-- `multiview`: installs cosypose c++ extension
-- `pypi`: install pinocchio & opencv from PyPI (don't use this with conda)
 
 ## Create data directory
 
