@@ -4814,4 +4814,4 @@ pypi = ["opencv-contrib-python", "opencv-python", "pin", "torch", "torchnet", "t
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "ce1c2ce07ac33046ca28a512e3c757751e062ccb42e719e37aa9b611abdf5232"
+content-hash = "bed9aaecac84ec1276aecedd2079fba19a56eabf98c06815025fd69ed820d6ac"
