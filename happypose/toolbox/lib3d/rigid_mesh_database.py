@@ -70,6 +70,7 @@ class MeshDataBase:
         for label, obj in self.obj_dict.items():
             if obj.diameter_meters is None:
                 mesh = self.meshes[label]
+                print("label =", label)
                 points = np.array(mesh.vertices) * obj.scale
                 extent = points.max(0) - points.min(0)
                 diameter = np.linalg.norm(extent)

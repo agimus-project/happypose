@@ -44,6 +44,7 @@ class BOPObjectDataset(RigidObjectDataset):
                 ContinuousSymmetry(offset=d["offset"], axis=d["axis"])
                 for d in bop_info.get("symmetries_continuous", [])
             ]
+            print("obj label =", obj_label)
             obj = RigidObject(
                 label=label_format.format(label=obj_label),
                 mesh_path=Path(mesh_path),

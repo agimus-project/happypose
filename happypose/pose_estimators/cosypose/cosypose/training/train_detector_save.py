@@ -1,133 +1,4 @@
-import os
-import numpy as np
-import pytest 
-
-from omegaconf import OmegaConf
-
-from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
-    get_rank,
-    get_world_size,
-    init_distributed_mode,
-    reduce_dict,
-    sync_model,
-)
-
-from happypose.toolbox.utils.logging import get_logger, set_logging_level
-
-logger = get_logger(__name__)
-
-class TestCosyposeDetectorTraining():
-    
-    @pytest.fixture(autouse=True)
-    def setup(self):
-
-        args = {
-            'config':'bop-ycbv-synt+real'
-        }
-        
-        cfg_detector = OmegaConf.create({})
-        
-        logger.info(
-            f"Training with config: {args['config']}",
-        )
-
-        cfg_detector.resume_run_id = None
-
-        N_CPUS = int(os.environ.get("N_CPUS", 10))
-        N_GPUS = int(os.environ.get("N_PROCS", 1))
-        N_WORKERS = min(N_CPUS - 2, 8)
-        N_RAND = np.random.randint(1e6)
-        cfg_detector.n_gpus = N_GPUS
-
-        run_comment = ""
-
-        # Data
-        cfg_detector.train_ds_names = []
-        cfg_detector.val_ds_names = cfg_detector.train_ds_names
-        cfg_detector.val_epoch_interval = 10
-        cfg_detector.test_ds_names = []
-        cfg_detector.test_epoch_interval = 30
-        cfg_detector.n_test_frames = None
-
-        cfg_detector.input_resize = (480, 640)
-        cfg_detector.rgb_augmentation = True
-        cfg_detector.background_augmentation = True
-        cfg_detector.gray_augmentation = False
-
-        # Model
-        cfg_detector.backbone_str = "resnet50-fpn"
-        cfg_detector.anchor_sizes = ((32,), (64,), (128,), (256,), (512,))
-
-        # Pretraning
-        cfg_detector.run_id_pretrain = None
-        cfg_detector.pretrain_coco = True
-
-        # Training
-        cfg_detector.batch_size = 2
-        cfg_detector.epoch_size = 5000
-        cfg_detector.n_epochs = 2
-        cfg_detector.lr_epoch_decay = 200
-        cfg_detector.n_epochs_warmup = 1
-        cfg_detector.n_dataloader_workers = N_WORKERS
-
-        # Optimizer
-        cfg_detector.optimizer = "sgd"
-        cfg_detector.lr = (0.02 / 8) * N_GPUS * float(cfg_detector.batch_size / 4)
-        cfg_detector.weight_decay = 1e-4
-        cfg_detector.momentum = 0.9
-
-        # Method
-        cfg_detector.rpn_box_reg_alpha = 1
-        cfg_detector.objectness_alpha = 1
-        cfg_detector.classifier_alpha = 1
-        cfg_detector.mask_alpha = 1
-        cfg_detector.box_reg_alpha = 1
-        if "tless" in args['config']:
-            cfg_detector.input_resize = (540, 720)
-        elif "ycbv" in args['config']:
-            cfg_detector.input_resize = (480, 640)
-        elif "bop-" in args['config']:
-            cfg_detector.input_resize = None
-        else:
-            raise ValueError
-
-        if "bop-" in args['config']:
-            from happypose.pose_estimators.cosypose.cosypose.bop_config import (
-                BOP_CONFIG,
-                PBR_DETECTORS,
-            )
-
-            bop_name, train_type = args['config'].split("-")[1:]
-            bop_cfg = BOP_CONFIG[bop_name]
-            if train_type == "pbr":
-                cfg_detector.train_ds_names = [(bop_cfg["train_pbr_ds_name"][0], 1)]
-            elif train_type == "synt+real":
-                cfg_detector.train_ds_names = bop_cfg["train_synt_real_ds_names"]
-                cfg_detector.run_id_pretrain = PBR_DETECTORS[bop_name]
-            else:
-                raise ValueError
-            cfg_detector.val_ds_names = cfg_detector.train_ds_names
-            cfg_detector.input_resize = bop_cfg["input_resize"]
-            if len(bop_cfg["test_ds_name"]) > 0:
-                cfg_detector.test_ds_names = bop_cfg["test_ds_name"]
-
-        else:
-            raise ValueError(args['config'])
-        cfg_detector.val_ds_names = cfg_detector.train_ds_names
-
-        cfg_detector.run_id = f"detector-{args['config']}-{run_comment}-{N_RAND}"
-
-        N_GPUS = int(os.environ.get("N_PROCS", 1))
-        cfg_detector.epoch_size = cfg_detector.epoch_size // N_GPUS
-        self.cfg_detector = cfg_detector
-    
-    def test_detector_training(self):
-        if torch.cuda.is_available():
-            train_detector(self.cfg_detector)
-        else:
-            pytest.skip("Cannot test training without GPU available")
-        
-
+import argparse
 import functools
 import time
 from collections import defaultdict
@@ -139,14 +10,16 @@ import torch.distributed as dist
 import yaml
 from torch.backends import cudnn
 from torch.hub import load_state_dict_from_url
-from torch.utils.data import DataLoader
+from torch.utils.data import ConcatDataset, DataLoader
 from torchnet.meter import AverageValueMeter
+from torchvision.models.detection.mask_rcnn import model_urls
 from tqdm import tqdm
 
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import (
     DetectionDataset,
 )
+from happypose.pose_estimators.cosypose.cosypose.datasets.samplers import PartialSampler
 from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
 
 # Evaluation
@@ -161,24 +34,88 @@ from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     sync_model,
 )
 from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.pose_estimators.cosypose.cosypose.utils.multiepoch_dataloader import (
+    MultiEpochDataLoader,
+)
 from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset
+
 from happypose.toolbox.datasets.scene_dataset import (
     IterableMultiSceneDataset,
+    IterableSceneDataset,
     RandomIterableSceneDataset,
-)
-from happypose.toolbox.utils.resources import (
-    get_cuda_memory,
-    get_gpu_memory,
-    get_total_memory,
+    SceneDataset,
 )
 
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import check_update_config, create_model_detector
-from happypose.pose_estimators.cosypose.cosypose.training.maskrcnn_forward_loss import h_maskrcnn
-
-from happypose.pose_estimators.cosypose.cosypose.training.train_detector import collate_fn
+from .detector_models_cfg import check_update_config, create_model_detector
+from .maskrcnn_forward_loss import h_maskrcnn
 
 cudnn.benchmark = True
 logger = get_logger(__name__)
+
+
+def collate_fn(batch):
+    return tuple(zip(*batch))
+
+
+def make_eval_configs(args, model_training, epoch):
+    model = model_training.module
+    model.config = args
+    model.cfg = args
+    detector = Detector(model)
+
+    configs = []
+    for ds_name in args.test_ds_names:
+        cfg = argparse.ArgumentParser("").parse_args([])
+        cfg.ds_name = ds_name
+        cfg.save_dir = args.save_dir / f"dataset={ds_name}/epoch={epoch}"
+        cfg.n_workers = args.n_dataloader_workers
+        cfg.pred_bsz = 16
+        cfg.eval_bsz = 16
+        cfg.n_frames = None
+        cfg.skip_evaluation = False
+        cfg.skip_model_predictions = False
+        cfg.external_predictions = True
+        cfg.n_frames = args.n_test_frames
+        configs.append(cfg)
+    return configs, detector
+
+
+def run_eval(args, model_training, epoch):
+    errors = {}
+    configs, detector = make_eval_configs(args, model_training, epoch)
+    for cfg in configs:
+        results = run_detection_eval(cfg, detector=detector)
+        if dist.get_rank() == 0:
+            errors[cfg.ds_name] = results["summary"]
+    return errors
+
+
+def log(config, model, log_dict, test_dict, epoch):
+    save_dir = config.save_dir
+    save_dir.mkdir(exist_ok=True)
+    log_dict.update(epoch=epoch)
+    if not (save_dir / "config.yaml").exists():
+        (save_dir / "config.yaml").write_text(yaml.dump(config))
+
+    def save_checkpoint(model):
+        ckpt_name = "checkpoint"
+        ckpt_name += ".pth.tar"
+        path = save_dir / ckpt_name
+        torch.save({"state_dict": model.module.state_dict(), "epoch": epoch}, path)
+
+    save_checkpoint(model)
+    with open(save_dir / "log.txt", "a") as f:
+        f.write(json.dumps(log_dict, ignore_nan=True) + "\n")
+
+    if test_dict is not None:
+        for ds_name, ds_errors in test_dict.items():
+            ds_errors["epoch"] = epoch
+            with open(save_dir / f"errors_{ds_name}.txt", "a") as f:
+                f.write(json.dumps(test_dict[ds_name], ignore_nan=True) + "\n")
+
+    logger.info(config.run_id)
+    logger.info(log_dict)
+    logger.info(test_dict)
 
 
 def train_detector(args):
@@ -203,11 +140,10 @@ def train_detector(args):
     device = torch.cuda.current_device()
     init_distributed_mode()
     world_size = get_world_size()
-    this_rank_epoch_size = args.epoch_size // get_world_size()
-    this_rank_n_batch_per_epoch = this_rank_epoch_size // args.batch_size
     args.n_gpus = world_size
     args.global_batch_size = world_size * args.batch_size
     logger.info(f"Connection established with {world_size} gpus.")
+    
 
     # Make train/val datasets
     def make_datasets(dataset_names):
@@ -219,13 +155,7 @@ def train_detector(args):
             ds = make_scene_dataset(ds_name)
             iterator = RandomIterableSceneDataset(ds, deterministic=deterministic)
             logger.info(f"Loaded {ds_name} with {len(ds)} images.")
-            pre_label = ds_name.split(".")[0]
-            for idx, label in enumerate(ds.all_labels):
-                ds.all_labels[idx] = "{pre_label}-{label}".format(
-                    pre_label=pre_label, label=label
-                )
             all_labels = all_labels.union(set(ds.all_labels))
-
             for _ in range(n_repeat):
                 datasets.append(iterator)
         return IterableMultiSceneDataset(datasets), all_labels
@@ -248,32 +178,37 @@ def train_detector(args):
         "gray_augmentation": args.gray_augmentation,
         "label_to_category_id": label_to_category_id,
     }
-
+    
+    print("make datasets")
     ds_train = DetectionDataset(scene_ds_train, **ds_kwargs)
     ds_val = DetectionDataset(scene_ds_val, **ds_kwargs)
 
-    # train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
+    print("make dataloaders")
+    train_sampler = PartialSampler(ds_train, epoch_size=args.epoch_size)
     ds_iter_train = DataLoader(
         ds_train,
+        sampler=train_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_train = iter(ds_iter_train)
+    ds_iter_train = MultiEpochDataLoader(ds_iter_train)
 
-    # val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
+    val_sampler = PartialSampler(ds_val, epoch_size=int(0.1 * args.epoch_size))
     ds_iter_val = DataLoader(
         ds_val,
+        sampler=val_sampler,
         batch_size=args.batch_size,
         num_workers=args.n_dataloader_workers,
         collate_fn=collate_fn,
         drop_last=False,
         pin_memory=True,
     )
-    ds_iter_val = iter(ds_iter_val)
+    ds_iter_val = MultiEpochDataLoader(ds_iter_val)
 
+    print("create model detector")
     model = create_model_detector(
         cfg=args,
         n_classes=len(args.label_to_category_id),
@@ -296,7 +231,7 @@ def train_detector(args):
         logger.info(f"Using pretrained model from {pretrain_path}.")
         model.load_state_dict(torch.load(pretrain_path)["state_dict"])
     elif args.pretrain_coco:
-        state_dict = load_state_dict_from_url('https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth')
+        state_dict = load_state_dict_from_url(model_urls["maskrcnn_resnet50_fpn_coco"])
 
         def keep(k):
             return "box_predictor" not in k and "mask_predictor" not in k
@@ -353,8 +288,7 @@ def train_detector(args):
         gamma=0.1,
     )
     lr_scheduler.last_epoch = start_epoch - 1
-    # This led to a warning in newer version of Py
-    # lr_scheduler.step()
+    lr_scheduler.step()
 
     for epoch in range(start_epoch, end_epoch):
         meters_train = defaultdict(AverageValueMeter)
@@ -370,57 +304,51 @@ def train_detector(args):
             for n, sample in enumerate(iterator):
                 if n > 0:
                     meters_time["data"].add(time.time() - t)
-                if n < 3:
-                    optimizer.zero_grad()
 
-                    t = time.time()
-                    loss = h(data=sample, meters=meters_train)
-                    meters_time["forward"].add(time.time() - t)
-                    iterator.set_postfix(loss=loss.item())
-                    meters_train["loss_total"].add(loss.item())
+                optimizer.zero_grad()
 
-                    t = time.time()
-                    loss.backward()
-                    total_grad_norm = torch.nn.utils.clip_grad_norm_(
-                        model.parameters(),
-                        max_norm=np.inf,
-                        norm_type=2,
-                    )
-                    meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
+                t = time.time()
+                loss = h(data=sample, meters=meters_train)
+                meters_time["forward"].add(time.time() - t)
+                iterator.set_postfix(loss=loss.item())
+                meters_train["loss_total"].add(loss.item())
 
-                    optimizer.step()
-                    meters_time["backward"].add(time.time() - t)
-                    meters_time["memory"].add(
-                        torch.cuda.max_memory_allocated() / 1024.0**2,
-                    )
+                t = time.time()
+                loss.backward()
+                total_grad_norm = torch.nn.utils.clip_grad_norm_(
+                    model.parameters(),
+                    max_norm=np.inf,
+                    norm_type=2,
+                )
+                meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
 
-                    if epoch < args.n_epochs_warmup:
-                        lr_scheduler_warmup.step()
-                    t = time.time()
+                optimizer.step()
+                meters_time["backward"].add(time.time() - t)
+                meters_time["memory"].add(
+                    torch.cuda.max_memory_allocated() / 1024.0**2,
+                )
 
-                    if epoch >= args.n_epochs_warmup:
-                        lr_scheduler.step()
-                else:
-                    break
+                if epoch < args.n_epochs_warmup:
+                    lr_scheduler_warmup.step()
+                t = time.time()
+            if epoch >= args.n_epochs_warmup:
+                lr_scheduler.step()
 
         @torch.no_grad()
         def validation():
             model.train()
-            for n, sample in enumerate(tqdm(ds_iter_val, ncols=80)):
-                if n < 3:
-                    loss = h(data=sample, meters=meters_val)
-                    meters_val["loss_total"].add(loss.item())
-                else:
-                    break
+            for sample in tqdm(ds_iter_val, ncols=80):
+                loss = h(data=sample, meters=meters_val)
+                meters_val["loss_total"].add(loss.item())
 
         train_epoch()
         if epoch % args.val_epoch_interval == 0:
             validation()
 
-        # test_dict = None
-        # if epoch % args.test_epoch_interval == 0:
-        #    model.eval()
-        #    test_dict = run_eval(args, model, epoch)
+        test_dict = None
+        if epoch % args.test_epoch_interval == 0:
+            model.eval()
+            test_dict = run_eval(args, model, epoch)
 
         log_dict = {}
         log_dict.update(
@@ -428,15 +356,13 @@ def train_detector(args):
                 "grad_norm": meters_train["grad_norm"].mean,
                 "grad_norm_std": meters_train["grad_norm"].std,
                 "learning_rate": optimizer.param_groups[0]["lr"],
-                "time_forward": meters_train["time_forward"].mean,
-                "time_backward": meters_train["time_backward"].mean,
-                "time_data": meters_train["time_data"].mean,
-                "cuda_memory": get_cuda_memory(),
-                "gpu_memory": get_gpu_memory(),
-                "cpu_memory": get_total_memory(),
+                "time_forward": meters_time["forward"].mean,
+                "time_backward": meters_time["backward"].mean,
+                "time_data": meters_time["data"].mean,
+                "gpu_memory": meters_time["memory"].mean,
                 "time": time.time(),
-                "n_iterations": epoch * args.epoch_size // args.batch_size,
-                "n_datas": epoch * this_rank_n_batch_per_epoch * args.batch_size,
+                "n_iterations": (epoch + 1) * len(ds_iter_train),
+                "n_datas": (epoch + 1) * args.global_batch_size * len(ds_iter_train),
             },
         )
 
@@ -445,6 +371,12 @@ def train_detector(args):
                 log_dict[f"{string}_{k}"] = meters[k].mean
 
         log_dict = reduce_dict(log_dict)
-
+        if get_rank() == 0:
+            log(
+                config=args,
+                model=model,
+                epoch=epoch,
+                log_dict=log_dict,
+                test_dict=test_dict,
+            )
         dist.barrier()
-

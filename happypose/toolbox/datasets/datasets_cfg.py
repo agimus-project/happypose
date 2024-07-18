@@ -101,6 +101,11 @@ def make_scene_dataset(
         ds_dir = BOP_DS_DIR / "ycbv"
         ds = BOPDataset(ds_dir, split="test", label_format="ycbv-{label}")
         ds = keep_bop19(ds)
+    #only intended to run the tests
+    elif ds_name == "ycbv.bop19.test":
+        ds_dir = BOP_DS_DIR / "ycbv-test"
+        ds = BOPDataset(ds_dir, split="test", label_format="ycbv-{label}")
+        ds = keep_bop19(ds)
     elif ds_name == "ruapc.bop19":
         ds_dir = BOP_DS_DIR / "ruapc"
         ds = BOPDataset(ds_dir, split="test", label_format="ruapc-{label}")
@@ -500,6 +505,10 @@ def make_urdf_dataset(ds_name: str) -> RigidObjectDataset:
 def get_obj_ds_info(ds_name: str) -> Tuple[Optional[str], str]:
     urdf_ds_name = None  # Only used for bullet compatibility
     if ds_name == "ycbv.bop19":
+        ds_name = "ycbv"
+        urdf_ds_name = "ycbv"
+        obj_ds_name = "ycbv.panda3d"
+    elif ds_name == "ycbv.bop19.test":
         ds_name = "ycbv"
         urdf_ds_name = "ycbv"
         obj_ds_name = "ycbv.panda3d"

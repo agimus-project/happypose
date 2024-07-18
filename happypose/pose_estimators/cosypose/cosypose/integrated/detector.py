@@ -22,7 +22,9 @@ class Detector(DetectorModule):
         self.category_id_to_label = {
             v: k for k, v in self.config.label_to_category_id.items()
         }
-        if ds_name == "ycbv.bop19":
+        # Incompatibility of model names between CosyPose and MegaPose ?
+        # see issue #177
+        if ds_name == "ycbv.bop19" or ds_name == "ycbv.bop19.test":
             ds_name = "ycbv"
         for k, v in self.category_id_to_label.items():
             if k == 0:

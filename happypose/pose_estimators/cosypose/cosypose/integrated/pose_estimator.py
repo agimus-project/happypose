@@ -170,6 +170,7 @@ class PoseEstimator(PoseEstimationModule):
                     detection_th,
                     mask_th,
                 )
+                print("detections =", detections.infos["label"])
                 if torch.cuda.is_available():
                     detections = detections.cuda()
                 else:
