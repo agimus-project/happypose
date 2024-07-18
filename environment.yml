@@ -7,11 +7,9 @@ channels:
    - defaults
 dependencies:
   - pytorch-cuda==12.1
-  - python=3.9
   - pip
-  - pytorch==2.1
-  - torchvision==0.16
-  - mkl==2024.0.0
+  - pytorch
+  - torchvision
   - geckodriver
   - firefox
   - opencv
