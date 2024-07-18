@@ -8,10 +8,7 @@ import pytest
 # Third Party
 from omegaconf import OmegaConf
 
-from happypose.pose_estimators.megapose.config import (
-    LOCAL_DATA_DIR,
-    RESULTS_DIR,
-)
+from happypose.pose_estimators.megapose.config import LOCAL_DATA_DIR, RESULTS_DIR
 from happypose.pose_estimators.megapose.evaluation.bop import run_evaluation
 from happypose.pose_estimators.megapose.evaluation.eval_config import (
     BOPEvalConfig,
@@ -19,15 +16,11 @@ from happypose.pose_estimators.megapose.evaluation.eval_config import (
     FullEvalConfig,
     HardwareConfig,
 )
-from happypose.pose_estimators.megapose.evaluation.evaluation import (
-    get_save_dir,
-)
+from happypose.pose_estimators.megapose.evaluation.evaluation import get_save_dir
 from happypose.pose_estimators.megapose.scripts.run_full_megapose_eval import (
     create_eval_cfg,
 )
-from happypose.toolbox.utils.distributed import (
-    get_rank,
-)
+from happypose.toolbox.utils.distributed import get_rank
 from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -110,11 +103,11 @@ class TestCosyPoseEvaluation:
         assert (
             self.cfg["inference"]["n_pose_hypotheses"] == 5
         ), "Error: n_pose_hypotheses is not correct"
+        assert not self.cfg["inference"][
+            "run_depth_refiner"
+        ], "Error: run_depth_refiner is not correct"
         assert (
-            self.cfg["inference"]["run_depth_refiner"] == False
-        ), "Error: run_depth_refiner is not correct"
-        assert (
-            self.cfg["inference"]["depth_refiner"] == None
+            self.cfg["inference"]["depth_refiner"] is None
         ), "Error: depth_refiner is not correct"
         assert (
             self.cfg["inference"]["bsz_objects"] == 16
@@ -129,34 +122,30 @@ class TestCosyPoseEvaluation:
         assert (
             self.cfg["n_rendering_workers"] == 8
         ), "Error: n_rendering_workers is not correct"
-        assert self.cfg["n_frames"] == None, "Error: n_frames is not correct"
+        assert self.cfg["n_frames"] is None, "Error: n_frames is not correct"
         assert self.cfg["batch_size"] == 1, "Error: batch_size is not correct"
         assert (
             self.cfg["save_dir"] == f"{LOCAL_DATA_DIR}/results/ycbv-debug"
         ), "Error: save_dir is not correct"
         assert self.cfg["bsz_images"] == 256, "Error: bsz_images is not correct"
         assert self.cfg["bsz_objects"] == 16, "Error: bsz_objects is not correct"
+        assert self.cfg["skip_inference"], "Error: skip_inference is not correct"
+        assert self.cfg["skip_evaluation"], "Error: skip_evaluation is not correct"
         assert (
-            self.cfg["skip_inference"] == True
-        ), "Error: skip_inference is not correct"
-        assert (
-            self.cfg["skip_evaluation"] == True
-        ), "Error: skip_evaluation is not correct"
-        assert (
-            self.cfg["global_batch_size"] == None
+            self.cfg["global_batch_size"] is None
         ), "Error: global_batch_size is not correct"
         assert self.cfg["hardware"]["n_cpus"] == 10, "Error: n_cpus is not correct"
         assert self.cfg["hardware"]["n_gpus"] == 1, "Error: n_gpus is not correct"
-        assert self.cfg["debug"] == False, "Error: debug is not correct"
+        assert not self.cfg["debug"], "Error: debug is not correct"
         assert self.cfg["detection_coarse_types"] == [
             ["detector", "S03_grid"]
         ], "Error: detection_coarse_types is not correct"
         assert self.cfg["ds_names"] == ["ycbv.bop19"], "Error: ds_names is not correct"
-        assert self.cfg["run_bop_eval"] == True, "Error: run_bop_eval is not correct"
-        assert (
-            self.cfg["eval_coarse_also"] == False
-        ), "Error: eval_coarse_also is not correct"
-        assert self.cfg["convert_only"] == False, "Error: convert_only is not correct"
+        assert self.cfg["run_bop_eval"], "Error: run_bop_eval is not correct"
+        assert not self.cfg[
+            "eval_coarse_also"
+        ], "Error: eval_coarse_also is not correct"
+        assert not self.cfg["convert_only"], "Error: convert_only is not correct"
 
     # TODO
     # Rajouter un test pour save_dir ?

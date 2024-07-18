@@ -1,16 +1,55 @@
+import functools
 import os
+import time
+from collections import defaultdict
 
 import numpy as np
 import pytest
+import torch
+import torch.distributed as dist
+import yaml
 from omegaconf import OmegaConf
+from torch.backends import cudnn
+from torch.hub import load_state_dict_from_url
+from torch.utils.data import DataLoader
+from torchnet.meter import AverageValueMeter
+from tqdm import tqdm
 
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
+from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import (
+    DetectionDataset,
+)
+
+# Evaluation
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
+    check_update_config,
+    create_model_detector,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.maskrcnn_forward_loss import (
+    h_maskrcnn,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.train_detector import (
+    collate_fn,
+)
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     get_world_size,
     init_distributed_mode,
     reduce_dict,
     sync_model,
 )
+from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableMultiSceneDataset,
+    RandomIterableSceneDataset,
+)
+
+# from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.utils.logging import get_logger
+from happypose.toolbox.utils.resources import (
+    get_cuda_memory,
+    get_gpu_memory,
+    get_total_memory,
+)
 
 logger = get_logger(__name__)
 
@@ -119,47 +158,6 @@ class TestCosyposeDetectorTraining:
     def test_detector_training(self):
         train_detector(self.cfg_detector)
 
-
-import functools
-import time
-from collections import defaultdict
-
-import torch
-import torch.distributed as dist
-import yaml
-from torch.backends import cudnn
-from torch.hub import load_state_dict_from_url
-from torch.utils.data import DataLoader
-from torchnet.meter import AverageValueMeter
-from tqdm import tqdm
-
-from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
-from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import (
-    DetectionDataset,
-)
-
-# Evaluation
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
-    check_update_config,
-    create_model_detector,
-)
-from happypose.pose_estimators.cosypose.cosypose.training.maskrcnn_forward_loss import (
-    h_maskrcnn,
-)
-from happypose.pose_estimators.cosypose.cosypose.training.train_detector import (
-    collate_fn,
-)
-from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset
-from happypose.toolbox.datasets.scene_dataset import (
-    IterableMultiSceneDataset,
-    RandomIterableSceneDataset,
-)
-from happypose.toolbox.utils.resources import (
-    get_cuda_memory,
-    get_gpu_memory,
-    get_total_memory,
-)
 
 cudnn.benchmark = True
 logger = get_logger(__name__)

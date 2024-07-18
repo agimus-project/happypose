@@ -1,16 +1,56 @@
+import functools
 import os
+import time
+from collections import defaultdict
 
 import numpy as np
 import pytest
+import torch
+import torch.distributed as dist
+import yaml
 from omegaconf import OmegaConf
+from torch.backends import cudnn
+from torch.utils.data import DataLoader
+from torchnet.meter import AverageValueMeter
+from tqdm import tqdm
 
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
+from happypose.pose_estimators.cosypose.cosypose.training.pose_forward_loss import (
+    h_pose,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
+    check_update_config,
+    create_pose_model_cosypose,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.train_pose import (
+    make_eval_bundle,
+    run_eval,
+)
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     get_world_size,
     init_distributed_mode,
     reduce_dict,
     sync_model,
 )
+from happypose.toolbox.datasets.datasets_cfg import (
+    make_object_dataset,
+    make_scene_dataset,
+)
+from happypose.toolbox.datasets.pose_dataset import PoseDataset
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableMultiSceneDataset,
+    RandomIterableSceneDataset,
+)
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+
+# from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
 from happypose.toolbox.utils.logging import get_logger
+from happypose.toolbox.utils.resources import (
+    get_cuda_memory,
+    get_gpu_memory,
+    get_total_memory,
+)
 
 logger = get_logger(__name__)
 
@@ -208,48 +248,6 @@ class TestCosyposePoseTraining:
     def test_pose_training(self):
         train_pose(self.cfg_pose)
 
-
-import functools
-import time
-from collections import defaultdict
-
-import torch
-import torch.distributed as dist
-import yaml
-from torch.backends import cudnn
-from torch.utils.data import DataLoader
-from torchnet.meter import AverageValueMeter
-from tqdm import tqdm
-
-from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
-from happypose.pose_estimators.cosypose.cosypose.training.pose_forward_loss import (
-    h_pose,
-)
-from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
-    check_update_config,
-    create_pose_model_cosypose,
-)
-from happypose.pose_estimators.cosypose.cosypose.training.train_pose import (
-    make_eval_bundle,
-    run_eval,
-)
-from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-from happypose.toolbox.datasets.datasets_cfg import (
-    make_object_dataset,
-    make_scene_dataset,
-)
-from happypose.toolbox.datasets.pose_dataset import PoseDataset
-from happypose.toolbox.datasets.scene_dataset import (
-    IterableMultiSceneDataset,
-    RandomIterableSceneDataset,
-)
-from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from happypose.toolbox.utils.resources import (
-    get_cuda_memory,
-    get_gpu_memory,
-    get_total_memory,
-)
 
 cudnn.benchmark = True
 logger = get_logger(__name__)
