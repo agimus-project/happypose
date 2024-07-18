@@ -231,7 +231,9 @@ def train_detector(args):
         logger.info(f"Using pretrained model from {pretrain_path}.")
         model.load_state_dict(torch.load(pretrain_path)["state_dict"])
     elif args.pretrain_coco:
-        state_dict = load_state_dict_from_url('https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth')
+        state_dict = load_state_dict_from_url(
+            "https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth"
+        )
 
         def keep(k):
             return "box_predictor" not in k and "mask_predictor" not in k
@@ -289,7 +291,7 @@ def train_detector(args):
     )
     lr_scheduler.last_epoch = start_epoch - 1
     # This led to a warning in newer version of PyTorch?
-    #lr_scheduler.step()
+    # lr_scheduler.step()
 
     for epoch in range(start_epoch, end_epoch):
         meters_train = defaultdict(AverageValueMeter)

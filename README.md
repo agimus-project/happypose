@@ -39,15 +39,13 @@ git clone --branch dev --recurse-submodules https://github.com/agimus-project/ha
 cd happypose
 python -m venv .venv
 source .venv/bin/activate
-pip install .[pypi,cpu] --extra-index-url https://download.pytorch.org/whl/cpu
+pip install .[pypi]
 ```
 
 ### Install extras:
 
-- `cpu`: required to get pytorch CPU from PyPI (don't use this for GPU or with conda)
-- `gpu`: required to get pytorch GPU from PyPI (don't use this for CPU or with conda)
 - `multiview`: installs cosypose c++ extension
-- `pypi`: install pinocchio & opencv from PyPI (don't use this with conda)
+- `pypi`: install torch, pinocchio & opencv from PyPI (don't use this with conda)
 
 ## Create data directory
 

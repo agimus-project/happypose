@@ -55,16 +55,10 @@ scipy = "^1.13.0"
 seaborn = "^0.12.2"
 selenium = "^4.20.0"
 simplejson = "^3.19.2"
-torch = [
-  {markers = "extra=='cpu'", optional = true, source = "torch_cpu", version = "2.1"},
-  {markers = "extra=='gpu'", optional = true, version = "2.1"}
-]
-torchnet = "^0.0.4"
+torch = {optional = true, version = "^2.3"}
+torchnet = {optional = true, version = "^0.0.4"}
 torchtnt = {optional = true, version = "^0.2.4"}
-torchvision = [
-  {markers = "extra=='cpu'", optional = true, source = "torch_cpu", version = "0.16"},
-  {markers = "extra=='gpu'", optional = true, version = "0.16"}
-]
+torchvision = {optional = true, version = "^0.18"}
 tqdm = "^4.66.2"
 transforms3d = "^0.4.1"
 trimesh = "^3.23.5"
@@ -72,11 +66,9 @@ webdataset = "^0.2.57"
 xarray = "^2024.3.0"
 
 [tool.poetry.extras]
-cpu = ["torch", "torchvision"]
 evaluation = ["cmeel-teaser-plusplus"]
-gpu = ["torch", "torchvision"]
 multiview = ["cosypose"]
-pypi = ["opencv-contrib-python", "opencv-python", "pin", "torchtnt"]
+pypi = ["opencv-contrib-python", "opencv-python", "pin", "torch", "torchnet", "torchtnt", "torchvision"]
 
 [tool.poetry.group.dev]
 optional = true
@@ -92,15 +84,6 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 myst-parser = "^2.0.0"
 sphinx = "^7.3.7"
-
-[[tool.poetry.source]]
-name = "torch_cpu"
-priority = "supplemental"
-url = "https://download.pytorch.org/whl/cpu"
-
-[[tool.poetry.source]]
-name = "PyPI"
-priority = "primary"
 
 [tool.poetry.urls]
 changelog = "https://github.com/agimus-project/happypose/blob/main/CHANGELOG.md"

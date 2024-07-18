@@ -49,6 +49,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Third Party
 from bop_toolkit_lib import inout  # noqa
 
+
 def main():
     parser = argparse.ArgumentParser("Bop evaluation")
     parser.add_argument("--results_path", default="", type=str)
@@ -121,16 +122,16 @@ def convert_results_to_bop(
         print("row =", row)
         obj_id = int(row.label.split("_")[-1])
         if use_pose_score:
-            score = row['pose_score']
+            score = row["pose_score"]
         else:
-            score = row['score']
+            score = row["score"]
         if "time" in row:
-            time = row['time']
+            time = row["time"]
         else:
             time = -1
         pred = dict(
-            scene_id=row['scene_id'],
-            im_id=row['view_id'],
+            scene_id=row["scene_id"],
+            im_id=row["view_id"],
             obj_id=obj_id,
             score=score,
             t=t,
@@ -202,9 +203,7 @@ def run_evaluation(cfg: BOPEvalConfig) -> None:
         csv_path = eval_dir / f"{method}_{cfg.dataset.split('.')[0]}-{cfg.split}.csv"
 
         # pose scores give better AR scores in general
-        convert_results_to_bop(
-            results_path, csv_path, cfg.method, use_pose_score=False
-        )
+        convert_results_to_bop(results_path, csv_path, cfg.method, use_pose_score=False)
 
         if not cfg.convert_only:
             _run_bop_evaluation(csv_path, cfg.eval_dir, eval_detection=False)

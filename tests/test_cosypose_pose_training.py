@@ -1,35 +1,71 @@
+import functools
 import os
+import time
+from collections import defaultdict
+
 import numpy as np
-import pytest 
-
+import pytest
+import torch
+import torch.distributed as dist
+import yaml
 from omegaconf import OmegaConf
+from torch.backends import cudnn
+from torch.utils.data import DataLoader
+from torchnet.meter import AverageValueMeter
+from tqdm import tqdm
 
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
+from happypose.pose_estimators.cosypose.cosypose.training.pose_forward_loss import (
+    h_pose,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
+    check_update_config,
+    create_pose_model_cosypose,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.train_pose import (
+    make_eval_bundle,
+    run_eval,
+)
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
     get_world_size,
     init_distributed_mode,
     reduce_dict,
     sync_model,
 )
+from happypose.toolbox.datasets.datasets_cfg import (
+    make_object_dataset,
+    make_scene_dataset,
+)
+from happypose.toolbox.datasets.pose_dataset import PoseDataset
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableMultiSceneDataset,
+    RandomIterableSceneDataset,
+)
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
-from happypose.toolbox.utils.logging import get_logger, set_logging_level
+# from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.toolbox.utils.logging import get_logger
+from happypose.toolbox.utils.resources import (
+    get_cuda_memory,
+    get_gpu_memory,
+    get_total_memory,
+)
 
 logger = get_logger(__name__)
 
-class TestCosyposePoseTraining():
-    
+
+class TestCosyposePoseTraining:
     @pytest.fixture(autouse=True)
     def setup(self):
-    
-        args = {
-            'config':'ycbv-refiner-syntonly'
-        }
-        
+        args = {"config": "ycbv-refiner-syntonly"}
+
         cfg_pose = OmegaConf.create({})
-        
+
         logger.info(
             f"Training with config: {args['config']}",
         )
-        if args['config']:
+        if args["config"]:
             logger.info(
                 f"Training with config: {args['config']}",
             )
@@ -92,14 +128,14 @@ class TestCosyposePoseTraining():
         cfg_pose.n_iterations = 1
         cfg_pose.min_area = None
 
-        if "bop-" in args['config']:
+        if "bop-" in args["config"]:
             from happypose.pose_estimators.cosypose.cosypose.bop_config import (
                 BOP_CONFIG,
                 PBR_COARSE,
                 PBR_REFINER,
             )
 
-            bop_name, train_type, model_type = args['config'].split("-")[1:]
+            bop_name, train_type, model_type = args["config"].split("-")[1:]
             bop_cfg = BOP_CONFIG[bop_name]
             if train_type == "pbr":
                 cfg_pose.train_ds_names = [(bop_cfg["train_pbr_ds_name"][0], 1)]
@@ -128,7 +164,7 @@ class TestCosyposePoseTraining():
             else:
                 raise ValueError
 
-        elif "ycbv-" in args['config']:
+        elif "ycbv-" in args["config"]:
             cfg_pose.urdf_ds_name = "ycbv"
             cfg_pose.object_ds_name = "ycbv"
             cfg_pose.train_ds_names = [
@@ -140,16 +176,16 @@ class TestCosyposePoseTraining():
             cfg_pose.test_ds_names = ["ycbv.test.keyframes"]
             cfg_pose.input_resize = (480, 640)
 
-            if args['config'] == "ycbv-refiner-syntonly":
+            if args["config"] == "ycbv-refiner-syntonly":
                 cfg_pose.TCO_input_generator = "gt+noise"
                 cfg_pose.train_ds_names = [("synthetic.ycbv-1M.train", 1)]
-            elif args['config'] == "ycbv-refiner-finetune":
+            elif args["config"] == "ycbv-refiner-finetune":
                 cfg_pose.TCO_input_generator = "gt+noise"
                 cfg_pose.run_id_pretrain = "ycbv-refiner-syntonly--596719"
             else:
-                raise ValueError(args['config'])
+                raise ValueError(args["config"])
 
-        elif "tless-" in args['config']:
+        elif "tless-" in args["config"]:
             cfg_pose.urdf_ds_name = "tless.cad"
             cfg_pose.object_ds_name = "tless.cad"
             cfg_pose.train_ds_names = [
@@ -160,102 +196,61 @@ class TestCosyposePoseTraining():
             cfg_pose.test_ds_names = ["tless.primesense.test"]
             cfg_pose.input_resize = (540, 720)
 
-            if args['config'] == "tless-coarse":
+            if args["config"] == "tless-coarse":
                 cfg_pose.TCO_input_generator = "fixed"
-            elif args['config'] == "tless-refiner":
+            elif args["config"] == "tless-refiner":
                 cfg_pose.TCO_input_generator = "gt+noise"
 
             # Ablations
-            elif args['config'] == "tless-coarse-ablation-loss":
+            elif args["config"] == "tless-coarse-ablation-loss":
                 cfg_pose.loss_disentangled = False
                 cfg_pose.TCO_input_generator = "fixed"
-            elif args['config'] == "tless-refiner-ablation-loss":
+            elif args["config"] == "tless-refiner-ablation-loss":
                 cfg_pose.loss_disentangled = False
                 cfg_pose.TCO_input_generator = "gt+noise"
 
-            elif args['config'] == "tless-coarse-ablation-network":
+            elif args["config"] == "tless-coarse-ablation-network":
                 cfg_pose.TCO_input_generator = "fixed"
                 cfg_pose.backbone_str = "flownet"
-            elif args['config'] == "tless-refiner-ablation-network":
+            elif args["config"] == "tless-refiner-ablation-network":
                 cfg_pose.TCO_input_generator = "gt+noise"
                 cfg_pose.backbone_str = "flownet"
 
-            elif args['config'] == "tless-coarse-ablation-rot":
+            elif args["config"] == "tless-coarse-ablation-rot":
                 cfg_pose.n_pose_dims = 7
                 cfg_pose.TCO_input_generator = "fixed"
-            elif args['config'] == "tless-refiner-ablation-rot":
+            elif args["config"] == "tless-refiner-ablation-rot":
                 cfg_pose.n_pose_dims = 7
                 cfg_pose.TCO_input_generator = "gt+noise"
 
-            elif args['config'] == "tless-coarse-ablation-augm":
+            elif args["config"] == "tless-coarse-ablation-augm":
                 cfg_pose.TCO_input_generator = "fixed"
                 cfg_pose.rgb_augmentation = False
-            elif args['config'] == "tless-refiner-ablation-augm":
+            elif args["config"] == "tless-refiner-ablation-augm":
                 cfg_pose.TCO_input_generator = "gt+noise"
                 cfg_pose.rgb_augmentation = False
 
             else:
-                raise ValueError(args['config'])
+                raise ValueError(args["config"])
 
         else:
-            raise ValueError(args['config'])
+            raise ValueError(args["config"])
 
         cfg_pose.run_id = f"{args['config']}-{run_comment}-{N_RAND}"
 
         N_GPUS = int(os.environ.get("N_PROCS", 1))
         cfg_pose.epoch_size = cfg_pose.epoch_size // N_GPUS
         self.cfg_pose = cfg_pose
-        
-    @pytest.mark.skip(reason="Currently, run two training tests (i.e. detector and pose) consecutively doesn't work with torch distributed")
+
+    @pytest.mark.skip(
+        reason="Currently, run two training tests (i.e. detector and pose) consecutively doesn't work with torch distributed"
+    )
     def test_pose_training(self):
         train_pose(self.cfg_pose)
- 
- 
- 
-import functools
-import time
-from collections import defaultdict
-from pathlib import Path
 
-import simplejson as json
-import torch
-import torch.distributed as dist
-import yaml
-from torch.backends import cudnn
-from torch.utils.data import DataLoader
-from torchnet.meter import AverageValueMeter
-from tqdm import tqdm
-
-from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
-
-
-from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-
-from happypose.toolbox.datasets.datasets_cfg import (
-    make_object_dataset,
-    make_scene_dataset,
-)
-from happypose.toolbox.datasets.pose_dataset import PoseDataset
-from happypose.toolbox.datasets.scene_dataset import (
-    IterableMultiSceneDataset,
-    RandomIterableSceneDataset,
-)
-from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
-from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
-from happypose.toolbox.utils.resources import (
-    get_cuda_memory,
-    get_gpu_memory,
-    get_total_memory,
-)
-
-from happypose.pose_estimators.cosypose.cosypose.training.pose_forward_loss import h_pose
-from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import check_update_config, create_pose_model_cosypose
-
-from happypose.pose_estimators.cosypose.cosypose.training.train_pose import make_eval_bundle, run_eval, log
 
 cudnn.benchmark = True
 logger = get_logger(__name__)
-
 
 
 def train_pose(args):
@@ -521,5 +516,3 @@ def train_pose(args):
 
         print("waiting on barrier")
         dist.barrier()
-
-            

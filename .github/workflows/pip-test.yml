@@ -30,7 +30,7 @@ jobs:
         run: pip install -U pip
 
       - name: Install happypose
-        run: pip install ".[cpu,multiview,pypi]" --extra-index-url https://download.pytorch.org/whl/cpu
+        run: pip install ".[multiview,pypi]"
 
       - name: Download pre-trained models required for tests
         run: |

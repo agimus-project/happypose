@@ -1,32 +1,66 @@
+import functools
 import os
+import time
+from collections import defaultdict
+
 import numpy as np
-import pytest 
-
+import pytest
+import torch
+import torch.distributed as dist
+import yaml
 from omegaconf import OmegaConf
+from torch.backends import cudnn
+from torch.hub import load_state_dict_from_url
+from torch.utils.data import DataLoader
+from torchnet.meter import AverageValueMeter
+from tqdm import tqdm
 
+from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
+from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import (
+    DetectionDataset,
+)
+
+# Evaluation
+from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import (
+    check_update_config,
+    create_model_detector,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.maskrcnn_forward_loss import (
+    h_maskrcnn,
+)
+from happypose.pose_estimators.cosypose.cosypose.training.train_detector import (
+    collate_fn,
+)
 from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
-    get_rank,
     get_world_size,
     init_distributed_mode,
     reduce_dict,
     sync_model,
 )
+from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset
+from happypose.toolbox.datasets.scene_dataset import (
+    IterableMultiSceneDataset,
+    RandomIterableSceneDataset,
+)
 
-from happypose.toolbox.utils.logging import get_logger, set_logging_level
+# from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
+from happypose.toolbox.utils.logging import get_logger
+from happypose.toolbox.utils.resources import (
+    get_cuda_memory,
+    get_gpu_memory,
+    get_total_memory,
+)
 
 logger = get_logger(__name__)
 
-class TestCosyposeDetectorTraining():
-    
+
+class TestCosyposeDetectorTraining:
     @pytest.fixture(autouse=True)
     def setup(self):
+        args = {"config": "bop-ycbv-synt+real"}
 
-        args = {
-            'config':'bop-ycbv-synt+real'
-        }
-        
         cfg_detector = OmegaConf.create({})
-        
+
         logger.info(
             f"Training with config: {args['config']}",
         )
@@ -82,22 +116,22 @@ class TestCosyposeDetectorTraining():
         cfg_detector.classifier_alpha = 1
         cfg_detector.mask_alpha = 1
         cfg_detector.box_reg_alpha = 1
-        if "tless" in args['config']:
+        if "tless" in args["config"]:
             cfg_detector.input_resize = (540, 720)
-        elif "ycbv" in args['config']:
+        elif "ycbv" in args["config"]:
             cfg_detector.input_resize = (480, 640)
-        elif "bop-" in args['config']:
+        elif "bop-" in args["config"]:
             cfg_detector.input_resize = None
         else:
             raise ValueError
 
-        if "bop-" in args['config']:
+        if "bop-" in args["config"]:
             from happypose.pose_estimators.cosypose.cosypose.bop_config import (
                 BOP_CONFIG,
                 PBR_DETECTORS,
             )
 
-            bop_name, train_type = args['config'].split("-")[1:]
+            bop_name, train_type = args["config"].split("-")[1:]
             bop_cfg = BOP_CONFIG[bop_name]
             if train_type == "pbr":
                 cfg_detector.train_ds_names = [(bop_cfg["train_pbr_ds_name"][0], 1)]
@@ -112,7 +146,7 @@ class TestCosyposeDetectorTraining():
                 cfg_detector.test_ds_names = bop_cfg["test_ds_name"]
 
         else:
-            raise ValueError(args['config'])
+            raise ValueError(args["config"])
         cfg_detector.val_ds_names = cfg_detector.train_ds_names
 
         cfg_detector.run_id = f"detector-{args['config']}-{run_comment}-{N_RAND}"
@@ -120,59 +154,10 @@ class TestCosyposeDetectorTraining():
         N_GPUS = int(os.environ.get("N_PROCS", 1))
         cfg_detector.epoch_size = cfg_detector.epoch_size // N_GPUS
         self.cfg_detector = cfg_detector
-    
+
     def test_detector_training(self):
         train_detector(self.cfg_detector)
-        
 
-import functools
-import time
-from collections import defaultdict
-
-import numpy as np
-import simplejson as json
-import torch
-import torch.distributed as dist
-import yaml
-from torch.backends import cudnn
-from torch.hub import load_state_dict_from_url
-from torch.utils.data import DataLoader
-from torchnet.meter import AverageValueMeter
-from tqdm import tqdm
-
-from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
-from happypose.pose_estimators.cosypose.cosypose.datasets.detection_dataset import (
-    DetectionDataset,
-)
-from happypose.pose_estimators.cosypose.cosypose.integrated.detector import Detector
-
-# Evaluation
-from happypose.pose_estimators.cosypose.cosypose.scripts.run_detection_eval import (
-    run_detection_eval,
-)
-from happypose.pose_estimators.cosypose.cosypose.utils.distributed import (
-    get_rank,
-    get_world_size,
-    init_distributed_mode,
-    reduce_dict,
-    sync_model,
-)
-from happypose.pose_estimators.cosypose.cosypose.utils.logging import get_logger
-from happypose.toolbox.datasets.datasets_cfg import make_scene_dataset
-from happypose.toolbox.datasets.scene_dataset import (
-    IterableMultiSceneDataset,
-    RandomIterableSceneDataset,
-)
-from happypose.toolbox.utils.resources import (
-    get_cuda_memory,
-    get_gpu_memory,
-    get_total_memory,
-)
-
-from happypose.pose_estimators.cosypose.cosypose.training.detector_models_cfg import check_update_config, create_model_detector
-from happypose.pose_estimators.cosypose.cosypose.training.maskrcnn_forward_loss import h_maskrcnn
-
-from happypose.pose_estimators.cosypose.cosypose.training.train_detector import collate_fn
 
 cudnn.benchmark = True
 logger = get_logger(__name__)
@@ -293,7 +278,9 @@ def train_detector(args):
         logger.info(f"Using pretrained model from {pretrain_path}.")
         model.load_state_dict(torch.load(pretrain_path)["state_dict"])
     elif args.pretrain_coco:
-        state_dict = load_state_dict_from_url('https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth')
+        state_dict = load_state_dict_from_url(
+            "https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth"
+        )
 
         def keep(k):
             return "box_predictor" not in k and "mask_predictor" not in k
@@ -383,7 +370,9 @@ def train_detector(args):
                         max_norm=np.inf,
                         norm_type=2,
                     )
-                    meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
+                    meters_train["grad_norm"].add(
+                        torch.as_tensor(total_grad_norm).item()
+                    )
 
                     optimizer.step()
                     meters_time["backward"].add(time.time() - t)
@@ -444,4 +433,3 @@ def train_detector(args):
         log_dict = reduce_dict(log_dict)
 
         dist.barrier()
-

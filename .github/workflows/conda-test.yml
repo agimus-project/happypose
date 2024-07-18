@@ -52,7 +52,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Install happypose
-        run: pip install -e .
+        run: pip install -e .[multiview]
 
       - name: Download pre-trained models required for tests
         run: |
