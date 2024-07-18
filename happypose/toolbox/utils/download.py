@@ -170,9 +170,7 @@ async def main():
 
     if args.ycbv_tests:
         to_dl.append(("ycbv-debug.zip", DOWNLOAD_DIR))
-        to_unzip.append(
-            (DOWNLOAD_DIR / "ycbv-debug.zip", LOCAL_DATA_DIR / "results")
-        )
+        to_unzip.append((DOWNLOAD_DIR / "ycbv-debug.zip", LOCAL_DATA_DIR / "results"))
 
     if args.cosypose_models:
         for model in args.cosypose_models:

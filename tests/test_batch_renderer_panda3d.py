@@ -115,7 +115,12 @@ class TestPanda3DBatchRenderer:
         # Renders from 2 identical cams are equals
         assert tr_assert_close(renderings.rgbs[0], renderings.rgbs[1]) is None
         assert tr_assert_close(renderings.normals[0], renderings.normals[1]) is None
-        assert tr_assert_close(renderings.depths[0], renderings.depths[1], atol=1e-3, rtol=1e-3) is None
+        assert (
+            tr_assert_close(
+                renderings.depths[0], renderings.depths[1], atol=1e-3, rtol=1e-3
+            )
+            is None
+        )
         assert (
             tr_assert_close(renderings.binary_masks[0], renderings.binary_masks[1])
             is None

@@ -439,9 +439,7 @@ def train_pose(args):
                     max_norm=args.clip_grad_norm,
                     norm_type=2,
                 )
-                meters_train["grad_norm"].add(
-                    torch.as_tensor(total_grad_norm).item()
-                )
+                meters_train["grad_norm"].add(torch.as_tensor(total_grad_norm).item())
 
                 optimizer.step()
                 meters_time["backward"].add(time.time() - t)
@@ -462,7 +460,6 @@ def train_pose(args):
             for n, sample in enumerate(tqdm(ds_iter_val, ncols=80)):
                 loss = h(data=sample, meters=meters_val)
                 meters_val["loss_total"].add(loss.item())
-
 
         @torch.no_grad()
         def test():
