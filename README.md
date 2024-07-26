@@ -55,3 +55,57 @@ pip install .[pypi,cpu] --extra-index-url https://download.pytorch.org/whl/cpu
 Create data dir /somewhere/convenient. The dataset to store are quite large.
 export HAPPYPOSE_DATA_DIR=/somewhere/convenient
 ```
+
+## Test the install
+
+### CPU
+
+If you work on CPU, these models need to be download :
+
+```
+#hope dataset models for CosyPose
+python -m happypose.toolbox.utils.download --cosypose_models \
+            detector-bop-hope-pbr--15246 \
+            coarse-bop-hope-pbr--225203 \
+            refiner-bop-hope-pbr--955392
+```
+
+```
+# For MegaPose
+python -m happypose.toolbox.utils.download --megapose_models
+```
+
+and the examples
+
+```
+python -m happypose.toolbox.utils.download --examples barbecue-sauce
+```
+
+In the HappyPose folder:
+
+```
+pytest -v ./tests
+```
+
+You may need to install `pytest-order` : `pip installp pytest-order`. In this case, test related to the `evaluation` and the `training` of CosyPose are not run. If you want to use these functionalities, you need a GPU.
+
+### GPU
+
+Tests related to `evaluation` and `training` will be run if a GPU is available. Hence, a few more downloads are needed :
+
+```
+#ycbv models
+python -m happypose.toolbox.utils.download --cosypose_models \
+            coarse-bop-ycbv-pbr--724183 \
+            refiner-bop-ycbv-pbr--604090
+```
+
+```
+python -m happypose.toolbox.utils.download --bop_dataset ycbv
+```
+
+```
+python -m happypose.toolbox.utils.download --test-results
+```
+
+The tests take much longer in this case.

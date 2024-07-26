@@ -8,6 +8,7 @@ from typing import Dict
 
 # Third Party
 from omegaconf import OmegaConf
+import torch
 
 from happypose.pose_estimators.megapose.config import (
     RESULTS_DIR,
