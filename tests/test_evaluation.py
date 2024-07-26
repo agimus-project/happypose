@@ -130,56 +130,59 @@ class TestCosyPoseEvaluation():
     # Rajouter un test pour save_dir ?
     # Modifier ensuite pour que le path soit un path temporaire ?
     def test_evaluation_existing_results(self):
-        bop_eval_cfgs = []
-        for ds_name in self.cfg.ds_names:
-            # For each eval_cfg run the evaluation.
-            # Note that the results get saved to disk
-            for _save_key, eval_cfg in self.eval_cfg.items():
-                results_dir = get_save_dir(eval_cfg)
-                pred_keys = ["refiner/final"]
-                if eval_cfg.inference.run_depth_refiner:
-                    pred_keys.append("depth_refiner")
-                eval_out = {
-                    "results_path": results_dir / "results.pth.tar",
-                    "pred_keys": pred_keys,
-                    "save_dir": results_dir,
-                }
-                # Test results_dir and eval_out here
-                assert Path(
-                    eval_out["results_path"],
-                ).is_file(), f"The file {eval_out['results_path']} doesn't exist"
+        if torch.cuda.is_available():
+            bop_eval_cfgs = []
+            for ds_name in self.cfg.ds_names:
+                # For each eval_cfg run the evaluation.
+                # Note that the results get saved to disk
+                for _save_key, eval_cfg in self.eval_cfg.items():
+                    results_dir = get_save_dir(eval_cfg)
+                    pred_keys = ["refiner/final"]
+                    if eval_cfg.inference.run_depth_refiner:
+                        pred_keys.append("depth_refiner")
+                    eval_out = {
+                        "results_path": results_dir / "results.pth.tar",
+                        "pred_keys": pred_keys,
+                        "save_dir": results_dir,
+                    }
+                    # Test results_dir and eval_out here
+                    assert Path(
+                        eval_out["results_path"],
+                    ).is_file(), f"The file {eval_out['results_path']} doesn't exist"
 
-                # Run the bop eval for each type of prediction
-                if self.cfg.run_bop_eval and get_rank() == 0:
-                    bop_eval_keys = {"refiner/final", "depth_refiner"}
-                    bop_eval_keys = bop_eval_keys.intersection(set(eval_out["pred_keys"]))
+                    # Run the bop eval for each type of prediction
+                    if self.cfg.run_bop_eval and get_rank() == 0:
+                        bop_eval_keys = {"refiner/final", "depth_refiner"}
+                        bop_eval_keys = bop_eval_keys.intersection(set(eval_out["pred_keys"]))
 
-                    for method in bop_eval_keys:
-                        if "bop19" not in ds_name:
-                            continue
+                        for method in bop_eval_keys:
+                            if "bop19" not in ds_name:
+                                continue
 
-                        bop_eval_cfg = BOPEvalConfig(
-                            results_path=eval_out["results_path"],
-                            dataset=ds_name,
-                            split="test",
-                            eval_dir=eval_out["save_dir"] / "bop_evaluation",
-                            method=method,
-                            convert_only=False,
-                            use_post_score=False,
-                        )
-                        bop_eval_cfgs.append(bop_eval_cfg)
+                            bop_eval_cfg = BOPEvalConfig(
+                                results_path=eval_out["results_path"],
+                                dataset=ds_name,
+                                split="test",
+                                eval_dir=eval_out["save_dir"] / "bop_evaluation",
+                                method=method,
+                                convert_only=False,
+                                use_post_score=False,
+                            )
+                            bop_eval_cfgs.append(bop_eval_cfg)
 
-        assert bop_eval_cfg.results_path == eval_out["results_path"]
-        assert bop_eval_cfg.dataset == 'ycbv.bop19'
-        
-        if get_rank() == 0:
-            if self.cfg.run_bop_eval:
-                for bop_eval_cfg in bop_eval_cfgs:
-                    scores_pose_path, _ = run_evaluation(bop_eval_cfg)
-                    assert Path(LOCAL_DATA_DIR / "bop_eval_outputs" / f"refiner-final_{bop_eval_cfg.dataset.split('.')[0]}-{bop_eval_cfg.split}" / "scores_bop19.json").is_file()
-                    #assert scores_pose_path.is_file()
+            assert bop_eval_cfg.results_path == eval_out["results_path"]
+            assert bop_eval_cfg.dataset == 'ycbv.bop19'
+            
+            if get_rank() == 0:
+                if self.cfg.run_bop_eval:
+                    for bop_eval_cfg in bop_eval_cfgs:
+                        scores_pose_path, _ = run_evaluation(bop_eval_cfg)
+                        assert Path(LOCAL_DATA_DIR / "bop_eval_outputs" / f"refiner-final_{bop_eval_cfg.dataset.split('.')[0]}-{bop_eval_cfg.split}" / "scores_bop19.json").is_file()
+                        #assert scores_pose_path.is_file()
 
-        logger.info(f"Process {get_rank()} reached end of script")
+            logger.info(f"Process {get_rank()} reached end of script")
+        else:
+            pytest.skip("Evaluation is not tested without GPU")
         
     # TODO : Run the inference, then use the results for evaluation
     """

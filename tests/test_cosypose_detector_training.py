@@ -122,7 +122,10 @@ class TestCosyposeDetectorTraining():
         self.cfg_detector = cfg_detector
     
     def test_detector_training(self):
-        train_detector(self.cfg_detector)
+        if torch.cuda.is_available():
+            train_detector(self.cfg_detector)
+        else:
+            pytest.skip("Training is not tested without GPU")
         
 
 import functools

@@ -208,7 +208,10 @@ class TestCosyposePoseTraining():
         
     @pytest.mark.skip(reason="Currently, run two training tests (i.e. detector and pose) consecutively doesn't work with torch distributed")
     def test_pose_training(self):
-        train_pose(self.cfg_pose)
+        if torch.cuda.is_available():
+            train_pose(self.cfg_pose)
+        else:
+            pytest.skip("Training is not tested without GPU")
  
  
  
