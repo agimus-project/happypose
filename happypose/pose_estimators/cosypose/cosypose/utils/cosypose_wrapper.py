@@ -60,7 +60,7 @@ AVAILABLE_MODELS = {
         },
     },
     "ycbv": {
-        "ycbv": {
+        "pbr": {
             "detector_run_id": "detector-bop-ycbv-pbr--970850",
             "coarse_run_id": "coarse-bop-ycbv-pbr--724183",
             "refiner_run_id": "refiner-bop-ycbv-pbr--604090",
