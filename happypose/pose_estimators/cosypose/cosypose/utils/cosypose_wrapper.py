@@ -25,6 +25,9 @@ from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import
     load_model_cosypose,
 )
 from happypose.pose_estimators.megapose.inference.detector import Detector
+from happypose.pose_estimators.megapose.inference.types import (
+    ObservationTensor,
+)
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.inference.utils import load_detector
@@ -176,26 +179,20 @@ class CosyPoseWrapper:
         )
         return coarse_model, refiner_model
 
-    def inference(self, observation, coarse_guess=None):
-        detections = None
-        run_detector = True
-        if coarse_guess is None:
-            final_preds, all_preds = self.pose_predictor.run_inference_pipeline(
-                observation,
-                detections=detections,
-                run_detector=run_detector,
-                data_TCO_init=None,
-                n_coarse_iterations=1,
-                n_refiner_iterations=4,
-            )
-        else:
-            final_preds, all_preds = self.pose_predictor.run_inference_pipeline(
-                observation,
-                detections=detections,
-                run_detector=run_detector,
-                data_TCO_init=None,
-                n_coarse_iterations=0,
-                n_refiner_iterations=4,
-            )
+    def inference(self, observation: ObservationTensor):
+        """Example of how to un inference with the loaded models.
+
+        Args:
+        ---
+            observation: ObservationTensor, the data used for inference
+        """
+        final_preds, all_preds = self.pose_predictor.run_inference_pipeline(
+            observation,
+            detections=None,
+            run_detector=None,
+            data_TCO_init=None,
+            n_coarse_iterations=1,
+            n_refiner_iterations=4,
+        )
         print("inference successfull")
         return final_preds.cpu()
