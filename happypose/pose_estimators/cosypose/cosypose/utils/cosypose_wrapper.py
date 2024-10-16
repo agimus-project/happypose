@@ -90,7 +90,7 @@ class CosyPoseWrapper:
         Args:
         ----
             dataset_name: str, name of the dataset on which model was trained, hope|tless|ycbv
-            model_type: str, type of NN model (depends on training data), hope|tless|ycbv
+            model_type: str, type of NN model (depends on training data), pbr|synth+real
             object_dataset: RigidObjectDataset, None or already existing rigid object dataset. If None, will use dataset_name to build one.
             n_workers: int, how many processes will be spun in the batch renderer
             renderer_type: str 'panda3d'|'bullet'
@@ -110,7 +110,7 @@ class CosyPoseWrapper:
         Args:
         ----
             dataset_name: str, name of the dataset on which model was trained, hope|tless|ycbv
-            model_type: str, type of NN model (depends on training data), hope|tless|ycbv
+            model_type: str, type of NN model (depends on training data), pbr|synth+real
             renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
             n_workers: int, number of workers used in the renderer
             model_type: str, what training data was used, "pbr" and "synth+real" supported
@@ -180,7 +180,7 @@ class CosyPoseWrapper:
         return coarse_model, refiner_model
 
     def inference(self, observation: ObservationTensor):
-        """Example of how to un inference with the loaded models.
+        """Example of how to use inference with the loaded models.
 
         Args:
         ---
