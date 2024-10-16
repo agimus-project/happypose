@@ -11,7 +11,7 @@
 - Deprecate this class when possible
 """
 
-from typing import Union
+from typing import Tuple, Union
 
 import torch
 
@@ -24,6 +24,10 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator impor
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
     load_model_cosypose,
 )
+from happypose.pose_estimators.megapose.inference.detector import Detector
+from happypose.pose_estimators.megapose.inference.types import (
+    ObservationTensor,
+)
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.inference.utils import load_detector
@@ -32,62 +36,98 @@ from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+# To download model weights for one of the datasets, run these commands:
+# python -m happypose.toolbox.utils.download --cosypose_models=<detector_run_id>
+# python -m happypose.toolbox.utils.download --cosypose_models=<coarse_run_id>
+# python -m happypose.toolbox.utils.download --cosypose_models=<refiner_run_id>
+
+AVAILABLE_MODELS = {
+    "hope": {
+        "pbr": {
+            "detector_run_id": "detector-bop-hope-pbr--15246",
+            "coarse_run_id": "coarse-bop-hope-pbr--225203",
+            "refiner_run_id": "refiner-bop-hope-pbr--955392",
+        },
+        "synth+real": {},  # no such model
+    },
+    "tless": {
+        "pbr": {
+            "detector_run_id": "detector-bop-tless-pbr--873074",
+            "coarse_run_id": "coarse-bop-tless-pbr--506801",
+            "refiner_run_id": "refiner-bop-tless-pbr--233420",
+        },
+        "synth+real": {
+            "detector_run_id": "detector-bop-tless-synt+real--452847",
+            "coarse_run_id": "coarse-bop-tless-synt+real--160982",
+            "refiner_run_id": "refiner-bop-tless-synt+real--881314",
+        },
+    },
+    "ycbv": {
+        "pbr": {
+            "detector_run_id": "detector-bop-ycbv-pbr--970850",
+            "coarse_run_id": "coarse-bop-ycbv-pbr--724183",
+            "refiner_run_id": "refiner-bop-ycbv-pbr--604090",
+        },
+        "synth+real": {
+            "detector_run_id": "detector-bop-ycbv-synt+real--292971",
+            "coarse_run_id": "coarse-bop-ycbv-synt+real--822463",
+            "refiner_run_id": "refiner-bop-ycbv-synt+real--631598",
+        },
+    },
+}
+
+
 class CosyPoseWrapper:
     def __init__(
         self,
         dataset_name: str,
+        model_type: str = "pbr",
         object_dataset: Union[None, RigidObjectDataset] = None,
-        n_workers=8,
-        gpu_renderer=False,
         renderer_type: str = "panda3d",
+        n_workers: int = 8,
     ) -> None:
         """
-        inputs:
-        - dataset_name: hope|tless|ycbv
-        - object_dataset: None or already existing rigid object dataset. If None, will use dataset_name
-        to build one
-        - n_workers: how many processes will be spun in the batch renderer
-        - renderer_type: 'panda3d'|'bullet'
+        Args:
+        ----
+            dataset_name: str, name of the dataset on which model was trained, hope|tless|ycbv
+            model_type: str, type of NN model (depends on training data), pbr|synth+real
+            object_dataset: RigidObjectDataset, None or already existing rigid object dataset. If None, will use dataset_name to build one.
+            n_workers: int, how many processes will be spun in the batch renderer
+            renderer_type: str 'panda3d'|'bullet'
         """
 
         self.dataset_name = dataset_name
         self.object_dataset = object_dataset
         self.detector, self.pose_predictor = self.get_model(
-            dataset_name, n_workers, renderer_type
+            dataset_name, model_type, n_workers, renderer_type
         )
 
-    def get_model(self, dataset_name, n_workers, renderer_type):
-        # load models
-        if dataset_name == "hope":
-            # HOPE setup
-            # python -m happypose.toolbox.utils.download --cosypose_models=detector-bop-hope-pbr--15246
-            # python -m happypose.toolbox.utils.download --cosypose_models=coarse-bop-hope-pbr--225203
-            # python -m happypose.toolbox.utils.download --cosypose_models=refiner-bop-hope-pbr--955392
-            detector_run_id = "detector-bop-hope-pbr--15246"
-            coarse_run_id = "coarse-bop-hope-pbr--225203"
-            refiner_run_id = "refiner-bop-hope-pbr--955392"
-        elif dataset_name == "tless":
-            # TLESS setup
-            # python -m happypose.toolbox.utils.download --cosypose_models=detector-bop-tless-pbr--873074
-            # python -m happypose.toolbox.utils.download --cosypose_models=coarse-bop-tless-pbr--506801
-            # python -m happypose.toolbox.utils.download --cosypose_models=refiner-bop-tless-pbr--233420
-            detector_run_id = "detector-bop-tless-pbr--873074"
-            coarse_run_id = "coarse-bop-tless-pbr--506801"
-            refiner_run_id = "refiner-bop-tless-pbr--233420"
-        elif dataset_name == "ycbv":
-            # YCBV setup
-            # python -m happypose.toolbox.utils.download --cosypose_models=detector-bop-ycbv-pbr--970850
-            # python -m happypose.toolbox.utils.download --cosypose_models=coarse-bop-ycbv-pbr--724183
-            # python -m happypose.toolbox.utils.download --cosypose_models=refiner-bop-ycbv-pbr--604090
-            detector_run_id = "detector-bop-ycbv-pbr--970850"
-            coarse_run_id = "coarse-bop-ycbv-pbr--724183"
-            refiner_run_id = "refiner-bop-ycbv-pbr--604090"
-        else:
-            msg = f"Not prepared for {dataset_name} dataset"
-            raise ValueError(msg)
-        detector = load_detector(detector_run_id, device)
+    def get_model(
+        self, dataset_name, model_type, n_workers, renderer_type
+    ) -> Tuple[Detector, PoseEstimator]:
+        """Return CosyPose detector and pose estimator objects for a given dataset.
+
+        Args:
+        ----
+            dataset_name: str, name of the dataset on which model was trained, hope|tless|ycbv
+            model_type: str, type of NN model (depends on training data), pbr|synth+real
+            renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
+            n_workers: int, number of workers used in the renderer
+            model_type: str, what training data was used, "pbr" and "synth+real" supported
+        Returns:
+        -------
+            tuple (Detector,PoseEstimator)
+        """
+        try:
+            mids = AVAILABLE_MODELS[dataset_name][model_type]
+        except KeyError:
+            raise KeyError(
+                f"{dataset_name}, {model_type} combination not supported when loading cosypose models"
+            )
+
+        detector = load_detector(mids["detector_run_id"], device)
         coarse_model, refiner_model = self.load_pose_models(
-            coarse_run_id, refiner_run_id, n_workers, renderer_type
+            mids["coarse_run_id"], mids["refiner_run_id"], n_workers, renderer_type
         )
 
         pose_estimator = PoseEstimator(
@@ -139,26 +179,20 @@ class CosyPoseWrapper:
         )
         return coarse_model, refiner_model
 
-    def inference(self, observation, coarse_guess=None):
-        detections = None
-        run_detector = True
-        if coarse_guess is None:
-            final_preds, all_preds = self.pose_predictor.run_inference_pipeline(
-                observation,
-                detections=detections,
-                run_detector=run_detector,
-                data_TCO_init=None,
-                n_coarse_iterations=1,
-                n_refiner_iterations=4,
-            )
-        else:
-            final_preds, all_preds = self.pose_predictor.run_inference_pipeline(
-                observation,
-                detections=detections,
-                run_detector=run_detector,
-                data_TCO_init=None,
-                n_coarse_iterations=0,
-                n_refiner_iterations=4,
-            )
+    def inference(self, observation: ObservationTensor):
+        """Example of how to use inference with the loaded models.
+
+        Args:
+        ---
+            observation: ObservationTensor, the data used for inference
+        """
+        final_preds, all_preds = self.pose_predictor.run_inference_pipeline(
+            observation,
+            detections=None,
+            run_detector=None,
+            data_TCO_init=None,
+            n_coarse_iterations=1,
+            n_refiner_iterations=4,
+        )
         print("inference successfull")
         return final_preds.cpu()
