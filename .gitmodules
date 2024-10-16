@@ -1,3 +1,0 @@
-[submodule "deps/bop_renderer"]
-	path = deps/bop_renderer
-	url = https://github.com/thodan/bop_renderer/
