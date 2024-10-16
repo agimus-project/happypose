@@ -84,11 +84,13 @@ class CosyPoseWrapper:
         n_workers: int = 8,
     ) -> None:
         """
-        :param dataset_name: str, name of the dataset on which model was trained, hope|tless|ycbv
-        :param model_type: str, type of NN model (depends on training data), hope|tless|ycbv
-        :param object_dataset: None or already existing rigid object dataset. If None, will use dataset_name to build one
-        :param n_workers: how many processes will be spun in the batch renderer
-        :param renderer_type: 'panda3d'|'bullet'
+        Args:
+        ----
+            dataset_name: str, name of the dataset on which model was trained, hope|tless|ycbv
+            model_type: str, type of NN model (depends on training data), hope|tless|ycbv
+            object_dataset: RigidObjectDataset, None or already existing rigid object dataset. If None, will use dataset_name to build one.
+            n_workers: int, how many processes will be spun in the batch renderer
+            renderer_type: str 'panda3d'|'bullet'
         """
 
         self.dataset_name = dataset_name
@@ -100,15 +102,18 @@ class CosyPoseWrapper:
     def get_model(
         self, dataset_name, model_type, n_workers, renderer_type
     ) -> Tuple[Detector, PoseEstimator]:
-        """
-        Return CosyPose detector and pose estimator objects for a given dataset.
+        """Return CosyPose detector and pose estimator objects for a given dataset.
 
-        :param dataset_name: str, name of the dataset on which model was trained, hope|tless|ycbv
-        :param model_type: str, type of NN model (depends on training data), hope|tless|ycbv
-        :param renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
-        :param n_workers: int, number of workers used in the renderer
-        :param model_type: str, what training data was used, "pbr" and "synth+real" supported
-        :return: tuple (Detector,PoseEstimator)
+        Args:
+        ----
+            dataset_name: str, name of the dataset on which model was trained, hope|tless|ycbv
+            model_type: str, type of NN model (depends on training data), hope|tless|ycbv
+            renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
+            n_workers: int, number of workers used in the renderer
+            model_type: str, what training data was used, "pbr" and "synth+real" supported
+        Returns:
+        -------
+            tuple (Detector,PoseEstimator)
         """
         try:
             mids = AVAILABLE_MODELS[dataset_name][model_type]
