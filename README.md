@@ -32,12 +32,15 @@ conda activate happypose
 pip install -r requirements/base.txt
 ```
 
+With conda, you **must not** install `pypi`, `cpu` or `cu124` extras or requirements files.
+
 ### Example with uv
 
 ```
 git clone --branch dev --recurse-submodules https://github.com/agimus-project/happypose.git
 cd happypose
 uv sync --extra pypi --extra cpu  # you *must* choose between cpu / cu124
+source .venv/bin/activate
 ```
 
 ### Example with venv
