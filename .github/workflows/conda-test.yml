@@ -24,7 +24,7 @@ jobs:
       - name: Install EGL mesa - required for Panda3D renderer
         run: |
           sudo apt-get update -y -qq
-          sudo apt-get install -y -qq libegl1-mesa libegl1-mesa-dev
+          sudo apt-get install -y -qq libegl1-mesa-dev
 
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
