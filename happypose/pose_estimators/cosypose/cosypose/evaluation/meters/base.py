@@ -38,7 +38,7 @@ class Meter:
             all_datas = self.datas
             for n in range(1, world_size):
                 tmp_file = tmp_file_template.format(rank=n)
-                datas = torch.load(tmp_file)
+                datas = torch.load(tmp_file, weights_only=True)
                 for k in all_datas.keys():
                     all_datas[k].extend(datas.get(k, []))
                 Path(tmp_file).unlink()

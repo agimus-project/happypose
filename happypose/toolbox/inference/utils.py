@@ -64,7 +64,7 @@ def load_detector(run_id: str, device="cpu") -> torch.nn.Module:
     cfg = check_update_config_detector(cfg)
     label_to_category_id = cfg.label_to_category_id
     model = create_model_detector(cfg, len(label_to_category_id))
-    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=torch.device(device))
+    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=torch.device(device), weights_only=True)
     ckpt = ckpt["state_dict"]
     model.load_state_dict(ckpt)
     model = model.to(device).eval()

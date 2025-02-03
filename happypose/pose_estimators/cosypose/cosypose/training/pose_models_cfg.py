@@ -65,7 +65,7 @@ def load_model_cosypose(
     cfg = yaml.load((run_dir / "config.yaml").read_text(), Loader=yaml.UnsafeLoader)
     cfg = check_update_config(cfg)
     model = create_pose_model_cosypose(cfg, renderer=renderer, mesh_db=mesh_db_batched)
-    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device)
+    ckpt = torch.load(run_dir / "checkpoint.pth.tar", map_location=device, weights_only=True)
     ckpt = ckpt["state_dict"]
     model.load_state_dict(ckpt)
     model = model.to(device).eval()
