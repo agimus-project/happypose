@@ -29,6 +29,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 RGB_DIMS = [0, 1, 2]
 
+
 class PoseEstimator(PoseEstimationModule):
     """Performs inference for pose estimation."""
 
@@ -419,7 +420,7 @@ class PoseEstimator(PoseEstimationModule):
             labels_ = df_["label"].tolist()
             batch_im_ids_ = torch.as_tensor(df_["batch_im_id"].values, device=device)
 
-            images_ = images[batch_im_ids_]          
+            images_ = images[batch_im_ids_]
             K_ = observation.K[batch_im_ids_]
             if torch.cuda.is_available():
                 timer_ = CudaTimer(enabled=cuda_timer)

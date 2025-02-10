@@ -1,7 +1,7 @@
 # Standard Library
+import argparse
 import os
 import time
-import argparse
 from pathlib import Path
 
 # Third Party
@@ -13,7 +13,6 @@ from happypose.pose_estimators.cosypose.cosypose.utils.cosypose_wrapper import (
 )
 
 # HappyPose
-from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.inference.example_inference_utils import (
     load_detections,
     load_object_data,
@@ -30,7 +29,6 @@ from happypose.toolbox.utils.logging import get_logger, set_logging_level
 logger = get_logger(__name__)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 
 def main():
@@ -58,9 +56,7 @@ def main():
     detections = load_detections(example_dir).to(device)
     object_dataset = make_example_object_dataset(example_dir)
     rgb, depth, camera_data = load_observation_example(example_dir, load_depth=True)
-    observation = ObservationTensor.from_numpy(rgb, depth, camera_data.K).to(
-        device
-    )
+    observation = ObservationTensor.from_numpy(rgb, depth, camera_data.K).to(device)
 
     # Load models
     cosy = CosyPoseWrapper(
@@ -80,19 +76,17 @@ def main():
 
     if args.run_inference:
         data_TCO, extra_data = cosy.pose_predictor.run_inference_pipeline(
-            observation=observation, 
-            detections=detections, 
+            observation=observation,
+            detections=detections,
             run_detector=False,
-            n_refiner_iterations=3
+            n_refiner_iterations=3,
         )
         print("run_inference_pipeline timings:")
         print(extra_data["timing_str"])
         if args.run_depth_refiner:
             t1 = time.perf_counter()
             data_TCO, _ = cosy.depth_refiner.refine_poses(
-                predictions=data_TCO, 
-                depth=observation.depth, 
-                K=observation.K
+                predictions=data_TCO, depth=observation.depth, K=observation.K
             )
             print(f"Depth refiner took: {time.perf_counter() - t1}")
 

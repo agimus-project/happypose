@@ -50,7 +50,7 @@ def load_observation_example(
     camera_data_name: str = "camera_data.json",
     rgb_name: str = "image_rgb.png",
     depth_name: str = "image_depth.png",
-    scaling_factor: int = 1000
+    scaling_factor: int = 1000,
 ) -> Tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
     camera_data = CameraData.from_json((example_dir / camera_data_name).read_text())
 
@@ -59,7 +59,10 @@ def load_observation_example(
 
     depth = None
     if load_depth:
-        depth = np.array(Image.open(example_dir / depth_name), dtype=np.float32) / scaling_factor
+        depth = (
+            np.array(Image.open(example_dir / depth_name), dtype=np.float32)
+            / scaling_factor
+        )
         assert depth.shape[:2] == camera_data.resolution
 
     return rgb, depth, camera_data

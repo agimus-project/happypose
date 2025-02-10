@@ -24,19 +24,18 @@ from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator impor
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
     load_model_cosypose,
 )
+from happypose.pose_estimators.megapose.inference.depth_refiner import DepthRefiner
 from happypose.pose_estimators.megapose.inference.detector import Detector
+from happypose.pose_estimators.megapose.inference.icp_refiner import ICPRefiner
 from happypose.pose_estimators.megapose.inference.types import (
     ObservationTensor,
 )
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.inference.utils import load_detector
-from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase, BatchedMeshes
-from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
+from happypose.toolbox.lib3d.rigid_mesh_database import BatchedMeshes, MeshDataBase
 from happypose.toolbox.renderer.bullet_batch_renderer import BulletBatchRenderer
-
-from happypose.pose_estimators.megapose.inference.depth_refiner import DepthRefiner
-from happypose.pose_estimators.megapose.inference.icp_refiner import ICPRefiner
+from happypose.toolbox.renderer.panda3d_batch_renderer import Panda3dBatchRenderer
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -140,10 +139,7 @@ class CosyPoseWrapper:
 
         renderer = get_renderer(renderer_type, self.object_dataset, n_workers)
         coarse_model, refiner_model = load_pose_models(
-            mids["coarse_run_id"], 
-            mids["refiner_run_id"], 
-            renderer,
-            mesh_db_batched
+            mids["coarse_run_id"], mids["refiner_run_id"], renderer, mesh_db_batched
         )
 
         pose_estimator = PoseEstimator(
@@ -174,7 +170,9 @@ class CosyPoseWrapper:
         return final_preds.cpu()
 
 
-def get_renderer(renderer_type: str, object_dataset: RigidObjectDataset, n_workers: int):
+def get_renderer(
+    renderer_type: str, object_dataset: RigidObjectDataset, n_workers: int
+):
     if renderer_type == "panda3d":
         return Panda3dBatchRenderer(
             object_dataset,
@@ -190,25 +188,32 @@ def get_renderer(renderer_type: str, object_dataset: RigidObjectDataset, n_worke
         raise ValueError(f"Renderer type {renderer_type} not supported")
 
 
-def get_depth_refiner(depth_refiner_type: Union[None, str],
-                      mesh_db_batched: BatchedMeshes,
-                      renderer: Panda3dBatchRenderer
-                      ):
+def get_depth_refiner(
+    depth_refiner_type: Union[None, str],
+    mesh_db_batched: BatchedMeshes,
+    renderer: Panda3dBatchRenderer,
+):
     depth_refiner = None
     if depth_refiner_type is not None:
-        assert isinstance(renderer, Panda3dBatchRenderer), "Depth refiner are only compatible with panda3d"
+        assert isinstance(renderer, Panda3dBatchRenderer), (
+            "Depth refiner are only compatible with panda3d"
+        )
         if depth_refiner_type == "icp":
             depth_refiner = ICPRefiner(mesh_db_batched, renderer)
         elif depth_refiner_type == "teaserpp":
-            from happypose.pose_estimators.megapose.inference.teaserpp_refiner import TeaserppRefiner
+            from happypose.pose_estimators.megapose.inference.teaserpp_refiner import (
+                TeaserppRefiner,
+            )
+
             depth_refiner = TeaserppRefiner(mesh_db_batched, renderer)
     return depth_refiner
+
 
 def load_pose_models(
     coarse_run_id: str,
     refiner_run_id: str,
     renderer: Union[Panda3dBatchRenderer, BulletBatchRenderer],
-    mesh_db_batched: BatchedMeshes
+    mesh_db_batched: BatchedMeshes,
 ):
     coarse_model = load_model_cosypose(
         EXP_DIR / coarse_run_id, renderer, mesh_db_batched, device
@@ -217,4 +222,3 @@ def load_pose_models(
         EXP_DIR / refiner_run_id, renderer, mesh_db_batched, device
     )
     return coarse_model, refiner_model
-
