@@ -19,6 +19,7 @@ from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
 from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
     PoseEstimator,
 )
+from happypose.pose_estimators.cosypose.cosypose.models.pose import PosePredictor
 
 # Detection
 from happypose.pose_estimators.cosypose.cosypose.training.pose_models_cfg import (
@@ -116,13 +117,13 @@ class CosyPoseWrapper:
         Args:
         ----
             dataset_name: str, name of the dataset on which model was trained, hope|tless|ycbv
-            model_type: str, type of NN model (depends on training data), pbr|synth+real
-            renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
-            n_workers: int, number of workers used in the renderer
             model_type: str, what training data was used, "pbr" and "synth+real" supported
+            n_workers: int, number of workers used in the renderer
+            renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
+            depth_refiner_type: None or str, if None -> not used, str can be 'icp' or 'teaserpp'
         Returns:
         -------
-            tuple (Detector,PoseEstimator)
+            tuple (Detector, PoseEstimator, DepthRefiner)
         """
         try:
             mids = AVAILABLE_MODELS[dataset_name][model_type]
@@ -150,12 +151,15 @@ class CosyPoseWrapper:
         depth_refiner = get_depth_refiner(depth_refiner_type, mesh_db_batched, renderer)
         return detector, pose_estimator, depth_refiner
 
-    def inference(self, observation: ObservationTensor, use_depth_refinement):
+    def inference(
+        self, observation: ObservationTensor, use_depth_refinement: bool = False
+    ):
         """Example of how to use inference with the loaded models.
 
         Args:
         ---
             observation: ObservationTensor, the data used for inference
+            use_depth_refinement: if true, additional depth-based refinement is done
         """
         final_preds, all_preds = self.pose_predictor.run_inference_pipeline(
             observation,
@@ -174,7 +178,20 @@ class CosyPoseWrapper:
 
 def get_renderer(
     renderer_type: str, object_dataset: RigidObjectDataset, n_workers: int
-):
+) -> Union[Panda3dBatchRenderer, BulletBatchRenderer]:
+    """
+    Return a batch renderer.
+
+    Args:
+    ----
+        renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
+        object_dataset: RigidObjectDataset, None or already existing rigid object dataset. If None, will use dataset_name to build one.
+        n_workers: int, how many processes will be spun in the batch renderer
+
+    Return:
+    ---
+        Panda3dBatchRenderer or BulletBatchRenderer
+    """
     if renderer_type == "panda3d":
         return Panda3dBatchRenderer(
             object_dataset,
@@ -194,7 +211,20 @@ def get_depth_refiner(
     depth_refiner_type: Union[None, str],
     mesh_db_batched: BatchedMeshes,
     renderer: Panda3dBatchRenderer,
-):
+) -> DepthRefiner:
+    """
+    Return a depth refiner.
+
+    Args:
+    ----
+        depth_refiner_type: None or str, if None -> not used, str can be 'icp' or 'teaserpp'
+        mesh_db_batched: batched database of meshes
+        renderer: batch renderer object, as obtained from get_renderer\
+
+    Return
+    ---
+        DepthRefiner
+    """
     depth_refiner = None
     if depth_refiner_type is not None:
         assert isinstance(renderer, Panda3dBatchRenderer), (
@@ -216,7 +246,7 @@ def load_pose_models(
     refiner_run_id: str,
     renderer: Union[Panda3dBatchRenderer, BulletBatchRenderer],
     mesh_db_batched: BatchedMeshes,
-):
+) -> Tuple[PosePredictor, PosePredictor]:
     coarse_model = load_model_cosypose(
         EXP_DIR / coarse_run_id, renderer, mesh_db_batched, device
     )
