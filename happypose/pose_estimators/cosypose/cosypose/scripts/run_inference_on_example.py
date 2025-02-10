@@ -41,6 +41,7 @@ def main():
     parser.add_argument("--run-detections", action="store_true")
     parser.add_argument("--run-inference", action="store_true")
     parser.add_argument("--run-depth-refiner", action="store_true")
+    parser.add_argument("--depth-refiner-type", type=str, default="icp")
     parser.add_argument("--vis-detections", action="store_true")
     parser.add_argument("--vis-poses", action="store_true")
     args = parser.parse_args()
@@ -63,7 +64,10 @@ def main():
 
     # Load models
     cosy = CosyPoseWrapper(
-        dataset_name=args.dataset, object_dataset=object_dataset, n_workers=1
+        dataset_name=args.dataset,
+        object_dataset=object_dataset,
+        depth_refiner_type=args.depth_refiner_type,
+        n_workers=1,
     )
 
     if args.run_detections:
