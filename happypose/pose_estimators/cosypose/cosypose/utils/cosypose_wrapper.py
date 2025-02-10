@@ -150,7 +150,7 @@ class CosyPoseWrapper:
         depth_refiner = get_depth_refiner(depth_refiner_type, mesh_db_batched, renderer)
         return detector, pose_estimator, depth_refiner
 
-    def inference(self, observation: ObservationTensor):
+    def inference(self, observation: ObservationTensor, use_depth_refinement):
         """Example of how to use inference with the loaded models.
 
         Args:
@@ -165,8 +165,10 @@ class CosyPoseWrapper:
             n_coarse_iterations=1,
             n_refiner_iterations=4,
         )
-        if self.depth_refiner is not None:
-            breakpoint()
+        if use_depth_refinement and self.depth_refiner is not None:
+            final_preds, _ = self.depth_refiner.refine_poses(
+                predictions=final_preds, depth=observation.depth, K=observation.K
+            )
         return final_preds.cpu()
 
 

@@ -167,7 +167,6 @@ class PoseEstimator(PoseEstimationModule):
             )
             if detections is None and run_detector:
                 start_time = time.time()
-                breakpoint()
                 detections = self.forward_detection_model(
                     observation,
                     detection_th,

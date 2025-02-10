@@ -11,7 +11,6 @@ def check_update_config(cfg):
 
 
 def create_model_detector(cfg, n_classes):
-    breakpoint()
     model = DetectorMaskRCNN(
         input_resize=cfg.input_resize,
         n_classes=n_classes,
