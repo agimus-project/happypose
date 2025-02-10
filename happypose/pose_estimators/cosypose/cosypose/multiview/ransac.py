@@ -133,7 +133,7 @@ def make_obj_infos(matched_candidates):
     scene_infos = matched_candidates.infos.loc[:, ["obj_id", "score", "label"]].copy()
     gb = scene_infos.groupby("obj_id")
     scene_infos["n_cand"] = gb["score"].transform(len).astype(int)
-    scene_infos["score"] = gb["score"].transform(np.sum)
+    scene_infos["score"] = gb["score"].transform("sum")
     scene_infos = gb.first().reset_index(drop=False)
     return scene_infos
 

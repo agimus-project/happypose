@@ -349,7 +349,7 @@ def train_pose(args):
         resume_dir = EXP_DIR / args.resume_run_id
         path = resume_dir / "checkpoint.pth.tar"
         logger.info(f"Loading checkpoing from {path}")
-        save = torch.load(path)
+        save = torch.load(path, weights_only=True)
         state_dict = save["state_dict"]
         model.load_state_dict(state_dict)
         start_epoch = save["epoch"] + 1
