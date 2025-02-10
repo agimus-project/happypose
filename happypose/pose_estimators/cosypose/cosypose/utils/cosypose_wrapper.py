@@ -31,7 +31,10 @@ from happypose.pose_estimators.megapose.inference.types import (
 from happypose.toolbox.datasets.datasets_cfg import make_object_dataset
 from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.inference.utils import load_detector
-from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase
+from happypose.toolbox.lib3d.rigid_mesh_database import MeshDataBase, BatchedMeshes
+
+from happypose.pose_estimators.megapose.inference.depth_refiner import DepthRefiner
+from happypose.pose_estimators.megapose.inference.icp_refiner import ICPRefiner
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -83,6 +86,7 @@ class CosyPoseWrapper:
         dataset_name: str,
         model_type: str = "pbr",
         object_dataset: Union[None, RigidObjectDataset] = None,
+        depth_refiner_type: Union[None, str] = None,
         renderer_type: str = "panda3d",
         n_workers: int = 8,
     ) -> None:
@@ -98,13 +102,13 @@ class CosyPoseWrapper:
 
         self.dataset_name = dataset_name
         self.object_dataset = object_dataset
-        self.detector, self.pose_predictor = self.get_model(
-            dataset_name, model_type, n_workers, renderer_type
+        self.detector, self.pose_predictor, self.depth_refiner = self.get_model(
+            dataset_name, model_type, n_workers, renderer_type, depth_refiner_type
         )
 
     def get_model(
-        self, dataset_name, model_type, n_workers, renderer_type
-    ) -> Tuple[Detector, PoseEstimator]:
+        self, dataset_name, model_type, n_workers, renderer_type, depth_refiner_type
+    ) -> Tuple[Detector, PoseEstimator, DepthRefiner]:
         """Return CosyPose detector and pose estimator objects for a given dataset.
 
         Args:
@@ -126,8 +130,17 @@ class CosyPoseWrapper:
             )
 
         detector = load_detector(mids["detector_run_id"], device)
-        coarse_model, refiner_model = self.load_pose_models(
-            mids["coarse_run_id"], mids["refiner_run_id"], n_workers, renderer_type
+        if self.object_dataset is None:
+            self.object_dataset = make_object_dataset(self.dataset_name)
+        mesh_db = MeshDataBase.from_object_ds(self.object_dataset)
+        mesh_db_batched = mesh_db.batched().to(device)
+
+        renderer = get_renderer(renderer_type, self.object_dataset, n_workers)
+        coarse_model, refiner_model = load_pose_models(
+            mids["coarse_run_id"], 
+            mids["refiner_run_id"], 
+            renderer,
+            mesh_db_batched
         )
 
         pose_estimator = PoseEstimator(
@@ -135,49 +148,10 @@ class CosyPoseWrapper:
             coarse_model=coarse_model,
             detector_model=detector,
         )
-        return detector, pose_estimator
 
-    def load_pose_models(
-        self,
-        coarse_run_id: str,
-        refiner_run_id: str,
-        n_workers: int,
-        renderer_type: str = "panda3d",
-    ):
-        if self.object_dataset is None:
-            self.object_dataset = make_object_dataset(self.dataset_name)
-        if renderer_type == "panda3d":
-            from happypose.toolbox.renderer.panda3d_batch_renderer import (
-                Panda3dBatchRenderer,
-            )
+        depth_refiner = ICPRefiner(mesh_db_batched, renderer)
 
-            renderer = Panda3dBatchRenderer(
-                self.object_dataset,
-                n_workers=n_workers,
-            )
-        elif renderer_type == "bullet":
-            from happypose.toolbox.renderer.bullet_batch_renderer import (
-                BulletBatchRenderer,
-            )
-
-            renderer = BulletBatchRenderer(
-                self.object_dataset,
-                n_workers=n_workers,
-                gpu_renderer=torch.cuda.is_available(),
-            )
-        else:
-            raise ValueError(f"Renderer type {renderer_type} not supported")
-
-        mesh_db = MeshDataBase.from_object_ds(self.object_dataset)
-        mesh_db_batched = mesh_db.batched().to(device)
-
-        coarse_model = load_model_cosypose(
-            EXP_DIR / coarse_run_id, renderer, mesh_db_batched, device
-        )
-        refiner_model = load_model_cosypose(
-            EXP_DIR / refiner_run_id, renderer, mesh_db_batched, device
-        )
-        return coarse_model, refiner_model
+        return detector, pose_estimator, depth_refiner
 
     def inference(self, observation: ObservationTensor):
         """Example of how to use inference with the loaded models.
@@ -194,5 +168,45 @@ class CosyPoseWrapper:
             n_coarse_iterations=1,
             n_refiner_iterations=4,
         )
-        print("inference successfull")
+        if self.depth_refiner is not None:
+            breakpoint()
         return final_preds.cpu()
+
+
+def get_renderer(renderer_type: str, object_dataset: RigidObjectDataset, n_workers: int):
+    if renderer_type == "panda3d":
+        from happypose.toolbox.renderer.panda3d_batch_renderer import (
+            Panda3dBatchRenderer,
+        )
+
+        return Panda3dBatchRenderer(
+            object_dataset,
+            n_workers=n_workers,
+        )
+    elif renderer_type == "bullet":
+        from happypose.toolbox.renderer.bullet_batch_renderer import (
+            BulletBatchRenderer,
+        )
+
+        return BulletBatchRenderer(
+            object_dataset,
+            n_workers=n_workers,
+            gpu_renderer=torch.cuda.is_available(),
+        )
+    else:
+        raise ValueError(f"Renderer type {renderer_type} not supported")
+
+def load_pose_models(
+    coarse_run_id: str,
+    refiner_run_id: str,
+    renderer,
+    mesh_db_batched: BatchedMeshes
+):
+    coarse_model = load_model_cosypose(
+        EXP_DIR / coarse_run_id, renderer, mesh_db_batched, device
+    )
+    refiner_model = load_model_cosypose(
+        EXP_DIR / refiner_run_id, renderer, mesh_db_batched, device
+    )
+    return coarse_model, refiner_model
+
