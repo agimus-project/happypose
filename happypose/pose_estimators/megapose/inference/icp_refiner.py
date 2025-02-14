@@ -139,6 +139,12 @@ def icp_refinement(
     cam_K,
     TCO_pred,
     n_min_points=1000,
+    min_measured_depth=0.2,
+    max_measured_depth=5.0,
+    iterations=100,
+    tolerance=0.05,
+    rejection_scale=2.5,
+    num_levels=4,
 ):
     # Inspired from https://github.com/kirumang/Pix2Pose/blob/843effe0097e9982f4b07dd90b04ede2b9ee9294/tools/5_evaluation_bop_icp3d.py#L57
 
@@ -161,7 +167,9 @@ def icp_refinement(
         cy=cam_K[1, 2],
         refine=True,
     )
-    depth_valid = np.logical_and(depth_measured > 0.2, depth_measured < 5)
+    depth_valid = np.logical_and(
+        depth_measured > min_measured_depth, depth_measured < max_measured_depth
+    )
     depth_valid = np.logical_and(depth_valid, object_mask_measured)
     points_tgt = points_tgt[depth_valid]
 
@@ -198,16 +206,20 @@ def icp_refinement(
     TCO_pred_refined[:3, -1] += dists_centroid.reshape(-1)
     points_src[:, :3] += dists_centroid[None]
 
-    tolerence = 0.05
-    icp_fnc = cv2.ppf_match_3d_ICP(100, tolerence=tolerence, numLevels=4)
+    icp_fnc = cv2.ppf_match_3d_ICP(
+        iterations=iterations,
+        tolerence=tolerance,
+        rejectionScale=rejection_scale,
+        numLevels=num_levels,
+    )
     retval, residual, pose = icp_fnc.registerModelToScene(
         points_src.reshape(-1, 6),
         points_tgt.reshape(-1, 6),
     )
     TCO_pred_refined = pose @ TCO_pred_refined
-    TCO_pred_refined = torch.tensor(TCO_pred_refined, dtype=torch.float32).cuda()
+    TCO_pred_refined = torch.tensor(TCO_pred_refined, dtype=torch.float32)
 
-    if residual > tolerence or residual < 0:
+    if residual > iterations or residual < 0:
         retval = -1
     return TCO_pred_refined, retval
 
@@ -235,21 +247,28 @@ class ICPRefiner(DepthRefiner):
         masks: Optional[torch.tensor] = None,
         depth: Optional[torch.tensor] = None,
         K: Optional[torch.tensor] = None,
+        n_min_points=1000,
+        min_measured_depth=0.2,
+        max_measured_depth=5.0,
+        iterations=100,
+        tolerance=0.05,
+        rejection_scale=2.5,
+        num_levels=4,
     ) -> Tuple[PoseEstimatesType, Dict]:
         """Runs icp refinement. See superclass DepthRefiner for full documentation."""
         assert depth is not None
         assert K is not None
 
-        predictions_refined = predictions.clone()
+        predictions_refined = predictions.cpu().clone()
         resolution = depth.shape[-2:]
 
-        df = predictions.infos
+        df = predictions_refined.infos
         labels = df.label.tolist()
         batch_im_ids = df.batch_im_id.tolist()
 
-        # N = len(predictions)
-        N = len(predictions)
-        TCO_ = predictions.poses  # [N,4,4]
+        # N = len(predictions_refined)
+        N = len(predictions_refined)
+        TCO_ = predictions_refined.poses  # [N,4,4]
         K_ = K[batch_im_ids]  # [N,4,4]
 
         render_output = self.renderer.render(
@@ -264,9 +283,9 @@ class ICPRefiner(DepthRefiner):
         # [N,H,W]
         all_depth_rendered = render_output.depths
 
-        for n in range(len(predictions)):
-            view_id = predictions.infos.loc[n, "batch_im_id"]
-            TCO_pred = predictions.poses[n].cpu().numpy()
+        for n in range(len(predictions_refined)):
+            view_id = predictions_refined.infos.loc[n, "batch_im_id"]
+            TCO_pred = predictions_refined.poses[n].cpu().numpy()
 
             # [H,W]
             depth_measured = depth[view_id].squeeze().cpu().numpy()
@@ -291,7 +310,13 @@ class ICPRefiner(DepthRefiner):
                 mask,
                 cam_K,
                 TCO_pred,
-                n_min_points=1000,
+                n_min_points,
+                min_measured_depth,
+                max_measured_depth,
+                iterations,
+                tolerance,
+                rejection_scale,
+                num_levels,
             )
 
             # Assign poses to predictions refined
@@ -300,4 +325,4 @@ class ICPRefiner(DepthRefiner):
                 predictions_refined.poses[n] = TCO_refined
 
         extra_data = {}
-        return (predictions_refined, extra_data)
+        return (predictions_refined.to(predictions.device), extra_data)
