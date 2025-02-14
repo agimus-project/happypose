@@ -219,7 +219,7 @@ def icp_refinement(
     TCO_pred_refined = pose @ TCO_pred_refined
     TCO_pred_refined = torch.tensor(TCO_pred_refined, dtype=torch.float32)
 
-    if residual > iterations or residual < 0:
+    if residual > tolerance or residual < 0:
         retval = -1
     return TCO_pred_refined, retval
 
