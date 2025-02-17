@@ -1,14 +1,11 @@
 # Standard Library
 import argparse
 import os
+import time
 from pathlib import Path
 
 # Third Party
 import torch
-
-from happypose.pose_estimators.cosypose.cosypose.integrated.pose_estimator import (
-    PoseEstimator,
-)
 
 # CosyPose
 from happypose.pose_estimators.cosypose.cosypose.utils.cosypose_wrapper import (
@@ -16,7 +13,6 @@ from happypose.pose_estimators.cosypose.cosypose.utils.cosypose_wrapper import (
 )
 
 # HappyPose
-from happypose.toolbox.datasets.object_dataset import RigidObjectDataset
 from happypose.toolbox.inference.example_inference_utils import (
     load_detections,
     load_object_data,
@@ -26,38 +22,13 @@ from happypose.toolbox.inference.example_inference_utils import (
     make_poses_visualization,
     save_predictions,
 )
-from happypose.toolbox.inference.types import DetectionsType, ObservationTensor
-from happypose.toolbox.inference.utils import filter_detections, load_detector
+from happypose.toolbox.inference.types import ObservationTensor
+from happypose.toolbox.inference.utils import filter_detections
 from happypose.toolbox.utils.logging import get_logger, set_logging_level
 
 logger = get_logger(__name__)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-def setup_pose_estimator(dataset_to_use: str, object_dataset: RigidObjectDataset):
-    # TODO: remove this wrapper from code base
-    cosypose = CosyPoseWrapper(
-        dataset_name=dataset_to_use, object_dataset=object_dataset, n_workers=1
-    )
-
-    return cosypose.pose_predictor
-
-
-def run_inference(
-    pose_estimator: PoseEstimator,
-    observation: ObservationTensor,
-    detections: DetectionsType,
-) -> None:
-    observation.to(device)
-
-    data_TCO, extra_data = pose_estimator.run_inference_pipeline(
-        observation=observation, detections=detections, n_refiner_iterations=3
-    )
-    print("Timings:")
-    print(extra_data["timing_str"])
-
-    return data_TCO.cpu()
 
 
 def main():
@@ -67,6 +38,8 @@ def main():
     parser.add_argument("--dataset", type=str, default="hope")
     parser.add_argument("--run-detections", action="store_true")
     parser.add_argument("--run-inference", action="store_true")
+    parser.add_argument("--run-depth-refiner", action="store_true")
+    parser.add_argument("--depth-refiner-type", type=str, default="icp")
     parser.add_argument("--vis-detections", action="store_true")
     parser.add_argument("--vis-poses", action="store_true")
     args = parser.parse_args()
@@ -82,29 +55,42 @@ def main():
     # Load data
     detections = load_detections(example_dir).to(device)
     object_dataset = make_example_object_dataset(example_dir)
-    rgb, depth, camera_data = load_observation_example(example_dir, load_depth=False)
-    # TODO: cosypose forward does not work if depth is loaded detection
-    # contrary to megapose
-    observation = ObservationTensor.from_numpy(rgb, depth=None, K=camera_data.K).to(
-        device
-    )
+    rgb, depth, camera_data = load_observation_example(example_dir, load_depth=True)
+    observation = ObservationTensor.from_numpy(rgb, depth, camera_data.K).to(device)
 
     # Load models
-    pose_estimator = setup_pose_estimator(args.dataset, object_dataset)
+    cosy = CosyPoseWrapper(
+        dataset_name=args.dataset,
+        object_dataset=object_dataset,
+        depth_refiner_type=args.depth_refiner_type,
+        n_workers=1,
+    )
 
     if args.run_detections:
-        # TODO: hardcoded detector
-        detector = load_detector(run_id="detector-bop-hope-pbr--15246", device=device)
         # Masks are not used for pose prediction, but are computed by Mask-RCNN anyway
-        detections = detector.get_detections(observation, output_masks=True)
-        available_labels = [obj.label for obj in object_dataset.list_objects]
-        detections = filter_detections(detections, available_labels)
+        detections = cosy.detector.get_detections(observation, output_masks=True)
     else:
         detections = load_detections(example_dir).to(device)
+    available_labels = [obj.label for obj in object_dataset.list_objects]
+    detections = filter_detections(detections, available_labels)
 
     if args.run_inference:
-        output = run_inference(pose_estimator, observation, detections)
-        save_predictions(output, example_dir)
+        data_TCO, extra_data = cosy.pose_predictor.run_inference_pipeline(
+            observation=observation,
+            detections=detections,
+            run_detector=False,
+            n_refiner_iterations=3,
+        )
+        print("run_inference_pipeline timings:")
+        print(extra_data["timing_str"])
+        if args.run_depth_refiner:
+            t1 = time.perf_counter()
+            data_TCO, _ = cosy.depth_refiner.refine_poses(
+                predictions=data_TCO, depth=observation.depth, K=observation.K
+            )
+            print(f"Depth refiner took: {time.perf_counter() - t1}")
+
+        save_predictions(data_TCO.cpu(), example_dir)
 
     if args.vis_detections:
         make_detections_visualization(rgb, detections, example_dir)
