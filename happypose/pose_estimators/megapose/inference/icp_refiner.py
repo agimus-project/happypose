@@ -283,6 +283,7 @@ class ICPRefiner(DepthRefiner):
         # [N,H,W]
         all_depth_rendered = render_output.depths
 
+        extra_data = {"retvals_icp": []}
         for n in range(len(predictions_refined)):
             view_id = predictions_refined.infos.loc[n, "batch_im_id"]
             TCO_pred = predictions_refined.poses[n].cpu().numpy()
@@ -324,5 +325,7 @@ class ICPRefiner(DepthRefiner):
             if retval != -1:
                 predictions_refined.poses[n] = TCO_refined
 
-        extra_data = {}
+            # Store success state of icp refinement
+            extra_data["retvals_icp"].append(retval)
+
         return (predictions_refined.to(predictions.device), extra_data)
