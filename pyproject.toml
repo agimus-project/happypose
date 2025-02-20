@@ -36,6 +36,7 @@ dependencies = [
   "pybind11>=2.13.6",
   "pybullet>=3.2.6",
   "pypng>=0.20220715.0",
+  "pytest-order>=1.3.0",
   "pytest>=8.3.3",
   "pyyaml>=6.0.2",
   "roma>=1.5.0",
@@ -74,7 +75,6 @@ cu124 = [
 evaluation = ["cmeel-teaser-plusplus>=2.0"]
 pypi = [
   "opencv-contrib-python>=4.10.0",
-  "opencv-python>=4.10.0",
   "pin>=2.7"
 ]
 
