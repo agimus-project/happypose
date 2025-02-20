@@ -65,12 +65,12 @@ version = "0.1.0"
 
 [project.optional-dependencies]
 cpu = [
-  "torch>=2.5.1",
-  "torchvision>=0.20.1"
+  "torch>=2.6",
+  "torchvision>=0.21"
 ]
 cu124 = [
-  "torch>=2.5.1",
-  "torchvision>=0.20.1"
+  "torch>=2.6",
+  "torchvision>=0.21"
 ]
 evaluation = ["cmeel-teaser-plusplus>=2.0"]
 pypi = [
