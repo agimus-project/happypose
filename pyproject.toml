@@ -75,7 +75,6 @@ cu124 = [
 evaluation = ["cmeel-teaser-plusplus>=2.0"]
 pypi = [
   "opencv-contrib-python>=4.10.0",
-  "opencv-python>=4.10.0",
   "pin>=2.7"
 ]
 
