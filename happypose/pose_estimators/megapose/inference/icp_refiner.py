@@ -259,7 +259,8 @@ class ICPRefiner(DepthRefiner):
         assert depth is not None
         assert K is not None
 
-        predictions_refined = predictions.cpu().clone()
+        # PoseEstimatesType.cpu changes device inplace -> need to clone first
+        predictions_refined = predictions.clone().cpu()
         resolution = depth.shape[-2:]
 
         df = predictions_refined.infos
