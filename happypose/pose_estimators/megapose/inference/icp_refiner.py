@@ -267,7 +267,6 @@ class ICPRefiner(DepthRefiner):
         labels = df.label.tolist()
         batch_im_ids = df.batch_im_id.tolist()
 
-        # N = len(predictions_refined)
         N = len(predictions_refined)
         TCO_ = predictions_refined.poses  # [N,4,4]
         K_ = K[batch_im_ids]  # [N,4,4]
