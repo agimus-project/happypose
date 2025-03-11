@@ -42,9 +42,8 @@ class TestCosyPoseInference:
         self.device = "cpu"
 
         rgb, depth, camera_data = load_observation_example(data_dir, load_depth=True)
-        # TODO: cosypose forward does not work if depth is loaded detection contrary to megapose
         self.observation = ObservationTensor.from_numpy(
-            rgb, depth=None, K=camera_data.K
+            rgb, depth=depth, K=camera_data.K
         ).cpu()
 
         self.detector = load_detector(
@@ -62,7 +61,7 @@ class TestCosyPoseInference:
             ]
         )
         mesh_db = MeshDataBase.from_object_ds(self.object_dataset)
-        self.mesh_db_batched = mesh_db.batched().to("cpu")
+        self.mesh_db_batched = mesh_db.batched().cpu()
 
     @pytest.mark.parametrize("device", DEVICE)
     @pytest.mark.order(3)
