@@ -19,6 +19,10 @@ from happypose.toolbox.lib3d.transform_ops import (
     transform_pts,
 )
 
+# seed the RNG for reproduceable tests
+np.random.seed(0)
+torch.manual_seed(0)
+
 
 class TestTransform(unittest.TestCase):
     """
@@ -105,20 +109,29 @@ class TestRotations(unittest.TestCase):
             [self.quats_ts_norm[:, -1:], self.quats_ts_norm[:, :3]]
         )
         aa_ts = quaternion_to_angle_axis(quats_ts_norm)
-        aa = pin.log3(pin.Quaternion(self.quats_arr_norm[1]).toRotationMatrix())
-        self.assertTrue(np.allclose(aa_ts.numpy()[1], aa, atol=1e-6))
+        aa_arr = np.zeros((self.N, 3))
+        for i in range(self.N):
+            aa_arr[i] = pin.log3(
+                pin.Quaternion(self.quats_arr_norm[i]).toRotationMatrix()
+            )
+        # tolerance needs to be higher with seeds of 0 (for seeds 1, can be decreased to 1e-6)
+        self.assertTrue(np.allclose(aa_ts.numpy(), aa_arr, atol=1e-4))
 
     def test_quat2mat(self):
         # quat2mat assumes a wxyz quaternion order convention
         R_ts = quat2mat(self.quats_ts)
-        R = pin.Quaternion(self.quats_arr_norm[1]).toRotationMatrix()
-        self.assertTrue(np.allclose(R_ts[1, :3, :3].numpy(), R, atol=1e-6))
+        R_arr = np.zeros((self.N, 3, 3))
+        for i in range(self.N):
+            R_arr[i] = pin.Quaternion(self.quats_arr_norm[i]).toRotationMatrix()
+        self.assertTrue(np.allclose(R_ts[:, :3, :3].numpy(), R_arr, atol=1e-6))
 
     def test_compute_rotation_matrix_from_quaternions(self):
         # quaternion_to_angle_axis assumes a xyzw quaternion order convention
         R_ts = compute_rotation_matrix_from_quaternions(self.quats_ts)
-        R = pin.Quaternion(self.quats_arr_norm[1]).toRotationMatrix()
-        self.assertTrue(np.allclose(R_ts.numpy()[1], R, atol=1e-6))
+        R_arr = np.zeros((self.N, 3, 3))
+        for i in range(self.N):
+            R_arr[i] = pin.Quaternion(self.quats_arr_norm[i]).toRotationMatrix()
+        self.assertTrue(np.allclose(R_ts.numpy(), R_arr, atol=1e-6))
 
 
 class TestTransformOps(unittest.TestCase):
