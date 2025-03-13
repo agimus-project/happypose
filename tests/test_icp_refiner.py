@@ -82,4 +82,6 @@ class TestCosyPoseInference:
 
         T_est = pin.SE3(preds.poses[0].numpy())
         diff = T_est.inverse() * T_in
+        # ICP result should be only slightly different to the input
         assert np.linalg.norm(pin.log6(diff).vector) < 0.1
+        assert np.linalg.norm(pin.log6(diff).vector) > 1e-2
