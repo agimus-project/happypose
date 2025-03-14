@@ -71,5 +71,8 @@ jobs:
 
       - name: Run tests
         run: |
+          set -x
           python -m unittest
-          pytest tests -v
+          for test in tests/test_*.py; do
+            pytest tests -v $test
+          done
