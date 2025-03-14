@@ -52,7 +52,8 @@ jobs:
       - name: Run tests
         run: |
           set -x
-          python -m unittest
+          uv run python -m unittest
           for test in tests/test_*.py; do
-            grep -q pytest $test && pytest tests -v $test
+            grep -q pytest $test ||continue
+            uv run pytest tests -v $test
           done
