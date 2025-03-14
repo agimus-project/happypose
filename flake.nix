@@ -16,14 +16,22 @@
         "x86_64-darwin"
       ];
       perSystem =
-        { pkgs, ...  }:
+        { pkgs, ... }:
         {
-          devShells.default = pkgs.mkShell {
-            packages = with pkgs; [
-              python3
-              uv
-            ];
-          };
+          devShells.default =
+            with pkgs;
+            let
+              libs = [
+                glib
+                libGL
+              ];
+            in
+            mkShell {
+              packages = [
+                uv
+              ] ++ libs;
+              env.LD_LIBRARY_PATH = lib.makeLibraryPath libs;
+            };
         };
     };
 }
