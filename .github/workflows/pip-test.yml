@@ -55,5 +55,5 @@ jobs:
           set -x
           python -m unittest
           for test in tests/test_*.py; do
-            pytest tests -v $test
+            grep -q pytest $test && pytest tests -v $test
           done
