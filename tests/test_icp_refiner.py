@@ -84,4 +84,5 @@ class TestCosyPoseInference:
         diff = T_est.inverse() * T_in
         # ICP result should be only slightly different to the input
         assert np.linalg.norm(pin.log6(diff).vector) < 0.1
+        # make sure input and output poses are not the same pose
         assert np.linalg.norm(pin.log6(diff).vector) > 1e-2
