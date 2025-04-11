@@ -293,7 +293,10 @@ class MultiviewRefinement:
         # See http://people.duke.edu/~hpgavin/ce281/lm.pdf
         n_params_TWO = TWO_9d.numel()
         n_params_TCW = TCW_9d.numel()
-        n_params = n_params_TWO + n_params_TCW
+        if optimize_cameras:
+            n_params = n_params_TWO + n_params_TCW
+        else:
+            n_params = n_params_TWO
         self.idJ = torch.eye(n_params).to(self.device).to(self.dtype)
 
         prev_iter_is_update = False
@@ -318,17 +321,21 @@ class MultiviewRefinement:
                 break
 
             # NOTE: This should not be necessary ?
-            with torch.no_grad():
-                J = torch.cat((J_TWO.flatten(-2, -1), J_TCW.flatten(-2, -1)), dim=-1)
-                h = self.compute_lm_step(errors, J, lambd)
-                h_TWO_9d = h[:n_params_TWO].view(self.n_objects, 9)
-                h_TCW_9d = h[n_params_TWO:].view(self.n_views, 9)
-                TWO_9d_updated = TWO_9d + h_TWO_9d
-                if optimize_cameras:
+            if optimize_cameras:
+                with torch.no_grad():
+                    J = torch.cat((J_TWO.flatten(-2, -1), J_TCW.flatten(-2, -1)), dim=-1)
+                    h = self.compute_lm_step(errors, J, lambd)
+                    h_TWO_9d = h[:n_params_TWO].view(self.n_objects, 9)
+                    h_TCW_9d = h[n_params_TWO:].view(self.n_views, 9)
+                    TWO_9d_updated = TWO_9d + h_TWO_9d
                     TCW_9d_updated = TCW_9d + h_TCW_9d
-                else:
+            else:
+                with torch.no_grad():
+                    J = J_TWO.flatten(-2, -1)
+                    h = self.compute_lm_step(errors, J, lambd)
+                    h_TWO_9d = h.view(self.n_objects, 9)
+                    TWO_9d_updated = TWO_9d + h_TWO_9d
                     TCW_9d_updated = TCW_9d
-
             errors, next_loss, J_TWO, J_TCW = self.forward_jacobian(
                 TWO_9d_updated,
                 TCW_9d_updated,
