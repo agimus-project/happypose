@@ -220,7 +220,7 @@ class MultiviewRefinement:
         TCO_cand_aligned = self.cand_TCO @ sym
         return dists, TCO_cand_aligned
 
-    def forward_jacobian(self, TWO_9d, TCW_9d, loss_type="Huber", residuals_threshold=25):
+    def forward_jacobian(self, TWO_9d, TCW_9d, loss_type="thresholded_L2", residuals_threshold=25):
         _, TCO_cand_aligned = self.align_TCO_cand(TWO_9d, TCW_9d)
 
         # NOTE: This could be *much* faster by computing gradients manually, reducing
@@ -297,7 +297,7 @@ class MultiviewRefinement:
         optimize_cameras=True,
         n_iterations=50,
         residuals_threshold=25,
-        loss_type="Huber",
+        loss_type="thresholded_L2",
         lambd0=1e-3,
         L_down=9,
         L_up=11,
