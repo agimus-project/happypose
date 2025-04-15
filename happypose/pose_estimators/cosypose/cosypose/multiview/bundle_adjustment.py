@@ -220,7 +220,7 @@ class MultiviewRefinement:
         TCO_cand_aligned = self.cand_TCO @ sym
         return dists, TCO_cand_aligned
 
-    def forward_jacobian(self, TWO_9d, TCW_9d, residuals_threshold):
+    def forward_jacobian(self, TWO_9d, TCW_9d, loss_type="Huber", residuals_threshold=25):
         _, TCO_cand_aligned = self.align_TCO_cand(TWO_9d, TCW_9d)
 
         # NOTE: This could be *much* faster by computing gradients manually, reducing
@@ -257,12 +257,24 @@ class MultiviewRefinement:
         y = TCO_cand_points_n
         yhat = TCO_points_n
         errors = y - yhat
-        residuals = errors**2
-        residuals = torch.min(
-            residuals,
-            torch.ones_like(residuals) * residuals_threshold,
-        )
 
+        if loss_type == "thresholded_L2":
+            # Thresholded L2
+            residuals = errors**2
+            residuals = torch.min(
+                residuals,
+                torch.ones_like(residuals) * residuals_threshold,
+            )
+        elif loss_type == "Huber":
+            # Huber loss
+            delta = 1
+            abs_errors = torch.abs(errors)
+            quadratic = 0.5 * errors**2
+            linear = delta * (abs_errors - 0.5 * delta)
+            residuals = torch.where(abs_errors <= delta, quadratic, linear)
+
+        else:
+            raise ValueError(f"Unknown loss type {loss_type}")
         loss = residuals.mean()
         if torch.is_grad_enabled():
             yhat.sum().backward()
@@ -285,6 +297,7 @@ class MultiviewRefinement:
         optimize_cameras=True,
         n_iterations=50,
         residuals_threshold=25,
+        loss_type="Huber",
         lambd0=1e-3,
         L_down=9,
         L_up=11,
@@ -308,6 +321,7 @@ class MultiviewRefinement:
                 errors, loss, J_TWO, J_TCW = self.forward_jacobian(
                     TWO_9d,
                     TCW_9d,
+                    loss_type,
                     residuals_threshold,
                 )
 
@@ -339,6 +353,7 @@ class MultiviewRefinement:
             errors, next_loss, J_TWO, J_TCW = self.forward_jacobian(
                 TWO_9d_updated,
                 TCW_9d_updated,
+                loss_type,
                 residuals_threshold,
             )
 
