@@ -220,7 +220,7 @@ class MultiviewRefinement:
         TCO_cand_aligned = self.cand_TCO @ sym
         return dists, TCO_cand_aligned
 
-    def forward_jacobian(self, TWO_9d, TCW_9d, residuals_threshold):
+    def forward_jacobian(self, TWO_9d, TCW_9d, loss_type="thresholded_L2", residuals_threshold=25):
         _, TCO_cand_aligned = self.align_TCO_cand(TWO_9d, TCW_9d)
 
         # NOTE: This could be *much* faster by computing gradients manually, reducing
@@ -257,12 +257,24 @@ class MultiviewRefinement:
         y = TCO_cand_points_n
         yhat = TCO_points_n
         errors = y - yhat
-        residuals = errors**2
-        residuals = torch.min(
-            residuals,
-            torch.ones_like(residuals) * residuals_threshold,
-        )
 
+        if loss_type == "thresholded_L2":
+            # Thresholded L2
+            residuals = errors**2
+            residuals = torch.min(
+                residuals,
+                torch.ones_like(residuals) * residuals_threshold,
+            )
+        elif loss_type == "Huber":
+            # Huber loss
+            delta = 1
+            abs_errors = torch.abs(errors)
+            quadratic = 0.5 * errors**2
+            linear = delta * (abs_errors - 0.5 * delta)
+            residuals = torch.where(abs_errors <= delta, quadratic, linear)
+
+        else:
+            raise ValueError(f"Unknown loss type {loss_type}")
         loss = residuals.mean()
         if torch.is_grad_enabled():
             yhat.sum().backward()
@@ -285,6 +297,7 @@ class MultiviewRefinement:
         optimize_cameras=True,
         n_iterations=50,
         residuals_threshold=25,
+        loss_type="thresholded_L2",
         lambd0=1e-3,
         L_down=9,
         L_up=11,
@@ -293,7 +306,10 @@ class MultiviewRefinement:
         # See http://people.duke.edu/~hpgavin/ce281/lm.pdf
         n_params_TWO = TWO_9d.numel()
         n_params_TCW = TCW_9d.numel()
-        n_params = n_params_TWO + n_params_TCW
+        if optimize_cameras:
+            n_params = n_params_TWO + n_params_TCW
+        else:
+            n_params = n_params_TWO
         self.idJ = torch.eye(n_params).to(self.device).to(self.dtype)
 
         prev_iter_is_update = False
@@ -305,6 +321,7 @@ class MultiviewRefinement:
                 errors, loss, J_TWO, J_TCW = self.forward_jacobian(
                     TWO_9d,
                     TCW_9d,
+                    loss_type,
                     residuals_threshold,
                 )
 
@@ -318,20 +335,25 @@ class MultiviewRefinement:
                 break
 
             # NOTE: This should not be necessary ?
-            with torch.no_grad():
-                J = torch.cat((J_TWO.flatten(-2, -1), J_TCW.flatten(-2, -1)), dim=-1)
-                h = self.compute_lm_step(errors, J, lambd)
-                h_TWO_9d = h[:n_params_TWO].view(self.n_objects, 9)
-                h_TCW_9d = h[n_params_TWO:].view(self.n_views, 9)
-                TWO_9d_updated = TWO_9d + h_TWO_9d
-                if optimize_cameras:
+            if optimize_cameras:
+                with torch.no_grad():
+                    J = torch.cat((J_TWO.flatten(-2, -1), J_TCW.flatten(-2, -1)), dim=-1)
+                    h = self.compute_lm_step(errors, J, lambd)
+                    h_TWO_9d = h[:n_params_TWO].view(self.n_objects, 9)
+                    h_TCW_9d = h[n_params_TWO:].view(self.n_views, 9)
+                    TWO_9d_updated = TWO_9d + h_TWO_9d
                     TCW_9d_updated = TCW_9d + h_TCW_9d
-                else:
+            else:
+                with torch.no_grad():
+                    J = J_TWO.flatten(-2, -1)
+                    h = self.compute_lm_step(errors, J, lambd)
+                    h_TWO_9d = h.view(self.n_objects, 9)
+                    TWO_9d_updated = TWO_9d + h_TWO_9d
                     TCW_9d_updated = TCW_9d
-
             errors, next_loss, J_TWO, J_TCW = self.forward_jacobian(
                 TWO_9d_updated,
                 TCW_9d_updated,
+                loss_type,
                 residuals_threshold,
             )
 

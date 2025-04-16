@@ -59,6 +59,8 @@ class MultiviewScenePredictor:
         ransac_n_iter=2000,
         ransac_dist_threshold=0.02,
         ba_n_iter=100,
+        ba_loss="thresholded_L2",
+        ba_threshold=25,
     ):
         predictions = {}
         cand_inputs = candidates
@@ -110,6 +112,8 @@ class MultiviewScenePredictor:
             ba_outputs = problem.solve(
                 n_iterations=ba_n_iter,
                 optimize_cameras=not use_known_camera_poses,
+                loss_type=ba_loss,
+                residuals_threshold=ba_threshold,
             )
             pred_objects_, pred_cameras_ = ba_outputs["objects"], ba_outputs["cameras"]
             for x in (pred_objects_, pred_cameras_):
