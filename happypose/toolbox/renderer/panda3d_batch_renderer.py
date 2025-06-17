@@ -71,7 +71,7 @@ def worker_loop(
     renderer = Panda3dSceneRenderer(
         asset_dataset=object_dataset,
         preload_labels=preload_labels,
-        use_antialiasing=use_antialiasing
+        use_antialiasing=use_antialiasing,
     )
 
     while True:
@@ -134,7 +134,7 @@ class Panda3dBatchRenderer:
         n_workers: int = 8,
         preload_cache: bool = True,
         split_objects: bool = False,
-        use_antialiasing: bool = True
+        use_antialiasing: bool = True,
     ):
         self._is_closed = False
         self._object_dataset = asset_dataset

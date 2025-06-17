@@ -80,9 +80,7 @@ class App(ShowBase):
 
         if use_antialiasing:
             p3d.core.load_prc_file_data(
-                f"{__file__}_3", 
-                "framebuffer-multisample 1\n"
-                "multisamples 4\n"
+                f"{__file__}_3", "framebuffer-multisample 1\nmultisamples 4\n"
             )
 
         if torch.cuda.is_available():
@@ -158,7 +156,7 @@ class Panda3dSceneRenderer:
         preload_labels: Set[str] = set(),
         debug: bool = False,
         verbose: bool = False,
-        use_antialiasing: bool = True
+        use_antialiasing: bool = True,
     ):
         self._asset_dataset = asset_dataset
         self._label_to_node: Dict[str, p3d.core.NodePath] = {}

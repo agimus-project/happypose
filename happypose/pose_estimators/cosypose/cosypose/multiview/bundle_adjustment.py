@@ -220,7 +220,9 @@ class MultiviewRefinement:
         TCO_cand_aligned = self.cand_TCO @ sym
         return dists, TCO_cand_aligned
 
-    def forward_jacobian(self, TWO_9d, TCW_9d, loss_type="thresholded_L2", residuals_threshold=25):
+    def forward_jacobian(
+        self, TWO_9d, TCW_9d, loss_type="thresholded_L2", residuals_threshold=25
+    ):
         _, TCO_cand_aligned = self.align_TCO_cand(TWO_9d, TCW_9d)
 
         # NOTE: This could be *much* faster by computing gradients manually, reducing
@@ -337,7 +339,9 @@ class MultiviewRefinement:
             # NOTE: This should not be necessary ?
             if optimize_cameras:
                 with torch.no_grad():
-                    J = torch.cat((J_TWO.flatten(-2, -1), J_TCW.flatten(-2, -1)), dim=-1)
+                    J = torch.cat(
+                        (J_TWO.flatten(-2, -1), J_TCW.flatten(-2, -1)), dim=-1
+                    )
                     h = self.compute_lm_step(errors, J, lambd)
                     h_TWO_9d = h[:n_params_TWO].view(self.n_objects, 9)
                     h_TCW_9d = h[n_params_TWO:].view(self.n_views, 9)

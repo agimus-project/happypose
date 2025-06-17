@@ -83,7 +83,7 @@ class TestPanda3DBatchRenderer:
             n_workers=4,
             preload_cache=True,
             split_objects=False,
-            use_antialiasing=use_antialiasing
+            use_antialiasing=use_antialiasing,
         )
 
         TCO = torch.from_numpy((self.TWC.inverse() * self.TWO).matrix)

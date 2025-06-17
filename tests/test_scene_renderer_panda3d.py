@@ -77,7 +77,9 @@ class TestPanda3DSceneRenderer:
         """
         SAVEFIG = False
 
-        renderer = Panda3dSceneRenderer(asset_dataset=self.asset_dataset, use_antialiasing=use_antialiasing)
+        renderer = Panda3dSceneRenderer(
+            asset_dataset=self.asset_dataset, use_antialiasing=use_antialiasing
+        )
 
         renderings: List[CameraRenderingData] = renderer.render_scene(
             self.object_datas,
@@ -207,7 +209,7 @@ class TestPanda3DSceneRenderer:
         assert renderings[0].depth is None
         assert renderings[0].normals is None
         assert renderings[0].binary_mask is None
-        
+
         # not possible to render binary mask if depth is not rendered
         with pytest.raises(AssertionError):
             renderer.render_scene(
