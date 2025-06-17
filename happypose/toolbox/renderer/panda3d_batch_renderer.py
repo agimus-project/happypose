@@ -64,12 +64,14 @@ def worker_loop(
     in_queue: torch.multiprocessing.Queue,
     out_queue: torch.multiprocessing.Queue,
     object_dataset: RigidObjectDataset,
+    use_antialiasing: bool,
     preload_labels: Set[str] = set(),
 ) -> None:
     logger.debug(f"Init worker: {worker_id}")
     renderer = Panda3dSceneRenderer(
         asset_dataset=object_dataset,
         preload_labels=preload_labels,
+        use_antialiasing=use_antialiasing
     )
 
     while True:
@@ -132,11 +134,13 @@ class Panda3dBatchRenderer:
         n_workers: int = 8,
         preload_cache: bool = True,
         split_objects: bool = False,
+        use_antialiasing: bool = True
     ):
         self._is_closed = False
         self._object_dataset = asset_dataset
         self._n_workers = n_workers
         self._split_objects = split_objects
+        self.use_antialiasing = use_antialiasing
         self._renderers = []
         self._in_queues = []
         self._out_queue = None
@@ -327,6 +331,7 @@ class Panda3dBatchRenderer:
                     "out_queue": self._out_queue,
                     "object_dataset": self._object_dataset,
                     "preload_labels": preload_labels,
+                    "use_antialiasing": self.use_antialiasing,
                 },
             )
             renderer_process.start()

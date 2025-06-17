@@ -55,7 +55,7 @@ class Panda3dDebugData:
 class App(ShowBase):
     """Panda3d App."""
 
-    def __init__(self) -> None:
+    def __init__(self, use_antialiasing=True) -> None:
         p3d.core.load_prc_file_data(
             __file__,
             "load-display pandagl\n"
@@ -67,8 +67,6 @@ class App(ShowBase):
             "notify-level-device fatal\n"
             "texture-minfilter mipmap\n"
             "texture-anisotropic-degree 16\n"
-            "framebuffer-multisample 1\n"
-            "multisamples 4\n"
             "background-color 0.0 0.0 0.0 0.0\n"
             "load-file-type p3assimp\n"
             "track-memory-usage 1\n"
@@ -79,6 +77,13 @@ class App(ShowBase):
         )
         if "GITHUB_ACTIONS" in os.environ:
             p3d.core.load_prc_file_data(f"{__file__}_2", "gl-version 3 2\n")
+
+        if use_antialiasing:
+            p3d.core.load_prc_file_data(
+                f"{__file__}_3", 
+                "framebuffer-multisample 1\n"
+                "multisamples 4\n"
+            )
 
         if torch.cuda.is_available():
             assert "CUDA_VISIBLE_DEVICES" in os.environ
@@ -153,6 +158,7 @@ class Panda3dSceneRenderer:
         preload_labels: Set[str] = set(),
         debug: bool = False,
         verbose: bool = False,
+        use_antialiasing: bool = True
     ):
         self._asset_dataset = asset_dataset
         self._label_to_node: Dict[str, p3d.core.NodePath] = {}
@@ -164,7 +170,7 @@ class Panda3dSceneRenderer:
         if hasattr(builtins, "base"):
             self._app = builtins.base  # type: ignore
         else:
-            self._app = App()
+            self._app = App(use_antialiasing)
         self._app.cam.node().setActive(0)
         self._app.render.clear_light()
         self._rgb_texture = make_rgb_texture_normal_map(size=32)

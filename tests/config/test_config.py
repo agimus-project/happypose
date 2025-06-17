@@ -6,3 +6,5 @@ if torch.cuda.is_available():
     # See Issue #146
 else:
     DEVICE = ["cpu"]
+
+USE_ANTIALIASING = [False, True]
