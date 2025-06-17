@@ -60,11 +60,11 @@ if "CONDA_PREFIX" in os.environ:
         CONDA_BASE_DIR = os.environ["CONDA_PREFIX"]
         CONDA_ENV = "base"
 
-# cfg = yaml.load(
-#     (PROJECT_DIR / "happypose/pose_estimators/cosypose/config_yann.yaml").read_text(),
-#     Loader=yaml.FullLoader,
-# )
+cfg = yaml.load(
+    (PROJECT_DIR / "happypose/pose_estimators/cosypose/config_yann.yaml").read_text(),
+    Loader=yaml.FullLoader,
+)
 
-# SLURM_GPU_QUEUE = cfg["slurm_gpu_queue"]
-# SLURM_QOS = cfg["slurm_qos"]
-# DASK_NETWORK_INTERFACE = cfg["dask_network_interface"]
+SLURM_GPU_QUEUE = cfg["slurm_gpu_queue"]
+SLURM_QOS = cfg["slurm_qos"]
+DASK_NETWORK_INTERFACE = cfg["dask_network_interface"]
