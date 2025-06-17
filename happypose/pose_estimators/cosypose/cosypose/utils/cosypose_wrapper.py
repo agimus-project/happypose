@@ -91,6 +91,7 @@ class CosyPoseWrapper:
         depth_refiner_type: Union[None, str] = None,
         renderer_type: str = "panda3d",
         n_workers: int = 8,
+        use_antialiasing: bool = True
     ) -> None:
         """
         Args:
@@ -106,11 +107,11 @@ class CosyPoseWrapper:
         self.dataset_name = dataset_name
         self.object_dataset = object_dataset
         self.detector, self.pose_predictor, self.depth_refiner = self.get_model(
-            dataset_name, model_type, n_workers, renderer_type, depth_refiner_type
+            dataset_name, model_type, n_workers, renderer_type, depth_refiner_type, use_antialiasing
         )
 
     def get_model(
-        self, dataset_name, model_type, n_workers, renderer_type, depth_refiner_type
+        self, dataset_name, model_type, n_workers, renderer_type, depth_refiner_type, use_antialiasing
     ) -> Tuple[Detector, PoseEstimator, DepthRefiner]:
         """Return CosyPose detector and pose estimator objects for a given dataset.
 
@@ -121,6 +122,7 @@ class CosyPoseWrapper:
             n_workers: int, number of workers used in the renderer
             renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
             depth_refiner_type: None or str, if None -> not used, str can be 'icp' or 'teaserpp'
+            use_antialiasing: bool, use antialiasing in the rendering process, slower and does not increase much performance. Only for panda3d.
         Returns:
         -------
             tuple (Detector, PoseEstimator, DepthRefiner)
@@ -138,7 +140,7 @@ class CosyPoseWrapper:
         mesh_db = MeshDataBase.from_object_ds(self.object_dataset)
         mesh_db_batched = mesh_db.batched().to(device)
 
-        renderer = get_renderer(renderer_type, self.object_dataset, n_workers)
+        renderer = get_renderer(renderer_type, self.object_dataset, n_workers, use_antialiasing)
         coarse_model, refiner_model = load_pose_models(
             mids["coarse_run_id"], mids["refiner_run_id"], renderer, mesh_db_batched
         )
@@ -177,7 +179,7 @@ class CosyPoseWrapper:
 
 
 def get_renderer(
-    renderer_type: str, object_dataset: RigidObjectDataset, n_workers: int
+    renderer_type: str, object_dataset: RigidObjectDataset, n_workers: int, use_antialiasing
 ) -> Union[Panda3dBatchRenderer, BulletBatchRenderer]:
     """
     Return a batch renderer.
@@ -187,6 +189,7 @@ def get_renderer(
         renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
         object_dataset: RigidObjectDataset, None or already existing rigid object dataset. If None, will use dataset_name to build one.
         n_workers: int, how many processes will be spun in the batch renderer
+        use_antialiasing: bool, use antialiasing in the rendering process, slower and does not increase much performance. Only for panda3d.
 
     Return:
     ---
@@ -196,6 +199,7 @@ def get_renderer(
         return Panda3dBatchRenderer(
             object_dataset,
             n_workers=n_workers,
+            use_antialiasing=use_antialiasing
         )
     elif renderer_type == "bullet":
         return BulletBatchRenderer(

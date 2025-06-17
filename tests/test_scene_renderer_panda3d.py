@@ -20,12 +20,12 @@ from happypose.toolbox.renderer.types import (
     Panda3dObjectData,
 )
 
-from .config.test_config import DEVICE
+from .config.test_config import USE_ANTIALIASING
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
-class TestPanda3DBatchRenderer:
+class TestPanda3DSceneRenderer:
     """Unit tests for Panda3D renderer."""
 
     @pytest.fixture(autouse=True)
@@ -70,14 +70,16 @@ class TestPanda3DBatchRenderer:
         ]
 
     @pytest.mark.order(4)
-    @pytest.mark.parametrize("device", DEVICE)
-    def test_scene_renderer(self, device):
+    @pytest.mark.parametrize("use_antialiasing", USE_ANTIALIASING)
+    def test_scene_renderer(self, use_antialiasing):
         """
         Scene render an example object and check that output image match expectation.
         """
         SAVEFIG = False
 
-        renderer = Panda3dSceneRenderer(asset_dataset=self.asset_dataset)
+        renderer = Panda3dSceneRenderer(
+            asset_dataset=self.asset_dataset, use_antialiasing=use_antialiasing
+        )
 
         renderings: List[CameraRenderingData] = renderer.render_scene(
             self.object_datas,
@@ -208,6 +210,7 @@ class TestPanda3DBatchRenderer:
         assert renderings[0].normals is None
         assert renderings[0].binary_mask is None
 
+        # not possible to render binary mask if depth is not rendered
         with pytest.raises(AssertionError):
             renderer.render_scene(
                 self.object_datas,

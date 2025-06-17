@@ -19,7 +19,7 @@ from happypose.toolbox.renderer.types import (
     Panda3dObjectData,
 )
 
-from .config.test_config import DEVICE
+from .config.test_config import DEVICE, USE_ANTIALIASING
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -70,10 +70,12 @@ class TestPanda3DBatchRenderer:
 
     @pytest.mark.order(2)
     @pytest.mark.parametrize("device", DEVICE)
-    def test_batch_renderer(self, device):
+    @pytest.mark.parametrize("use_antialiasing", USE_ANTIALIASING)
+    def test_batch_renderer(self, device, use_antialiasing):
         """
         Batch render an example object and check that output image match expectation.
         """
+
         SAVEFIG = False
 
         renderer = Panda3dBatchRenderer(
@@ -81,6 +83,7 @@ class TestPanda3DBatchRenderer:
             n_workers=4,
             preload_cache=True,
             split_objects=False,
+            use_antialiasing=use_antialiasing,
         )
 
         TCO = torch.from_numpy((self.TWC.inverse() * self.TWO).matrix)
