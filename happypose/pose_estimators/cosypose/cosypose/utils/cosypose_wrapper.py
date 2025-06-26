@@ -117,12 +117,12 @@ class CosyPoseWrapper:
 
     def get_model(
         self,
-        dataset_name,
-        model_type,
-        n_workers,
-        renderer_type,
-        depth_refiner_type,
-        use_antialiasing,
+        dataset_name: str,
+        model_type: str,
+        n_workers: int,
+        renderer_type: str,
+        depth_refiner_type: Union[None, str],
+        use_antialiasing: bool,
     ) -> Tuple[Detector, PoseEstimator, DepthRefiner]:
         """Return CosyPose detector and pose estimator objects for a given dataset.
 
@@ -195,7 +195,7 @@ def get_renderer(
     renderer_type: str,
     object_dataset: RigidObjectDataset,
     n_workers: int,
-    use_antialiasing,
+    use_antialiasing: bool,
 ) -> Union[Panda3dBatchRenderer, BulletBatchRenderer]:
     """
     Return a batch renderer.
