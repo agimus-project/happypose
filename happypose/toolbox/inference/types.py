@@ -223,7 +223,7 @@ class ObservationTensor:
         # [C,H,W]
         if depth is not None:
             if depth.ndim == 3:
-                depth.unsqueeze(1)
+                depth = depth.unsqueeze(1)
 
             # Now depth is [B,1,H,W]
             img_tensor = torch.cat((rgb, depth), dim=1)
