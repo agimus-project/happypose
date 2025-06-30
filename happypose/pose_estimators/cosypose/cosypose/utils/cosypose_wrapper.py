@@ -92,6 +92,7 @@ class CosyPoseWrapper:
         renderer_type: str = "panda3d",
         n_workers: int = 8,
         use_antialiasing: bool = True,
+        p3d_preload_cache: bool = True,
     ) -> None:
         """
         Args:
@@ -113,6 +114,7 @@ class CosyPoseWrapper:
             renderer_type,
             depth_refiner_type,
             use_antialiasing,
+            p3d_preload_cache,
         )
 
     def get_model(
@@ -123,6 +125,7 @@ class CosyPoseWrapper:
         renderer_type: str,
         depth_refiner_type: Union[None, str],
         use_antialiasing: bool,
+        p3d_preload_cache: bool,
     ) -> Tuple[Detector, PoseEstimator, DepthRefiner]:
         """Return CosyPose detector and pose estimator objects for a given dataset.
 
@@ -134,6 +137,7 @@ class CosyPoseWrapper:
             renderer_type: str, which renderer to use, "panda3d" and "bullet" supported
             depth_refiner_type: None or str, if None -> not used, str can be 'icp' or 'teaserpp'
             use_antialiasing: bool, use antialiasing in the rendering process, slower and does not increase much performance. Only for panda3d.
+            p3d_preload_cache: bool, renderer preload all object models. Only for panda3d.
         Returns:
         -------
             tuple (Detector, PoseEstimator, DepthRefiner)
@@ -152,7 +156,11 @@ class CosyPoseWrapper:
         mesh_db_batched = mesh_db.batched().to(device)
 
         renderer = get_renderer(
-            renderer_type, self.object_dataset, n_workers, use_antialiasing
+            renderer_type,
+            self.object_dataset,
+            n_workers,
+            use_antialiasing,
+            p3d_preload_cache,
         )
         coarse_model, refiner_model = load_pose_models(
             mids["coarse_run_id"], mids["refiner_run_id"], renderer, mesh_db_batched
@@ -196,6 +204,7 @@ def get_renderer(
     object_dataset: RigidObjectDataset,
     n_workers: int,
     use_antialiasing: bool,
+    p3d_preload_cache: bool,
 ) -> Union[Panda3dBatchRenderer, BulletBatchRenderer]:
     """
     Return a batch renderer.
@@ -206,6 +215,7 @@ def get_renderer(
         object_dataset: RigidObjectDataset, None or already existing rigid object dataset. If None, will use dataset_name to build one.
         n_workers: int, how many processes will be spun in the batch renderer
         use_antialiasing: bool, use antialiasing in the rendering process, slower and does not increase much performance. Only for panda3d.
+        p3d_preload_cache: bool, renderer preload all object models. Only for panda3d.
 
     Return:
     ---
@@ -213,7 +223,10 @@ def get_renderer(
     """
     if renderer_type == "panda3d":
         return Panda3dBatchRenderer(
-            object_dataset, n_workers=n_workers, use_antialiasing=use_antialiasing
+            object_dataset,
+            n_workers=n_workers,
+            preload_cache=p3d_preload_cache,
+            use_antialiasing=use_antialiasing,
         )
     elif renderer_type == "bullet":
         return BulletBatchRenderer(
