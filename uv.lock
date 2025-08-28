@@ -165,7 +165,7 @@ wheels = [
 [[package]]
 name = "bop-toolkit-lib"
 version = "0.1.0"
-source = { git = "https://github.com/agimus-project/bop_toolkit#07e8a6657a52b71811cc261bc1b563a55e8718c6" }
+source = { git = "https://github.com/agimus-project/bop_toolkit#ba22a74dff2b395d83982774333b065ae47a51d4" }
 dependencies = [
     { name = "imageio" },
     { name = "numpy" },

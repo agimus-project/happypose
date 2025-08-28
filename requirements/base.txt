@@ -21,7 +21,7 @@ beautifulsoup4==4.13.5
     # via happypose
 bokeh==3.7.3
     # via happypose
-bop-toolkit-lib @ git+https://github.com/agimus-project/bop_toolkit@07e8a6657a52b71811cc261bc1b563a55e8718c6
+bop-toolkit-lib @ git+https://github.com/agimus-project/bop_toolkit@ba22a74dff2b395d83982774333b065ae47a51d4
     # via happypose
 braceexpand==0.1.7
     # via webdataset
