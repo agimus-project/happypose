@@ -2,143 +2,456 @@
 #    uv export --no-hashes --extra cpu
 -e .
 -e ./happypose/pose_estimators/cosypose
-absl-py==2.1.0
+    # via happypose
+absl-py==2.3.1
+    # via tensorboard
 addict==2.4.0
+    # via happypose
 antlr4-python3-runtime==4.9.3
-anyio==4.6.2.post1
-asttokens==2.4.1
-attrs==24.2.0
-beautifulsoup4==4.12.3
-bokeh==3.6.1
-bop-toolkit-lib @ git+https://github.com/agimus-project/bop_toolkit@53b6e2e335c4e6aa76e5db34e809506ee3f4cf16
+    # via omegaconf
+anyio==4.10.0
+    # via httpx
+asttokens==3.0.0
+    # via stack-data
+attrs==25.3.0
+    # via
+    #   outcome
+    #   trio
+beautifulsoup4==4.13.5
+    # via happypose
+bokeh==3.7.3
+    # via happypose
+bop-toolkit-lib @ git+https://github.com/agimus-project/bop_toolkit@07e8a6657a52b71811cc261bc1b563a55e8718c6
+    # via happypose
 braceexpand==0.1.7
-certifi==2024.8.30
-cffi==1.17.1 ; (implementation_name == 'pypy' and os_name != 'nt') or (implementation_name == 'pypy' and sys_platform == 'darwin') or (implementation_name == 'pypy' and sys_platform == 'linux') or (implementation_name != 'pypy' and sys_platform == 'darwin' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124') or (implementation_name != 'pypy' and sys_platform == 'linux' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124') or (os_name == 'nt' and sys_platform != 'darwin' and sys_platform != 'linux') or (os_name != 'nt' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124')
+    # via webdataset
+certifi==2025.8.3
+    # via
+    #   httpcore
+    #   httpx
+    #   requests
+    #   selenium
+cffi==1.17.1 ; (implementation_name == 'pypy' and os_name != 'nt') or (implementation_name == 'pypy' and sys_platform == 'darwin') or (implementation_name == 'pypy' and sys_platform == 'linux') or (os_name == 'nt' and sys_platform != 'darwin' and sys_platform != 'linux')
+    # via
+    #   pyzmq
+    #   trio
 cfgv==3.4.0
-charset-normalizer==3.4.0
-colorama==0.4.6 ; sys_platform == 'win32' or (extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124')
-contourpy==1.3.1
-coverage==7.6.8
+    # via pre-commit
+charset-normalizer==3.4.3
+    # via requests
+colorama==0.4.6 ; sys_platform == 'win32'
+    # via
+    #   ipython
+    #   pytest
+    #   tqdm
+contourpy==1.3.2 ; python_full_version < '3.11'
+    # via
+    #   bokeh
+    #   matplotlib
+contourpy==1.3.3 ; python_full_version >= '3.11'
+    # via
+    #   bokeh
+    #   matplotlib
+coverage==7.10.5
 cycler==0.12.1
-cython==3.0.11
-decorator==5.1.1
-distlib==0.3.9
-exceptiongroup==1.2.2 ; python_full_version < '3.11' or (extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124')
-executing==2.1.0
-filelock==3.16.1
-fonttools==4.55.0
+    # via matplotlib
+decorator==5.2.1
+    # via ipython
+distlib==0.4.0
+    # via virtualenv
+exceptiongroup==1.3.0 ; python_full_version < '3.11'
+    # via
+    #   anyio
+    #   ipython
+    #   pytest
+    #   trio
+    #   trio-websocket
+executing==2.2.0
+    # via stack-data
+filelock==3.19.1
+    # via
+    #   torch
+    #   virtualenv
+fonttools==4.59.2
+    # via matplotlib
 freetype-py==2.5.1
-fsspec==2024.10.0
-grpcio==1.68.0
-h11==0.14.0
+    # via vispy
+fsspec==2025.7.0
+    # via
+    #   torch
+    #   torchtnt
+grpcio==1.74.0
+    # via tensorboard
+h11==0.16.0
+    # via
+    #   httpcore
+    #   wsproto
 hsluv==5.0.4
-httpcore==1.0.7
-httpx==0.27.2
-identify==2.6.2
+    # via vispy
+httpcore==1.0.9
+    # via httpx
+httpx==0.28.1
+    # via happypose
+identify==2.6.13
+    # via pre-commit
 idna==3.10
-imageio==2.36.0
-iniconfig==2.0.0
-ipython==8.29.0
+    # via
+    #   anyio
+    #   httpx
+    #   requests
+    #   trio
+imageio==2.37.0
+    # via
+    #   bop-toolkit-lib
+    #   happypose
+    #   scikit-image
+iniconfig==2.1.0
+    # via pytest
+ipython==8.37.0 ; python_full_version < '3.11'
+    # via
+    #   happypose
+    #   meshcat
+ipython==9.4.0 ; python_full_version >= '3.11'
+    # via
+    #   happypose
+    #   meshcat
+ipython-pygments-lexers==1.1.1 ; python_full_version >= '3.11'
+    # via ipython
 jedi==0.19.2
-jinja2==3.1.4
-joblib==1.4.2
+    # via ipython
+jinja2==3.1.6
+    # via
+    #   bokeh
+    #   torch
+joblib==1.5.2
+    # via
+    #   happypose
+    #   scikit-learn
 jsonpatch==1.33
+    # via visdom
 jsonpointer==3.0.0
-kiwisolver==1.4.7
+    # via jsonpatch
+kiwisolver==1.4.9
+    # via
+    #   matplotlib
+    #   vispy
 lazy-loader==0.4
-markdown==3.7
+    # via scikit-image
+markdown==3.8.2
+    # via tensorboard
 markupsafe==3.0.2
-matplotlib==3.9.2
+    # via
+    #   jinja2
+    #   werkzeug
+matplotlib==3.10.5
+    # via seaborn
 matplotlib-inline==0.1.7
+    # via ipython
 meshcat==0.3.2
+    # via happypose
 mpmath==1.3.0
-mypy-extensions==1.0.0
-networkx==3.4.2
+    # via sympy
+mypy-extensions==1.1.0
+    # via typing-inspect
+narwhals==2.2.0
+    # via bokeh
+networkx==3.4.2 ; python_full_version < '3.11'
+    # via
+    #   scikit-image
+    #   torch
+    #   visdom
+networkx==3.5 ; python_full_version >= '3.11'
+    # via
+    #   scikit-image
+    #   torch
+    #   visdom
 nodeenv==1.9.1
+    # via pre-commit
 numpy==1.26.4
+    # via
+    #   bokeh
+    #   bop-toolkit-lib
+    #   contourpy
+    #   imageio
+    #   matplotlib
+    #   meshcat
+    #   pandas
+    #   plyfile
+    #   scikit-image
+    #   scikit-learn
+    #   scipy
+    #   seaborn
+    #   tensorboard
+    #   tifffile
+    #   torchtnt
+    #   torchvision
+    #   transforms3d
+    #   trimesh
+    #   visdom
+    #   vispy
+    #   webdataset
+    #   xarray
 omegaconf==2.3.0
+    # via happypose
 outcome==1.3.0.post0
-packaging==24.2
+    # via
+    #   trio
+    #   trio-websocket
+packaging==25.0
+    # via
+    #   bokeh
+    #   lazy-loader
+    #   matplotlib
+    #   pytest
+    #   scikit-image
+    #   tensorboard
+    #   torchtnt
+    #   vispy
+    #   xarray
 panda3d==1.10.15
-pandas==2.2.3
-parso==0.8.4
-pexpect==4.9.0 ; (sys_platform != 'emscripten' and sys_platform != 'win32') or (sys_platform == 'emscripten' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124') or (sys_platform == 'win32' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124')
-pillow==11.0.0
-platformdirs==4.3.6
-pluggy==1.5.0
-plyfile==1.1
-pre-commit==4.0.1
-prompt-toolkit==3.0.48
-protobuf==5.28.3
-psutil==6.1.0
-ptyprocess==0.7.0 ; (sys_platform != 'emscripten' and sys_platform != 'win32') or (sys_platform == 'emscripten' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124') or (sys_platform == 'win32' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124')
+    # via happypose
+pandas==2.3.2
+    # via
+    #   bokeh
+    #   seaborn
+    #   xarray
+parso==0.8.5
+    # via jedi
+pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
+    # via ipython
+pillow==9.5.0
+    # via
+    #   bokeh
+    #   bop-toolkit-lib
+    #   imageio
+    #   matplotlib
+    #   meshcat
+    #   scikit-image
+    #   tensorboard
+    #   torchvision
+    #   visdom
+platformdirs==4.4.0
+    # via virtualenv
+pluggy==1.6.0
+    # via pytest
+plyfile==1.1.2
+    # via happypose
+pre-commit==4.3.0
+prompt-toolkit==3.0.52
+    # via ipython
+protobuf==6.32.0
+    # via tensorboard
+psutil==7.0.0
+    # via torchtnt
+ptyprocess==0.7.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
+    # via pexpect
 pure-eval==0.2.3
-pybind11==2.13.6
-pybullet==3.2.6
-pycparser==2.22 ; (implementation_name == 'pypy' and os_name != 'nt') or (implementation_name == 'pypy' and sys_platform == 'darwin') or (implementation_name == 'pypy' and sys_platform == 'linux') or (implementation_name != 'pypy' and sys_platform == 'darwin' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124') or (implementation_name != 'pypy' and sys_platform == 'linux' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124') or (os_name == 'nt' and sys_platform != 'darwin' and sys_platform != 'linux') or (os_name != 'nt' and extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124')
-pygments==2.18.0
-pyngrok==7.2.1
-pyopengl==3.1.0
-pyparsing==3.2.0
+    # via stack-data
+pybind11==3.0.1
+    # via happypose
+pybullet==3.2.7
+    # via happypose
+pycparser==2.22 ; (implementation_name == 'pypy' and os_name != 'nt') or (implementation_name == 'pypy' and sys_platform == 'darwin') or (implementation_name == 'pypy' and sys_platform == 'linux') or (os_name == 'nt' and sys_platform != 'darwin' and sys_platform != 'linux')
+    # via cffi
+pygments==2.19.2
+    # via
+    #   ipython
+    #   ipython-pygments-lexers
+    #   pytest
+pyngrok==7.3.0
+    # via meshcat
+pyopengl==3.1.10
+    # via bop-toolkit-lib
+pyparsing==3.2.3
+    # via matplotlib
 pypng==0.20220715.0
+    # via
+    #   bop-toolkit-lib
+    #   happypose
 pyre-extensions==0.0.32
+    # via torchtnt
 pysocks==1.7.1
-pytest==8.3.3
+    # via urllib3
+pytest==8.4.1
+    # via
+    #   happypose
+    #   pytest-order
 pytest-order==1.3.0
+    # via happypose
 python-dateutil==2.9.0.post0
-pytz==2024.2
+    # via
+    #   matplotlib
+    #   pandas
+pytz==2025.2
+    # via
+    #   bop-toolkit-lib
+    #   pandas
 pyyaml==6.0.2
-pyzmq==26.2.0
-requests==2.32.3
-roma==1.5.1
-ruff==0.8.0
+    # via
+    #   bokeh
+    #   happypose
+    #   omegaconf
+    #   pre-commit
+    #   pyngrok
+    #   webdataset
+pyzmq==27.0.2
+    # via meshcat
+requests==2.32.5
+    # via visdom
+roma==1.5.4
+    # via happypose
+ruff==0.12.11
 scikit-image==0.24.0
-scikit-learn==1.5.2
-scipy==1.14.1
+    # via
+    #   bop-toolkit-lib
+    #   happypose
+scikit-learn==1.7.1
+    # via happypose
+scipy==1.15.3 ; python_full_version < '3.11'
+    # via
+    #   bop-toolkit-lib
+    #   happypose
+    #   scikit-image
+    #   scikit-learn
+    #   visdom
+scipy==1.16.1 ; python_full_version >= '3.11'
+    # via
+    #   bop-toolkit-lib
+    #   happypose
+    #   scikit-image
+    #   scikit-learn
+    #   visdom
 seaborn==0.13.2
-selenium==4.26.1
-setuptools==75.6.0
-simplejson==3.19.3
-six==1.16.0
+    # via happypose
+selenium==4.35.0
+    # via happypose
+setuptools==80.9.0
+    # via
+    #   tensorboard
+    #   torch
+    #   torchtnt
+simplejson==3.20.1
+    # via happypose
+six==1.17.0
+    # via
+    #   python-dateutil
+    #   torchnet
+    #   visdom
 sniffio==1.3.1
+    # via
+    #   anyio
+    #   trio
 sortedcontainers==2.4.0
-soupsieve==2.6
+    # via trio
+soupsieve==2.8
+    # via beautifulsoup4
 stack-data==0.6.3
-sympy==1.13.1
+    # via ipython
+sympy==1.14.0
+    # via torch
 tabulate==0.9.0
-tensorboard==2.18.0
+    # via torchtnt
+tensorboard==2.20.0
+    # via torchtnt
 tensorboard-data-server==0.7.2
-threadpoolctl==3.5.0
-tifffile==2024.9.20
-tomli==2.1.0 ; python_full_version <= '3.11' or (extra == 'extra-9-happypose-cpu' and extra == 'extra-9-happypose-cu124')
-torch==2.5.1 ; platform_machine == 'aarch64' and sys_platform == 'linux'
-torch==2.5.1 ; sys_platform == 'darwin'
-torch==2.5.1+cpu ; (platform_machine != 'aarch64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')
+    # via tensorboard
+threadpoolctl==3.6.0
+    # via scikit-learn
+tifffile==2025.5.10 ; python_full_version < '3.11'
+    # via scikit-image
+tifffile==2025.8.28 ; python_full_version >= '3.11'
+    # via scikit-image
+tomli==2.2.1 ; python_full_version <= '3.11'
+    # via
+    #   coverage
+    #   pytest
+torch==2.8.0 ; sys_platform == 'darwin'
+    # via
+    #   happypose
+    #   torchvision
+torch==2.8.0+cpu ; sys_platform != 'darwin'
+    # via
+    #   happypose
+    #   torchvision
 torchnet==0.0.4
+    # via happypose
 torchtnt==0.2.4
-torchvision==0.20.1 ; platform_machine == 'aarch64' and sys_platform == 'linux'
-torchvision==0.20.1 ; sys_platform == 'darwin'
-torchvision==0.20.1+cpu ; (platform_machine != 'aarch64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')
-tornado==6.4.2
+    # via happypose
+torchvision==0.23.0 ; platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'
+    # via happypose
+torchvision==0.23.0 ; sys_platform == 'darwin'
+    # via happypose
+torchvision==0.23.0+cpu ; (platform_machine != 'aarch64' and sys_platform == 'linux') or (platform_python_implementation != 'CPython' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')
+    # via happypose
+tornado==6.5.2
+    # via
+    #   bokeh
+    #   meshcat
+    #   visdom
 tqdm==4.67.1
+    # via
+    #   happypose
+    #   torchtnt
 traitlets==5.14.3
+    # via
+    #   ipython
+    #   matplotlib-inline
 transforms3d==0.4.2
-trimesh==4.5.2
-trio==0.27.0
-trio-websocket==0.11.1
-typing-extensions==4.12.2
+    # via happypose
+trimesh==4.7.4
+    # via happypose
+trio==0.30.0
+    # via
+    #   selenium
+    #   trio-websocket
+trio-websocket==0.12.2
+    # via selenium
+typing-extensions==4.14.1
+    # via
+    #   anyio
+    #   beautifulsoup4
+    #   exceptiongroup
+    #   ipython
+    #   pyre-extensions
+    #   selenium
+    #   torch
+    #   torchtnt
+    #   typing-inspect
+    #   virtualenv
 typing-inspect==0.9.0
-tzdata==2024.2
+    # via pyre-extensions
+tzdata==2025.2
+    # via pandas
 u-msgpack-python==2.8.0
-urllib3==2.2.3
-virtualenv==20.27.1
+    # via meshcat
+urllib3==2.5.0
+    # via
+    #   requests
+    #   selenium
+virtualenv==20.34.0
+    # via pre-commit
 visdom==0.2.4
-vispy==0.14.3
+    # via torchnet
+vispy==0.15.2
+    # via bop-toolkit-lib
 wcwidth==0.2.13
-webdataset==0.2.100
+    # via prompt-toolkit
+webdataset==1.0.2
+    # via
+    #   bop-toolkit-lib
+    #   happypose
 websocket-client==1.8.0
+    # via
+    #   selenium
+    #   visdom
 werkzeug==3.1.3
+    # via tensorboard
 wsproto==1.2.0
-xarray==2024.11.0
-xyzservices==2024.9.0
+    # via trio-websocket
+xarray==2025.6.1 ; python_full_version < '3.11'
+    # via happypose
+xarray==2025.8.0 ; python_full_version >= '3.11'
+    # via happypose
+xyzservices==2025.4.0
+    # via bokeh
 --extra-index-url https://download.pytorch.org/whl/cpu
