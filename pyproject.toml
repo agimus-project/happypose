@@ -1,6 +1,6 @@
 [build-system]
-build-backend = "setuptools.build_meta"
-requires = ["setuptools"]
+requires = ["uv_build>=0.8.13,<0.9.0"]
+build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
@@ -99,9 +99,6 @@ target-version = "py310"
 extend-ignore = ["D203", "D213"]
 extend-select = ["I", "RUF", "W"]
 
-[tool.setuptools]
-packages = ["happypose"]
-
 [tool.tomlsort]
 all = true
 
@@ -127,6 +124,9 @@ dependency-metadata = [
     "typing-extensions"
   ]}
 ]
+
+[tool.uv.build-backend]
+module-root = ""
 
 [[tool.uv.index]]
 explicit = true
