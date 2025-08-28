@@ -24,13 +24,21 @@
               libs = [
                 glib
                 libGL
+                libjpeg
+                zlib
               ];
             in
             mkShell {
               packages = [
                 uv
-              ] ++ libs;
-              env.LD_LIBRARY_PATH = lib.makeLibraryPath libs;
+              ]
+              ++ libs;
+              env = {
+                LD_LIBRARY_PATH = lib.makeLibraryPath libs;
+                CFLAGS = lib.concatMapStringsSep " " (
+                  x: "-I${lib.getInclude x}/include -L${lib.getLib x}/lib"
+                ) libs;
+              };
             };
         };
     };
