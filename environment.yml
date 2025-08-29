@@ -3,8 +3,6 @@ channels:
    - conda-forge
    - pytorch
    - nvidia
-   - anaconda
-   - defaults
 dependencies:
   - pytorch-cuda==12.4
   - pip

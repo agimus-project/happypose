@@ -21,10 +21,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-      - name: Install EGL mesa - required for Panda3D renderer
+      - name: Install apt deps
         run: |
           sudo apt-get update -y -qq
+          # deps for Panda3D renderer
           sudo apt-get install -y -qq libegl1-mesa-dev
+          # deps for pillow
+          sudo apt-get install -y -qq libjpeg-dev
 
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3

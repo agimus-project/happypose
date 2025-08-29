@@ -101,7 +101,7 @@ def round_repeats(repeats, global_params):
     multiplier = global_params.depth_coefficient
     if not multiplier:
         return repeats
-    return int(math.ceil(multiplier * repeats))
+    return math.ceil(multiplier * repeats)
 
 
 def drop_connect(inputs, p, training):
