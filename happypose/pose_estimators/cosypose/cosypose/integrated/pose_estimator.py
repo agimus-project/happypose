@@ -199,7 +199,9 @@ class PoseEstimator(PoseEstimationModule):
                 preds[f"coarse/iteration={n}"] = coarse_preds[f"iteration={n}"]
             data_TCO_coarse = coarse_preds[f"iteration={n_coarse_iterations}"]
             if isinstance(data_TCO_coarse, list) and len(data_TCO_coarse) == 0:
-                data_TCO_coarse = tc.PandasTensorCollection(detections.infos, poses=torch.empty(0,4,4))
+                data_TCO_coarse = tc.PandasTensorCollection(
+                    detections.infos, poses=torch.empty(0, 4, 4)
+                )
 
         else:
             assert n_coarse_iterations == 0
@@ -218,7 +220,9 @@ class PoseEstimator(PoseEstimationModule):
                 preds[f"refiner/iteration={n}"] = refiner_preds[f"iteration={n}"]
             data_TCO = refiner_preds[f"iteration={n_refiner_iterations}"]
             if isinstance(data_TCO, list) and len(data_TCO) == 0:
-                data_TCO = tc.PandasTensorCollection(detections.infos, poses=torch.empty(0,4,4))
+                data_TCO = tc.PandasTensorCollection(
+                    detections.infos, poses=torch.empty(0, 4, 4)
+                )
 
         timer.stop()
         timing_str = f"total={timer.elapsed():.2f}, {timing_str}"
