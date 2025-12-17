@@ -49,8 +49,6 @@ from happypose.toolbox.utils.timer import Timer
 
 logger = get_logger(__name__)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 class PoseEstimator(PoseEstimationModule):
     """Performs inference for pose estimation."""
@@ -75,7 +73,9 @@ class PoseEstimator(PoseEstimationModule):
 
         # Load the SO3 grid if was passed in
         if SO3_grid_size is not None:
-            self.load_SO3_grid(SO3_grid_size)
+            self.register_buffer(
+                "_SO3_grid", transform_utils.load_SO3_grid(SO3_grid_size)
+            )
 
         # load cfg and mesh_db from refiner model
         if self.refiner_model is not None:
@@ -95,11 +95,6 @@ class PoseEstimator(PoseEstimationModule):
         self.refiner_outputs = None
         self.coarse_outputs = None
         self.debug_dict: dict = {}
-
-    def load_SO3_grid(self, grid_size: int) -> None:
-        """Loads the SO(3) grid."""
-        self._SO3_grid = transform_utils.load_SO3_grid(grid_size)
-        self._SO3_grid = self._SO3_grid.to(device)
 
     @torch.no_grad()
     def forward_refiner(
@@ -549,6 +544,7 @@ class PoseEstimator(PoseEstimationModule):
         timing_str = ""
         timer = SimpleTimer()
         timer.start()
+        device = observation.images.device
 
         if bsz_images is not None:
             self.bsz_images = bsz_images

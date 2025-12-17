@@ -181,8 +181,8 @@ def add_instance_id(
         return df
 
     df = inputs.infos
-    df = df.groupby(["batch_im_id", "label"], group_keys=False).apply(
-        lambda df: create_instance_id(df), include_groups=True
+    df = df.groupby(["batch_im_id", "label"], group_keys=False)[df.columns].apply(
+        lambda df: create_instance_id(df)
     )
     inputs.infos = df
     return inputs
@@ -192,8 +192,10 @@ def filter_detections(
     detections: DetectionsType,
     labels: Optional[List[str]] = None,
     one_instance_per_class: bool = False,
+    detection_th: float = None,
 ) -> DetectionsType:
     """Filter detections based on kwargs."""
+
     if labels is not None:
         df = detections.infos
         df = df[df.label.isin(labels)]
@@ -204,8 +206,11 @@ def filter_detections(
         filter_field = "score"
         df = detections.infos
         df = df.sort_values(filter_field, ascending=False).groupby(group_cols).head(1)
-
         detections = detections[df.index.tolist()]
+
+    if detection_th is not None:
+        keep = np.where(detections.infos["score"] > detection_th)[0]
+        detections = detections[keep]
 
     return detections
 
