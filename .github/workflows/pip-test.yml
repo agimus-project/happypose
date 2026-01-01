@@ -28,7 +28,7 @@ jobs:
           sudo apt-get install -y -qq libjpeg-dev
 
       - name: Caching of the happypose installation and data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: local_data
           key: data
