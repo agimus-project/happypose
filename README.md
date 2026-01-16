@@ -68,20 +68,17 @@ export HAPPYPOSE_DATA_DIR=/somewhere/convenient
 
 ## Test the install
 
-### CPU
-
-If you work on CPU, these models need to be download :
-
+### With CPU/GPU
+Download CosyPose model weights specific to the hope dataset
 ```
-#hope dataset models for CosyPose
 python -m happypose.toolbox.utils.download --cosypose_models \
             detector-bop-hope-pbr--15246 \
             coarse-bop-hope-pbr--225203 \
             refiner-bop-hope-pbr--955392
 ```
 
+or download MegaPose model weights (works with all datasets)
 ```
-# For MegaPose
 python -m happypose.toolbox.utils.download --megapose_models
 ```
 
@@ -99,8 +96,7 @@ pytest -v ./tests
 
 You may need to install `pytest-order` : `pip installp pytest-order`. In this case, test related to the `evaluation` and the `training` of CosyPose are not run. If you want to use these functionalities, you need a GPU.
 
-### GPU
-
+### Only if GPU (cuda) is available
 Tests related to `evaluation` and `training` will be run if a GPU is available. Hence, a few more downloads are needed :
 
 ```
