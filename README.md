@@ -69,7 +69,7 @@ export HAPPYPOSE_DATA_DIR=/somewhere/convenient
 ## Test the install
 
 ### With CPU/GPU
-Download CosyPose model weights specific to the hope dataset 
+Download CosyPose model weights specific to the hope dataset
 ```
 python -m happypose.toolbox.utils.download --cosypose_models \
             detector-bop-hope-pbr--15246 \
