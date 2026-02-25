@@ -192,7 +192,7 @@ def filter_detections(
     detections: DetectionsType,
     labels: Optional[List[str]] = None,
     one_instance_per_class: bool = False,
-    detection_th: float = None,
+    detection_th: Optional[float] = None,
 ) -> DetectionsType:
     """Filter detections based on kwargs."""
 
