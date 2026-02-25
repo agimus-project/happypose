@@ -41,7 +41,7 @@ jobs:
         shell: bash
 
       - name: Caching of the happypose installation and data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ${{ env.CONDA }}/envs
