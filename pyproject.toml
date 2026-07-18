@@ -125,6 +125,9 @@ dependency-metadata = [
   ]}
 ]
 
+[tool.uv.extra-build-dependencies]
+visdom = ["setuptools<82.0.0"]
+
 [tool.uv.build-backend]
 module-root = ""
 
