@@ -9,13 +9,11 @@ happypose_docker() {
     --workdir $HOME/happypose \
     -v /etc/localtime:/etc/localtime:ro \
     -v /dev/input:/dev/input \
-    --shm-size=4G \
+    --shm-size=12G \
     --net=host \
     --add-host happypose_dev:127.0.0.1 \
     --hostname=happypose_dev \
     --privileged=true \
-    --env=DISPLAY \
-    --env=XDG_RUNTIME_DIR \
     --env=QT_X11_NO_MITSHM=1 \
     --device=/dev/dri:/dev/dri \
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
@@ -28,5 +26,5 @@ happypose_docker() {
 }
 
 happypose_docker_attach() {
-  docker exec -it -e "COLUMNS=$COLUMNS" -e "LINES=$LINES" happypose_dev /bin/bash
+  docker exec -it -e "COLUMNS=$COLUMNS" -e "LINES=$LINES" happypose_dev /bin/bash -c "source /happypose/.venv/bin/activate && bash"
 }
