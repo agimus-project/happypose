@@ -333,6 +333,7 @@ class PoseEstimator(PoseEstimationModule):
         - Scores them using the coarse model.
         """
         start_time = time.time()
+        device = observation.images.device
 
         happypose.toolbox.inference.types.assert_detections_valid(detections)
 
@@ -341,6 +342,9 @@ class PoseEstimator(PoseEstimationModule):
         SO3_grid = self._SO3_grid
         B = len(detections)
         M = self._SO3_grid.shape[0]
+
+        if SO3_grid.device != device:
+            SO3_grid = SO3_grid.to(device)
 
         # Add M rows for each row in detections
         df = detections.infos
@@ -359,7 +363,6 @@ class PoseEstimator(PoseEstimationModule):
         ids = torch.arange(len(df_hypotheses))
         ds = TensorDataset(ids)
         dl = DataLoader(ds, batch_size=bsz_images)
-        device = observation.images.device
 
         images_crop_list = []
         renders_list = []
