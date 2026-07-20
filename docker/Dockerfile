@@ -6,9 +6,11 @@ RUN apt-get update && \
     apt install -yq software-properties-common && \
     apt update && \
     apt install -yq \
+        nano \
         git \
         python3 \
         python3-pip \
+        p7zip-full \
         ffmpeg libsm6 libxext6 \
         nvidia-container-runtime \
         libgl1 libegl1-mesa libgles2-mesa \
@@ -24,9 +26,12 @@ RUN pip install uv==0.8.24
 
 # Tmp copy of repo's root
 WORKDIR /happypose
-COPY --exclude=docker/ . . 
+COPY . . 
 
 # Install pypi deps
 RUN uv sync --extra pypi --extra cu124
+
+RUN useradd -ms /bin/bash happypose
+USER happypose
 
 CMD ["/bin/bash"]
