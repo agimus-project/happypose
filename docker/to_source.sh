@@ -3,6 +3,7 @@
 happypose_docker() {
   echo "starting happypose docker"
   xhost +local:docker;
+  mkdir -p $HOME/happypose/dataset
   docker run -it --rm -d \
     --name="happypose_dev" \
     --runtime=nvidia \
