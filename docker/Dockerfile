@@ -26,7 +26,7 @@ RUN pip install uv==0.8.24
 
 # Tmp copy of repo's root
 WORKDIR /happypose
-COPY . . 
+COPY . .
 
 # Install pypi deps
 RUN uv sync --extra pypi --extra cu124
