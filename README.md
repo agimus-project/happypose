@@ -122,7 +122,12 @@ hf download bop-benchmark/ycbv \
             --repo-type=dataset \
             ycbv_base.zip ycbv_models.zip ycbv_test_all.zip ycbv_train_pbr.zip
 cd ./dataset/bop_datasets/ycbv
+7z e ycbv_base.zip 
 7z x ycbv_base.zip ycbv_models.zip ycbv_test_all.zip 
+```
+
+```
+python -m happypose.toolbox.utils.download --ycbv_tests
 ```
 
 Run the tests again using pytest as above, this time they will take much longer to complete.

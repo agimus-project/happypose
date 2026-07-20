@@ -104,7 +104,7 @@ def convert_results_to_coco(results_path, out_json_path, detection_method):
 def convert_results_to_bop(
     results_path: Path, out_csv_path: Path, method: str, use_pose_score: bool = True
 ):
-    predictions = torch.load(results_path)["predictions"]
+    predictions = torch.load(results_path, weights_only=False)["predictions"]
     predictions = predictions[method]
     if method == "coarse":
         predictions = get_best_coarse_predictions(predictions)
