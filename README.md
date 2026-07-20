@@ -22,6 +22,16 @@ We strongly suggest to install it in either a
 [venv](https://docs.python.org/fr/3/library/venv.html) or a
 [conda environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
 
+### Example with Docker
+
+```
+git clone --branch dev --recurse-submodules https://github.com/agimus-project/happypose.git
+cd happypose
+docker build -f docker/Dockerfile -t happypose:latest .
+source ./docker/to_source.sh
+happypose_docker
+```
+
 ### Example with conda
 
 ```
@@ -107,11 +117,12 @@ python -m happypose.toolbox.utils.download --cosypose_models \
 ```
 
 ```
-python -m happypose.toolbox.utils.download --bop_dataset ycbv
+hf download bop-benchmark/ycbv \
+            --local-dir ./dataset/bop_datasets/ycbv \
+            --repo-type=dataset \
+            ycbv_base.zip ycbv_models.zip ycbv_test_all.zip ycbv_train_pbr.zip
+cd ./dataset/bop_datasets/ycbv
+7z x ycbv_base.zip ycbv_models.zip ycbv_test_all.zip 
 ```
 
-```
-python -m happypose.toolbox.utils.download --test-results
-```
-
-The tests take much longer in this case.
+Run the tests again using pytest as above, this time they will take much longer to complete.
