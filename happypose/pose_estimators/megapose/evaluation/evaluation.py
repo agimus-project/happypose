@@ -51,6 +51,7 @@ logger = get_logger(__name__)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 def generate_save_key(detection_type: str, coarse_estimation_type: str) -> str:
     return f"{detection_type}+{coarse_estimation_type}"
 
@@ -126,8 +127,7 @@ def run_eval(
     if cfg.inference.detection_type == "detector":
         assert cfg.detector_run_id is not None
         detector_model = happypose.toolbox.inference.utils.load_detector(
-            cfg.detector_run_id,
-            device
+            cfg.detector_run_id, device
         )
     elif cfg.inference.detection_type in ["gt", "exte"]:
         detector_model = None
