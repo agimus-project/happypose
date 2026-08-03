@@ -128,6 +128,9 @@ dependency-metadata = [
 [tool.uv.build-backend]
 module-root = ""
 
+[tool.uv.extra-build-dependencies]
+visdom = ["setuptools<82.0.0"]
+
 [[tool.uv.index]]
 explicit = true
 name = "pytorch-cpu"

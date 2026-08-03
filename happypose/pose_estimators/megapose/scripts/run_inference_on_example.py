@@ -45,7 +45,7 @@ def run_inference(
     model_info: Dict,
     observation: ObservationTensor,
     detections: DetectionsType,
-) -> None:
+):
     observation.to(device)
 
     logger.info("Running inference.")
@@ -103,6 +103,9 @@ if __name__ == "__main__":
     if args.run_inference:
         output = run_inference(pose_estimator, model_info, observation, detections)
         save_predictions(output, example_dir)
+
+        # TODO: tmp solution to megapose stalling
+        del pose_estimator
 
     if args.vis_detections:
         make_detections_visualization(rgb, detections, example_dir)
