@@ -1,6 +1,6 @@
 import time
 from collections import defaultdict
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import torch
@@ -35,9 +35,9 @@ class PoseEstimator(PoseEstimationModule):
 
     def __init__(
         self,
-        refiner_model: Optional[torch.nn.Module] = None,
-        coarse_model: Optional[torch.nn.Module] = None,
-        detector_model: Optional[torch.nn.Module] = None,
+        refiner_model: torch.nn.Module | None = None,
+        coarse_model: torch.nn.Module | None = None,
+        detector_model: torch.nn.Module | None = None,
         # depth_refiner: Optional[DepthRefiner] = None,
         bsz_objects: int = 8,
         bsz_images: int = 256,
@@ -139,18 +139,18 @@ class PoseEstimator(PoseEstimationModule):
     def run_inference_pipeline(
         self,
         observation: ObservationTensor,
-        detections: Optional[DetectionsType] = None,
-        data_TCO_init: Optional[PandasTensorCollection] = None,
-        run_detector: Optional[bool] = None,
+        detections: DetectionsType | None = None,
+        data_TCO_init: PandasTensorCollection | None = None,
+        run_detector: bool | None = None,
         n_refiner_iterations: int = 1,
         n_coarse_iterations: int = 1,
-        bsz_images: Optional[int] = None,
-        bsz_objects: Optional[int] = None,
-        coarse_estimates: Optional[PoseEstimatesType] = None,
+        bsz_images: int | None = None,
+        bsz_objects: int | None = None,
+        coarse_estimates: PoseEstimatesType | None = None,
         detection_th: float = 0.7,
         mask_th: float = 0.8,
-        labels_to_keep: Optional[List[str]] = None,
-    ) -> Tuple[PoseEstimatesType, dict]:
+        labels_to_keep: list[str] | None = None,
+    ) -> tuple[PoseEstimatesType, dict]:
         timing_str = ""
         timer = SimpleTimer()
         timer.start()
@@ -265,7 +265,7 @@ class PoseEstimator(PoseEstimationModule):
         n_iterations: int = 5,
         keep_all_outputs: bool = False,
         cuda_timer: bool = False,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
         """Runs the refiner model for the specified number of iterations.
 
         Will actually use the batched_model_predictions to stay within
@@ -377,7 +377,7 @@ class PoseEstimator(PoseEstimationModule):
         n_iterations: int = 5,
         keep_all_outputs: bool = False,
         cuda_timer: bool = False,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
         """Runs the refiner model for the specified number of iterations.
 
         Will actually use the batched_model_predictions to stay within

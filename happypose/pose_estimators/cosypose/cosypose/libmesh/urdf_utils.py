@@ -137,4 +137,3 @@ def obj_to_urdf(obj_path, urdf_path):
 
     xmlstr = minidom.parseString(ET.tostring(robot)).toprettyxml(indent="   ")
     Path(urdf_path).write_text(xmlstr)  # Write xml file
-    return
