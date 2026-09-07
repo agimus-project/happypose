@@ -201,9 +201,7 @@ def train_detector(args):
             logger.info(f"Loaded {ds_name} with {len(ds)} images.")
             pre_label = ds_name.split(".")[0]
             for idx, label in enumerate(ds.all_labels):
-                ds.all_labels[idx] = "{pre_label}-{label}".format(
-                    pre_label=pre_label, label=label
-                )
+                ds.all_labels[idx] = f"{pre_label}-{label}"
             all_labels = all_labels.union(set(ds.all_labels))
 
             for _ in range(n_repeat):

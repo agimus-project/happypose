@@ -92,4 +92,3 @@ class MeshcatSceneViewer:
             TWO = np.array(obj_info["TWO"].tolist())
             self.visualizer[node_name].set_object(geometry, material)
             self.visualizer[node_name].set_transform(TWO)
-        return

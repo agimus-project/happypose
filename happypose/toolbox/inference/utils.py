@@ -15,7 +15,6 @@ limitations under the License.
 
 # Standard Library
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 
 # Third Party
 import numpy as np
@@ -78,7 +77,7 @@ def load_detector(run_id: str, device="cpu") -> torch.nn.Module:
     return model
 
 
-def load_cfg(path: Union[str, Path]) -> OmegaConf:
+def load_cfg(path: str | Path) -> OmegaConf:
     cfg = yaml.load(Path(path).read_text(), Loader=yaml.UnsafeLoader)
     if isinstance(cfg, dict):
         cfg = OmegaConf.load(path)
@@ -90,9 +89,9 @@ def load_pose_models(
     refiner_run_id: str,
     object_dataset: RigidObjectDataset,
     force_panda3d_renderer: bool = False,
-    renderer_kwargs: Optional[Dict] = None,
+    renderer_kwargs: dict | None = None,
     models_root: Path = EXP_DIR,
-) -> Tuple[
+) -> tuple[
     torch.nn.Module,
     torch.nn.Module,
     BatchedMeshes,
@@ -166,8 +165,8 @@ def load_pose_models(
 
 
 def add_instance_id(
-    inputs: Union[PoseEstimatesType, DetectionsType],
-) -> Union[PoseEstimatesType, DetectionsType]:
+    inputs: PoseEstimatesType | DetectionsType,
+) -> PoseEstimatesType | DetectionsType:
     """Adds a column with instance_id to the provided detections.
 
     Instance_id uniquely identifies multiple occurences of the same object
@@ -190,7 +189,7 @@ def add_instance_id(
 
 def filter_detections(
     detections: DetectionsType,
-    labels: Optional[List[str]] = None,
+    labels: list[str] | None = None,
     one_instance_per_class: bool = False,
     detection_th: float = None,
 ) -> DetectionsType:
@@ -215,7 +214,7 @@ def filter_detections(
     return detections
 
 
-def make_cameras(camera_data: List[CameraData]) -> PandasTensorCollection:
+def make_cameras(camera_data: list[CameraData]) -> PandasTensorCollection:
     """Creates a PandasTensorCollection from list of camera data.
 
     Returns
@@ -233,7 +232,7 @@ def make_cameras(camera_data: List[CameraData]) -> PandasTensorCollection:
     return tc.PandasTensorCollection(infos=pd.DataFrame(infos), K=torch.stack(K))
 
 
-def make_detections_from_object_data(object_data: List[ObjectData]) -> DetectionsType:
+def make_detections_from_object_data(object_data: list[ObjectData]) -> DetectionsType:
     infos = pd.DataFrame(
         {
             "label": [data.label for data in object_data],

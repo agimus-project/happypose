@@ -15,7 +15,6 @@ limitations under the License.
 
 # Standard Library
 from pathlib import Path
-from typing import List
 
 # Third Party
 import pandas as pd
@@ -88,7 +87,6 @@ class TensorCollection:
 
     def __setstate__(self, state):
         self.__init__(**state["tensors"])
-        return
 
     def __setattr__(self, name, value):
         if "_tensors" not in self.__dict__:
@@ -195,13 +193,12 @@ class PandasTensorCollection(TensorCollection):
     def __setstate__(self, state):
         self.__init__(state["infos"], **state["tensors"])
         self.meta = state["meta"]
-        return
 
 
 def filter_top_pose_estimates(
     data_TCO: PandasTensorCollection,
     top_K: int,
-    group_cols: List[str],
+    group_cols: list[str],
     filter_field: str,
     ascending: bool = False,
 ) -> PandasTensorCollection:

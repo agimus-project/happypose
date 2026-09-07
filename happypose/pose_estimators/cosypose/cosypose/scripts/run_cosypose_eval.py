@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 from happypose.pose_estimators.cosypose.cosypose.utils.tqdm import patch_tqdm
 
 patch_tqdm()
