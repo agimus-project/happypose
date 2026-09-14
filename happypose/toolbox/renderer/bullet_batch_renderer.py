@@ -1,5 +1,4 @@
 import multiprocessing
-from typing import List, Union
 
 import numpy as np
 import torch
@@ -11,7 +10,7 @@ from happypose.toolbox.renderer.types import BatchRenderOutput, WorkerRenderOutp
 
 
 def init_renderer(
-    asset_dataset: Union[RigidObjectDataset, UrdfDataset],
+    asset_dataset: RigidObjectDataset | UrdfDataset,
     preload=True,
     gpu_renderer=True,
 ):
@@ -82,7 +81,7 @@ def worker_loop(
 class BulletBatchRenderer:
     def __init__(
         self,
-        asset_dataset: Union[RigidObjectDataset, UrdfDataset],
+        asset_dataset: RigidObjectDataset | UrdfDataset,
         n_workers=8,
         preload_cache=True,
         gpu_renderer=True,
@@ -94,7 +93,7 @@ class BulletBatchRenderer:
 
     def render(
         self,
-        labels: List[str],
+        labels: list[str],
         TCO: torch.Tensor,
         K: torch.Tensor,
         resolution=(240, 320),
