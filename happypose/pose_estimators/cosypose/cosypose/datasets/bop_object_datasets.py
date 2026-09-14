@@ -1,10 +1,9 @@
 import json
 from pathlib import Path
-from typing import Union
 
 
 class BOPObjectDataset:
-    def __init__(self, ds_dir, label_format: Union[None, str] = None):
+    def __init__(self, ds_dir, label_format: None | str = None):
         ds_dir = Path(ds_dir)
         infos_file = ds_dir / "models_info.json"
         infos = json.loads(infos_file.read_text())

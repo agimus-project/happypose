@@ -208,7 +208,6 @@ def run_inference(args):
         logger.info(f"Saved predictions in {save_dir}")
 
     torch.distributed.barrier()
-    return
 
 
 def main():

@@ -1,11 +1,9 @@
 """Placeholder file to serve as example."""
 
-from typing import Optional
-
 from happypose.toolbox.renderer import Renderer
 
 
-def cosy_placeholder(renderer: Optional[Renderer] = None):
+def cosy_placeholder(renderer: Renderer | None = None):
     """Mock a call to cosypose with an optional rendering.
 
     This make no sense, other than providing content to the layout of the project.

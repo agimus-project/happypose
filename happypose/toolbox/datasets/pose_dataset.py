@@ -18,7 +18,6 @@ import random
 import time
 import typing
 from dataclasses import dataclass
-from typing import List, Optional, Set, Union
 
 # Third Party
 import numpy as np
@@ -71,7 +70,7 @@ class PoseData:
     bbox: np.ndarray
     TCO: np.ndarray
     K: np.ndarray
-    depth: Optional[np.ndarray]
+    depth: np.ndarray | None
     object_data: ObjectData
 
 
@@ -85,11 +84,11 @@ class BatchPoseData:
     """
 
     rgbs: torch.Tensor
-    object_datas: List[ObjectData]
+    object_datas: list[ObjectData]
     bboxes: torch.Tensor
     TCO: torch.Tensor
     K: torch.Tensor
-    depths: Optional[torch.Tensor] = None
+    depths: torch.Tensor | None = None
 
     def pin_memory(self) -> "BatchPoseData":
         self.rgbs = self.rgbs.pin_memory()
@@ -111,14 +110,14 @@ class PoseDataset(torch.utils.data.IterableDataset):
 
     def __init__(
         self,
-        scene_ds: Union[SceneDataset, IterableSceneDataset],
+        scene_ds: SceneDataset | IterableSceneDataset,
         resize: Resolution = (480, 640),
-        min_area: Optional[float] = None,
+        min_area: float | None = None,
         apply_rgb_augmentation: bool = True,
         apply_depth_augmentation: bool = False,
         apply_background_augmentation: bool = False,
         return_first_object: bool = False,
-        keep_labels_set: Optional[Set[str]] = None,
+        keep_labels_set: set[str] | None = None,
         depth_augmentation_level: int = 1,
     ):
         self.scene_ds = scene_ds
@@ -223,7 +222,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
         if keep_labels_set is not None:
             self.keep_labels_set = keep_labels_set
 
-    def collate_fn(self, list_data: List[PoseData]) -> BatchPoseData:
+    def collate_fn(self, list_data: list[PoseData]) -> BatchPoseData:
         batch_data = BatchPoseData(
             rgbs=torch.from_numpy(np.stack([d.rgb for d in list_data])).permute(
                 0,
@@ -242,7 +241,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
             batch_data.depths = torch.from_numpy(np.stack([d.depth for d in list_data]))  # type: ignore
         return batch_data
 
-    def make_data_from_obs(self, obs: SceneObservation) -> Union[PoseData, None]:
+    def make_data_from_obs(self, obs: SceneObservation) -> PoseData | None:
         """Construct a PoseData for a object random of the scene_ds[idx] observation.
         The object satisfies the constraints:
             1. The visible 2D area is superior or equal to min_area
@@ -332,7 +331,7 @@ class PoseDataset(torch.utils.data.IterableDataset):
         )
         return data
 
-    def __getitem__(self, index: int) -> Union[PoseData, None]:
+    def __getitem__(self, index: int) -> PoseData | None:
         assert isinstance(self.scene_ds, SceneDataset)
         obs = self.scene_ds[index]
         return self.make_data_from_obs(obs)

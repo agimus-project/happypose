@@ -61,4 +61,3 @@ class Meter:
 
         if world_size > 1:
             torch.distributed.barrier()
-        return

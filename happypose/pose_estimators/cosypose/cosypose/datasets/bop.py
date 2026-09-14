@@ -53,7 +53,6 @@ def build_index(ds_dir, save_file, split, save_file_annotations):
     )
     frame_index.to_feather(save_file)
     save_file_annotations.write_bytes(pickle.dumps(annotations))
-    return
 
 
 class BOPDataset:
