@@ -124,7 +124,7 @@ def angle_axis_to_rotation_matrix(angle_axis):
     eps = 1e-6
     mask = (theta2 > eps).view(-1, 1, 1).to(theta2.device)
     mask_pos = (mask).type_as(theta2)
-    mask_neg = (mask == False).type_as(theta2)  # noqa
+    mask_neg = (mask == False).type_as(theta2)
 
     # create output pose matrix
     batch_size = angle_axis.shape[0]

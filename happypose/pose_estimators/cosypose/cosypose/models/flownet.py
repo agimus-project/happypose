@@ -1,6 +1,6 @@
 # See Implementation here https://github.com/ClementPinard/FlowNetPytorch/blob/master/models/FlowNetS.py
 import torch
-import torch.nn as nn
+from torch import nn
 from torch.nn.init import constant_, kaiming_normal_
 
 from happypose.pose_estimators.cosypose.cosypose.config import LOCAL_DATA_DIR

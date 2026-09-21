@@ -1,13 +1,12 @@
 import pathlib
 import typing as tp
-from typing import List
 
 import submitit
 
 from job_runner.configs import JobEnvironmentConfig, RunnerConfig
 
 
-def make_setup(cfg: JobEnvironmentConfig) -> List[str]:
+def make_setup(cfg: JobEnvironmentConfig) -> list[str]:
     setup = []
     if cfg.env:
         for k, v in cfg.env.items():
@@ -16,7 +15,7 @@ def make_setup(cfg: JobEnvironmentConfig) -> List[str]:
 
 
 def make_snapshots(
-    code_directories: List[pathlib.Path],
+    code_directories: list[pathlib.Path],
     output_dir: pathlib.Path,
     exclude: tp.Sequence[str] = (),
 ):
@@ -28,7 +27,6 @@ def make_snapshots(
         )
         with snapshot:
             pass
-    return
 
 
 def make_submitit_executor(

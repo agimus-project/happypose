@@ -14,7 +14,7 @@ limitations under the License.
 """
 
 # Standard Library
-from typing import Tuple, Union
+from typing import Union
 
 # Third Party
 import numpy as np
@@ -28,14 +28,12 @@ class Transform:
     def __init__(
         self,
         *args: Union[
-            Union[pin.SE3, np.ndarray, torch.Tensor],  # T
-            Union[
-                pin.Quaternion,
-                np.ndarray,
-                torch.Tensor,
-                Tuple[float, float, float, float],
-            ],  # rotation
-            Union[np.ndarray, torch.Tensor, Tuple[float, float, float]],  # translation
+            pin.SE3 | np.ndarray | torch.Tensor,  # T
+            pin.Quaternion
+            | np.ndarray
+            | torch.Tensor
+            | tuple[float, float, float, float],  # rotation
+            np.ndarray | torch.Tensor | tuple[float, float, float],  # translation
         ],
     ):
         """- Transform(T): SE3 or (4, 4) array

@@ -14,7 +14,7 @@ limitations under the License.
 """
 
 # Standard Library
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any
 
 # Third Party
 import cv2
@@ -23,7 +23,7 @@ import torch
 from PIL import ImageEnhance
 
 
-def image_to_np_uint8(im: Union[torch.Tensor, np.ndarray]) -> np.ndarray:
+def image_to_np_uint8(im: torch.Tensor | np.ndarray) -> np.ndarray:
     """Returns a np.uint8 image."""
     if isinstance(im, torch.Tensor):
         im_np = im.detach().cpu().numpy()
@@ -54,9 +54,9 @@ def get_mask_from_rgb(img: np.ndarray) -> np.ndarray:
 def make_contour_overlay(
     img: np.ndarray,
     render: np.ndarray,
-    color: Optional[Tuple[int, int, int]] = None,
+    color: tuple[int, int, int] | None = None,
     dilate_iterations: int = 1,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     if color is None:
         color = (0, 255, 0)
 

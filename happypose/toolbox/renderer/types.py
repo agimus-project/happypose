@@ -14,8 +14,8 @@ limitations under the License.
 """
 
 # Standard Library
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable, Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -29,12 +29,12 @@ from happypose.toolbox.lib3d.transform import Transform
 # Local Folder
 from .utils import depth_image_from_depth_buffer
 
-RgbaColor = Tuple[float, float, float, float]
+RgbaColor = tuple[float, float, float, float]
 NodeFunction = Callable[
     [p3d.core.NodePath, p3d.core.NodePath],
     None,
 ]  # (root_node_path, object_node_path)
-Resolution = Tuple[int, int]  # width, height
+Resolution = tuple[int, int]  # width, height
 
 TCCGL = Transform(
     np.array([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=float),
@@ -55,9 +55,9 @@ class BatchRenderOutput:
     """
 
     rgbs: torch.Tensor
-    normals: Optional[torch.Tensor]
-    depths: Optional[torch.Tensor]
-    binary_masks: Optional[torch.Tensor]
+    normals: torch.Tensor | None
+    depths: torch.Tensor | None
+    binary_masks: torch.Tensor | None
 
 
 @dataclass
@@ -72,9 +72,9 @@ class WorkerRenderOutput:
 
     data_id: int
     rgb: torch.Tensor
-    normals: Optional[torch.Tensor]
-    depth: Optional[torch.Tensor]
-    binary_mask: Optional[torch.Tensor]
+    normals: torch.Tensor | None
+    depth: torch.Tensor | None
+    binary_mask: torch.Tensor | None
 
 
 @dataclass
@@ -87,20 +87,20 @@ class CameraRenderingData:
     """
 
     rgb: np.ndarray
-    normals: Optional[np.ndarray] = None
-    depth: Optional[np.ndarray] = None
-    binary_mask: Optional[np.ndarray] = None
+    normals: np.ndarray | None = None
+    depth: np.ndarray | None = None
+    binary_mask: np.ndarray | None = None
 
 
 @dataclass
 class Panda3dCameraData:
     K: np.ndarray
-    resolution: Tuple[int, int]
+    resolution: tuple[int, int]
     TWC: Transform = field(default_factory=default_transform)
     z_near: float = 0.1
     z_far: float = 10
     node_name: str = "camera"
-    positioning_function: Optional[NodeFunction] = None
+    positioning_function: NodeFunction | None = None
 
     def __post_init__(self):
         self.TWC = Transform(self.TWC)
@@ -151,18 +151,18 @@ class Panda3dLightData:
 
     light_type: str
     color: RgbaColor = (1.0, 1.0, 1.0, 1.0)
-    positioning_function: Optional[NodeFunction] = None
+    positioning_function: NodeFunction | None = None
 
 
 @dataclass
 class Panda3dObjectData:
     label: str
     TWO: Transform = field(default_factory=default_transform)
-    color: Optional[RgbaColor] = None
-    material: Optional[p3d.core.Material] = None
+    color: RgbaColor | None = None
+    material: p3d.core.Material | None = None
     remove_mesh_material: bool = False
     scale: float = 1
-    positioning_function: Optional[NodeFunction] = None
+    positioning_function: NodeFunction | None = None
 
     def __post_init__(self):
         if not isinstance(self.TWO, Transform):
@@ -200,7 +200,7 @@ class Panda3dCamera:
     def create(
         name: str,
         resolution: Resolution,
-        app: Optional[ShowBase] = None,
+        app: ShowBase | None = None,
     ) -> "Panda3dCamera":
         if app is None:
             app = base  # type: ignore # noqa: F821
