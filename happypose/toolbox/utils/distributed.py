@@ -18,7 +18,7 @@ import datetime
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import omegaconf
 
@@ -45,7 +45,7 @@ def get_tmp_dir() -> Path:
 
 def sync_config(
     cfg: omegaconf.dictconfig.DictConfig,
-    local_fields: List[str] = [],
+    local_fields: list[str] = [],
 ) -> omegaconf.dictconfig.DictConfig:
     cfg_path = get_tmp_dir() / "config.yaml"
     if get_rank() == 0:
@@ -83,7 +83,6 @@ def redirect_output() -> None:
         output_file = Path(os.environ["JOB_DIR"]) / f"stdout{rank}.out"
         sys.stdout = open(output_file, "w")
         sys.stderr = open(output_file, "w")
-    return
 
 
 def get_rank() -> int:
@@ -103,9 +102,9 @@ def get_world_size() -> int:
 
 
 def reduce_dict(
-    input_dict: Dict[str, Any],
+    input_dict: dict[str, Any],
     average: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """https://github.com/pytorch/vision/blob/master/references/detection/utils.py
     Args:
         input_dict (dict): all the values will be reduced

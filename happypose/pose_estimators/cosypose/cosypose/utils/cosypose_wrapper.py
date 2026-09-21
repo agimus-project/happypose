@@ -11,8 +11,6 @@
 - Deprecate this class when possible
 """
 
-from typing import Tuple, Union
-
 import torch
 
 from happypose.pose_estimators.cosypose.cosypose.config import EXP_DIR
@@ -87,8 +85,8 @@ class CosyPoseWrapper:
         self,
         dataset_name: str,
         model_type: str = "pbr",
-        object_dataset: Union[None, RigidObjectDataset] = None,
-        depth_refiner_type: Union[None, str] = None,
+        object_dataset: None | RigidObjectDataset = None,
+        depth_refiner_type: None | str = None,
         renderer_type: str = "panda3d",
         n_workers: int = 8,
         use_antialiasing: bool = True,
@@ -123,10 +121,10 @@ class CosyPoseWrapper:
         model_type: str,
         n_workers: int,
         renderer_type: str,
-        depth_refiner_type: Union[None, str],
+        depth_refiner_type: None | str,
         use_antialiasing: bool,
         p3d_preload_cache: bool,
-    ) -> Tuple[Detector, PoseEstimator, DepthRefiner]:
+    ) -> tuple[Detector, PoseEstimator, DepthRefiner]:
         """Return CosyPose detector and pose estimator objects for a given dataset.
 
         Args:
@@ -205,7 +203,7 @@ def get_renderer(
     n_workers: int,
     use_antialiasing: bool,
     p3d_preload_cache: bool,
-) -> Union[Panda3dBatchRenderer, BulletBatchRenderer]:
+) -> Panda3dBatchRenderer | BulletBatchRenderer:
     """
     Return a batch renderer.
 
@@ -239,7 +237,7 @@ def get_renderer(
 
 
 def get_depth_refiner(
-    depth_refiner_type: Union[None, str],
+    depth_refiner_type: None | str,
     mesh_db_batched: BatchedMeshes,
     renderer: Panda3dBatchRenderer,
 ) -> DepthRefiner:
@@ -275,9 +273,9 @@ def get_depth_refiner(
 def load_pose_models(
     coarse_run_id: str,
     refiner_run_id: str,
-    renderer: Union[Panda3dBatchRenderer, BulletBatchRenderer],
+    renderer: Panda3dBatchRenderer | BulletBatchRenderer,
     mesh_db_batched: BatchedMeshes,
-) -> Tuple[PosePredictor, PosePredictor]:
+) -> tuple[PosePredictor, PosePredictor]:
     coarse_model = load_model_cosypose(
         EXP_DIR / coarse_run_id, renderer, mesh_db_batched, device
     )
