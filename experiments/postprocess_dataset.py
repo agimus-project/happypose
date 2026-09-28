@@ -42,7 +42,6 @@ def process_key(key, ds_dir, stoi_obj, out_dir):
             gt_n["obj_id"] = stoi_obj[gt_n["obj_id"]]
         gt = [inout._gt_as_json(d) for d in gt]
         inout.save_json(out_dir / f"{key}.gt.json", gt)
-    return
 
 
 def process_keys(keys, *args):

@@ -2,8 +2,6 @@ import os
 from pathlib import Path
 
 # Standard Library
-from typing import Dict
-
 import pytest
 import torch
 
@@ -62,7 +60,7 @@ class TestCosyPoseEvaluation:
         # Iterate over each dataset
         for ds_name in self.cfg.ds_names:
             # create the EvalConfig objects that we will call `run_eval` on
-            eval_configs: Dict[str, EvalConfig] = {}
+            eval_configs: dict[str, EvalConfig] = {}
             for (
                 detection_type,
                 coarse_estimation_type,

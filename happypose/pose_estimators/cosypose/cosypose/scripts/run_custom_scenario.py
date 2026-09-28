@@ -103,7 +103,6 @@ def save_scene_json(objects, cameras, results_scene_path):
 
     scene = {"objects": list_objects, "cameras": list_cameras}
     results_scene_path.write_text(json.dumps(scene))
-    return
 
 
 def main():

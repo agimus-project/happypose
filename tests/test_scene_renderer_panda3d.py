@@ -2,7 +2,6 @@
 
 import os
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import pytest
@@ -81,7 +80,7 @@ class TestPanda3DSceneRenderer:
             asset_dataset=self.asset_dataset, use_antialiasing=use_antialiasing
         )
 
-        renderings: List[CameraRenderingData] = renderer.render_scene(
+        renderings: list[CameraRenderingData] = renderer.render_scene(
             self.object_datas,
             self.camera_datas,
             self.light_datas,

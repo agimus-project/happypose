@@ -16,7 +16,6 @@ limitations under the License.
 
 # Standard Library
 from collections import defaultdict
-from typing import Dict, Optional
 
 # Third Party
 import torch
@@ -84,8 +83,8 @@ class PredictionRunner:
         pose_estimator: PoseEstimator,
         obs_tensor: ObservationTensor,
         detections: DetectionsType,
-        initial_estimates: Optional[PoseEstimatesType] = None,
-    ) -> Dict[str, PoseEstimatesType]:
+        initial_estimates: PoseEstimatesType | None = None,
+    ) -> dict[str, PoseEstimatesType]:
         """Runs inference pipeline, extracts the results.
 
         Returns: A dict with keys
@@ -166,7 +165,7 @@ class PredictionRunner:
 
     def get_predictions(
         self, pose_estimator: PoseEstimator
-    ) -> Dict[str, PoseEstimatesType]:
+    ) -> dict[str, PoseEstimatesType]:
         """Runs predictions
 
         Returns: A dict with keys

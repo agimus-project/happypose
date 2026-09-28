@@ -7,7 +7,6 @@ import random
 import re
 import zipfile
 from pathlib import Path
-from typing import Set
 
 import httpx
 from bs4 import BeautifulSoup
@@ -477,7 +476,7 @@ class Flags:
     def __init__(self, flags: [str]):
         # only '--exclude' were used before so this is the only flag currently usable
         # if you need to use other flags, feel free to implement them here
-        self.exclude_set: Set[str] = set()
+        self.exclude_set: set[str] = set()
 
         parser = argparse.ArgumentParser("Flags parsing")
         parser.add_argument("--exclude", default="", type=str)

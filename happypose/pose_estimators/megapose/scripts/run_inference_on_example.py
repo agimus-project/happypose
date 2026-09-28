@@ -2,7 +2,6 @@
 import argparse
 import os
 from pathlib import Path
-from typing import Dict
 
 # Third Party
 import torch
@@ -42,7 +41,7 @@ def setup_pose_estimator(model_name: str, object_dataset: RigidObjectDataset):
 
 def run_inference(
     pose_estimator: PoseEstimator,
-    model_info: Dict,
+    model_info: dict,
     observation: ObservationTensor,
     detections: DetectionsType,
 ) -> None:

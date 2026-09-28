@@ -15,8 +15,8 @@ docs = [
 
 [project]
 authors = [
-  {name = "Elliot Maître"},
-  {name = "Yann Labbé"}
+  { name = "Elliot Maître" },
+  { name = "Yann Labbé" }
 ]
 classifiers = ["License :: OSI Approved :: BSD License"]
 dependencies = [
@@ -56,7 +56,7 @@ dependencies = [
 ]
 description = "Toolbox and trackers for object pose-estimation"
 maintainers = [
-  {email = "guilhem.saurel@laas.fr", name = "Guilhem Saurel"}
+  { email = "guilhem.saurel@laas.fr", name = "Guilhem Saurel" }
 ]
 name = "happypose"
 readme = "README.md"
@@ -105,13 +105,13 @@ all = true
 [tool.uv]
 conflicts = [
   [
-    {extra = "cpu"},
-    {extra = "cu124"}
+    { extra = "cpu" },
+    { extra = "cu124" }
   ]
 ]
 dependency-metadata = [
-  {name = "torchnet", requires-dist = ["six", "visdom"]},
-  {name = "torchtnt", requires-dist = [
+  { name = "torchnet", requires-dist = ["six", "visdom"] },
+  { name = "torchtnt", requires-dist = [
     "fsspec",
     "numpy",
     "packaging",
@@ -122,7 +122,7 @@ dependency-metadata = [
     "tensorboard",
     "tqdm",
     "typing-extensions"
-  ]}
+  ] }
 ]
 
 [tool.uv.build-backend]
@@ -139,15 +139,15 @@ name = "pytorch-cu124"
 url = "https://download.pytorch.org/whl/cu124"
 
 [tool.uv.sources]
-bop-toolkit-lib = {git = "https://github.com/agimus-project/bop_toolkit"}
-cosypose = {workspace = true}
+bop-toolkit-lib = { git = "https://github.com/agimus-project/bop_toolkit" }
+cosypose = { workspace = true }
 torch = [
-  {extra = "cpu", index = "pytorch-cpu", marker = "platform_system != 'Darwin'"},
-  {extra = "cu124", index = "pytorch-cu124"}
+  { extra = "cpu", index = "pytorch-cpu", marker = "platform_system != 'Darwin'" },
+  { extra = "cu124", index = "pytorch-cu124" }
 ]
 torchvision = [
-  {extra = "cpu", index = "pytorch-cpu", marker = "platform_system != 'Darwin'"},
-  {extra = "cu124", index = "pytorch-cu124"}
+  { extra = "cpu", index = "pytorch-cpu", marker = "platform_system != 'Darwin'" },
+  { extra = "cu124", index = "pytorch-cu124" }
 ]
 
 [tool.uv.workspace]
