@@ -164,14 +164,12 @@ def convert_obj_to_gltf(obj_path):
     binormals_obj_path.unlink()
     if gltf_path.exists():
         gltf_path.unlink()
-    return
 
 
 def convert_obj_to_gltf_(obj_path):
     p = Process(target=convert_obj_to_gltf, args=(obj_path,))
     p.start()
     p.join()
-    return
 
 
 def convert_gltf(gltf_path):

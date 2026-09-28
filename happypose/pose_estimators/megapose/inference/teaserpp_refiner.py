@@ -15,7 +15,6 @@ limitations under the License.
 
 # Standard Library
 import time
-from typing import Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -190,10 +189,10 @@ class TeaserppRefiner(DepthRefiner):
     def refine_poses(
         self,
         predictions: PoseEstimatesType,
-        masks: Optional[torch.tensor] = None,
-        depth: Optional[torch.tensor] = None,
-        K: Optional[torch.tensor] = None,
-    ) -> Tuple[PoseEstimatesType, dict]:
+        masks: torch.tensor | None = None,
+        depth: torch.tensor | None = None,
+        K: torch.tensor | None = None,
+    ) -> tuple[PoseEstimatesType, dict]:
         """Runs Teaserpp refiner. See superclass DepthRefiner for full documentation.
 
         To generate correspondences for Teaser++ we use the following approach.

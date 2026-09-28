@@ -1,5 +1,3 @@
-from typing import Optional
-
 import numpy as np
 import pandas as pd
 import torch
@@ -31,7 +29,7 @@ class Detector(DetectorModule):
     def get_detections(
         self,
         observation: ObservationTensor,
-        detection_th: Optional[float] = None,
+        detection_th: float | None = None,
         output_masks: bool = False,
         mask_th: float = 0.8,
         one_instance_per_class: bool = False,

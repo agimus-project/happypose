@@ -25,7 +25,7 @@ import torch.distributed as dist
 from omegaconf import OmegaConf
 
 # MegaPose
-import happypose.pose_estimators.megapose.utils.hostlist as hostlist
+from happypose.pose_estimators.megapose.utils import hostlist
 from happypose.toolbox.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -75,7 +75,6 @@ def redirect_output():
         output_file = Path(os.environ["JOB_DIR"]) / f"stdout{rank}.out"
         sys.stdout = open(output_file, "w")
         sys.stderr = open(output_file, "w")
-    return
 
 
 def get_rank():

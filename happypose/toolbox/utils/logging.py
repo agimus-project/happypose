@@ -48,4 +48,3 @@ def set_logging_level(level):
                 logger.setLevel(logging.DEBUG)
     else:
         pass
-    return

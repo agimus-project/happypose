@@ -26,4 +26,3 @@ def apply_random_textures(body, texture_ids, per_link=False, np_random=np.random
                 physicsClientId=body._client.client_id,
                 specularColor=specular * np.ones(3),
             )
-    return

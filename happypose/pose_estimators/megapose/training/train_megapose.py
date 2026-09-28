@@ -18,7 +18,7 @@ import functools
 import os
 import time
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any
 
 # Third Party
 import numpy as np
@@ -155,7 +155,7 @@ def train_megapose(cfg: TrainingConfig) -> None:
 
     # Scene dataset
     def make_iterable_scene_dataset(
-        dataset_configs: List[DatasetConfig],
+        dataset_configs: list[DatasetConfig],
         deterministic: bool = False,
     ) -> IterableMultiSceneDataset:
         scene_dataset_iterators = []
@@ -298,10 +298,10 @@ def train_megapose(cfg: TrainingConfig) -> None:
     scaler = torch.cuda.amp.GradScaler()
 
     for epoch in range(start_epoch, cfg.n_epochs + 1):
-        meters_train: Dict[str, AverageValueMeter] = defaultdict(
+        meters_train: dict[str, AverageValueMeter] = defaultdict(
             lambda: AverageValueMeter(),
         )
-        meters_val: Dict[str, AverageValueMeter] = defaultdict(
+        meters_val: dict[str, AverageValueMeter] = defaultdict(
             lambda: AverageValueMeter(),
         )
 
@@ -338,7 +338,7 @@ def train_megapose(cfg: TrainingConfig) -> None:
 
                 optimizer.zero_grad()
 
-                debug_dict: Dict[str, Any] = {}
+                debug_dict: dict[str, Any] = {}
                 timer_forward = CudaTimer(enabled=cfg.cuda_timing)
                 timer_forward.start()
                 with torch.cuda.amp.autocast():

@@ -15,7 +15,6 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -53,29 +52,29 @@ class TrainingConfig(omegaconf.dictconfig.DictConfig):
     """
 
     # Datasets
-    train_datasets: List[DatasetConfig] = field(default_factory=lambda: [])
+    train_datasets: list[DatasetConfig] = field(default_factory=list)
     input_resize: Resolution = (540, 720)
-    val_datasets: List[DatasetConfig] = field(default_factory=lambda: [])
+    val_datasets: list[DatasetConfig] = field(default_factory=list)
     val_epoch_interval: int = 10
     split_objects_across_gpus: bool = True
-    n_max_objects: Optional[int] = None
+    n_max_objects: int | None = None
 
     # Meshes
     n_symmetries_batch: int = 32
-    resample_n_points: Optional[int] = None
+    resample_n_points: int | None = None
 
     # Data augmentation
     rgb_augmentation: bool = True
     background_augmentation: bool = True
     depth_augmentation: bool = False
     depth_augmentation_level: int = 2
-    min_area: Optional[float] = None
+    min_area: float | None = None
 
     # Run management
-    run_id: Optional[str] = None
-    resume_run_id: Optional[str] = None
-    run_id_pretrain: Optional[str] = None
-    save_dir: Optional[str] = None
+    run_id: str | None = None
+    resume_run_id: str | None = None
+    run_id_pretrain: str | None = None
+    save_dir: str | None = None
     run_comment: str = ""
     run_postfix: str = str(np.random.randint(int(1e6)))
     batch_size: int = 16
@@ -106,8 +105,8 @@ class TrainingConfig(omegaconf.dictconfig.DictConfig):
     # Hypotheses
     hypotheses_init_method: str = "refiner_gt+noise"
     n_hypotheses: int = 1
-    init_euler_deg_std: Tuple[float, float, float] = (15, 15, 15)
-    init_trans_std: Tuple[float, float, float] = (0.01, 0.01, 0.05)
+    init_euler_deg_std: tuple[float, float, float] = (15, 15, 15)
+    init_trans_std: tuple[float, float, float] = (0.01, 0.01, 0.05)
 
     # Optimizer
     optimizer: str = "adam"
@@ -141,5 +140,5 @@ class TrainingConfig(omegaconf.dictconfig.DictConfig):
     cuda_timing: bool = False
 
     # Infos
-    global_batch_size: Optional[int] = None
+    global_batch_size: int | None = None
     hardware: HardwareConfig = field(default_factory=HardwareConfig)
