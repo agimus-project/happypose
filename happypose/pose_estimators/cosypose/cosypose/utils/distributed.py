@@ -34,7 +34,6 @@ def redirect_output():
         output_file = Path(os.environ["JOB_DIR"]) / f"stdout{rank}.out"
         sys.stdout = open(output_file, "w")
         sys.stderr = open(output_file, "w")
-    return
 
 
 def get_rank():

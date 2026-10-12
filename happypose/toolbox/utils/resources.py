@@ -69,4 +69,3 @@ def assign_gpu():
     assert local_rank < len(device_ids)
     cuda_id = int(device_ids[local_rank])
     os.environ["CUDA_VISIBLE_DEVICES"] = str(cuda_id)
-    return
