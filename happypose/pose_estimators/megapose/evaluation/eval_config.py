@@ -15,7 +15,6 @@ limitations under the License.
 
 # Standard Library
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 # MegaPose
 from happypose.pose_estimators.megapose.inference.types import InferenceConfig
@@ -52,8 +51,8 @@ class EvalConfig:
 
     # Network
     detector_run_id: str = "bop_pbr"
-    coarse_run_id: Optional[str] = None
-    refiner_run_id: Optional[str] = None
+    coarse_run_id: str | None = None
+    refiner_run_id: str | None = None
 
     # Dataset
     ds_name: str = "ycbv.bop19"
@@ -62,19 +61,19 @@ class EvalConfig:
     inference: InferenceConfig = field(default_factory=InferenceConfig)
 
     # Run management
-    result_id: Optional[str] = None
+    result_id: str | None = None
     n_dataloader_workers: int = 8
     n_rendering_workers: int = 8
-    n_frames: Optional[int] = None
+    n_frames: int | None = None
     batch_size: int = 1
-    save_dir: Optional[str] = None
+    save_dir: str | None = None
     bsz_images: int = 256
     bsz_objects: int = 16
     skip_inference: bool = False
     skip_evaluation: bool = True
 
     # Infos
-    global_batch_size: Optional[int] = None
+    global_batch_size: int | None = None
     hardware: HardwareConfig = field(default_factory=HardwareConfig)
 
     # Debug
@@ -84,8 +83,8 @@ class EvalConfig:
 @dataclass
 class FullEvalConfig(EvalConfig):
     # Full eval
-    detection_coarse_types: Optional[List] = None
-    ds_names: Optional[List[str]] = None
+    detection_coarse_types: list | None = None
+    ds_names: list[str] | None = None
     run_bop_eval: bool = True
     eval_coarse_also: bool = False
     convert_only: bool = False
@@ -98,6 +97,6 @@ class BOPEvalConfig:
     split: str
     eval_dir: str
     method: str  # ['refiner/final', 'depth_refiner', etc.]
-    detection_method: Optional[str] = None
+    detection_method: str | None = None
     convert_only: bool = False
-    use_post_score: Optional[bool] = True
+    use_post_score: bool | None = True

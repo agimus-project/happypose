@@ -1,6 +1,5 @@
 import typing as tp
 from dataclasses import dataclass
-from typing import Dict, List
 
 from hydra.core.config_store import ConfigStore
 
@@ -16,7 +15,7 @@ class NodeConfig:
 @dataclass
 class SlurmQueueConfig(NodeConfig):
     partition: str
-    constraint: tp.Optional[str] = None
+    constraint: str | None = None
 
 
 @dataclass
@@ -32,31 +31,31 @@ class SlurmJobConfig(JobConfig):
     account: str
     qos: str
     time: str
-    additional_parameters: tp.Optional[Dict[str, tp.Any]]
+    additional_parameters: dict[str, tp.Any] | None
 
 
 @dataclass
 class CodeSnapshotConfig:
-    snapshot_dir: tp.Optional[str]
-    exclude_path: tp.Optional[str]
-    python_packages_dir: tp.Optional[List[str]] = None
+    snapshot_dir: str | None
+    exclude_path: str | None
+    python_packages_dir: list[str] | None = None
 
 
 @dataclass
 class JobEnvironmentConfig:
     conda_env: str
-    code_snapshot: tp.Optional[CodeSnapshotConfig] = None
-    env: tp.Optional[Dict[str, str]] = None
+    code_snapshot: CodeSnapshotConfig | None = None
+    env: dict[str, str] | None = None
 
 
 @dataclass
 class RunnerConfig:
     log_dir: str
     job_env: JobEnvironmentConfig
-    local_node: tp.Optional[NodeConfig]
-    local_job: tp.Optional[JobConfig]
-    slurm_queue: tp.Optional[SlurmQueueConfig]
-    slurm_job: tp.Optional[SlurmJobConfig]
+    local_node: NodeConfig | None
+    local_job: JobConfig | None
+    slurm_queue: SlurmQueueConfig | None
+    slurm_job: SlurmJobConfig | None
     use_slurm: bool = False
 
 

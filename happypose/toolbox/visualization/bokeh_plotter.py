@@ -19,7 +19,6 @@ from collections.abc import Iterator
 from hashlib import sha1
 from itertools import cycle
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 
 # Third Party
 import bokeh
@@ -38,8 +37,8 @@ from happypose.toolbox.visualization.utils import get_mask_from_rgb, image_to_np
 class BokehPlotter:
     def __init__(
         self,
-        dump_image_dir: Optional[Path] = None,
-        read_image_dir: Optional[Path] = None,
+        dump_image_dir: Path | None = None,
+        read_image_dir: Path | None = None,
         is_notebook: bool = True,
     ):
         """Used to plot images.
@@ -47,7 +46,7 @@ class BokehPlotter:
         Contains an internal state `source_map` holding pointers to image data.
         This can be useful for updating images in real-time without re-creating figures.
         """
-        self.source_map: Dict[str, bokeh.models.sources.ColumnDataSource] = {}
+        self.source_map: dict[str, bokeh.models.sources.ColumnDataSource] = {}
         self.dump_image_dir = dump_image_dir
         self.read_image_dir = read_image_dir
         if is_notebook:
@@ -58,13 +57,13 @@ class BokehPlotter:
         return cycle(sns.color_palette(n_colors=40).as_hex())
 
     @property
-    def colors(self) -> Iterator[Tuple[float, float, float]]:
+    def colors(self) -> Iterator[tuple[float, float, float]]:
         return cycle(sns.color_palette(n_colors=40))
 
     def get_source(
         self,
         name: str,
-    ) -> Tuple[bokeh.models.sources.ColumnDataSource, bool]:
+    ) -> tuple[bokeh.models.sources.ColumnDataSource, bool]:
         if name in self.source_map:
             source = self.source_map[name]
             new = False
@@ -76,8 +75,8 @@ class BokehPlotter:
 
     def plot_image(
         self,
-        im: Union[torch.Tensor, np.ndarray],
-        figure: Optional[bokeh.plotting.figure] = None,
+        im: torch.Tensor | np.ndarray,
+        figure: bokeh.plotting.figure | None = None,
         name: str = "image",
     ) -> bokeh.plotting.figure:
         im_np = image_to_np_uint8(im)
@@ -117,7 +116,7 @@ class BokehPlotter:
         self,
         rgb_input: np.ndarray,
         rgb_rendered: np.ndarray,
-        figure: Optional[bokeh.plotting.figure] = None,
+        figure: bokeh.plotting.figure | None = None,
     ) -> bokeh.plotting.figure:
         """Overlays observed and rendered images.
 
@@ -144,8 +143,8 @@ class BokehPlotter:
         self,
         f: bokeh.plotting.figure,
         detections: PandasTensorCollection,
-        colors: Union[str, List[str]] = "red",
-        text: Optional[Union[str, list[str]]] = None,
+        colors: str | list[str] = "red",
+        text: str | list[str] | None = None,
         text_auto: bool = True,
         text_font_size: str = "8pt",
         line_width: int = 2,
