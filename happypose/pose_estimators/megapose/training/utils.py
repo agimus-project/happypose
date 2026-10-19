@@ -15,8 +15,8 @@ limitations under the License.
 
 # Standard Library
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Optional
 
 # Third Party
 import simplejson as json
@@ -49,7 +49,7 @@ def cast_to_numpy(obj, dtype=None):
     return obj
 
 
-def cast_images(rgb: torch.Tensor, depth: Optional[torch.Tensor]) -> torch.Tensor:
+def cast_images(rgb: torch.Tensor, depth: torch.Tensor | None) -> torch.Tensor:
     """Convert rgb and depth to a single to cuda FloatTensor.
 
     Arguments:
@@ -116,7 +116,7 @@ def make_optimizer(
     parameters,  # : Iterator[torch.nn.Parameter],
     cfg: TrainingConfig,
 ) -> torch.optim.Optimizer:
-    optimizer: Optional[torch.optim.Optimizer] = None
+    optimizer: torch.optim.Optimizer | None = None
     if cfg.optimizer == "adam":
         optimizer = torch.optim.Adam(
             parameters,
@@ -209,10 +209,8 @@ def write_logs(cfg, model, epoch, log_dict=None, test_dict=None, bokeh_docs=None
         for ds_name, ds_errors in test_dict.items():
             ds_errors["epoch"] = epoch
             with open(save_dir / f"errors_{ds_name}.txt", "a") as f:
-                f.write(json.dumps(test_dict[ds_name], ignore_nan=True) + "\n")
+                f.write(json.dumps(ds_errors, ignore_nan=True) + "\n")
         logger.info(test_dict)
-
-    return
 
 
 class SimpleTimer:

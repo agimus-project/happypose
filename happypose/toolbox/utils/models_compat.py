@@ -23,5 +23,5 @@ def change_keys_of_older_models(state_dict):
             new_k = "views_logits_head." + k[len("backbone.head.0.") :]
         else:
             new_k = k
-        new_state_dict[new_k] = state_dict[k]
+        new_state_dict[new_k] = _v
     return new_state_dict
