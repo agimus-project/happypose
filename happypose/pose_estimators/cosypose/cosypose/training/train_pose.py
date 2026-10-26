@@ -92,7 +92,7 @@ def log(config, model, log_dict, test_dict, epoch):
         for ds_name, ds_errors in test_dict.items():
             ds_errors["epoch"] = epoch
             with open(save_dir / f"errors_{ds_name}.txt", "a") as f:
-                f.write(json.dumps(test_dict[ds_name], ignore_nan=True) + "\n")
+                f.write(json.dumps(ds_errors, ignore_nan=True) + "\n")
 
     logger.info(config.run_id)
     logger.info(log_dict)
