@@ -18,7 +18,6 @@ import dataclasses
 import random
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
 
 # Third Party
 import cv2
@@ -44,10 +43,7 @@ class SceneObservationTransform:
 class SceneObservationAugmentation(SceneObservationTransform):
     def __init__(
         self,
-        transform: Union[
-            SceneObservationTransform,
-            List["SceneObservationAugmentation"],
-        ],
+        transform: SceneObservationTransform | list["SceneObservationAugmentation"],
         p: float = 1.0,
     ):
         self.p = p
@@ -68,7 +64,7 @@ class PillowRGBTransform(SceneObservationTransform):
     def __init__(
         self,
         pillow_fn: PIL.ImageEnhance._Enhance,
-        factor_interval: Tuple[float, float],
+        factor_interval: tuple[float, float],
     ):
         self.pillow_fn = pillow_fn
         self.factor_interval = factor_interval
@@ -83,7 +79,7 @@ class PillowRGBTransform(SceneObservationTransform):
 
 
 class PillowSharpness(PillowRGBTransform):
-    def __init__(self, factor_interval: Tuple[float, float] = (0.0, 50.0)):
+    def __init__(self, factor_interval: tuple[float, float] = (0.0, 50.0)):
         super().__init__(
             pillow_fn=ImageEnhance.Sharpness,
             factor_interval=factor_interval,
@@ -91,7 +87,7 @@ class PillowSharpness(PillowRGBTransform):
 
 
 class PillowContrast(PillowRGBTransform):
-    def __init__(self, factor_interval: Tuple[float, float] = (0.2, 50.0)):
+    def __init__(self, factor_interval: tuple[float, float] = (0.2, 50.0)):
         super().__init__(
             pillow_fn=ImageEnhance.Contrast,
             factor_interval=factor_interval,
@@ -99,7 +95,7 @@ class PillowContrast(PillowRGBTransform):
 
 
 class PillowBrightness(PillowRGBTransform):
-    def __init__(self, factor_interval: Tuple[float, float] = (0.1, 6.0)):
+    def __init__(self, factor_interval: tuple[float, float] = (0.1, 6.0)):
         super().__init__(
             pillow_fn=ImageEnhance.Brightness,
             factor_interval=factor_interval,
@@ -107,12 +103,12 @@ class PillowBrightness(PillowRGBTransform):
 
 
 class PillowColor(PillowRGBTransform):
-    def __init__(self, factor_interval: Tuple[float, float] = (0, 20.0)):
+    def __init__(self, factor_interval: tuple[float, float] = (0, 20.0)):
         super().__init__(pillow_fn=ImageEnhance.Color, factor_interval=factor_interval)
 
 
 class PillowBlur(SceneObservationTransform):
-    def __init__(self, factor_interval: Tuple[int, int] = (1, 3)):
+    def __init__(self, factor_interval: tuple[int, int] = (1, 3)):
         self.factor_interval = factor_interval
 
     def __call__(self, obs: SceneObservation) -> SceneObservation:
@@ -233,8 +229,8 @@ class DepthEllipseDropoutTransform(DepthTransform):
     @staticmethod
     def generate_random_ellipses(
         depth_img: np.ndarray,
-        noise_params: Dict[str, float],
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        noise_params: dict[str, float],
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         # Sample number of ellipses to dropout
         num_ellipses_to_dropout = np.random.poisson(
             noise_params["ellipse_dropout_mean"],
@@ -269,7 +265,7 @@ class DepthEllipseDropoutTransform(DepthTransform):
     @staticmethod
     def dropout_random_ellipses(
         depth_img: np.ndarray,
-        noise_params: Dict[str, float],
+        noise_params: dict[str, float],
     ) -> np.ndarray:
         """Randomly drop a few ellipses in the image for robustness.
 
@@ -384,7 +380,7 @@ class DepthEllipseNoiseTransform(DepthTransform):
 
 
 class DepthBlurTransform(DepthTransform):
-    def __init__(self, factor_interval: Tuple[int, int] = (3, 7)):
+    def __init__(self, factor_interval: tuple[int, int] = (3, 7)):
         self.factor_interval = factor_interval
 
     def _transform_depth(self, depth: np.ndarray) -> np.ndarray:

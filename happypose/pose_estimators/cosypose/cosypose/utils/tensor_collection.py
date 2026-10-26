@@ -72,7 +72,6 @@ class TensorCollection:
 
     def __setstate__(self, state):
         self.__init__(**state["tensors"])
-        return
 
     def __setattr__(self, name, value):
         if "_tensors" not in self.__dict__:
@@ -179,4 +178,3 @@ class PandasTensorCollection(TensorCollection):
     def __setstate__(self, state):
         self.__init__(state["infos"], **state["tensors"])
         self.meta = state["meta"]
-        return
