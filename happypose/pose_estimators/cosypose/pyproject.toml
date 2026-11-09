@@ -7,12 +7,12 @@ requires = [
 
 [project]
 authors = [
-  {name = "Yann Labbé"}
+  { name = "Yann Labbé" }
 ]
 classifiers = ["License :: OSI Approved :: BSD License"]
 description = "CosyPose C extension"
 maintainers = [
-  {email = "guilhem.saurel@laas.fr", name = "Guilhem Saurel"}
+  { email = "guilhem.saurel@laas.fr", name = "Guilhem Saurel" }
 ]
 name = "cosypose"
 readme = "README.md"

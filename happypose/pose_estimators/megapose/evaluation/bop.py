@@ -47,7 +47,7 @@ from happypose.toolbox.utils.tensor_collection import (
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Third Party
-from bop_toolkit_lib import inout  # noqa
+from bop_toolkit_lib import inout
 
 
 def main():
@@ -98,7 +98,6 @@ def convert_results_to_coco(results_path, out_json_path, detection_method):
         )
         infos.append(info)
     Path(out_json_path).write_text(json.dumps(infos))
-    return
 
 
 def convert_results_to_bop(

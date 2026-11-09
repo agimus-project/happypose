@@ -17,7 +17,6 @@ limitations under the License.
 
 # Standard Library
 from pathlib import Path
-from typing import Optional, Tuple
 
 # Third Party
 import bokeh
@@ -61,9 +60,9 @@ def to_rgba(im: np.ndarray) -> np.ndarray:
 def plot_image(
     im: np.ndarray,
     tools: str = "",
-    im_size: Optional[Resolution] = None,
-    figure: Optional[bokeh.plotting.figure] = None,
-) -> Tuple[bokeh.plotting.figure, bokeh.models.sources.ColumnDataSource]:
+    im_size: Resolution | None = None,
+    figure: bokeh.plotting.figure | None = None,
+) -> tuple[bokeh.plotting.figure, bokeh.models.sources.ColumnDataSource]:
     if np.asarray(im).ndim == 2:
         gray = True
     else:
@@ -108,7 +107,7 @@ def image_figure(
     source: bokeh.models.sources.ColumnDataSource,
     im_size: Resolution = (240, 320),
     gray: bool = False,
-    figure: Optional[bokeh.plotting.figure] = None,
+    figure: bokeh.plotting.figure | None = None,
 ) -> bokeh.plotting.figure:
     # NOTE: Remove this function ?
     h, w = im_size
