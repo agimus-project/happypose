@@ -17,7 +17,6 @@ limitations under the License.
 import copy
 import os
 from pathlib import Path
-from typing import Dict, Tuple
 
 # Third Party
 from omegaconf import OmegaConf
@@ -72,7 +71,7 @@ def create_eval_cfg(
     detection_type: str,
     coarse_estimation_type: str,
     ds_name: str,
-) -> Tuple[str, EvalConfig]:
+) -> tuple[str, EvalConfig]:
     cfg = copy.deepcopy(cfg)
 
     cfg.inference.detection_type = detection_type
@@ -85,9 +84,7 @@ def create_eval_cfg(
         ds_name_root = cfg.ds_name.split(".")[0]
         if cfg.detector_run_id == "bop_pbr":
             cfg.detector_run_id = PBR_DETECTORS[ds_name_root]
-    elif detection_type == "gt":
-        pass
-    elif detection_type == "exte":
+    elif detection_type == "gt" or detection_type == "exte":
         pass
     else:
         msg = f"Unknown detector type {detection_type}"
@@ -113,7 +110,7 @@ def run_full_eval(cfg: FullEvalConfig) -> None:
     # Iterate over each dataset
     for ds_name in cfg.ds_names:
         # create the EvalConfig objects that we will call `run_eval` on
-        eval_configs: Dict[str, EvalConfig] = {}
+        eval_configs: dict[str, EvalConfig] = {}
         for detection_type, coarse_estimation_type in cfg.detection_coarse_types:
             name, cfg_ = create_eval_cfg(
                 cfg,

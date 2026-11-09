@@ -15,7 +15,6 @@ limitations under the License.
 
 # Standard Library
 import json
-from typing import List, Optional, Tuple
 
 # Third Party
 import numpy as np
@@ -66,7 +65,7 @@ def keep_bop19(ds: SceneDataset) -> SceneDataset:
 def make_scene_dataset(
     ds_name: str,
     load_depth: bool = False,
-    n_frames: Optional[int] = None,
+    n_frames: int | None = None,
 ) -> SceneDataset:
     # BOP challenge splits
     if ds_name == "hb.bop19":
@@ -253,12 +252,7 @@ def make_scene_dataset(
 def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     # BOP original models
 
-    if ds_name == "tless":
-        ds: RigidObjectDataset = BOPObjectDataset(
-            BOP_DS_DIR / "tless/models_cad",
-            label_format="tless-{label}",
-        )
-    elif ds_name == "tless.cad":
+    if ds_name == "tless" or ds_name == "tless.cad":
         ds: RigidObjectDataset = BOPObjectDataset(
             BOP_DS_DIR / "tless/models_cad",
             label_format="tless-{label}",
@@ -384,7 +378,7 @@ def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     elif ds_name.startswith("shapenet."):
         ds_name = ds_name[len("shapenet.") :]
 
-        filters_list: List[str] = []
+        filters_list: list[str] = []
         if ds_name.startswith("filters="):
             filter_str = ds_name.split(".")[0]
             filters_list = filter_str.split("filters=")[1].split(",")
@@ -415,7 +409,7 @@ def make_object_dataset(ds_name: str) -> RigidObjectDataset:
     elif ds_name.startswith("gso."):
         ds_name = ds_name[len("gso.") :]
 
-        n_objects_: Optional[int] = None
+        n_objects_: int | None = None
         if ds_name.startswith("nobjects="):
             nobjects_str = ds_name.split(".")[0]
             n_objects_ = int(nobjects_str.split("=")[1])
@@ -505,7 +499,7 @@ def make_urdf_dataset(ds_name: str) -> RigidObjectDataset:
     return ds
 
 
-def get_obj_ds_info(ds_name: str) -> Tuple[Optional[str], str]:
+def get_obj_ds_info(ds_name: str) -> tuple[str | None, str]:
     urdf_ds_name = None  # Only used for bullet compatibility
     if ds_name == "ycbv.bop19":
         ds_name = "ycbv"

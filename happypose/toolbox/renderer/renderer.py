@@ -9,4 +9,3 @@ class Renderer(ABC):
     @abstractmethod
     def render(self, scene):
         """Render the scene and return an image."""
-        pass

@@ -538,7 +538,6 @@ def run_script(script, script_path, verbose=True):
         env=env,
         **VERBOSE_KWARGS[verbose],
     )
-    return
 
 
 @MEMORY.cache
@@ -758,7 +757,6 @@ def record_chunk(cfg, ds_dir, chunk_id):
             f"{chunk_id:06d}_" + "{image_id:06d}",
         )
         shutil.rmtree(output_dir)
-    return
 
 
 """
@@ -855,9 +853,7 @@ def main(cli_cfg):
     ds_dir = Path(cfg.ds_dir)
     if get_rank() == 0:
         if ds_dir.exists():
-            if cfg.resume_dataset is not None:
-                pass
-            elif cfg.chunk_ids is not None:
+            if cfg.resume_dataset is not None or cfg.chunk_ids is not None:
                 pass
             elif cfg.overwrite:
                 shutil.rmtree(cfg.ds_dir)
@@ -890,7 +886,6 @@ def main(cli_cfg):
         chunk_id = int(chunk_id)
         record_chunk(cfg, ds_dir, chunk_id)
     dist.barrier()
-    return
 
 
 if __name__ == "__main__":

@@ -14,7 +14,6 @@ limitations under the License.
 """
 
 # Standard Library
-from typing import Dict, Optional, Tuple
 
 # Third Party
 import cv2
@@ -244,9 +243,9 @@ class ICPRefiner(DepthRefiner):
     def refine_poses(
         self,
         predictions: PoseEstimatesType,
-        masks: Optional[torch.tensor] = None,
-        depth: Optional[torch.tensor] = None,
-        K: Optional[torch.tensor] = None,
+        masks: torch.tensor | None = None,
+        depth: torch.tensor | None = None,
+        K: torch.tensor | None = None,
         n_min_points=1000,
         min_measured_depth=0.2,
         max_measured_depth=5.0,
@@ -254,7 +253,7 @@ class ICPRefiner(DepthRefiner):
         tolerance=0.05,
         rejection_scale=2.5,
         num_levels=4,
-    ) -> Tuple[PoseEstimatesType, Dict]:
+    ) -> tuple[PoseEstimatesType, dict]:
         """Runs icp refinement. See superclass DepthRefiner for full documentation."""
         assert depth is not None
         assert K is not None

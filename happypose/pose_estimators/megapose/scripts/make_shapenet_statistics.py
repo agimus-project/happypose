@@ -42,12 +42,10 @@ def measure_memory(gltf_path):
     s = s.splitlines()
     mems = []
     for line in s:
-        if "GeomVertexData arrays occupy" in line:
-            print(line)
-            l_ = line.split(" ")
-            idx = next(n for n, w in enumerate(l_) if w == "occupy")
-            mems.append(float(l_[idx + 1]))
-        elif "GeomPrimitive arrays occupy" in line:
+        if (
+            "GeomVertexData arrays occupy" in line
+            or "GeomPrimitive arrays occupy" in line
+        ):
             print(line)
             l_ = line.split(" ")
             idx = next(n for n, w in enumerate(l_) if w == "occupy")
@@ -62,7 +60,6 @@ def measure_memory(gltf_path):
         "tot_mem_kb": tot_mem_kb,
     }
     (gltf_path.parent / "stats.json").write_text(json.dumps(stats))
-    return
 
 
 def measure_memory_(gltf_path):

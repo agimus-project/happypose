@@ -149,7 +149,6 @@ def compute_errors(preds, method, obj_dataset, max_sym_rot_step_deg=1):
 
 def create_plots(result_name):
     """Make the png figures from the."""
-    pass
 
 
 def create_default_object_pts():
