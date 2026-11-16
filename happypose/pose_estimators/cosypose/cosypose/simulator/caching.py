@@ -44,7 +44,7 @@ class BodyCache:
             gb_label[label] += 1
 
         for label, _n_instances in gb_label.items():
-            n_missing = gb_label[label] - len(self.cache[label])
+            n_missing = _n_instances - len(self.cache[label])
             for _n in range(n_missing):
                 self._load_body(label)
 

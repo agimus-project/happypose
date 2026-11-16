@@ -15,7 +15,7 @@ limitations under the License.
 
 # Standard Library
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 # Third Party
 import torch
@@ -78,8 +78,8 @@ def get_save_dir(cfg: EvalConfig) -> Path:
 
 def run_eval(
     cfg: EvalConfig,
-    save_dir: Optional[Path] = None,
-) -> Dict[str, Any]:
+    save_dir: Path | None = None,
+) -> dict[str, Any]:
     """Run eval for a single setting on a single dataset.
 
     A single setting is a (detection_type, coarse_estimation_type) such
@@ -171,7 +171,7 @@ def run_eval(
 
     if cfg.inference.run_depth_refiner:
         if cfg.inference.depth_refiner == "icp":
-            depth_refiner: Optional[DepthRefiner] = ICPRefiner(mesh_db, renderer)
+            depth_refiner: DepthRefiner | None = ICPRefiner(mesh_db, renderer)
         elif cfg.inference.depth_refiner == "teaserpp":
             from happypose.pose_estimators.megapose.inference.teaserpp_refiner import (
                 TeaserppRefiner,

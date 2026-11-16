@@ -22,7 +22,6 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import partial
-from typing import Dict, List, Set
 
 import numpy as np
 import panda3d as p3d
@@ -49,7 +48,7 @@ from .utils import make_rgb_texture_normal_map, np_to_lmatrix4
 
 @dataclass
 class Panda3dDebugData:
-    timings: Dict[str, float]
+    timings: dict[str, float]
 
 
 class App(ShowBase):
@@ -108,7 +107,7 @@ class App(ShowBase):
 def make_scene_lights(
     ambient_light_color: RgbaColor = (0.1, 0.1, 0.1, 1.0),
     point_lights_color: RgbaColor = (0.4, 0.4, 0.4, 1.0),
-) -> List[Panda3dLightData]:
+) -> list[Panda3dLightData]:
     """Creates 1 ambient light + 6 point lights to illuminate a panda3d scene."""
     pos = np.array(
         [
@@ -129,7 +128,6 @@ def make_scene_lights(
         radius = root_node.getBounds().radius
         xyz_ = pos * radius * 10
         light_node.setPos(tuple(xyz_.tolist()))
-        return
 
     light_datas = [Panda3dLightData(light_type="ambient", color=ambient_light_color)]
     for pos_n in pos:
@@ -153,18 +151,18 @@ class Panda3dSceneRenderer:
     def __init__(
         self,
         asset_dataset: RigidObjectDataset,
-        preload_labels: Set[str] = set(),
+        preload_labels: set[str] = set(),
         debug: bool = False,
         verbose: bool = False,
         use_antialiasing: bool = True,
     ):
         self._asset_dataset = asset_dataset
-        self._label_to_node: Dict[str, p3d.core.NodePath] = {}
+        self._label_to_node: dict[str, p3d.core.NodePath] = {}
         self.verbose = verbose
         self.debug = debug
         self.debug_data = Panda3dDebugData(timings={})
 
-        self._cameras_pool: Dict[Resolution, List[Panda3dCamera]] = defaultdict(list)
+        self._cameras_pool: dict[Resolution, list[Panda3dCamera]] = defaultdict(list)
         if hasattr(builtins, "base"):
             self._app = builtins.base  # type: ignore
         else:
@@ -187,10 +185,10 @@ class Panda3dSceneRenderer:
         self._cameras_pool[resolution].append(cam)
         return cam
 
-    def get_cameras(self, data_cameras: List[Panda3dCameraData]) -> List[Panda3dCamera]:
-        resolution_to_data_cameras: Dict[
+    def get_cameras(self, data_cameras: list[Panda3dCameraData]) -> list[Panda3dCamera]:
+        resolution_to_data_cameras: dict[
             Resolution,
-            List[Panda3dCameraData],
+            list[Panda3dCameraData],
         ] = defaultdict(list)
         for data_camera in data_cameras:
             resolution_to_data_cameras[data_camera.resolution].append(data_camera)
@@ -236,8 +234,8 @@ class Panda3dSceneRenderer:
     def setup_scene(
         self,
         root_node: p3d.core.NodePath,
-        data_objects: List[Panda3dObjectData],
-    ) -> List[p3d.core.NodePath]:
+        data_objects: list[Panda3dObjectData],
+    ) -> list[p3d.core.NodePath]:
         obj_nodes = []
         for n, data_obj in enumerate(data_objects):
             label = data_obj.label
@@ -258,8 +256,8 @@ class Panda3dSceneRenderer:
     def setup_cameras(
         self,
         root_node: p3d.core.NodePath,
-        data_cameras: List[Panda3dCameraData],
-    ) -> List[Panda3dCamera]:
+        data_cameras: list[Panda3dCameraData],
+    ) -> list[Panda3dCamera]:
         cameras = self.get_cameras(data_cameras)
 
         for data_camera, camera in zip(data_cameras, cameras):
@@ -276,10 +274,10 @@ class Panda3dSceneRenderer:
 
     def render_images(
         self,
-        cameras: List[Panda3dCamera],
+        cameras: list[Panda3dCamera],
         copy_arrays: bool = True,
         render_depth: bool = False,
-    ) -> List[CameraRenderingData]:
+    ) -> list[CameraRenderingData]:
         self._app.graphicsEngine.renderFrame()
         self._app.graphicsEngine.syncFrame()
 
@@ -298,8 +296,8 @@ class Panda3dSceneRenderer:
     def setup_lights(
         self,
         root_node: p3d.core,
-        light_datas: List[Panda3dLightData],
-    ) -> List[p3d.core.NodePath]:
+        light_datas: list[Panda3dLightData],
+    ) -> list[p3d.core.NodePath]:
         light_node_paths = []
         for n, light_data in enumerate(light_datas):
             if light_data.light_type == "point":
@@ -323,15 +321,15 @@ class Panda3dSceneRenderer:
 
     def render_scene(
         self,
-        object_datas: List[Panda3dObjectData],
-        camera_datas: List[Panda3dCameraData],
-        light_datas: List[Panda3dLightData],
+        object_datas: list[Panda3dObjectData],
+        camera_datas: list[Panda3dCameraData],
+        light_datas: list[Panda3dLightData],
         render_normals: bool = False,
         render_depth: bool = False,
         render_binary_mask: bool = False,
         copy_arrays: bool = True,
         clear: bool = True,
-    ) -> List[CameraRenderingData]:
+    ) -> list[CameraRenderingData]:
         if render_binary_mask:
             assert render_depth, "Binary mask can only be rendered if depth is rendered"
 
