@@ -1,5 +1,3 @@
-from typing import Dict, List, Union
-
 import numpy as np
 import pybullet as pb
 
@@ -25,7 +23,7 @@ from happypose.toolbox.renderer.types import CameraRenderingData
 class BulletSceneRenderer(BaseScene):
     def __init__(
         self,
-        asset_dataset: Union[RigidObjectDataset, UrdfDataset],
+        asset_dataset: RigidObjectDataset | UrdfDataset,
         preload_cache=False,
         background_color=(0, 0, 0),
         gpu_renderer=True,
@@ -69,10 +67,10 @@ class BulletSceneRenderer(BaseScene):
 
     def render_images(
         self,
-        cam_infos: Dict,
+        cam_infos: dict,
         render_depth: bool = False,
         render_binary_mask: bool = False,
-    ) -> List[CameraRenderingData]:
+    ) -> list[CameraRenderingData]:
         cam_renderings = []
         for cam_info in cam_infos:
             K = cam_info["K"]
@@ -111,11 +109,11 @@ class BulletSceneRenderer(BaseScene):
 
     def render_scene(
         self,
-        obj_infos: Dict,
-        cam_infos: Dict,
+        obj_infos: dict,
+        cam_infos: dict,
         render_depth=False,
         render_binary_mask=False,
-    ) -> List[CameraRenderingData]:
+    ) -> list[CameraRenderingData]:
         self.setup_scene(obj_infos)
         return self.render_images(
             cam_infos, render_depth=render_depth, render_binary_mask=render_binary_mask

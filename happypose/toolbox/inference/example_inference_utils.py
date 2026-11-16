@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import List, Tuple, Union
 
 import numpy as np
 from bokeh.io import export_png
@@ -51,7 +50,7 @@ def load_observation_example(
     rgb_name: str = "image_rgb.png",
     depth_name: str = "image_depth.png",
     scaling_factor: int = 1000,
-) -> Tuple[np.ndarray, Union[None, np.ndarray], CameraData]:
+) -> tuple[np.ndarray, None | np.ndarray, CameraData]:
     camera_data = CameraData.from_json((example_dir / camera_data_name).read_text())
 
     rgb = np.array(Image.open(example_dir / rgb_name), dtype=np.uint8)
@@ -76,7 +75,7 @@ def load_detections(
     return detections
 
 
-def load_object_data(data_path: Path) -> List[ObjectData]:
+def load_object_data(data_path: Path) -> list[ObjectData]:
     """"""
     object_data = json.loads(data_path.read_text())
     object_data = [ObjectData.from_json(d) for d in object_data]
@@ -104,7 +103,6 @@ def make_detections_visualization(
     export_png(fig_det, filename=output_fn)
 
     logger.info(f"Wrote detections visualization: {output_fn}")
-    return
 
 
 def save_predictions(
@@ -127,7 +125,7 @@ def save_predictions(
 def make_poses_visualization(
     rgb: np.ndarray,
     object_dataset: RigidObjectDataset,
-    object_datas: List[ObjectData],
+    object_datas: list[ObjectData],
     camera_data: CameraData,
     example_dir: Path,
 ) -> None:
@@ -176,4 +174,3 @@ def make_poses_visualization(
     export_png(fig_contour_overlay, filename=vis_dir / "contour_overlay.png")
     export_png(fig_all, filename=vis_dir / "all_results.png")
     logger.info(f"Wrote visualizations to {vis_dir}.")
-    return
