@@ -18,7 +18,7 @@ from __future__ import annotations
 # Standard Library
 import time
 from collections import defaultdict
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 # Third Party
 import numpy as np
@@ -55,10 +55,10 @@ class PoseEstimator(PoseEstimationModule):
 
     def __init__(
         self,
-        refiner_model: Optional[torch.nn.Module] = None,
-        coarse_model: Optional[torch.nn.Module] = None,
-        detector_model: Optional[torch.nn.Module] = None,
-        depth_refiner: Optional[DepthRefiner] = None,
+        refiner_model: torch.nn.Module | None = None,
+        coarse_model: torch.nn.Module | None = None,
+        detector_model: torch.nn.Module | None = None,
+        depth_refiner: DepthRefiner | None = None,
         bsz_objects: int = 8,
         bsz_images: int = 256,
         SO3_grid_size: int = 576,
@@ -105,7 +105,7 @@ class PoseEstimator(PoseEstimationModule):
         keep_all_outputs: bool = False,
         cuda_timer: bool = False,
         **refiner_kwargs,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
         """Runs the refiner model for the specified number of iterations.
 
         Will actually use the batched_model_predictions to stay within
@@ -221,7 +221,7 @@ class PoseEstimator(PoseEstimationModule):
         data_TCO: PoseEstimatesType,
         cuda_timer: bool = False,
         return_debug_data: bool = False,
-    ) -> Tuple[PoseEstimatesType, dict]:
+    ) -> tuple[PoseEstimatesType, dict]:
         """Score the estimates using the coarse model.
 
         Adds the 'pose_score' field to data_TCO.infos
@@ -326,7 +326,7 @@ class PoseEstimator(PoseEstimationModule):
         detections: DetectionsType,
         cuda_timer: bool = False,
         return_debug_data: bool = False,
-    ) -> Tuple[PoseEstimatesType, dict]:
+    ) -> tuple[PoseEstimatesType, dict]:
         """Generates pose hypotheses and scores them with the coarse model.
 
         - Generates coarse hypotheses using the SO(3) grid.
@@ -493,7 +493,7 @@ class PoseEstimator(PoseEstimationModule):
         self,
         observation: ObservationTensor,
         predictions: PoseEstimatesType,
-    ) -> Tuple[PoseEstimatesType, dict]:
+    ) -> tuple[PoseEstimatesType, dict]:
         """Runs the depth refiner."""
         assert self.depth_refiner is not None, "You must specify a depth refiner"
         depth = observation.depth
@@ -511,18 +511,18 @@ class PoseEstimator(PoseEstimationModule):
     def run_inference_pipeline(
         self,
         observation: ObservationTensor,
-        detections: Optional[DetectionsType] = None,
-        run_detector: Optional[bool] = None,
+        detections: DetectionsType | None = None,
+        run_detector: bool | None = None,
         n_refiner_iterations: int = 5,
         n_pose_hypotheses: int = 1,
         keep_all_refiner_outputs: bool = False,
         run_depth_refiner: bool = False,
-        bsz_images: Optional[int] = None,
-        bsz_objects: Optional[int] = None,
-        cuda_timer: Optional[bool] = False,
-        coarse_estimates: Optional[PoseEstimatesType] = None,
-        labels_to_keep: Optional[List[str]] = None,
-    ) -> Tuple[PoseEstimatesType, dict]:
+        bsz_images: int | None = None,
+        bsz_objects: int | None = None,
+        cuda_timer: bool | None = False,
+        coarse_estimates: PoseEstimatesType | None = None,
+        labels_to_keep: list[str] | None = None,
+    ) -> tuple[PoseEstimatesType, dict]:
         """Runs the entire pose estimation pipeline.
 
         Performs the following steps
